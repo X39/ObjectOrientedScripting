@@ -19,7 +19,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Concept", "Concept", "{5D8F86FF-A0FB-4916-A9EA-330753451618}"
 	ProjectSection(SolutionItems) = preProject
 		..\Concept\example.oos = ..\Concept\example.oos
-		..\Concept\example.oos.proj = ..\Concept\example.oos.proj
+		..\Concept\example.oosproj = ..\Concept\example.oosproj
 		..\Concept\example.sqf = ..\Concept\example.sqf
 		..\Concept\objectOrientedSQF.txt = ..\Concept\objectOrientedSQF.txt
 	EndProjectSection

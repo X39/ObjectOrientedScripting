@@ -48,7 +48,13 @@ reserved namespaces:
 	- SQF			-	Contains ALL native SQF functions (all SQF stuff is considered as function! Also, no validation is performed if it is correct)
 
 preprocessor directives:
-	- include <relativeFilepath>	-	Includes a files content to this spot
+	- include "<relativeFilepath>"							-	Includes a files content to this spot
+	- define <sequence> <replace>							-	Sets specific character sequence to be the following value
+	- define <sequence>(<arg1>,  <arg2>, <argN>)  <replace>	-	Sets specific character sequence to be the following value
+	- undefine <sequence>									-	Unsets given character sequence and thus preventing further replacement
+	- ifdef <define>										-	following code will only be processed if given define exists
+	- ifndef <define>										-	following code will only be processed if given define not exists
+	- else													-	part of if
 
 Entry Points:
 	function preInit()

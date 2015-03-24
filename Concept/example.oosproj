@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<project>
+		<title>exampleProject</title>
+		<author>X39</author>
+		<mainfile>./example.oos</mainfile>
+    <outputfolder>./Concept/output</outputfolder>
+    <buildfolder>./Concept/build</buildfolder>
+	</project>
+	<translator>
+		<version>1.0</version>
+	</translator>
+</root>
