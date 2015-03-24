@@ -6,6 +6,25 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF84C111-A032-4014-B391-640F9F144F0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wrapper", "Wrapper\Wrapper.csproj", "{A3B85D87-D67F-4C01-94A2-379CCA4EA094}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47} = {AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compiler.csproj", "{E8FB7167-440C-4708-A884-3D674EFD6179}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A3B85D87-D67F-4C01-94A2-379CCA4EA094} = {A3B85D87-D67F-4C01-94A2-379CCA4EA094}
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47} = {AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Concept", "Concept", "{5D8F86FF-A0FB-4916-A9EA-330753451618}"
+	ProjectSection(SolutionItems) = preProject
+		..\Concept\example.oos = ..\Concept\example.oos
+		..\Concept\example.oos.proj = ..\Concept\example.oos.proj
+		..\Concept\example.sqf = ..\Concept\example.sqf
+		..\Concept\objectOrientedSQF.txt = ..\Concept\objectOrientedSQF.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csproj", "{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,11 +36,22 @@ Global
 		{A3B85D87-D67F-4C01-94A2-379CCA4EA094}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3B85D87-D67F-4C01-94A2-379CCA4EA094}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3B85D87-D67F-4C01-94A2-379CCA4EA094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8FB7167-440C-4708-A884-3D674EFD6179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8FB7167-440C-4708-A884-3D674EFD6179}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8FB7167-440C-4708-A884-3D674EFD6179}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8FB7167-440C-4708-A884-3D674EFD6179}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A3B85D87-D67F-4C01-94A2-379CCA4EA094} = {CF84C111-A032-4014-B391-640F9F144F0A}
+		{E8FB7167-440C-4708-A884-3D674EFD6179} = {CF84C111-A032-4014-B391-640F9F144F0A}
+		{5D8F86FF-A0FB-4916-A9EA-330753451618} = {CF84C111-A032-4014-B391-640F9F144F0A}
+		{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47} = {CF84C111-A032-4014-B391-640F9F144F0A}
 	EndGlobalSection
 EndGlobal

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Reflection;
 
-namespace ObjectOrientedScripting
+namespace Wrapper
 {
     class Program
     {
@@ -14,11 +15,51 @@ namespace ObjectOrientedScripting
             foreach(string s in args)
                 Console.WriteLine(s);
             if (args.Length == 0)
+            {
+                Logger.log(Logger.LogLevel.ERROR, "No Parameter provided");
                 return;
+            }
             if (!File.Exists(args[0]))
+            {
+                Logger.log(Logger.LogLevel.ERROR, "Cannot open not existing file");
                 return;
-            Project proj = Project.openProject(args[0]);
-            //ToDo: Select Compiler
+            }
+            Project proj;
+            ICompiler compiler;
+            try
+            {
+                proj = Project.openProject(args[0]);
+            }
+            catch (Exception ex)
+            {
+                Logger.log(Logger.LogLevel.ERROR, "Failed to open Project file:");
+                Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
+                return;
+            }
+            try
+            {
+                //ToDo: Dont pick "default" compiler and instead pick by version number (need to scan filesystem for this + have a compiler rdy for usage ...)
+                Assembly assembly = Assembly.LoadFrom(@"D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Compiler\bin\Release\Compiler.dll");
+                Type type = assembly.GetType("Wrapper.Compiler", true);
+                compiler = (ICompiler)Activator.CreateInstance(type);
+            }
+            catch(Exception ex)
+            {
+                Logger.log(Logger.LogLevel.ERROR, "Failed to load compiler:");
+                Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
+                return;
+            }
+            try
+            {
+                compiler.Preprocess(proj);
+                compiler.Compile(proj);
+                compiler.Translate(proj);
+            }
+            catch (Exception ex)
+            {
+                Logger.log(Logger.LogLevel.ERROR, "Failed to patch project:");
+                Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
+            }
         }
     }
 }

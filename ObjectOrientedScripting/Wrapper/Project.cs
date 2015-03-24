@@ -3,7 +3,7 @@ using System.IO;
 using System.Xml;
 
 
-namespace ObjectOrientedScripting
+namespace Wrapper
 {
     public class Project
     {
@@ -39,8 +39,8 @@ namespace ObjectOrientedScripting
                 throw new ArgumentException("Provided parameter 'file' is null");
             if (!File.Exists(file))
                 throw new ArgumentException("Provided parameter 'file' is refering a not existing file");
-            if(!file.EndsWith(".oos.proj"))
-                throw new ArgumentException("Provided parameter 'file' is refering a to a non .oos.proj file");
+            if (!file.EndsWith(".oosproj"))
+                throw new ArgumentException("Provided parameter 'file' is refering a to a non .oosproj file");
             XmlDocument reader = new XmlDocument();
             reader.Load(file);
             XmlNode projectNode = reader.SelectSingleNode("/root/project");

@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace ObjectOrientedScripting
+namespace Wrapper
 {
-    interface Compiler
+    public interface ICompiler
     {
         Version getVersion();
-        void Run(Project proj);
+        void Translate(Project proj);
+        void Compile(Project proj);
+        void Preprocess(Project proj);
     }
 }
