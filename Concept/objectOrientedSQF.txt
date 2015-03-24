@@ -141,6 +141,20 @@ Control Structures:
 		//shorten if only
 		if(<condition>)
 			<singleCodeLine>;
+
+	try-catch-throw syntax:
+		//throw (to throw an exception in a control structure)
+		throw <messageAsString>
+		//try-catch
+		try
+		{
+			<codeCausingExceptions>
+		}
+		catch(<variableName>)
+		{
+			<codeHandlingExceptions>
+		}
+
 Definitions:
 	Class:
 		- A Class ALWAYS has a constructor (not existing constructor = empty constructor)
