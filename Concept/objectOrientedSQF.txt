@@ -1,0 +1,141 @@
+ObjectOrientedSQF - Syntax Document V1.0
+----------------------------------------
+
+allowed characters for names:
+	- A-Z			-	Everywhere
+	- a-z			-	Everywhere
+	- 0-9			-	Not at the very begining (0arr is not allowed, arr0 is)
+	- _				-	Everywhere
+
+reserved instructions:
+	- static		-	Used to declare a variable/function as "global" for the object (not local to the instance)
+	- public		-	Function/Variable is accessible from anywhere (default)
+	- protected		-	Function/Variable is accessible from children only
+	- private		-	Function/Variable is accessible only from this very object (children also wont be able to access it)
+	- var			-	Tells the translator that the following name is a variable
+	- function		-	Tells the translator that the following name is a function
+	- class			-	Tells the translator that a new class gets defined in the following scope
+	- new			-	Creates a new instance of an object/array
+	- return		-	Return out of a function
+	- if			-	if statement
+	- else			-	used in combination with if
+	- switch		-	switch statement
+	- case			-	used in combination with switch
+	- default		-	used in combination with switch
+	- for			-	for statement
+	- while			-	while statement
+	- do			-	used in combination with while
+	- namespace		-	used to create a new namespace instance
+	- this			-	self reference in an instance
+	- isset			-	isNil equivalence
+	- toString		-	str equivalence
+	- override		-	used to override a parents function (invalid if no parent present or parent does not has given function, also invalid if missing on overridden function)
+
+reserved characters:
+	- []			-	Array markers
+	- ()			-	ExecuteFirst brackets OR function parameter section
+	- {}			-	Scope range
+	- =				-	"Assign" operator (left takes value of right, in case of arrays left will get a reference only (use new for a copy))
+	- +-*/%			-	Arithmetical operators
+	- & | == && || !-	logical operators (&& and || are lazy evaluation operators)
+	- ?:			-	Short hand if (<condition> ? <returnWhenTrue> : <returnWhenFalse>)
+	- #				-	Preprocessor directive (if not first char besides tabs and whitespace then it is considered as error)
+	- //			-	Line comment
+	- /* */			-	Block comment
+	- /** */		-	Function/Variable/Class/Namespace comment (used for documentation, follows the JavaDocs syntax)
+
+reserved namespaces:
+	- SQF			-	Contains ALL native SQF functions (all SQF stuff is considered as function! Also, no validation is performed if it is correct)
+
+preprocessor directives:
+	- include <relativeFilepath>	-	Includes a files content to this spot
+
+Entry Points:
+	function preInit()
+	function postInit()
+
+Control Structures:
+	object syntax:
+		//define object
+		class <objectName> : <parentObject1>, <parentObject2> , <parentObjectN>
+		{
+			//Constructor
+			public function <objectName>(<arg1>,  <arg2>, <argN>)
+		}
+		//create new instance
+		new <objectName>(<arg1>,  <arg2>, <argN>)
+		//access stuff inside of an object
+		<objectName>.<something>
+	
+	namespace syntax:
+		//define namespace
+		namespace <namespaceName>
+		{
+			
+		}
+		//access stuff inside of an namespace
+		<namespaceName>::<something>
+	
+	function syntax:
+		<static|public> function <functionName>(<arg1>, <arg2>, <argN>)
+		{
+			
+		}
+	
+	variable syntax:
+		<static|public> var <variableName>
+	
+	switch syntax:
+		swtich(<state>)
+		{
+			case <state>:
+				break;
+			default:
+				break;
+		}
+	
+	for syntax:
+		for(<beforeLoop>;<exitCondition>;<endOfCycle>)
+		{
+			
+		}
+	
+	while syntax:
+		//check before code
+		while(<exitCondition>)
+		{
+			
+		}
+		//check after code
+		do
+		{
+			
+		}while(<exitCondition>);
+	
+	if syntax:
+		//full
+		if(<condition>)
+		{
+			
+		}
+		else
+		{
+			
+		}
+		//only if
+		if(<condition>)
+		{
+			
+		}
+		//shorten if full
+		if(<condition>)
+			<singleCodeLine>;
+		else
+			<singleCodeLine>;
+		//shorten if only
+		if(<condition>)
+			<singleCodeLine>;
+Definitions:
+	Class:
+		- A Class ALWAYS has a constructor (not existing constructor = empty constructor)
+		- A Constructor can be encapsulated as private/protected thus making it "impossible" to create an object outside of given function
