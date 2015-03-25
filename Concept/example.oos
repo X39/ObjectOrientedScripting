@@ -1,3 +1,9 @@
+#include "example.def"
+#define SOMEDEF //testmore
+
+SOMEDEF
+TEST6
+
 class cFoo
 {
 	public function foobar(someRandomArg)

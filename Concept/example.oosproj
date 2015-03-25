@@ -4,8 +4,8 @@
 		<title>exampleProject</title>
 		<author>X39</author>
 		<mainfile>./example.oos</mainfile>
-    <outputfolder>./Concept/output</outputfolder>
-    <buildfolder>./Concept/build</buildfolder>
+    <outputfolder>./output/</outputfolder>
+    <buildfolder>./build/</buildfolder>
 	</project>
 	<translator>
 		<version>1.0</version>
