@@ -23,6 +23,8 @@ reserved instructions:
 	- case			-	used in combination with switch
 	- default		-	used in combination with switch
 	- for			-	for statement
+	- foreach		-	for each element in array
+	- in			-	used in combination with foreach
 	- while			-	while statement
 	- do			-	used in combination with while
 	- namespace		-	used to create a new namespace instance
@@ -65,8 +67,9 @@ Control Structures:
 		//define object
 		class <objectName> : <parentObject1>, <parentObject2> , <parentObjectN>
 		{
+			//Magic Functions:
 			//Constructor
-			public function <objectName>(<arg1>,  <arg2>, <argN>)
+			<public|protected|private> function <objectName>(<arg1>,  <arg2>, <argN>)
 		}
 		//create new instance
 		new <objectName>(<arg1>,  <arg2>, <argN>)
@@ -83,13 +86,13 @@ Control Structures:
 		<namespaceName>::<something>
 	
 	function syntax:
-		<static|public> function <functionName>(<arg1>, <arg2>, <argN>)
+		<static|public|protected|private> function <functionName>(<arg1>, <arg2>, <argN>)
 		{
 			
 		}
 	
 	variable syntax:
-		<static|public> var <variableName>
+		<static|public|protected|private> var <variableName>
 	
 	switch syntax:
 		swtich(<state>)
