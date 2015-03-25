@@ -8,13 +8,19 @@ public class Logger
 {
     public enum LogLevel
     {
-        INFO     = "[INFO]   ",
-        WARNING  = "[WARNING]",
-        ERROR    = "[ERROR]  ",
-        CONTINUE = "         "
+        INFO = 0,
+        WARNING,
+        ERROR,
+        CONTINUE
     }
+    private static readonly string[] logLevelTranslated = {
+        "[INFO]   ",
+        "[WARNING]",
+        "[ERROR]  ",
+        "         "
+    };
     public static void log(LogLevel l, string msg)
     {
-        Console.WriteLine(l + "\t" + msg);
+        Console.WriteLine(logLevelTranslated[(int)l] + "\t" + msg);
     }
 }

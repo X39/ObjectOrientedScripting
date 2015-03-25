@@ -39,7 +39,7 @@ namespace Wrapper
             try
             {
                 //ToDo: Dont pick "default" compiler and instead pick by version number (need to scan filesystem for this + have a compiler rdy for usage ...)
-                Assembly assembly = Assembly.LoadFrom(@"D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Compiler\bin\Release\Compiler.dll");
+                Assembly assembly = Assembly.LoadFrom(@"D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Compiler\bin\Debug\Compiler.dll");
                 Type type = assembly.GetType("Wrapper.Compiler", true);
                 compiler = (ICompiler)Activator.CreateInstance(type);
             }

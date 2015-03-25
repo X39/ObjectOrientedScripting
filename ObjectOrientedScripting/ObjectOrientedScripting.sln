@@ -18,6 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Concept", "Concept", "{5D8F86FF-A0FB-4916-A9EA-330753451618}"
 	ProjectSection(SolutionItems) = preProject
+		..\Concept\example.def = ..\Concept\example.def
 		..\Concept\example.oos = ..\Concept\example.oos
 		..\Concept\example.oosproj = ..\Concept\example.oosproj
 		..\Concept\example.sqf = ..\Concept\example.sqf
