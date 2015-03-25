@@ -29,15 +29,20 @@
 	For simplicity, characters in strings are left uppercase
 	it should not matter at the end if they are upper or lower case!
 *)
-CodeInstruction = VariableAssignment, IfElse, For, ForEach, Switch, FunctionCall, Return;
-Identifier = (AlphabetCharacter | '_'), {AlphabetCharacter | NumberCharacter};
 AlphabetCharacter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z';
 NumberCharacter = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0';
-String = (('"' | "'"), ?All Characters?, ('"' | "'"));
-Scalar = (['-'], NumberCharacter, ['.', NumberCharacter]);
-Bool = ('TRUE', 'FALSE');
-Array = '{', {(Value | Array), [',']}, '}'
-Value = (String | Scalar | Bool | (Array, '[', NumberCharacter, ']', {'[', NumberCharacter, ']'}));
+Bool = 'TRUE' | 'FALSE';
+
+String = ('"', {AlphabetCharacter | NumberCharacter}, "'") | ("'", {AlphabetCharacter | NumberCharacter}, "'");
+Scalar = ['-'], NumberCharacter, [['.', NumberCharacter], {NumberCharacter}];
+Array = '{', [Value, {',', Value}], '}';
+Value = Identifier | FunctionCall | String | Scalar | Bool | (Array, {'[', NumberCharacter, ']'});
+
+Identifier = (AlphabetCharacter | '_'), {AlphabetCharacter | NumberCharacter};
+FunctionCall = Identifier, '(', [Identifier, {',', Identifier}], ')', ';';
+VariableAssignment = Identifier, ('=' | '+=' | '-=' | '++' | '--' | '*=' | '/=' | '^='), Value, ';';
+
+CodeInstruction = VariableAssignment, IfElse, For, ForEach, Switch, FunctionCall, Return;
 
 Programm =	{Namespace, Class, Function, Identifier}, ( ?Function 'preInit' as preInit entry point? | ?Function 'postInit' as postInit entry point? );
 Namespace =	'NAMESPACE', Identifier, '{', {Namespace, Class, Function, Identifier}, '}', {';'};
@@ -46,8 +51,6 @@ GlobalFunction = 'STATIC', 'FUNCTION', Identifier, '(', {Identifier}, ')', '{', 
 GlobalVariable = 'STATIC', 'VAR', Identifier, [VariableAssignment], ';';
 ClassFunction =	('STATIC' | 'PUBLIC' | 'PRIVATE' | 'PROTECTED'), 'FUNCTION', Identifier, '(', {Identifier}, ')', '{', {CodeInstruction}, '}', {';'};
 ClassVariable = ('STATIC' | 'PUBLIC' | 'PRIVATE' | 'PROTECTED'), 'VAR', Identifier, [VariableAssignment], ';';
-FunctionCall = Identifier, '(', {Identifier}, ')', ';';
-VariableAssignment = Identifier, ('=' | '+=' | '-=' | '++' | '--' | '*=' | '/='), {(Identifier | Value | FunctionCall)}, ';';
 IfElse = 'IF', '(', Expression, ')', (('{', {CodeInstruction}, '}') | CodeInstruction), ['ELSE', (('{', {CodeInstruction}, '}') | CodeInstruction)];
 Expression = ['('], (ConditionalExpression | Expression | Value | Identifier | FunctionCall), [('>' | '<' | '>=' | '<=' | '=='), (ConditionalExpression | Expression | Value | Identifier | FunctionCall), [')'], {(('&&' | '||'), Expression)}];
 ConditionalExpression = ['('], {(ConditionalExpression | Expression | Value | Identifier | FunctionCall)}, '?', (ConditionalExpression | Expression | Value | Identifier | FunctionCall), ':', (ConditionalExpression | Expression | Value | Identifier | FunctionCall), [')'];
