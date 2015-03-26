@@ -1,0 +1,8 @@
+class cBar : cFoo
+{
+	public function override foobar(someRandomArg)
+	{
+		super("superbar");
+		SQF::diag_log("class bar " + someRandomArg);
+	}
+}

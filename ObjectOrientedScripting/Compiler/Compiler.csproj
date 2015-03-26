@@ -40,6 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler.cs" />
+    <Compile Include="OOS LanguageObjects\IInstruction.cs" />
+    <Compile Include="OOS LanguageObjects\Namespace.cs" />
+    <Compile Include="OOS LanguageObjects\Scope.cs" />
     <Compile Include="PPDefine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

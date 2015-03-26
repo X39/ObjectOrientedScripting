@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Wrapper;
 using Compiler;
+using Compiler.OOS_LanguageObjects;
 using System.IO;
 
 namespace Wrapper
@@ -18,12 +19,29 @@ namespace Wrapper
         #region Translating
         public void Translate(Project proj)
         {
-            throw new NotImplementedException();
+            Namespace mainNamespace = new Namespace("oos", null);
+
+            //Read compiled file
+            StreamReader reader = new StreamReader(proj.Buildfolder + "_compile_.obj");
+            //TODO: parse file to object tree
+            reader.Close();
+
+            //Write namespace tree to disk
+            //TODO: write namespace tree to disk
         }
         #endregion
         #region Compiling
         public void Compile(Project proj)
         {
+            /*
+            //Make sure the build directory exists and create it if needed
+            if (!Directory.Exists(proj.Buildfolder))
+                Directory.CreateDirectory(proj.Buildfolder);
+            //Check if result file is existing, create it if it is not
+            if (!File.Exists(proj.Buildfolder + "_compile_.obj"))
+                File.Create(proj.Buildfolder + "_compile_.obj");
+             */
+            File.Move(proj.Buildfolder + "_preprocess_.obj", proj.Buildfolder + "_compile_.obj");
             Logger.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
         }
         #endregion

@@ -32,6 +32,7 @@ reserved instructions:
 	- isset			-	isNil equivalence
 	- toString		-	str equivalence
 	- override		-	used to override a parents function (invalid if no parent present or parent does not has given function, also invalid if missing on overridden function)
+	- native		-	used to directly execute one line of SQF code. Example: native _foo = 'bar';
 
 reserved characters:
 	- []			-	Array markers

@@ -1,0 +1,7 @@
+class cFoo
+{
+	public function foobar(someRandomArg)
+	{
+		SQF::diag_log("class foo " + someRandomArg);
+	}
+}
