@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wrapper;
+using Compiler;
 using System.IO;
 
 namespace Wrapper
@@ -29,8 +30,7 @@ namespace Wrapper
             if (!File.Exists(proj.Buildfolder + "_preprocess_.obj"))
                 File.Create(proj.Buildfolder + "_preprocess_.obj");
             StreamWriter writer = new StreamWriter(proj.Buildfolder + "_preprocess_.obj", false, Encoding.Unicode, 1024);
-            //ToDo: create Defines object to allow argument parsing and proper replacing (current method is too lazy and not solid enough)
-            Dictionary<string, string> defines = new Dictionary<string,string>();
+            Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
             preprocessFile(ifdefs, defines, proj, proj.Mainfile, writer);
             writer.Flush();
@@ -42,7 +42,7 @@ namespace Wrapper
             FALSE,
             IGNORE
         }
-        private void preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, string> defines, Project proj, string filePath, StreamWriter writer)
+        private void preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, PPDefine> defines, Project proj, string filePath, StreamWriter writer)
         {
             StreamReader reader = new StreamReader(filePath);
             string s;
@@ -61,9 +61,8 @@ namespace Wrapper
                     int i = ifdefs.Count - 1;
                     if (i >= 0 && ifdefs[i] != preprocessFile_IfDefModes.TRUE)
                         continue;
-                    //ToDo: Handle defines with arguments
-                    foreach (string key in defines.Keys)
-                        s = s.Replace(key, defines[key]);
+                    foreach (PPDefine def in defines.Values)
+                        s = def.replace(s);
                     writer.WriteLine(s);
                     continue;
                 }
@@ -91,8 +90,7 @@ namespace Wrapper
                             index2 = index = afterDefine.IndexOf('(');
                         if(index < 0)
                             index = afterDefine.Length;
-                        //ToDo: Handle defines with arguemnts
-                        defines.Add(afterDefine.Substring(0, index), afterDefine.Substring(index).TrimStart(new char[] { ' ' }));
+                        defines.Add(afterDefine.Substring(0, index), new PPDefine(afterDefine));
                         break;
                     case "#undefine":
                         defines.Remove(s.Substring(spaceIndex).Trim());
