@@ -59,18 +59,25 @@ namespace Compiler
         {
             string output = "";
             string word = "";
+            //Itterate through EVERY character (as we cant simply use the normal string.replace function we have to do it by ourself ...)
             for(int i = 0; i < input.Length; i++)
             {
                 char c = input[i];
-                if (!char.IsLetterOrDigit(c))
+                //check if our current character is a letter or number or _
+                if (!char.IsLetterOrDigit(c) && c != '_')
                 {
+                    //reset current word as we did not had the current define here and encountered a word terminator
                     output += word + c;
                     word = "";
                     continue;
                 }
+                //add current character to current word
                 word += c;
+                //check if current word matches our define
                 if(word.Equals(_name, StringComparison.Ordinal))
                 {
+                    //it matched our define
+                    //check if our current define has arguments and directly replace the word with current content if it has no
                     if(_arguments.Length == 0)
                     {
                         word = _value;
@@ -78,9 +85,13 @@ namespace Compiler
                         word = "";
                         continue;
                     }
+                    //we do have arguments so lets continue
+
                     i++;
+                    //make sure our word has arguments attached and throw an exception if not
                     if (input[i] != '(')
                         throw new Exception("encountered unexpected character while preprocessing, expected '(' but got '" + c + "'");
+                    //some variables to set before the for loop
                     string curValue = _value;
                     int curArg = 0;
                     word = "";
@@ -88,11 +99,15 @@ namespace Compiler
                     char ignoreStringChar = '\0';
                     bool ignoreString = false;
                     int backSlashCounter = 0;
+
+                    //Lets go and parse everything we can find that could be a part of our define
                     for (i++; i < input.Length; i++)
                     {
                         c = input[i];
+                        //check if we have an argument seperator here
                         if (c == ',' && counter == 1 && !ignoreString)
                         {
+                            //throw an expection if we have too many arguments for this define
                             if (curArg >= _arguments.Length)
                                 throw new Exception("encountered unexpected extra argument in define while preprocessing, allowed count is " + _arguments.Length);
                             curValue = curValue.Replace(_arguments[curArg], word);
@@ -100,8 +115,10 @@ namespace Compiler
                             curArg++;
                             continue;
                         }
+                        //check for the end of arguments here
                         if (c == ')' && counter == 1 && !ignoreString)
                         {
+                            //throw an expection if we have too many arguments for this define
                             if (curArg >= _arguments.Length)
                                 throw new Exception("encountered unexpected extra argument in define while preprocessing, allowed count is " + _arguments.Length);
                             curValue = curValue.Replace(_arguments[curArg], word);
@@ -109,31 +126,39 @@ namespace Compiler
                             counter--;
                             break;
                         }
+                        //add current character to current argument word
                         word += c;
                         if (ignoreString)
                         {
+                            //We are currently inside a string so lets ignore every possible character that could annoy us
                             if (c == ignoreStringChar && backSlashCounter % 2 == 0)
                             {
                                 ignoreString = false;
                                 ignoreStringChar = '\0';
                                 continue;
                             }
+                            //Add +1 to the backSlashCounter so we can make sure that we wont accidently exit the string too early and reset it if we dont have a backslash here
                             if (c == '\\')
                                 backSlashCounter++;
+                            else
+                                backSlashCounter = 0;
                         }
                         else
                         {
+                            //Check for string mode
                             if(c == '\'' || c == '"')
                             {
                                 ignoreString = true;
                                 ignoreStringChar = c;
                                 continue;
                             }
+                            //Check if we have another capsulation here, if we do add +1 to the counter
                             if (c == '(' || c == '{')
                             {
                                 counter++;
                                 continue;
                             }
+                            //End of an capsulation, if it is remove -1 from the counter
                             if (c == ')' || c == '}')
                             {
                                 counter--;
@@ -141,8 +166,9 @@ namespace Compiler
                             }
                         }
                     }
+                    //we exited the define with an invalid number of capsulations ... seems like something moved wrong here!
                     if (counter != 0)
-                        throw new Exception("Missing defines arguemnts end character");
+                        throw new Exception("Missing defines arguemnts end character in current line");
                     output += curValue;
                 }
             }

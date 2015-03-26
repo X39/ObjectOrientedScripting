@@ -25,6 +25,12 @@ namespace Wrapper
             set { this._author = value; }
             get { return this._author; }
         }
+        private string _pboName;
+        public string PboName
+        {
+            set { this._pboName = value; }
+            get { return this._pboName; }
+        }
         private string _mainfile;
         public string Mainfile
         {
@@ -94,6 +100,8 @@ namespace Wrapper
                          proj.OutputFolder = node.InnerText;
                 else if (node.Name.Equals("buildfolder", StringComparison.OrdinalIgnoreCase))
                          proj.Buildfolder = node.InnerText;
+                else if (node.Name.Equals("pboName", StringComparison.OrdinalIgnoreCase))
+                         proj.PboName = node.InnerText;
             }
             return proj;
         }

@@ -51,15 +51,23 @@ namespace Wrapper
             }
             try
             {
+                Logger.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
                 compiler.Preprocess(proj);
+                Logger.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
+                Logger.log(Logger.LogLevel.INFO, "-----  Starting compiling  -----");
                 compiler.Compile(proj);
+                Logger.log(Logger.LogLevel.INFO, "-----  Compiling is  done  -----");
+                Logger.log(Logger.LogLevel.INFO, "----- Starting translating -----");
                 compiler.Translate(proj);
+                Logger.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
             }
             catch (Exception ex)
             {
                 Logger.log(Logger.LogLevel.ERROR, "Failed to patch project:");
                 Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
             }
+            Console.WriteLine("\nPress ENTER to continue");
+            Console.Read();
         }
     }
 }
