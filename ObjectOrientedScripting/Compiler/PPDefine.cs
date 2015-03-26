@@ -91,7 +91,7 @@ namespace Compiler
                     for (i++; i < input.Length; i++)
                     {
                         c = input[i];
-                        if (c == ',' && counter == 1)
+                        if (c == ',' && counter == 1 && !ignoreString)
                         {
                             if (curArg >= _arguments.Length)
                                 throw new Exception("encountered unexpected extra argument in define while preprocessing, allowed count is " + _arguments.Length);
@@ -100,7 +100,7 @@ namespace Compiler
                             curArg++;
                             continue;
                         }
-                        if (c == ')' && counter == 1)
+                        if (c == ')' && counter == 1 && !ignoreString)
                         {
                             if (curArg >= _arguments.Length)
                                 throw new Exception("encountered unexpected extra argument in define while preprocessing, allowed count is " + _arguments.Length);

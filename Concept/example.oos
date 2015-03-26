@@ -1,10 +1,13 @@
-//#include "example.def"
+#include "example.def"
 #define SOMEDEF //testmore
 #define somethingWithArgs(TEST) //test TEST
 
 SOMEDEF
 TEST6
-somethingWithArgs(approved)somethingWithArgs(approved)
+somethingWithArgs(approved)
+somethingWithArgs(", approved")
+somethingWithArgs((, approved))
+somethingWithArgs({a,p,r,o,v,e,d})
 
 class cFoo
 {
