@@ -14,7 +14,7 @@ namespace Wrapper
     {
         public Version getVersion()
         {
-            return new Version("1.0.0-a1");
+            return new Version("0.1.0-a1");
         }
         #region Translating
         public void Translate(Project proj)
@@ -23,11 +23,71 @@ namespace Wrapper
 
             //Read compiled file
             StreamReader reader = new StreamReader(proj.Buildfolder + "_compile_.obj");
-            //TODO: parse file to object tree
+            Stack<IInstruction> tree = new Stack<IInstruction>();
+            tree.Push(mainNamespace);
+            readCompiledFile(reader, tree);
             reader.Close();
 
             //Write namespace tree to disk
             //TODO: write namespace tree to disk
+        }
+        public void readCompiledFile(StreamReader reader, Stack<IInstruction> tree)
+        {
+            string buffer = "";
+            while (true)
+            {
+                int index;
+                int c;
+                IInstruction instr;
+                
+                c = reader.Read();
+                if (c == -1)
+                    break;
+                if (char.IsControl((char)c))
+                    continue;
+                
+                buffer += (char) c;
+                //Check if current character is a semicolon (thus a line terminator) and continue if it is not (we need the FULL instruction name here)
+                if ((char)c != ';' || (char) c != '{')
+                    continue;
+
+                if (buffer.StartsWith("namespace "))
+                {
+                    if (!(tree.Last() is Namespace))
+                        throw new Exception("Cannot create a namespace at this point! Namespace creation is only valid in Namespaces and not inside of " + tree.Last().GetType().Name);
+                    if (Namespace.parse(reader, buffer, out instr))
+                    {
+                        tree.Last().addInstruction(instr);
+                        tree.Push(instr);
+                        continue;
+                    }
+                }
+                if (buffer.StartsWith("class "))
+                {
+                    if (!(tree.Last() is Namespace))
+                        throw new Exception("Cannot create a namespace at this point! Namespace creation is only valid in Namespaces and not inside of " + tree.Last().GetType().Name);
+                    if (Namespace.parse(reader, buffer, out instr))
+                    {
+                        tree.Last().addInstruction(instr);
+                        tree.Push(instr);
+                        continue;
+                    }
+                }
+            }
+            //for (uint filelinenumber = 0; (s = reader.read) != null; filelinenumber++)
+            //{
+            //    string instruction;
+            //    int index = 0;
+            //    index = s.IndexOf(' ');
+            //    if (index == -1)
+            //        throw new Exception("Unknown instruction set at line " + filelinenumber + ", missing space");
+            //    instruction = s.Substring(0, index);
+            //    switch(instruction)
+            //    {
+            //        default:
+            //            break;
+            //    }
+            //}
         }
         #endregion
         #region Compiling
