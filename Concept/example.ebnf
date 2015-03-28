@@ -29,34 +29,34 @@
 	For simplicity, characters in strings are left uppercase
 	it should not matter at the end if they are upper or lower case!
 *)
-AlphabetCharacter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z';
-NumberCharacter = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0';
-Bool = 'TRUE' | 'FALSE';
+AlphabetCharacter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
+NumberCharacter = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0";
+Bool = "TRUE" | "FALSE";
 
-String = ('"', {AlphabetCharacter | NumberCharacter}, "'") | ("'", {AlphabetCharacter | NumberCharacter}, "'");
-Scalar = ['-'], NumberCharacter, [['.', NumberCharacter], {NumberCharacter}];
-Array = '{', [Value, {', ', Value}], '}';
-Value = Identifier | FunctionCall | String | Scalar | Bool | (Array, {'[', NumberCharacter, ']'});
+String = ('"', {AlphabetCharacter | NumberCharacter}, '"') | ("'", {AlphabetCharacter | NumberCharacter}, "'");
+Scalar = ["-"], NumberCharacter, [[".", NumberCharacter], {NumberCharacter}];
+Array = "{", [Value, {", ", Value}], "}";
+Value = Identifier | FunctionCall | String | Scalar | Bool | (Array, {"[", NumberCharacter, "]"});
 
-Identifier = (AlphabetCharacter | '_'), {AlphabetCharacter | NumberCharacter};
-FunctionCall = Identifier, '(', [Identifier, {',', Identifier}], ')', ';';
-VariableAssignment = Identifier, [(' = ' | ' += ' | ' -= ' | ' ++ ' | ' -- ' | ' *= ' | ' /= ' | ' ^= '), Value], ';';
+Identifier = (AlphabetCharacter | "_"), {AlphabetCharacter | NumberCharacter};
+FunctionCall = Identifier, "(", [Identifier, {",", Identifier}], ")", ";";
+VariableAssignment = Identifier, [(" = " | " += " | " -= " | " ++ " | " -- " | " *= " | " /= " | " ^= "), Value], ";";
 
-Expression = (('(', Expression, ')') | Value), [(' > ' | ' < ' | ' >= ' | ' <= ' | ' == ' | ' && ' | ' || '), (('(', Expression, ')') | Value);
+Expression = (("(", Expression, ")") | Value), [(" > " | " < " | " >= " | " <= " | " == " | " && " | " || "), (("(", Expression, ")") | Value);
 
-IfElse = 'IF ', '(', Expression, ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [' ELSE ', (('{', {CodeInstruction}, '}') | CodeInstruction)];
-For = 'FOR ', '(', [CodeInstruction], ';', [Expression | Value], ';', [CodeInstruction], ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [';'];
-ForEach = 'FOREACH ', '(', 'VAR ', Identifier, ' IN ', (Identifier | Array), ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [';'];
-Switch = 'SWITCH ', '(', Identifier, ')', '{', {'CASE ', (String | Scalar | Bool), ': ', CodeInstruction}, '}', [';'];
-Return = 'RETURN ', (Expression | Value);
+IfElse = "IF ", "(", Expression, ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [" ELSE ", (("{", {CodeInstruction}, "}") | CodeInstruction)];
+For = "FOR ", "(", [CodeInstruction], ";", [Expression | Value], ";", [CodeInstruction], ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [";"];
+ForEach = "FOREACH ", "(", "VAR ", Identifier, " IN ", (Identifier | Array), ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [";"];
+Switch = "SWITCH ", "(", Identifier, ")", "{", {"CASE ", (String | Scalar | Bool), ": ", CodeInstruction}, "}", [";"];
+Return = "RETURN ", (Expression | Value);
 
 CodeInstruction = FunctionCall | VariableAssignment | IfElse | For | ForEach | Switch | Return;
 
-GlobalVariable = 'STATIC ', 'VAR ', Identifier, [(' = ' | ' += ' | ' -= ' | ' ++ ' | ' -- ' | ' *= ' | ' /= ' | ' ^= '), Value], ';';
-ClassVariable = ('STATIC ' | 'PUBLIC ' | 'PRIVATE ' | 'PROTECTED '), 'VAR ', Identifier, [(' = ' | ' += ' | ' -= ' | ' ++ ' | ' -- ' | ' *= ' | ' /= ' | ' ^= '), Value], ';';
-GlobalFunction = 'STATIC ', 'FUNCTION ', Identifier, '(', [Identifier, {',', Identifier}], ')', '{', {CodeInstruction},  '}', {';'};
-ClassFunction =	('STATIC ' | 'PUBLIC ' | 'PRIVATE ' | 'PROTECTED '), 'FUNCTION ', Identifier, '(', [Identifier, {',', Identifier}], ')', '{', {CodeInstruction}, '}', {';'};
+GlobalVariable = "STATIC ", "VAR ", Identifier, [(" = " | " += " | " -= " | " ++ " | " -- " | " *= " | " /= " | " ^= "), Value], ";";
+ClassVariable = ("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "VAR ", Identifier, [(" = " | " += " | " -= " | " ++ " | " -- " | " *= " | " /= " | " ^= "), Value], ";";
+GlobalFunction = "STATIC ", "FUNCTION ", Identifier, "(", [Identifier, {",", Identifier}], ")", "{", {CodeInstruction},  "}", {";"};
+ClassFunction =	("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "FUNCTION ", Identifier, "(", [Identifier, {",", Identifier}], ")", "{", {CodeInstruction}, "}", {";"};
 
-Class =	'CLASS ', Identifier, '{', {ClassVariable | ClassFunction}, '}', {';'};
-Namespace = 'NAMESPACE ', Identifier, '{', {Namespace | Class | GlobalVariable | GlobalFunction}, '}', {';'};
+Class =	"CLASS ", Identifier, "{", {ClassVariable | ClassFunction}, "}", {";"};
+Namespace = "NAMESPACE ", Identifier, "{", {Namespace | Class | GlobalVariable | GlobalFunction}, "}", {";"};
 Programm = {Namespace | Class | GlobalVariable | GlobalFunction};
