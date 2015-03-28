@@ -16,7 +16,11 @@ namespace Compiler.OOS_LanguageObjects
         IInstruction getParent();
         /**returns a list of child IInstructions with given type*/
         IInstruction[] getChildInstructions(Type t, bool recursive = true);
+        /**returns first occurance of given type in tree or NULL if nothing was found*/
+        IInstruction getFirstOf(Type t);
         /**Adds given instruction to child instruction list and checks if it is valid to own this instruction*/
         void addInstruction(IInstruction instr);
+        /**returns current tab ammount*/
+        int getTabs();
     }
 }

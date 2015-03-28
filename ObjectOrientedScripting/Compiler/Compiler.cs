@@ -19,12 +19,10 @@ namespace Wrapper
         #region Translating
         public void Translate(Project proj)
         {
-            Namespace mainNamespace = new Namespace("oos", null);
-
             //Read compiled file
             StreamReader reader = new StreamReader(proj.Buildfolder + "_compile_.obj");
             Stack<IInstruction> tree = new Stack<IInstruction>();
-            tree.Push(mainNamespace);
+            
             readCompiledFile(reader, tree);
             reader.Close();
 
@@ -39,55 +37,18 @@ namespace Wrapper
                 int index;
                 int c;
                 IInstruction instr;
-                
+
                 c = reader.Read();
                 if (c == -1)
                     break;
                 if (char.IsControl((char)c))
                     continue;
-                
-                buffer += (char) c;
-                //Check if current character is a semicolon (thus a line terminator) and continue if it is not (we need the FULL instruction name here)
-                if ((char)c != ';' || (char) c != '{')
-                    continue;
 
-                if (buffer.StartsWith("namespace "))
-                {
-                    if (!(tree.Last() is Namespace))
-                        throw new Exception("Cannot create a namespace at this point! Namespace creation is only valid in Namespaces and not inside of " + tree.Last().GetType().Name);
-                    if (Namespace.parse(reader, buffer, out instr))
-                    {
-                        tree.Last().addInstruction(instr);
-                        tree.Push(instr);
-                        continue;
-                    }
-                }
-                if (buffer.StartsWith("class "))
-                {
-                    if (!(tree.Last() is Namespace))
-                        throw new Exception("Cannot create a namespace at this point! Namespace creation is only valid in Namespaces and not inside of " + tree.Last().GetType().Name);
-                    if (Namespace.parse(reader, buffer, out instr))
-                    {
-                        tree.Last().addInstruction(instr);
-                        tree.Push(instr);
-                        continue;
-                    }
-                }
+                buffer += (char)c;
+                //Check if current character is a semicolon (thus a line terminator) and continue if it is not (we need the FULL instruction name here)
+                if ((char)c != ';' || (char)c != '{')
+                    continue;
             }
-            //for (uint filelinenumber = 0; (s = reader.read) != null; filelinenumber++)
-            //{
-            //    string instruction;
-            //    int index = 0;
-            //    index = s.IndexOf(' ');
-            //    if (index == -1)
-            //        throw new Exception("Unknown instruction set at line " + filelinenumber + ", missing space");
-            //    instruction = s.Substring(0, index);
-            //    switch(instruction)
-            //    {
-            //        default:
-            //            break;
-            //    }
-            //}
         }
         #endregion
         #region Compiling
