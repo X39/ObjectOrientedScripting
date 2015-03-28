@@ -35,27 +35,28 @@ Bool = 'TRUE' | 'FALSE';
 
 String = ('"', {AlphabetCharacter | NumberCharacter}, "'") | ("'", {AlphabetCharacter | NumberCharacter}, "'");
 Scalar = ['-'], NumberCharacter, [['.', NumberCharacter], {NumberCharacter}];
-Array = '{', [Value, {',', Value}], '}';
+Array = '{', [Value, {', ', Value}], '}';
 Value = Identifier | FunctionCall | String | Scalar | Bool | (Array, {'[', NumberCharacter, ']'});
 
 Identifier = (AlphabetCharacter | '_'), {AlphabetCharacter | NumberCharacter};
 FunctionCall = Identifier, '(', [Identifier, {',', Identifier}], ')', ';';
-VariableAssignment = Identifier, ('=' | '+=' | '-=' | '++' | '--' | '*=' | '/=' | '^='), Value, ';';
+VariableAssignment = Identifier, [(' = ' | ' += ' | ' -= ' | ' ++ ' | ' -- ' | ' *= ' | ' /= ' | ' ^= '), Value], ';';
 
-Expression = ['('], (Expression | Value), [('>' | '<' | '>=' | '<=' | '==' | '&&' | '||'), (Expression | Value), [')'];
+Expression = (('(', Expression, ')') | Value), [(' > ' | ' < ' | ' >= ' | ' <= ' | ' == ' | ' && ' | ' || '), (('(', Expression, ')') | Value);
 
-CodeInstruction = VariableAssignment, IfElse, For, ForEach, Switch, FunctionCall, Return;
+IfElse = 'IF ', '(', Expression, ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [' ELSE ', (('{', {CodeInstruction}, '}') | CodeInstruction)];
+For = 'FOR ', '(', [CodeInstruction], ';', [Expression | Value], ';', [CodeInstruction], ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [';'];
+ForEach = 'FOREACH ', '(', 'VAR ', Identifier, ' IN ', (Identifier | Array), ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [';'];
+Switch = 'SWITCH ', '(', Identifier, ')', '{', {'CASE ', (String | Scalar | Bool), ': ', CodeInstruction}, '}', [';'];
+Return = 'RETURN ', (Expression | Value);
 
-Programm =	{Namespace, Class, Function, Identifier}, ( ?Function 'preInit' as preInit entry point? | ?Function 'postInit' as postInit entry point? );
-Namespace =	'NAMESPACE', Identifier, '{', {Namespace, Class, Function, Identifier}, '}', {';'};
-Class =	'CLASS', Identifier, '{', {Function, Identifier}, '}', {';'};
-GlobalFunction = 'STATIC', 'FUNCTION', Identifier, '(', {Identifier}, ')', '{', {CodeInstruction},  '}', {';'};
-GlobalVariable = 'STATIC', 'VAR', Identifier, [VariableAssignment], ';';
-ClassFunction =	('STATIC' | 'PUBLIC' | 'PRIVATE' | 'PROTECTED'), 'FUNCTION', Identifier, '(', {Identifier}, ')', '{', {CodeInstruction}, '}', {';'};
-ClassVariable = ('STATIC' | 'PUBLIC' | 'PRIVATE' | 'PROTECTED'), 'VAR', Identifier, [VariableAssignment], ';';
-IfElse = 'IF', '(', Expression, ')', (('{', {CodeInstruction}, '}') | CodeInstruction), ['ELSE', (('{', {CodeInstruction}, '}') | CodeInstruction)];
+CodeInstruction = FunctionCall | VariableAssignment | IfElse | For | ForEach | Switch | Return;
 
-For = 'FOR', '(', [CodeInstruction], ';', [ConditionalExpression | Expression | Value | Identifier | FunctionCall], ';', [CodeInstruction], ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [';'];
-ForEach = 'FOREACH', '(', 'VAR', Identifier, 'IN', (Identifier | Array), ')', (('{', {CodeInstruction}, '}') | CodeInstruction), [';'];
-Switch = 'SWITCH', '(', (Identifier | Value) ')', '{', {('CASE', (Identifier | Value), ':'), CodeInstruction}, '}', [';'];
-Return = 'RETURN', (Expression | Value);
+GlobalVariable = 'STATIC ', 'VAR ', Identifier, [(' = ' | ' += ' | ' -= ' | ' ++ ' | ' -- ' | ' *= ' | ' /= ' | ' ^= '), Value], ';';
+ClassVariable = ('STATIC ' | 'PUBLIC ' | 'PRIVATE ' | 'PROTECTED '), 'VAR ', Identifier, [(' = ' | ' += ' | ' -= ' | ' ++ ' | ' -- ' | ' *= ' | ' /= ' | ' ^= '), Value], ';';
+GlobalFunction = 'STATIC ', 'FUNCTION ', Identifier, '(', [Identifier, {',', Identifier}], ')', '{', {CodeInstruction},  '}', {';'};
+ClassFunction =	('STATIC ' | 'PUBLIC ' | 'PRIVATE ' | 'PROTECTED '), 'FUNCTION ', Identifier, '(', [Identifier, {',', Identifier}], ')', '{', {CodeInstruction}, '}', {';'};
+
+Class =	'CLASS ', Identifier, '{', {ClassVariable | ClassFunction}, '}', {';'};
+Namespace = 'NAMESPACE ', Identifier, '{', {Namespace | Class | GlobalVariable | GlobalFunction}, '}', {';'};
+Programm = {Namespace | Class | GlobalVariable | GlobalFunction};
