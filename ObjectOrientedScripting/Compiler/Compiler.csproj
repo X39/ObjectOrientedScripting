@@ -41,8 +41,25 @@
   <ItemGroup>
     <Compile Include="Compiler.cs" />
     <Compile Include="IInstruction.cs" />
-    <Compile Include="OOS LanguageObjects\Identifier.cs" />
-    <Compile Include="OOS LanguageObjects\Value.cs" />
+    <Compile Include="OOS LanguageObjects\Class.cs" />
+    <Compile Include="OOS LanguageObjects\ClassFunction.cs" />
+    <Compile Include="OOS LanguageObjects\ClassVariable.cs" />
+    <Compile Include="OOS LanguageObjects\Assignment.cs" />
+    <Compile Include="OOS LanguageObjects\For.cs" />
+    <Compile Include="OOS LanguageObjects\ForEach.cs" />
+    <Compile Include="OOS LanguageObjects\Function.cs" />
+    <Compile Include="OOS LanguageObjects\Done\Identifier.cs" />
+    <Compile Include="OOS LanguageObjects\Done\LocalVariable.cs" />
+    <Compile Include="OOS LanguageObjects\FunctionCall.cs" />
+    <Compile Include="OOS LanguageObjects\GlobalFunction.cs" />
+    <Compile Include="OOS LanguageObjects\GlobalVariable.cs" />
+    <Compile Include="OOS LanguageObjects\IfThen.cs" />
+    <Compile Include="OOS LanguageObjects\Namespace.cs" />
+    <Compile Include="OOS LanguageObjects\Return.cs" />
+    <Compile Include="OOS LanguageObjects\Scope.cs" />
+    <Compile Include="OOS LanguageObjects\Done\Value.cs" />
+    <Compile Include="OOS LanguageObjects\Variable.cs" />
+    <Compile Include="OOS LanguageObjects\While.cs" />
     <Compile Include="PPDefine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

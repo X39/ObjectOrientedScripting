@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class Value : IInstruction
+    public class Value : IInstruction
     {
         private IInstruction _parent;
-        private string _value;
+        private string _value; //ToDo: Replace string value type with seperated IInstructions for each possible value
         private Value(IInstruction parent, string value)
         {
             this._parent = parent;
             this._value = value;
         }
-        public static IInstruction parse(IInstruction parent, string toParse)
+        public static Value parse(IInstruction parent, string toParse)
         {
             //throw new Exception("Identifier '" + name + "' contains not allowed characters for identifierts, allowed characters: regex [_0-9A-Za-z]");
             string value = toParse.Trim();
@@ -86,20 +86,29 @@ namespace Compiler.OOS_LanguageObjects
             return this._parent;
         }
         /**returns a list of child IInstructions with given type*/
-        IInstruction[] getChildInstructions(Type t, bool recursive = true)
+        IInstruction[] getInstructions(Type t, bool recursiveUp = true, bool recursiveDown = false)
         {
-            return new IInstruction[] { };
+            List<IInstruction> result = new List<IInstruction>();
+            if (recursiveUp && recursiveDown)
+                throw new Exception("Cannot move up AND down at the same time");
+            if (t.IsInstanceOfType(this))
+                result.Add(this);
+            if (recursiveUp)
+                this._parent.getInstructions(t, recursiveUp, recursiveDown);
+            //if (recursiveDown)
+            //    result.AddRange(new IInstruction[] { });
+            return result.ToArray();
         }
         /**returns first occurance of given type in tree or NULL if nothing was found*/
         IInstruction getFirstOf(Type t)
         {
             IInstruction firstOccurance = this.getParent().getFirstOf(t);
-            return (firstOccurance == null ? (this.GetType().Equals(t) ? this : null) : firstOccurance);
+            return (firstOccurance == null ? (t.IsInstanceOfType(this) ? this : null) : firstOccurance);
         }
         /**Adds given instruction to child instruction list and checks if it is valid to own this instruction*/
         void addInstruction(IInstruction instr)
         {
-            throw new Exception("An Identifier cannot have sub isntructions");
+            throw new Exception("An Identifier cannot have sub instructions");
         }
         /**returns current tab ammount*/
         int getTabs()

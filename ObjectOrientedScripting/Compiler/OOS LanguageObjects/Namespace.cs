@@ -6,8 +6,18 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public interface IInstruction
+    class Namespace : IInstruction
     {
+        private Namespace _parent;
+        private List<IInstruction> _childs;
+        private string _name;
+        public string Name { get { return (this._parent.Name == null ? "" : this._parent.Name + "_") + this._name; } }
+        private Namespace(Namespace parent, string name)
+        {
+            this._parent = parent;
+            this._name = name;
+            this._childs = new List<IInstruction>();
+        }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         void printInstructions(object writer, bool printTabs = true);
         /**Parses given string input specially for this element (example use: foreach(var foo in bar) would replace every occurance of foo with _x and every occurence of _x with __x or something like that)*/
