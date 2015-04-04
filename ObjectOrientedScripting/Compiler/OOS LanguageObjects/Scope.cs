@@ -20,7 +20,73 @@ namespace Compiler.OOS_LanguageObjects
         }
         public static Scope parse(IInstruction parent, StreamReader toParse)
         {
-            return null;
+            string codeLine = "";
+            int ci;
+            Scope scope = new Scope(parent);
+            while(true)
+            {
+                ci = toParse.Read();
+                if (ci < 0)
+                    break;
+                char c = (char)ci;
+                if (char.IsControl(c))
+                    continue;
+                codeLine += c;
+                if (c == '}') //End of Scope
+                    break;
+                //some optimization ... should improve parsing a little
+                if (codeLine.Length == "native".Length && codeLine.StartsWith("native"))
+                {
+                    if (c == '\n')
+                    {
+                        codeLine.Trim();
+                        scope.addInstruction(Native.parse(scope, codeLine));
+                        codeLine = "";
+                    }
+                }
+                if(c == ';' || c == '{')
+                {//End of code line
+                    codeLine.Trim();
+                    if (codeLine.StartsWith("var"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("foreach"))
+                    {
+
+                    }
+                    if(codeLine.StartsWith("for"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("do"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("while"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("switch"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("if"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("else"))
+                    {
+
+                    }
+                    if (codeLine.StartsWith("return"))
+                    {
+
+                    }
+                    codeLine = "";
+                }
+            }
+            return scope;
         }
         public string getScopeName()
         {

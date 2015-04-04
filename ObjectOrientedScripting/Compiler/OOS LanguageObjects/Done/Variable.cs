@@ -6,36 +6,38 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class For : IInstruction
+    public class Variable : IInstruction
     {
         private IInstruction _parent;
-        private IInstruction _runAfter;
-        private IInstruction _arg1;
-        private IInstruction _arg2;
-        private IInstruction _arg3;
-        public For(IInstruction parent)
+        private IInstruction _assignment;
+        private IInstruction _identifier;
+        public IInstruction Identifier { get { return this._identifier; } }
+        private Variable(IInstruction parent)
         {
             this._parent = parent;
         }
-
-        public static For parse()
+        public static Variable parse(IInstruction parent, string toParse)
         {
-            return null;
+            if (!toParse.StartsWith("var ", StringComparison.OrdinalIgnoreCase))
+                throw new Exception("No variable assignment");
+            toParse.Remove(0, "var ".Length);
+            string instructionName = toParse.Substring(toParse.IndexOfAny(new char[] { ';', '=' }));
+            Variable var = new Variable(parent);
+            Identifier ident = Compiler.OOS_LanguageObjects.Identifier.parse(var, instructionName);
+            Assignment assign = null;
+            if(toParse.Contains('='))
+                assign = Assignment.parse(var, toParse);
+            var._identifier = ident;
+            var._assignment = assign;
+            return var;
         }
-
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         void printInstructions(object writer, bool printTabs = true)
         {
             if (!(writer is System.IO.StreamWriter))
                 throw new Exception("printInstruction expected a StreamWriter object but received a " + writer.GetType().Name + " object");
-            this._arg1.printInstructions(writer, printTabs);
-            ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "while {");
-            this._arg2.printInstructions(writer, false);
-            ((System.IO.StreamWriter)writer).Write("} do");
-            ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "{");
-            this._runAfter.printInstructions(writer, printTabs);
-            this._arg3.printInstructions(writer, printTabs);
-            ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "};");
+            if(this._assignment != null)
+                this._assignment.printInstructions(writer, printTabs);
         }
         /**Parses given string input specially for this element (example use: foreach(var foo in bar) would replace every occurance of foo with _x and every occurence of _x with __x or something like that)*/
         string parseInput(string input)
@@ -59,10 +61,9 @@ namespace Compiler.OOS_LanguageObjects
                 this._parent.getInstructions(t, recursiveUp, recursiveDown);
             if (recursiveDown)
             {
-                result.AddRange(this._runAfter.getInstructions(t, recursiveUp, recursiveDown));
-                result.AddRange(this._arg1.getInstructions(t, recursiveUp, recursiveDown));
-                result.AddRange(this._arg2.getInstructions(t, recursiveUp, recursiveDown));
-                result.AddRange(this._arg3.getInstructions(t, recursiveUp, recursiveDown));
+                result.AddRange(this._identifier.getInstructions(t, recursiveUp, recursiveDown));
+                if(this._assignment != null)
+                    result.AddRange(this._assignment.getInstructions(t, recursiveUp, recursiveDown));
             }
             return result.ToArray();
         }
@@ -78,7 +79,7 @@ namespace Compiler.OOS_LanguageObjects
             throw new Exception("An Identifier cannot have sub instructions");
         }
         /**returns current tab ammount*/
-        public int getTabs()
+        int getTabs()
         {
             return this._parent.getTabs();
         }

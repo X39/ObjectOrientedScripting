@@ -11,9 +11,36 @@ namespace Compiler.OOS_LanguageObjects
         private IInstruction _parent;
         private string _name;
         public string Name { get { return this._name; } }
+        public readonly string[] reservedIdentifiers = 
+        {
+            "native",
+            "if",
+            "else",
+            "for",
+            "foreach",
+            "do",
+            "switch",
+            "case",
+            "default",
+            "return",
+            "namespace",
+            "class",
+            "function",
+            "var",
+            "static",
+            "public",
+            "private",
+            "protected",
+            "try",
+            "catch",
+            "throw"
+        };
         private Identifier(IInstruction parent, string value)
         {
             this._parent = parent;
+            value = this.parseInput(value);
+            if (reservedIdentifiers.Contains(value))
+                throw new Exception("'" + value + "' is a reserved term and thus not allowed for identifiers");
             this._name = this.parseInput(value);
         }
         private static bool isValidIdentifierChar(char c)

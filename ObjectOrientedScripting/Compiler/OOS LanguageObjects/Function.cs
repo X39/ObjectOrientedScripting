@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class Function
+    class Function : IInstruction
     {
         public string Name { get { return ""; } }
     }

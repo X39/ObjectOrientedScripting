@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class FunctionCall
+    class FunctionCall : IInstruction
     {
     }
 }

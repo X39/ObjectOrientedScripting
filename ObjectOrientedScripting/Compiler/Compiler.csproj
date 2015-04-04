@@ -58,7 +58,9 @@
     <Compile Include="OOS LanguageObjects\Return.cs" />
     <Compile Include="OOS LanguageObjects\Scope.cs" />
     <Compile Include="OOS LanguageObjects\Done\Value.cs" />
-    <Compile Include="OOS LanguageObjects\Variable.cs" />
+    <Compile Include="OOS LanguageObjects\Done\Variable.cs" />
+    <Compile Include="OOS LanguageObjects\Done\Native.cs" />
+    <Compile Include="OOS LanguageObjects\New.cs" />
     <Compile Include="OOS LanguageObjects\While.cs" />
     <Compile Include="PPDefine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

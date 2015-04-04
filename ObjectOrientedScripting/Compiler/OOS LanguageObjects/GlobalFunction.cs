@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class GlobalFunction
+    class GlobalFunction : Function
     {
     }
 }
