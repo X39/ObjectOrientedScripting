@@ -74,7 +74,7 @@ namespace Compiler.OOS_LanguageObjects
             return this._parent;
         }
         /**returns a list of child IInstructions with given type*/
-        IInstruction[] getInstructions(Type t, bool recursiveUp = true, bool recursiveDown = false)
+        public IInstruction[] getInstructions(Type t, bool recursiveUp = true, bool recursiveDown = false)
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
@@ -88,7 +88,7 @@ namespace Compiler.OOS_LanguageObjects
             return result.ToArray();
         }
         /**returns first occurance of given type in tree or NULL if nothing was found*/
-        IInstruction getFirstOf(Type t)
+        public IInstruction getFirstOf(Type t)
         {
             IInstruction firstOccurance = this.getParent().getFirstOf(t);
             return (firstOccurance == null ? (t.IsInstanceOfType(this) ? this : null) : firstOccurance);

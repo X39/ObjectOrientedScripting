@@ -21,34 +21,11 @@ namespace Wrapper
         {
             //Read compiled file
             StreamReader reader = new StreamReader(proj.Buildfolder + "_compile_.obj");
-            Stack<IInstruction> tree = new Stack<IInstruction>();
-            
-            readCompiledFile(reader, tree);
+            Namespace oos = Namespace.parse(reader, null, "namespace oos {");
             reader.Close();
 
             //Write namespace tree to disk
             //TODO: write namespace tree to disk
-        }
-        public void readCompiledFile(StreamReader reader, Stack<IInstruction> tree)
-        {
-            string buffer = "";
-            while (true)
-            {
-                int index;
-                int c;
-                IInstruction instr;
-
-                c = reader.Read();
-                if (c == -1)
-                    break;
-                if (char.IsControl((char)c))
-                    continue;
-
-                buffer += (char)c;
-                //Check if current character is a semicolon (thus a line terminator) and continue if it is not (we need the FULL instruction name here)
-                if ((char)c != ';' || (char)c != '{')
-                    continue;
-            }
         }
         #endregion
         #region Compiling

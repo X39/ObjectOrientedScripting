@@ -31,7 +31,7 @@ namespace Compiler.OOS_LanguageObjects
             return ass;
         }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
-        void printInstructions(object writer, bool printTabs = true)
+        public void printInstructions(object writer, bool printTabs = true)
         {
             if (!(writer is System.IO.StreamWriter))
                 throw new Exception("printInstruction expected a StreamWriter object but received a " + writer.GetType().Name + " object");
@@ -42,7 +42,7 @@ namespace Compiler.OOS_LanguageObjects
             ((System.IO.StreamWriter)writer).Write(';');
         }
         /**Parses given string input specially for this element (example use: foreach(var foo in bar) would replace every occurance of foo with _x and every occurence of _x with __x or something like that)*/
-        string parseInput(string input)
+        public string parseInput(string input)
         {
             return this._parent.parseInput(input);
         }
@@ -52,7 +52,7 @@ namespace Compiler.OOS_LanguageObjects
             return this._parent;
         }
         /**returns a list of child IInstructions with given type*/
-        IInstruction[] getInstructions(Type t, bool recursiveUp = true, bool recursiveDown = false)
+        public IInstruction[] getInstructions(Type t, bool recursiveUp = true, bool recursiveDown = false)
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
@@ -69,7 +69,7 @@ namespace Compiler.OOS_LanguageObjects
             return result.ToArray();
         }
         /**returns first occurance of given type in tree or NULL if nothing was found*/
-        IInstruction getFirstOf(Type t)
+        public IInstruction getFirstOf(Type t)
         {
             IInstruction firstOccurance = this.getParent().getFirstOf(t);
             return (firstOccurance == null ? (t.IsInstanceOfType(this) ? this : null) : firstOccurance);
