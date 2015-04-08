@@ -29,6 +29,20 @@
 	For simplicity, characters in strings are left uppercase
 	it should not matter at the end if they are upper or lower case!
 *)
+
+File = {Namespace | Class | GlobalVariable | GlobalFunction};
+
+Namespace = "NAMESPACE ", Identifier, " {", {Namespace | Class | GlobalVariable | GlobalFunction}, "}", {";"};
+Class =	"CLASS ", Identifier, " {", {ClassVariable | ClassFunction}, "}", {";"};
+
+GlobalFunction = "STATIC ", "FUNCTION ", Identifier, " (", [Identifier, {", ", Identifier}], ")", " {", {CodeInstruction},  "}", {";"};
+ClassFunction =	("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "FUNCTION ", Identifier, " (", [Identifier, {", ", Identifier}], ")", " {", {CodeInstruction}, "}", {";"};
+
+GlobalVariable = "STATIC ", "VAR ", Identifier, [(" = " | (" ", Operator, "= ")), Value], ";";
+ClassVariable = ("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "VAR ", Identifier, [(" = " | (" ", Operator, "= ")), Value], ";";
+
+CodeInstruction = FunctionCall | VariableAssignment | IfElse | For | ForEach | Switch | Return;
+
 AlphabetCharacter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
 NumberCharacter = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0";
 Bool = "TRUE" | "FALSE";
@@ -51,13 +65,6 @@ ForEach = "FOREACH ", "(", "VAR ", Identifier, " IN ", (Identifier | Array), ")"
 Switch = "SWITCH ", "(", Identifier, ")", "{", {"CASE ", (String | Scalar | Bool), ": ", CodeInstruction}, "}", [";"];
 Return = "RETURN ", (Expression | Value);
 
-CodeInstruction = FunctionCall | VariableAssignment | IfElse | For | ForEach | Switch | Return;
 
-GlobalVariable = "STATIC ", "VAR ", Identifier, [(" = " | " += " | " -= " | " ++ " | " -- " | " *= " | " /= " | " ^= "), Value], ";";
-ClassVariable = ("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "VAR ", Identifier, [(" = " | " += " | " -= " | " ++ " | " -- " | " *= " | " /= " | " ^= "), Value], ";";
-GlobalFunction = "STATIC ", "FUNCTION ", Identifier, "(", [Identifier, {",", Identifier}], ")", "{", {CodeInstruction},  "}", {";"};
-ClassFunction =	("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "FUNCTION ", Identifier, "(", [Identifier, {",", Identifier}], ")", "{", {CodeInstruction}, "}", {";"};
 
-Class =	"CLASS ", Identifier, "{", {ClassVariable | ClassFunction}, "}", {";"};
-Namespace = "NAMESPACE ", Identifier, "{", {Namespace | Class | GlobalVariable | GlobalFunction}, "}", {";"};
-Programm = {Namespace | Class | GlobalVariable | GlobalFunction};
+
