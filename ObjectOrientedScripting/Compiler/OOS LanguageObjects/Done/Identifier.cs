@@ -39,7 +39,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             this._parent = parent;
             value = this.parseInput(value);
-            if (reservedIdentifiers.Contains(value))
+            if (reservedIdentifiers.Contains(value, StringComparer.OrdinalIgnoreCase))
                 throw new Exception("'" + value + "' is a reserved term and thus not allowed for identifiers");
             this._name = this.parseInput(value);
         }
@@ -78,7 +78,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
-                throw new Exception("Cannot move up AND down at the same time");
+                return this.getFirstOf(typeof(Namespace)).getInstructions(t, false, true);
             if (t.IsInstanceOfType(this))
                 result.Add(this);
             if (recursiveUp)

@@ -35,7 +35,7 @@ namespace Compiler.OOS_LanguageObjects
                 if (c == '}') //End of Scope
                     break;
                 //some optimization ... should improve parsing a little
-                if (codeLine.Length == "native".Length && codeLine.StartsWith("native"))
+                if (codeLine.Length == "native".Length && codeLine.StartsWith("native", StringComparison.OrdinalIgnoreCase))
                 {
                     if (c == '\n')
                     {
@@ -47,41 +47,42 @@ namespace Compiler.OOS_LanguageObjects
                 if(c == ';' || c == '{')
                 {//End of code line
                     codeLine.Trim();
-                    if (codeLine.StartsWith("var"))
+                    if (codeLine.StartsWith("var", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(LocalVariable.parse(scope, codeLine));
                     }
-                    if (codeLine.StartsWith("foreach"))
+                    else if (codeLine.StartsWith("foreach", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(ForEach.parse(toParse, scope, codeLine));
                     }
-                    if(codeLine.StartsWith("for"))
+                    else if (codeLine.StartsWith("for", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(For.parse(toParse, scope, codeLine));
                     }
-                    if (codeLine.StartsWith("do"))
+                    else if (codeLine.StartsWith("do", StringComparison.OrdinalIgnoreCase) || codeLine.StartsWith("while", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(While.parse(toParse, scope, codeLine));
                     }
-                    if (codeLine.StartsWith("while"))
+                    else if (codeLine.StartsWith("switch", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(Switch.parse(toParse, scope, codeLine));
                     }
-                    if (codeLine.StartsWith("switch"))
+                    else if (codeLine.StartsWith("if", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(IfThen.parse(toParse, scope, codeLine));
                     }
-                    if (codeLine.StartsWith("if"))
+                    else if (codeLine.StartsWith("return", StringComparison.OrdinalIgnoreCase))
                     {
-
+                        scope.addInstruction(Return.parse(scope, codeLine));
                     }
-                    if (codeLine.StartsWith("else"))
+                    else
                     {
-
-                    }
-                    if (codeLine.StartsWith("return"))
-                    {
-
+                        //ToDo: current implementation is lazy ... there should be a better way to do so. Imrpove current routine
+                        int equalityIndex = codeLine.IndexOf("=");
+                        if (equalityIndex != -1 && codeLine[equalityIndex + 1] != '=')
+                            scope.addInstruction(Assignment.parse(scope, codeLine));
+                        else
+                            scope.addInstruction(Expression.parse(scope, codeLine));
                     }
                     codeLine = "";
                 }
@@ -155,7 +156,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
-                throw new Exception("Cannot move up AND down at the same time");
+                return this.getFirstOf(typeof(Namespace)).getInstructions(t, false, true);
             if (t.IsInstanceOfType(this))
                 result.Add(this);
             if (recursiveUp)
@@ -180,8 +181,20 @@ namespace Compiler.OOS_LanguageObjects
         {
             if(!(instr is FunctionCall || instr is Assignment || instr is For || instr is ForEach || instr is IfThen || instr is While || instr is Return))
                 throw new Exception("IInstruction of the type " + instr.GetType().Name + " is not allowed for a Scope");
-            if (instr is Return && this._parent is Function)
-                this._hasReturn = true;
+            if (instr is Return)
+            {
+                if (this._parent is Function)
+                {
+                    this._hasReturn = true;
+                }
+                else
+                {
+                    Scope scope = (Scope)getFirstOf(typeof(Scope));
+                    if (scope == null)
+                        throw new Exception("Cannot find FunctionScope for return instruction");
+                    scope._hasReturn = true;
+                }
+            }
             this._childs.Add(instr);
         }
         /**returns current tab ammount*/

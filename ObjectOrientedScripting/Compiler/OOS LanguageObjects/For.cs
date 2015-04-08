@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
@@ -18,10 +19,7 @@ namespace Compiler.OOS_LanguageObjects
             this._parent = parent;
         }
 
-        public static For parse()
-        {
-            return null;
-        }
+        public static For parse(StreamReader reader, IInstruction parent, string currentLine) { throw new NotImplementedException(); }
 
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true)

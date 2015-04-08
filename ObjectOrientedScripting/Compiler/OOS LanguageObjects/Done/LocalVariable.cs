@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class LocalVariable : IInstruction
+    public class LocalVariable : Variable
     {
         private IInstruction _parent;
         private IInstruction _instr;
-        public IInstruction Instruction { get { return this._instr; } }
         public static LocalVariable parse(IInstruction parent, string input)
         {
-            if (!input.StartsWith("var "))
+            if (!input.StartsWith("var ", StringComparison.OrdinalIgnoreCase))
                 throw new Exception("A LocalVariable needs to start with the 'var' term");
             string ident = "_" + input.Substring("var ".Length);
             LocalVariable localVar = new LocalVariable();
@@ -25,6 +24,13 @@ namespace Compiler.OOS_LanguageObjects
             else
                 throw new Exception("Unknown LocalVariable syntax. Expected 'var <identifier> [= <value>];' Got: " + input);
             return localVar;
+        }
+        public Identifier getVariableIdentifier()
+        {
+            if (this._instr is Assignment)
+                return ((Assignment)this._instr).LeftHand;
+            else
+                return (Identifier)this._instr;
         }
         public string getLocalScopeIdentifier()
         {
@@ -57,7 +63,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
-                throw new Exception("Cannot move up AND down at the same time");
+                return this.getFirstOf(typeof(Namespace)).getInstructions(t, false, true);
             if (t.IsInstanceOfType(this))
                 result.Add(this);
             if (recursiveUp)

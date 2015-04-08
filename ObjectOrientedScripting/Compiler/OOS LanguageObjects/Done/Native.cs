@@ -42,7 +42,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
-                throw new Exception("Cannot move up AND down at the same time");
+                return this.getFirstOf(typeof(Namespace)).getInstructions(t, false, true);
             if (t.IsInstanceOfType(this))
                 result.Add(this);
             if (recursiveUp)

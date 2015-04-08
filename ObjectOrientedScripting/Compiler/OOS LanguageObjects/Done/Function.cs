@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public interface Variable : IInstruction
-    {
-        Identifier getVariableIdentifier();
-    }
+    public interface Function : IInstruction {}
 }

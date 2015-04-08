@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class Function : IInstruction
+    class Switch : IInstruction
     {
         public string Name { get { return ""; } }
         public static Function parse(StreamReader reader, IInstruction parent, string currentLine) { throw new NotImplementedException(); }

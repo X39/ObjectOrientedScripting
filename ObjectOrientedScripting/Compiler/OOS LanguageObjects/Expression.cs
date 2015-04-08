@@ -7,9 +7,9 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class GlobalVariable : Variable
+    class Expression : IInstruction
     {
-        public static GlobalVariable parse(StreamReader reader, string currentLine) { throw new NotImplementedException(); }
+        public static While parse(IInstruction parent, string currentLine) { throw new NotImplementedException(); }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true) { throw new NotImplementedException(); }
         /**Parses given string input specially for this element (example use: foreach(var foo in bar) would replace every occurance of foo with _x and every occurence of _x with __x or something like that)*/
@@ -24,6 +24,5 @@ namespace Compiler.OOS_LanguageObjects
         public void addInstruction(IInstruction instr) { throw new NotImplementedException(); }
         /**returns current tab ammount*/
         public int getTabs() { throw new NotImplementedException(); }
-        public Identifier getVariableIdentifier() { throw new NotImplementedException(); }
     }
 }

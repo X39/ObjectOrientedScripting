@@ -9,9 +9,9 @@ namespace Compiler.OOS_LanguageObjects
     public class Assignment : IInstruction
     {
         private IInstruction _parent;
-        private IInstruction _leftHand;
+        private Identifier _leftHand;
         private IInstruction _rightHand;
-        public IInstruction LeftHand { get { return this._leftHand; } }
+        public Identifier LeftHand { get { return this._leftHand; } }
         public IInstruction RightHand { get { return this._rightHand; } }
         private Assignment(IInstruction parent)
         {
@@ -27,7 +27,7 @@ namespace Compiler.OOS_LanguageObjects
             string rightHand = input.Substring(input.IndexOf('='));
             Assignment ass = new Assignment(parent);
             ass._leftHand = Identifier.parse(ass, leftHand);
-            //ToDo: Parse rightHand
+            ass._rightHand = Expression.parse(ass, input);
             return ass;
         }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
@@ -56,7 +56,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
-                throw new Exception("Cannot move up AND down at the same time");
+                return this.getFirstOf(typeof(Namespace)).getInstructions(t, false, true);
             if (t.IsInstanceOfType(this))
                 result.Add(this);
             if (recursiveUp)

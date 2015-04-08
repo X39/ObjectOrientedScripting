@@ -24,5 +24,6 @@ namespace Compiler.OOS_LanguageObjects
         public void addInstruction(IInstruction instr) { throw new NotImplementedException(); }
         /**returns current tab ammount*/
         public int getTabs() { throw new NotImplementedException(); }
+        public Identifier getVariableIdentifier() { throw new NotImplementedException(); }
     }
 }
