@@ -43,28 +43,24 @@ ClassVariable = ("STATIC " | "PUBLIC " | "PRIVATE " | "PROTECTED "), "VAR ", Ide
 
 CodeInstruction = FunctionCall | VariableAssignment | IfElse | For | ForEach | Switch | Return;
 
+Return = "RETURN ", (Expression | Value);
+Switch = "SWITCH ", "(", Identifier, ")", " {", {"CASE ", (String | Scalar | Bool), ": ", CodeInstruction}, "}", [";"];
+ForEach = "FOREACH ", "(", "VAR ", Identifier, " IN ", (Identifier | Array), ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [";"];
+For = "FOR ", "(", [CodeInstruction], ";", [Expression | Value], ";", [CodeInstruction], ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [";"];
+IfElse = "IF ", "(", Expression, ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [" ELSE ", (("{", {CodeInstruction}, "}") | CodeInstruction)];
+
+Expression = (("(", Expression, ")") | Value), [(" > " | " < " | " >= " | " <= " | " == " | " && " | " || "), (("(", Expression, ")") | Value);
+
+VariableAssignment = Identifier, ("++" | "--" | (" ", [Operator], "= ", Value)), ";";
+FunctionCall = Identifier, "(", [Identifier, {",", Identifier}], ")", ";";
+Identifier = (AlphabetCharacter | "_"), {AlphabetCharacter | NumberCharacter};
+
+Value = Identifier | FunctionCall | String | Scalar | Bool | (Array, {"[", NumberCharacter, "]"});
+Array = "{", [Value, {", ", Value}], "}";
+Scalar = ["-"], NumberCharacter, [[".", NumberCharacter], {NumberCharacter}];
+String = ('"', {AlphabetCharacter | NumberCharacter}, '"') | ("'", {AlphabetCharacter | NumberCharacter}, "'");
+
 AlphabetCharacter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
 NumberCharacter = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0";
 Bool = "TRUE" | "FALSE";
 Operator = "+" | "-" | "*" | "/";
-
-String = ('"', {AlphabetCharacter | NumberCharacter}, '"') | ("'", {AlphabetCharacter | NumberCharacter}, "'");
-Scalar = ["-"], NumberCharacter, [[".", NumberCharacter], {NumberCharacter}];
-Array = "{", [Value, {", ", Value}], "}";
-Value = Identifier | FunctionCall | String | Scalar | Bool | (Array, {"[", NumberCharacter, "]"});
-
-Identifier = (AlphabetCharacter | "_"), {AlphabetCharacter | NumberCharacter};
-FunctionCall = Identifier, "(", [Identifier, {",", Identifier}], ")", ";";
-VariableAssignment = Identifier, ("++" | "--" | (" ", [Operator], "= ", Value)), ";";
-
-Expression = (("(", Expression, ")") | Value), [(" > " | " < " | " >= " | " <= " | " == " | " && " | " || "), (("(", Expression, ")") | Value);
-
-IfElse = "IF ", "(", Expression, ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [" ELSE ", (("{", {CodeInstruction}, "}") | CodeInstruction)];
-For = "FOR ", "(", [CodeInstruction], ";", [Expression | Value], ";", [CodeInstruction], ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [";"];
-ForEach = "FOREACH ", "(", "VAR ", Identifier, " IN ", (Identifier | Array), ")", (("{", {CodeInstruction}, "}") | CodeInstruction), [";"];
-Switch = "SWITCH ", "(", Identifier, ")", "{", {"CASE ", (String | Scalar | Bool), ": ", CodeInstruction}, "}", [";"];
-Return = "RETURN ", (Expression | Value);
-
-
-
-
