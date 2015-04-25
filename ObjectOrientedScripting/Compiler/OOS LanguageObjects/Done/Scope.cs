@@ -110,8 +110,12 @@ namespace Compiler.OOS_LanguageObjects
                     instr = instr.getParent();
                     counter++;
                 }
-                return n.Name + f.Name + new string('_', counter);
+                return n.Name + f.getName() + new string('_', counter);
             }
+        }
+        public bool hasInstructions()
+        {
+            return this._childs.Count > 0;
         }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true)
