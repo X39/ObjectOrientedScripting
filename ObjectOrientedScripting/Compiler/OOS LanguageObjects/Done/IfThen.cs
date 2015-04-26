@@ -17,9 +17,23 @@ namespace Compiler.OOS_LanguageObjects
         {
             this._parent = parent;
         }
-        public static IfThen parse(StreamReader reader, IInstruction parent, string currentLine)
+        public static IfThen parse(StreamReader reader, IInstruction parent, string currentLine, IfThen oldIf = null)
         {
-            throw new NotImplementedException();
+            if (oldIf == null)
+            {
+                IfThen ifthen = new IfThen(parent);
+                currentLine = currentLine.Remove(0, 2).Trim();
+                ifthen._condition = Expression.parse(ifthen, currentLine);
+                ifthen._ifScope = Scope.parse(ifthen, reader);
+                return ifthen;
+            }
+            else
+            {
+                //ToDo: Implement Else If
+                currentLine = currentLine.Remove(0, 4).Trim();
+                oldIf._elseScope = Scope.parse(oldIf, reader);
+                return oldIf;
+            }
         }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true)

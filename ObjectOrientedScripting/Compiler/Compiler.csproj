@@ -54,7 +54,7 @@
     <Compile Include="OOS LanguageObjects\FunctionCall.cs" />
     <Compile Include="OOS LanguageObjects\GlobalFunction.cs" />
     <Compile Include="OOS LanguageObjects\GlobalVariable.cs" />
-    <Compile Include="OOS LanguageObjects\IfThen.cs" />
+    <Compile Include="OOS LanguageObjects\Done\IfThen.cs" />
     <Compile Include="OOS LanguageObjects\Namespace.cs" />
     <Compile Include="OOS LanguageObjects\Return.cs" />
     <Compile Include="OOS LanguageObjects\Done\Scope.cs" />

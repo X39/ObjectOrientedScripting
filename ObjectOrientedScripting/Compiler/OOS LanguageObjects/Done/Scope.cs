@@ -23,6 +23,7 @@ namespace Compiler.OOS_LanguageObjects
             string codeLine = "";
             int ci;
             Scope scope = new Scope(parent);
+            IInstruction lastInstruction = null;
             while(true)
             {
                 ci = toParse.Read();
@@ -49,31 +50,45 @@ namespace Compiler.OOS_LanguageObjects
                     codeLine.Trim();
                     if (codeLine.StartsWith("var", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(LocalVariable.parse(scope, codeLine));
+                        lastInstruction = LocalVariable.parse(scope, codeLine);
+                        scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("foreach", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(ForEach.parse(toParse, scope, codeLine));
+                        lastInstruction = ForEach.parse(toParse, scope, codeLine);
+                        scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("for", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(For.parse(toParse, scope, codeLine));
+                        lastInstruction = For.parse(toParse, scope, codeLine);
+                        scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("do", StringComparison.OrdinalIgnoreCase) || codeLine.StartsWith("while", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(While.parse(toParse, scope, codeLine));
+                        lastInstruction = While.parse(toParse, scope, codeLine);
+                        scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("switch", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(Switch.parse(toParse, scope, codeLine));
+                        lastInstruction = Switch.parse(toParse, scope, codeLine);
+                        scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("if", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(IfThen.parse(toParse, scope, codeLine));
+                        lastInstruction = IfThen.parse(toParse, scope, codeLine);
+                        scope.addInstruction(lastInstruction);
+                    }
+                    else if (codeLine.StartsWith("else", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!(lastInstruction is IfThen))
+                            throw new Exception("Unexpected else");
+                        lastInstruction = IfThen.parse(toParse, scope, codeLine, (IfThen)lastInstruction);
+                        scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("return", StringComparison.OrdinalIgnoreCase))
                     {
-                        scope.addInstruction(Return.parse(scope, codeLine));
+                        lastInstruction = Return.parse(scope, codeLine);
+                        scope.addInstruction(lastInstruction);
                     }
                     else
                     {
