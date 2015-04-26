@@ -140,14 +140,6 @@ Control Structures:
 		{
 			
 		}
-		//shorten if full
-		if(<condition>)
-			<singleCodeLine>;
-		else
-			<singleCodeLine>;
-		//shorten if only
-		if(<condition>)
-			<singleCodeLine>;
 
 	try-catch-throw syntax:
 		//throw (to throw an exception in a control structure)
