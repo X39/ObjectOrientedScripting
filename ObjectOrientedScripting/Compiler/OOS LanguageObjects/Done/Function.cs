@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects
 {
     public interface Function : IInstruction
     {
-        public string getName();
+        string getName();
     }
 }

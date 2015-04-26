@@ -16,12 +16,12 @@ namespace Wrapper
                 Console.WriteLine(s);
             if (args.Length == 0)
             {
-                Logger.log(Logger.LogLevel.ERROR, "No Parameter provided");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "No Parameter provided");
                 return;
             }
             if (!File.Exists(args[0]))
             {
-                Logger.log(Logger.LogLevel.ERROR, "Cannot open not existing file");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open not existing file");
                 return;
             }
             Project proj;
@@ -32,8 +32,8 @@ namespace Wrapper
             }
             catch (Exception ex)
             {
-                Logger.log(Logger.LogLevel.ERROR, "Failed to open Project file:");
-                Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to open Project file:");
+                Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
                 return;
             }
             try
@@ -45,26 +45,26 @@ namespace Wrapper
             }
             catch(Exception ex)
             {
-                Logger.log(Logger.LogLevel.ERROR, "Failed to load compiler:");
-                Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to load compiler:");
+                Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
                 return;
             }
             try
             {
-                Logger.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
+                Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
                 compiler.Preprocess(proj);
-                Logger.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
-                Logger.log(Logger.LogLevel.INFO, "-----  Starting compiling  -----");
+                Logger.Instance.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
+                Logger.Instance.log(Logger.LogLevel.INFO, "-----  Starting compiling  -----");
                 compiler.Compile(proj);
-                Logger.log(Logger.LogLevel.INFO, "-----  Compiling is  done  -----");
-                Logger.log(Logger.LogLevel.INFO, "----- Starting translating -----");
+                Logger.Instance.log(Logger.LogLevel.INFO, "-----  Compiling is  done  -----");
+                Logger.Instance.log(Logger.LogLevel.INFO, "----- Starting translating -----");
                 compiler.Translate(proj);
-                Logger.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
+                Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
             }
             catch (Exception ex)
             {
-                Logger.log(Logger.LogLevel.ERROR, "Failed to patch project:");
-                Logger.log(Logger.LogLevel.CONTINUE, ex.Message);
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to patch project:");
+                Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
             }
             Console.WriteLine("\nPress ENTER to continue");
             Console.Read();

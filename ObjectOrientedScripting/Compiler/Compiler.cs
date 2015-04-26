@@ -40,7 +40,7 @@ namespace Wrapper
                 File.Create(proj.Buildfolder + "_compile_.obj");
              */
             File.Move(proj.Buildfolder + "_preprocess_.obj", proj.Buildfolder + "_compile_.obj");
-            Logger.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
+            Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
         }
         #endregion
         #region PreProcessing
@@ -101,8 +101,8 @@ namespace Wrapper
                     catch(Exception ex)
                     {
                         //Catch possible exceptions from define parsing
-                        Logger.log(Logger.LogLevel.ERROR, "Experienced some error while parsing existing defines.");
-                        Logger.log(Logger.LogLevel.CONTINUE, ex.Message + ". file: " + filePath + ". linenumber: " + filelinenumber);
+                        Logger.Instance.log(Logger.LogLevel.ERROR, "Experienced some error while parsing existing defines.");
+                        Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message + ". file: " + filePath + ". linenumber: " + filelinenumber);
                         reader.Close();
                         return false;
                     }
