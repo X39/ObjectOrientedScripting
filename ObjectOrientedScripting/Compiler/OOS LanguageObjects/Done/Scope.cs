@@ -20,6 +20,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public static Scope parse(IInstruction parent, StreamReader toParse)
         {
+            //ToDo: Add String detection to not get confused when reserved chars are inside of a string (for example: var idk = "foobar;"; would cause with current implementation a stop before the string ends)
             string codeLine = "";
             int ci;
             Scope scope = new Scope(parent);
@@ -111,7 +112,7 @@ namespace Compiler.OOS_LanguageObjects
                 throw new Exception("Could not resolve ScopeName as there is no parent namespace, compiler bug");
             if(this._parent is Function)
             {
-                return n.Name + ((Function)this._parent).Name;
+                return n.Name + ((Function)this._parent).getName();
             }
             else
             {

@@ -9,6 +9,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     class GlobalFunction : Function
     {
+        public string getName() { throw new NotImplementedException(); }
         public static GlobalFunction parse(StreamReader reader, string currentLine) { throw new NotImplementedException(); }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true) { throw new NotImplementedException(); }

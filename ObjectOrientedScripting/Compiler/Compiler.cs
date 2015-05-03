@@ -14,7 +14,7 @@ namespace Wrapper
     {
         public Version getVersion()
         {
-            return new Version("0.1.0-a1");
+            return new Version("0.1.0-a");
         }
         #region Translating
         public void Translate(Project proj)
