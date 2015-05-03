@@ -11,15 +11,34 @@ namespace Compiler.OOS_LanguageObjects
     {
         private IInstruction _parent;
         private IInstruction _runAfter;
-        private IInstruction _arg1;
-        private IInstruction _arg2;
-        private IInstruction _arg3;
+        private Expression _arg1;
+        private Expression _arg2;
+        private Expression _arg3;
         public For(IInstruction parent)
         {
             this._parent = parent;
+            this._runAfter = null;
+            this._arg1 = null;
+            this._arg2 = null;
+            this._arg3 = null;
         }
 
-        public static For parse(StreamReader reader, IInstruction parent, string currentLine) { throw new NotImplementedException(); }
+        public static For parse(StreamReader reader, IInstruction parent, string currentLine)
+        {
+            currentLine = currentLine.Remove(0, 3).Trim();
+            currentLine = currentLine.Remove(0, 1).Trim();
+            For f = new For(parent);
+            f._arg1 = Expression.parse(f, currentLine.Substring(0, currentLine.IndexOf(';')));
+            currentLine = currentLine.Remove(0, currentLine.IndexOf(';')).Trim();
+            string sTmp = currentLine.Substring(currentLine.LastIndexOf(';'));
+            sTmp = sTmp.Remove(sTmp.LastIndexOf(')')).Trim();
+            currentLine = currentLine.Remove(currentLine.LastIndexOf(';')).Trim();
+            f._arg2 = Expression.parse(f, currentLine);
+            f._arg3 = Expression.parse(f, sTmp);
+            f._runAfter = Scope.parse(f, reader);
+            currentLine = currentLine.Remove(0, currentLine.IndexOf(';')).Trim();
+            return f;
+        }
 
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true)
