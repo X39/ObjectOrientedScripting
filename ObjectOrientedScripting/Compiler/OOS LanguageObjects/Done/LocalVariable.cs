@@ -17,7 +17,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (!input.StartsWith("var ", StringComparison.OrdinalIgnoreCase))
                 throw new Exception("A LocalVariable needs to start with the 'var' term");
-            string ident = "_" + input.Substring("var ".Length);
+            string ident = parent.parseInput("_" + input.Substring("var ".Length));
             LocalVariable localVar = new LocalVariable();
             localVar._parent = parent;
             if (ident.Contains('='))

@@ -40,15 +40,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler.cs" />
-    <Compile Include="IInstruction.cs" />
+    <Compile Include="Interfaces\IInstruction.cs" />
     <Compile Include="OOS LanguageObjects\Class.cs" />
     <Compile Include="OOS LanguageObjects\ClassFunction.cs" />
     <Compile Include="OOS LanguageObjects\ClassVariable.cs" />
     <Compile Include="OOS LanguageObjects\Done\Assignment.cs" />
     <Compile Include="OOS LanguageObjects\Done\For.cs" />
     <Compile Include="OOS LanguageObjects\ForEach.cs" />
+    <Compile Include="Interfaces\IFinalizable.cs" />
     <Compile Include="OOS LanguageObjects\Switch.cs" />
-    <Compile Include="OOS LanguageObjects\Done\Function.cs" />
+    <Compile Include="Interfaces\IFunction.cs" />
     <Compile Include="OOS LanguageObjects\Done\Identifier.cs" />
     <Compile Include="OOS LanguageObjects\Done\LocalVariable.cs" />
     <Compile Include="OOS LanguageObjects\FunctionCall.cs" />
@@ -59,7 +60,7 @@
     <Compile Include="OOS LanguageObjects\Done\Return.cs" />
     <Compile Include="OOS LanguageObjects\Done\Scope.cs" />
     <Compile Include="OOS LanguageObjects\Done\Value.cs" />
-    <Compile Include="OOS LanguageObjects\Done\Variable.cs" />
+    <Compile Include="Interfaces\IVariable.cs" />
     <Compile Include="OOS LanguageObjects\Done\Native.cs" />
     <Compile Include="OOS LanguageObjects\New.cs" />
     <Compile Include="OOS LanguageObjects\Expression.cs" />
