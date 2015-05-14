@@ -119,11 +119,6 @@ Control Structures:
 		{
 			
 		}
-		//check after code
-		do
-		{
-			
-		}while(<exitCondition>);
 	
 	if syntax:
 		//full
