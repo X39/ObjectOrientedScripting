@@ -10,14 +10,15 @@ namespace Compiler.OOS_LanguageObjects
     {
         private IInstruction _parent;
         private IInstruction _value;
-        private Return(IInstruction parent, IInstruction value)
+        private Return(IInstruction parent)
         {
             this._parent = parent;
-            this._value = value;
         }
         public static Return parse(IInstruction parent, string toParse)
         {
-            return null;
+            Return r = new Return(parent);
+            r._value = Expression.parse(r, toParse);
+            return r;
         }
         /**Prints out given instruction into StreamWriter as SQF. writer object is either a string or a StreamWriter*/
         public void printInstructions(object writer, bool printTabs = true)
@@ -48,13 +49,13 @@ namespace Compiler.OOS_LanguageObjects
         {
             List<IInstruction> result = new List<IInstruction>();
             if (recursiveUp && recursiveDown)
-                throw new Exception("Cannot move up AND down at the same time");
+                return this.getFirstOf(typeof(Namespace)).getInstructions(t, false, true);
             if (t.IsInstanceOfType(this))
                 result.Add(this);
             if (recursiveUp)
                 this._parent.getInstructions(t, recursiveUp, recursiveDown);
-            //if (recursiveDown)
-            //    result.AddRange(new IInstruction[] { });
+            if (recursiveDown)
+                result.AddRange(this._value.getInstructions(t, recursiveUp, recursiveDown));
             return result.ToArray();
         }
         /**returns first occurance of given type in tree or NULL if nothing was found*/
@@ -66,7 +67,7 @@ namespace Compiler.OOS_LanguageObjects
         /**Adds given instruction to child instruction list and checks if it is valid to own this instruction*/
         public void addInstruction(IInstruction instr)
         {
-            throw new Exception("An Identifier cannot have sub instructions");
+            throw new Exception("A return instruction cannot have multiple sub instructions");
         }
         /**returns current tab ammount*/
         public int getTabs()
