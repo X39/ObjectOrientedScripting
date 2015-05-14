@@ -9,10 +9,10 @@ namespace Compiler.OOS_LanguageObjects
 {
     class Switch : IInstruction
     {
+        public string Name { get { return ""; } }
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }
         //IInstruction
-        public string Name { get { return ""; } }
         public static Switch parse(StreamReader reader, IInstruction parent, string currentLine) { throw new NotImplementedException(); }
         public void printInstructions(object writer, bool printTabs = true) { throw new NotImplementedException(); }
         public string parseInput(string input) { throw new NotImplementedException(); }

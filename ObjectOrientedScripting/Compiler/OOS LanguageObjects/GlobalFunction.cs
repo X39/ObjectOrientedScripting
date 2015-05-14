@@ -7,12 +7,11 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class GlobalFunction : Function
+    class GlobalFunction : IFunction
     {
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }
         //IInstruction
-        public string getName() { throw new NotImplementedException(); }
         public static GlobalFunction parse(StreamReader reader, string currentLine) { throw new NotImplementedException(); }
         public void printInstructions(object writer, bool printTabs = true) { throw new NotImplementedException(); }
         public string parseInput(string input) { throw new NotImplementedException(); }

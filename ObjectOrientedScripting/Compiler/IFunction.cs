@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public interface Function : IInstruction
+    public interface IFunction : IInstruction
     {
         string getName();
     }

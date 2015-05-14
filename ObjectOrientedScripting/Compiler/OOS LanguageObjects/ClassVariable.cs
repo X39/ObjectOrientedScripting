@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class ClassVariable : Variable
+    public class ClassVariable : IVariable
     {
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }

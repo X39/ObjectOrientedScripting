@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class GlobalVariable : Variable
+    public class GlobalVariable : IVariable
     {
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class LocalVariable : Variable
+    public class LocalVariable : IVariable
     {
         private IInstruction _parent;
         private IInstruction _instr;

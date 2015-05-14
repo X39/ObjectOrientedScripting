@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class ClassFunction : Function
+    class ClassFunction : IFunction
     {
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }
