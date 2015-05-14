@@ -19,7 +19,7 @@ namespace Compiler.OOS_LanguageObjects
             this._hasReturn = false;
         }
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static Scope parse(IInstruction parent, StreamReader toParse)
         {
@@ -113,13 +113,13 @@ namespace Compiler.OOS_LanguageObjects
             Namespace n = (Namespace)this.getFirstOf(typeof(Namespace));
             if (n == null)
                 throw new Exception("Could not resolve ScopeName as there is no parent namespace, compiler bug");
-            if(this._parent is Function)
+            if (this._parent is IFunction)
             {
-                return n.Name + ((Function)this._parent).getName();
+                return n.Name + ((IFunction)this._parent).getName();
             }
             else
             {
-                Function f = (Function)this.getFirstOf(typeof(Function));
+                IFunction f = (IFunction)this.getFirstOf(typeof(IFunction));
                 if (f == null)
                     throw new Exception("Could not resolve ScopeName as scope is not bound to a function, compiler bug");
                 IInstruction instr = this;
@@ -200,7 +200,7 @@ namespace Compiler.OOS_LanguageObjects
                 throw new Exception("IInstruction of the type " + instr.GetType().Name + " is not allowed for a Scope");
             if (instr is Return)
             {
-                if (this._parent is Function)
+                if (this._parent is IFunction)
                 {
                     this._hasReturn = true;
                 }

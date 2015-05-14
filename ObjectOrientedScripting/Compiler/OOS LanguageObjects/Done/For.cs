@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static For parse(StreamReader reader, IInstruction parent, string currentLine)
         {

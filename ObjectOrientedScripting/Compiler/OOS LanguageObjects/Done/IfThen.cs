@@ -18,7 +18,7 @@ namespace Compiler.OOS_LanguageObjects
             this._parent = parent;
         }
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static IfThen parse(StreamReader reader, IInstruction parent, string currentLine, IfThen oldIf = null)
         {

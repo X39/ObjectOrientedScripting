@@ -20,7 +20,7 @@ namespace Compiler.OOS_LanguageObjects
             this._rightHand = null;
         }
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static Assignment parse(IInstruction parent, string input)
         {

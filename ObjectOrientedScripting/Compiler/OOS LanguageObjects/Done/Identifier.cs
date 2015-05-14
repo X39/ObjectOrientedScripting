@@ -48,7 +48,7 @@ namespace Compiler.OOS_LanguageObjects
             return char.IsLetterOrDigit(c) || c == '_';
         }
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static Identifier parse(IInstruction parent, string toParse)
         {

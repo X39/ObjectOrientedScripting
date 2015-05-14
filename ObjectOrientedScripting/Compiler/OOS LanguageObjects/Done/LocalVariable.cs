@@ -11,7 +11,7 @@ namespace Compiler.OOS_LanguageObjects
         private IInstruction _parent;
         private IInstruction _instr;
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static LocalVariable parse(IInstruction parent, string input)
         {

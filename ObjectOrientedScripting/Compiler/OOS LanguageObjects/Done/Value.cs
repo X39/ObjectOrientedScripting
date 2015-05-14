@@ -16,7 +16,7 @@ namespace Compiler.OOS_LanguageObjects
             this._value = value;
         }
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize() { }
         //IInstruction
         public static Value parse(IInstruction parent, string toParse)
         {
