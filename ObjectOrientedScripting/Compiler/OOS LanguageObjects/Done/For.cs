@@ -50,8 +50,11 @@ namespace Compiler.OOS_LanguageObjects
             ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "while {");
             this._arg2.printInstructions(writer, false);
             ((System.IO.StreamWriter)writer).Write("} do");
-            ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "{");
-            this._runAfter.printInstructions(writer, printTabs);
+                ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "{");
+            if (typeof(Scope).IsInstanceOfType(this._runAfter))
+                ((Scope)this._runAfter).printInstructions(writer, printTabs, false, null);
+            else
+                this._runAfter.printInstructions(writer, printTabs);
             this._arg3.printInstructions(writer, printTabs);
             ((System.IO.StreamWriter)writer).Write("\r\n" + (printTabs ? new string('\t', this.getTabs()) : "") + "};");
         }

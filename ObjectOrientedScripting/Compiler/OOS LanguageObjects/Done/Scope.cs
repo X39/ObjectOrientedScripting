@@ -138,6 +138,12 @@ namespace Compiler.OOS_LanguageObjects
         }
         public void printInstructions(object writer, bool printTabs = true)
         {
+            printInstructions(writer, printTabs, true, null);
+        }
+        public void printInstructions(object writer, bool printTabs = true, bool printBackets = true, IInstruction printAfter = null)
+        {
+            if (!printBackets && this._hasReturn)
+                throw new Exception("Cannot leave out Brackets for Scopes with return");
             if (!(writer is System.IO.StreamWriter))
                 throw new Exception("printInstruction expected a StreamWriter object but received a " + writer.GetType().Name + " object");
             if (this._hasReturn)
@@ -145,8 +151,10 @@ namespace Compiler.OOS_LanguageObjects
                 ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 2) : "") + "{\r\n");
                 ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "private[\"_return" + this.getScopeName() + "\"];\r\n");
                 ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "scopeName \"" + this.getScopeName() + "\";\r\n");
+                ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "_this call");
             }
-            ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "{\r\n");
+            if (printBackets)
+                ((System.IO.StreamWriter)writer).Write((printTabs && !this._hasReturn ? new string('\t', this.getTabs() - 1) : "") + "{\r\n");
             IInstruction[] localVariables = this.getInstructions(typeof(LocalVariable), false, false);
             string privateArray = "private[";
             foreach (LocalVariable instr in localVariables)
@@ -156,7 +164,10 @@ namespace Compiler.OOS_LanguageObjects
             ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs()) : "") + privateArray);
             foreach (IInstruction instr in this._childs)
                 printInstructions(writer, printTabs);
-            ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "}\r\n");
+            if (printAfter != null)
+                printAfter.printInstructions(writer, printTabs);
+            if (printBackets)
+                ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "}\r\n");
             if (this._hasReturn)
             {
                 ((System.IO.StreamWriter)writer).Write((printTabs ? new string('\t', this.getTabs() - 1) : "") + "_return" + this.getScopeName() + "\r\n");
