@@ -10,6 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     class Class : IInstruction
     {
         public string getConstructorFunctionName() { throw new NotImplementedException(); }
+        public string getFullyQualifiedName() { throw new NotImplementedException(); }
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }
         //IInstruction
