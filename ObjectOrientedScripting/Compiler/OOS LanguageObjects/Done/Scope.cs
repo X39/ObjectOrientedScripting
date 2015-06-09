@@ -96,7 +96,7 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     else
                     {
-                        //ToDo: current implementation is lazy ... there should be a better way to do so. Imrpove current routine
+                        //ToDo: current implementation is lazy ... there should be a better way to do so. Improve current routine
                         int equalityIndex = codeLine.IndexOf("=");
                         if (equalityIndex != -1 && codeLine[equalityIndex + 1] != '=')
                             scope.addInstruction(Assignment.parse(scope, codeLine));
