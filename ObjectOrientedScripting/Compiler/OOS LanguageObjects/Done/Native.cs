@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class Native : IInstruction
+    public class Native : IInstruction
     {
         private IInstruction _parent;
         private string _value;

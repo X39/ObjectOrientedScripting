@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class Return : IInstruction
+    public class Return : IInstruction
     {
         private IInstruction _parent;
         private IInstruction _value;

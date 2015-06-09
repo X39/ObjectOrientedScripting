@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class For : IInstruction
+    public class For : IInstruction
     {
         private IInstruction _parent;
         private IInstruction _runAfter;
