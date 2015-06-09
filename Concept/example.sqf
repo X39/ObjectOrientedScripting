@@ -2,7 +2,7 @@ oos_fnc_class_cFoo____constructor___ = {
 	_obj = [
 		[nil, "foobar"],
 		[{throw "UNKNOWN FUNCTION";}, {
-			diag_log "class foo" + (_this select 0);
+			diag_log "class foo" + (_this select 1);
 		}]
 	];
 	_obj
@@ -11,8 +11,8 @@ oos_fnc_class_cBar____constructor___ = {
 	_obj = [
 		[nil, "foobar"],
 		[{throw "UNKNOWN FUNCTION";}, {
-			diag_log "class foo" + (_this select 0);
-			diag_log "class foo" + (_this select 0);
+			diag_log "class foo" + (_this select 1);
+			diag_log "class bar" + (_this select 1);
 		}]
 	];
 	_obj
@@ -34,7 +34,7 @@ oos_fnc_class_testObj____constructor___ = {
 	_obj = [
 		["testFncPublic", "testVarPublic"],
 		[{throw "UNKNOWN FUNCTION";}, {
-			diag_log str (_this select 0);
+			diag_log str (_this select 1);
 		}, nil]
 	];
 	//this.testVarPublic = ""
