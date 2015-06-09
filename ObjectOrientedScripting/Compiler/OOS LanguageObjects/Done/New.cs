@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    class New : IInstruction
+    public class New : IInstruction
     {
         private IInstruction _parent;
         private string _objectName;
