@@ -9,7 +9,19 @@ namespace Compiler.OOS_LanguageObjects
 {
     class Class : IInstruction
     {
+        /// <summary>
+        /// Returns the constructor name in SQF
+        /// Example:
+        /// oos_fnc_class_oos_namespace1_foobar____constructor___
+        /// </summary>
+        /// <returns>String containing the constructor function name</returns>
         public string getConstructorFunctionName() { throw new NotImplementedException(); }
+        /// <summary>
+        /// Returns the fully qualified name as string
+        /// Example:
+        /// OOS::NAMESPACE1::FOOBAR
+        /// </summary>
+        /// <returns>String containing the FQN</returns>
         public string getFullyQualifiedName() { throw new NotImplementedException(); }
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }
