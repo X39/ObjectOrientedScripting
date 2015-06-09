@@ -45,8 +45,7 @@ static function preInit()
 	SQF::diag_log("preInit");
 	var obj = new testObj();
 	obj.testFncPublic("preInitArg1", "preInitArg2");
-	testObj.testFncStatic("preInitArg1", "preInitArg2");
-	obj.testFncStatic("preInitArg1", "preInitArg2");
+	testObj::testFncStatic("preInitArg1", "preInitArg2");
 	var foo = new cFoo();
 	foo.foobar("normal foo");
 	//rpt log now contains "class foo normal foo";
