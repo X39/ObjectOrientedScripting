@@ -79,7 +79,7 @@ namespace Compiler.OOS_LanguageObjects
                     ((System.IO.StreamWriter)writer).Write(", ");
                 this._values[i].printInstructions(writer, false);
             }
-            ((System.IO.StreamWriter)writer).Write("] call " + this._objectClass.getMainFunctionName());
+            ((System.IO.StreamWriter)writer).Write("] call " + this._objectClass.getConstructorFunctionName());
         }
         public string parseInput(string input)
         {
