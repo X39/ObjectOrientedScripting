@@ -9,6 +9,13 @@ namespace Compiler.OOS_LanguageObjects
 {
     class Expression : IInstruction
     {
+        /// <summary>
+        /// Searches for the end index of an expression in given string
+        /// </summary>
+        /// <param name="s">String that should contain an expression</param>
+        /// <returns>0 if there is no expression inside of the string or the proper index that marks the end</returns>
+        public static int findExpressionEnd(string s) { throw new NotImplementedException(); }
+
         //IFinalizable
         public void finalize() { throw new NotImplementedException(); }
         //IInstruction
