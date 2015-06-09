@@ -62,7 +62,7 @@
     <Compile Include="OOS LanguageObjects\Done\Value.cs" />
     <Compile Include="Interfaces\IVariable.cs" />
     <Compile Include="OOS LanguageObjects\Done\Native.cs" />
-    <Compile Include="OOS LanguageObjects\New.cs" />
+    <Compile Include="OOS LanguageObjects\Done\New.cs" />
     <Compile Include="OOS LanguageObjects\Expression.cs" />
     <Compile Include="OOS LanguageObjects\While.cs" />
     <Compile Include="PPDefine.cs" />

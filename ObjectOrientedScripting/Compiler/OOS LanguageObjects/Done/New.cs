@@ -23,7 +23,20 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         //IFinalizable
-        public void finalize() { throw new NotImplementedException(); }
+        public void finalize()
+        {
+            var classObjects = this.getFirstOf(typeof(Namespace)).getInstructions(typeof(Class), false, true);
+            foreach(var it in classObjects)
+            {
+                if(((Class)it).getFullyQualifiedName().Equals(this._objectName, StringComparison.OrdinalIgnoreCase))
+                {
+                    this._objectClass = (Class)it;
+                    break;
+                }
+            }
+            if (this._objectClass == null)
+                throw new Exception("Cannot finalize NEW operation, CLASS with FullyQualifiedName '" + this._objectName + "' is not existing.");
+        }
         //IInstruction
         public static New parse(IInstruction parent, string input)
         {
