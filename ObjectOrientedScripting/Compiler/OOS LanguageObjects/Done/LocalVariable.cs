@@ -10,6 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     {
         private IInstruction _parent;
         private IInstruction _instr;
+        public IInstruction Instr { get { return this._instr; } }
         //IFinalizable
         public void finalize() { }
         //IInstruction
