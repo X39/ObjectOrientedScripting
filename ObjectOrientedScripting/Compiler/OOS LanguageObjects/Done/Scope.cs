@@ -28,6 +28,8 @@ namespace Compiler.OOS_LanguageObjects
             int ci;
             Scope scope = new Scope(parent);
             IInstruction lastInstruction = null;
+            if (toParse.Peek() == '{')
+                toParse.Read();
             while(true)
             {
                 ci = toParse.Read();
