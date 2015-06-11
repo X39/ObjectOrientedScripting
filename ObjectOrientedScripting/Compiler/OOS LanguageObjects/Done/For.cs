@@ -11,7 +11,7 @@ namespace Compiler.OOS_LanguageObjects
     {
         private IInstruction _parent;
         private IInstruction _runAfter;
-        private Expression _arg1;
+        private LocalVariable _arg1;
         private Expression _arg2;
         private Expression _arg3;
         public For(IInstruction parent)
@@ -31,7 +31,7 @@ namespace Compiler.OOS_LanguageObjects
             currentLine = currentLine.Remove(0, 3).Trim();
             currentLine = currentLine.Remove(0, 1).Trim();
             For f = new For(parent);
-            f._arg1 = Expression.parse(f, currentLine.Substring(0, currentLine.IndexOf(';')));
+            f._arg1 = LocalVariable.parse(f, currentLine.Substring(0, currentLine.IndexOf(';')));
             currentLine = currentLine.Remove(0, currentLine.IndexOf(';')).Trim();
             string sTmp = currentLine.Substring(currentLine.LastIndexOf(';'));
             sTmp = sTmp.Remove(sTmp.LastIndexOf(')')).Trim();
@@ -91,7 +91,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public void addInstruction(IInstruction instr)
         {
-            throw new Exception("An Identifier cannot have sub instructions");
+            this._runAfter.addInstruction(instr);
         }
         public int getTabs()
         {
