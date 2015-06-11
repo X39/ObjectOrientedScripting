@@ -112,6 +112,12 @@ Control Structures:
 		{
 			
 		}
+
+	foreach syntax:
+		foreach(var <varName> in <EXPRESSION>)
+		{
+			
+		}
 	
 	while syntax:
 		//check before code
