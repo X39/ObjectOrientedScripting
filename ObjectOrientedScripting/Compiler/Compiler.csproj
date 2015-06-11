@@ -46,7 +46,7 @@
     <Compile Include="OOS LanguageObjects\ClassVariable.cs" />
     <Compile Include="OOS LanguageObjects\Done\Assignment.cs" />
     <Compile Include="OOS LanguageObjects\Done\For.cs" />
-    <Compile Include="OOS LanguageObjects\ForEach.cs" />
+    <Compile Include="OOS LanguageObjects\Done\ForEach.cs" />
     <Compile Include="Interfaces\IFinalizable.cs" />
     <Compile Include="OOS LanguageObjects\Switch.cs" />
     <Compile Include="Interfaces\IFunction.cs" />
