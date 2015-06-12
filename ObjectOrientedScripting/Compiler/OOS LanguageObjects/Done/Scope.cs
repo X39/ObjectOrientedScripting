@@ -21,12 +21,14 @@ namespace Compiler.OOS_LanguageObjects
         //IFinalizable
         public void finalize() { }
         //IInstruction
-        public static Scope parse(IInstruction parent, StreamReader toParse)
+        public static Scope parse(IInstruction parent, StreamReader toParse, List<IInstruction> addBefore = null)
         {
             //ToDo: Add String detection to not get confused when reserved chars are inside of a string (for example: var idk = "foobar;"; would cause with current implementation a stop before the string ends)
             string codeLine = "";
             int ci;
             Scope scope = new Scope(parent);
+            if (addBefore != null)
+                scope._childs.AddRange(addBefore);
             IInstruction lastInstruction = null;
             if (toParse.Peek() == '{')
                 toParse.Read();
@@ -72,11 +74,6 @@ namespace Compiler.OOS_LanguageObjects
                     else if (codeLine.StartsWith("do", StringComparison.OrdinalIgnoreCase) || codeLine.StartsWith("while", StringComparison.OrdinalIgnoreCase))
                     {
                         lastInstruction = While.parse(toParse, scope, codeLine);
-                        scope.addInstruction(lastInstruction);
-                    }
-                    else if (codeLine.StartsWith("switch", StringComparison.OrdinalIgnoreCase))
-                    {
-                        lastInstruction = Switch.parse(toParse, scope, codeLine);
                         scope.addInstruction(lastInstruction);
                     }
                     else if (codeLine.StartsWith("if", StringComparison.OrdinalIgnoreCase))
