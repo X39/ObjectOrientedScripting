@@ -43,10 +43,6 @@ namespace Compiler.OOS_LanguageObjects
                 throw new Exception("'" + value + "' is a reserved term and thus not allowed for identifiers");
             this._name = this.parseInput(value);
         }
-        private static bool isValidIdentifierChar(char c)
-        {
-            return char.IsLetterOrDigit(c) || c == '_';
-        }
         //IFinalizable
         public void finalize()
         {
@@ -56,8 +52,8 @@ namespace Compiler.OOS_LanguageObjects
         public static Identifier parse(IInstruction parent, string toParse)
         {
             string name = toParse.Trim();
-            if (!name.All(isValidIdentifierChar))
-                throw new Exception("Identifier '" + name + "' contains not allowed characters for identifierts, allowed characters: [_0-9A-Za-z]");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[_a-zA-Z][a-zA-Z0-9]+$"))
+                throw new Exception("Identifier '" + name + "' contains not allowed characters for identifierts, allowed REGEX: ^[_a-zA-Z][a-zA-Z0-9]+$");
             //maybe ToDo: Validate that representing variable is existing (requires Variable items to be implemented)
             return new Identifier(parent, name);
         }
