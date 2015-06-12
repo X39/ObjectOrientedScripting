@@ -52,8 +52,8 @@ namespace Compiler.OOS_LanguageObjects
         public static Identifier parse(IInstruction parent, string toParse)
         {
             string name = toParse.Trim();
-            if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[_a-zA-Z][a-zA-Z0-9]+$"))
-                throw new Exception("Identifier '" + name + "' contains not allowed characters for identifierts, allowed REGEX: ^[_a-zA-Z][a-zA-Z0-9]+$");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[_a-zA-Z][_a-zA-Z0-9]+$"))
+                throw new Exception("Identifier '" + name + "' contains not allowed characters for identifierts, allowed REGEX: ^[_a-zA-Z][_a-zA-Z0-9]+$");
             //maybe ToDo: Validate that representing variable is existing (requires Variable items to be implemented)
             return new Identifier(parent, name);
         }
