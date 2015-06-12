@@ -33,6 +33,13 @@ namespace Compiler.OOS_LanguageObjects
         {
             return input;
         }
+        public void setParent(IInstruction parent)
+        {
+            if (parent is Scope)
+                this._parent = parent;
+            else
+                throw new Exception("Changing parent to non-Scope is not allowed for '" + typeof(Assignment).Name + "' Objects.");
+        }
         public IInstruction getParent()
         {
             return this._parent;
