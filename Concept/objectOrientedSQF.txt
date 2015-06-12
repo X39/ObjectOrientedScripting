@@ -1,7 +1,7 @@
-ObjectOrientedSQF - Syntax Document V1.0
+ObjectOrientedSQF - Syntax Document V1.2
 ----------------------------------------
 
-allowed characters for names:
+allowed characters for names (REGEX validation: ^[_a-zA-Z][_a-zA-Z0-9]+$:
 	- A-Z			-	Everywhere
 	- a-z			-	Everywhere
 	- 0-9			-	Not at the very begining (0arr is not allowed, arr0 is)
@@ -37,6 +37,10 @@ reserved instructions:
 	- simulation	-	reserved for future use
 	- switch		-	reserved for future use
 	- break			-	reserved for future use
+	- try			-	reserved for future use
+	- catch			-	reserved for future use
+	- throw			-	reserved for future use
+	- instanceof	-	reserved for future use
 
 reserved characters:
 	- []			-	Array markers
@@ -134,20 +138,18 @@ Control Structures:
 			
 		}
 
-	try-catch-throw syntax:
-		//throw (to throw an exception in a control structure)
-		throw <messageAsString>
-		//try-catch
-		try
-		{
-			<codeCausingExceptions>
-		}
-		catch(<variableName>)
-		{
-			<codeHandlingExceptions>
-		}
-
 Definitions:
 	Class:
 		- A Class ALWAYS has a constructor (not existing constructor = empty constructor)
-		- A Constructor can be encapsulated as private/protected thus making it "impossible" to create an object outside of given function
+		- A Constructor can be encapsulated as private/protected thus making it "impossible" to create an object outside of given functio
+
+Notes:
+	In First itteration it is not planned to do a lot of features due to the time which would be required to implement them
+	A short overview (might not be complete):
+	- TryCatch and throw
+	- Switch
+	- PreProcessor stringification
+	- PreProcessor merging
+	- SingleLine ifElse/while/for/foreach/...
+	- full validation of variables etc. (everywhere just lazy stuff is used as its faster to implement, further improvements for each object is planned)
+	- stuff that requires more meta information in the different objects (instanceof for example)
