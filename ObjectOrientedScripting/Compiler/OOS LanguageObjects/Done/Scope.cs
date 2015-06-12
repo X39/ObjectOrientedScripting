@@ -28,7 +28,11 @@ namespace Compiler.OOS_LanguageObjects
             int ci;
             Scope scope = new Scope(parent);
             if (addBefore != null)
+            {
+                foreach(var it in addBefore)
+                    it.setParent(scope);
                 scope._childs.AddRange(addBefore);
+            }
             IInstruction lastInstruction = null;
             if (toParse.Peek() == '{')
                 toParse.Read();
