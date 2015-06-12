@@ -19,7 +19,6 @@ reserved instructions:
 	- return		-	Return out of a function
 	- if			-	if statement
 	- else			-	used in combination with if
-	- switch		-	switch statement
 	- case			-	used in combination with switch
 	- default		-	used in combination with switch
 	- for			-	for statement
@@ -33,9 +32,11 @@ reserved instructions:
 	- toString		-	str equivalence
 	- override		-	used to override a parents function (invalid if no parent present or parent does not has given function, also invalid if missing on overridden function)
 	- native		-	used to directly execute one line of SQF code. Example: native _foo = 'bar';
+	- nil			-	value type to unset something
 	- working		-	reserved for future use
 	- simulation	-	reserved for future use
-	- nil			-	
+	- switch		-	reserved for future use
+	- break			-	reserved for future use
 
 reserved characters:
 	- []			-	Array markers
@@ -97,15 +98,6 @@ Control Structures:
 	
 	variable syntax:
 		<static|public|protected|private> var <variableName>
-	
-	switch syntax:
-		swtich(<state>)
-		{
-			case <state>:
-				break;
-			default:
-				break;
-		}
 	
 	for syntax:
 		for(<beforeLoop>;<exitCondition>;<endOfCycle>)
