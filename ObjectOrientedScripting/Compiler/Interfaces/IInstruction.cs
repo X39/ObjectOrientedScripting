@@ -31,6 +31,11 @@ namespace Compiler.OOS_LanguageObjects
         /// <returns>Objects parent IInstruction</returns>
         IInstruction getParent();
         /// <summary>
+        /// Changes IInstructions parent
+        /// </summary>
+        /// <param name="parent">Objects parent IInstruction</param>
+        void setParent(IInstruction parent);
+        /// <summary>
         /// Iterates current IInstruction tree up/down and returns given type
         /// </summary>
         /// <param name="t"></param>
