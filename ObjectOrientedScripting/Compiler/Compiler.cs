@@ -21,7 +21,6 @@ namespace Wrapper
         {
             //Read compiled file
             StreamReader reader = new StreamReader(proj.Buildfolder + "_compile_.obj");
-            Namespace oos = Namespace.parse(reader, null, "namespace oos {");
             reader.Close();
 
             //Write namespace tree to disk

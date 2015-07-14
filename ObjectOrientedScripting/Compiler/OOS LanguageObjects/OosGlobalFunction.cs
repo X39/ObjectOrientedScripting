@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public interface IVariable : IInstruction
+    public class OosGlobalFunction : BaseFunctionObject
     {
-        Identifier getVariableIdentifier();
     }
 }
