@@ -45,6 +45,8 @@
     <Compile Include="OOS LanguageObjects\BaseLangObject.cs" />
     <Compile Include="OOS LanguageObjects\BaseVariableObject.cs" />
     <Compile Include="OOS LanguageObjects\enums.cs" />
+    <Compile Include="OOS LanguageObjects\HelperClasses\ListBaseLangObject.cs" />
+    <Compile Include="OOS LanguageObjects\HelperClasses\ListString.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iName.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iNormalizedName.cs" />
     <Compile Include="OOS LanguageObjects\OosClass.cs" />
