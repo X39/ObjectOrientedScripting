@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Concept", "Concept", "{5D8F
 		..\Concept\example.oosproj = ..\Concept\example.oosproj
 		..\Concept\example.sqf = ..\Concept\example.sqf
 		..\Concept\objectOrientedSQF.txt = ..\Concept\objectOrientedSQF.txt
+		..\Concept\oos.ebnf = ..\Concept\oos.ebnf
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csproj", "{AB1BED91-BEDF-485C-B697-2D0DB1DC7D47}"
