@@ -38,4 +38,8 @@ public class Logger
         Console.WriteLine(line);
         fstream.WriteLine(line);
     }
+    public void close()
+    {
+        this.fstream.Close();
+    }
 }
