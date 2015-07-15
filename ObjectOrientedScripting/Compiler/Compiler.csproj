@@ -54,9 +54,18 @@
     <Compile Include="OOS LanguageObjects\OosClassVariable.cs" />
     <Compile Include="OOS LanguageObjects\OosCodeInstruction.cs" />
     <Compile Include="OOS LanguageObjects\OosExpression.cs" />
+    <Compile Include="OOS LanguageObjects\OosCase.cs" />
+    <Compile Include="OOS LanguageObjects\OosBreak.cs" />
+    <Compile Include="OOS LanguageObjects\OosReturn.cs" />
+    <Compile Include="OOS LanguageObjects\OosIfElse.cs" />
+    <Compile Include="OOS LanguageObjects\OosTryCatch.cs" />
+    <Compile Include="OOS LanguageObjects\OosSwitch.cs" />
+    <Compile Include="OOS LanguageObjects\OosThrow.cs" />
+    <Compile Include="OOS LanguageObjects\OosWhileLoop.cs" />
     <Compile Include="OOS LanguageObjects\OosFunctionCall.cs" />
     <Compile Include="OOS LanguageObjects\OosGlobalFunction.cs" />
     <Compile Include="OOS LanguageObjects\OosGlobalVariable.cs" />
+    <Compile Include="OOS LanguageObjects\OosForLoop.cs" />
     <Compile Include="OOS LanguageObjects\OosInstanceOf.cs" />
     <Compile Include="OOS LanguageObjects\OosLocalVariable.cs" />
     <Compile Include="OOS LanguageObjects\OosNamespace.cs" />
@@ -66,8 +75,10 @@
     <Compile Include="OOS LanguageObjects\OosValue.cs" />
     <Compile Include="OOS LanguageObjects\OosVariable.cs" />
     <Compile Include="OOS LanguageObjects\OosVariableAssignment.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="PPDefine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scanner.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Logger\Logger.csproj">
