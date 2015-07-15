@@ -8,7 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class OosTypeOf : BaseLangObject
     {
-        public BaseLangObject Argument { get { return this.Children[0]; } set { this.Children[0] = value; value.setParent(this); } }
+        public BaseLangObject Argument { get { return this.Children[0]; } set { this.Children[0] = value; if(value != null) value.setParent(this); } }
 
         public OosTypeOf()
         {

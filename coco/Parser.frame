@@ -126,7 +126,7 @@ public class Parser {
 public class Errors {
 	public int count = 0;                                    // number of errors detected
 	public System.IO.TextWriter errorStream = Console.Out;   // error messages go to this stream
-	public string errMsgFormat = "-- line {0} col {1}: {2}"; // 0=line, 1=column, 2=text
+	public string errMsgFormat = "line {0} col {1}: {2}"; // 0=line, 1=column, 2=text
 
 	public virtual void SynErr (int line, int col, int n) {
 		string s;
@@ -134,26 +134,31 @@ public class Errors {
 -->errors
 			default: s = "error " + n; break;
 		}
-		errorStream.WriteLine(errMsgFormat, line, col, s);
+        Logger.Instance.log(Logger.LogLevel.ERROR, String.Format(errMsgFormat, line, col, s));
+		//errorStream.WriteLine(errMsgFormat, line, col, s);
 		count++;
 	}
 
 	public virtual void SemErr (int line, int col, string s) {
-		errorStream.WriteLine(errMsgFormat, line, col, s);
+        Logger.Instance.log(Logger.LogLevel.ERROR, String.Format(errMsgFormat, line, col, s));
+		//errorStream.WriteLine(errMsgFormat, line, col, s);
 		count++;
 	}
 	
 	public virtual void SemErr (string s) {
-		errorStream.WriteLine(s);
+        Logger.Instance.log(Logger.LogLevel.ERROR, s);
+		//errorStream.WriteLine(s);
 		count++;
 	}
 	
 	public virtual void Warning (int line, int col, string s) {
-		errorStream.WriteLine(errMsgFormat, line, col, s);
+        Logger.Instance.log(Logger.LogLevel.WARNING, String.Format(errMsgFormat, line, col, s));
+		//errorStream.WriteLine(errMsgFormat, line, col, s);
 	}
 	
 	public virtual void Warning(string s) {
-		errorStream.WriteLine(s);
+        Logger.Instance.log(Logger.LogLevel.WARNING, s);
+		//errorStream.WriteLine(s);
 	}
 } // Errors
 

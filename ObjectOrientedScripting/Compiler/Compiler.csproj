@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler.cs" />
+    <Compile Include="Exceptions\ParsingException.cs" />
     <Compile Include="Exceptions\InvalidParent.cs" />
     <Compile Include="OOS LanguageObjects\BaseFunctionObject.cs" />
     <Compile Include="OOS LanguageObjects\BaseLangObject.cs" />
@@ -52,7 +53,6 @@
     <Compile Include="OOS LanguageObjects\OosClass.cs" />
     <Compile Include="OOS LanguageObjects\OosClassFunction.cs" />
     <Compile Include="OOS LanguageObjects\OosClassVariable.cs" />
-    <Compile Include="OOS LanguageObjects\OosCodeInstruction.cs" />
     <Compile Include="OOS LanguageObjects\OosExpression.cs" />
     <Compile Include="OOS LanguageObjects\OosCase.cs" />
     <Compile Include="OOS LanguageObjects\OosBreak.cs" />

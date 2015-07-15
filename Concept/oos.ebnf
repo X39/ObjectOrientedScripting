@@ -1,5 +1,6 @@
 using Compiler.OOS_LanguageObjects;
 using Compiler.OOS_LanguageObjects.HelperClasses;
+using Compiler.OOS_LanguageObjects.Ex;
 
 
 COMPILER OOS
@@ -18,15 +19,9 @@ TOKENS
 	INTEGER = ('-' | '+') DIGIT { DIGIT }.
 	DOUBLE = ('-' | '+') DIGIT { DIGIT } '.' DIGIT { DIGIT }.
 	FQIDENT = ["::"] ( CHARACTER { CHARACTER | UNDERSCORE | DIGIT } ) { "::" ( CHARACTER { CHARACTER | UNDERSCORE | DIGIT } ) } [ '.' ( CHARACTER { CHARACTER | UNDERSCORE | DIGIT } ) ].
-	LOCALIDENT = UNDERSCORE ( CHARACTER | UNDERSCORE) {CHARACTER | UNDERSCORE | DIGIT }.
+	LOCALIDENT = UNDERSCORE ( CHARACTER | UNDERSCORE) {CHARACTER | UNDERSCORE | DIGIT } [ '.' ( CHARACTER { CHARACTER | UNDERSCORE | DIGIT } ) ].
 	LINETERMINATOR = ';'.
 	STRING = '"' { STRINGCHARS | "\\\""} '"'.
-	BRO = '('.
-	BRC = ')'.
-	BSO = '['.
-	BSC = ']'.
-	BCO = '{'.
-	BCC = '}'.
 	COMMA = ','.
 	
 COMMENTS FROM "/*" TO "*/" NESTED
@@ -46,13 +41,13 @@ PRODUCTIONS
 	
 	ARRAY<out BaseLangObject bloOut>										(. var v1 = new OosValue(); bloOut = (BaseLangObject)v1;  BaseLangObject v2; .)
 	=
-		BSO																	(. v1.append("["); .)
+		'['																	(. v1.append("["); .)
 		VALUE<out v2>														(. v1.append((OosValue)v2); .)
 		{
 			COMMA															(. v1.append(","); .)
 			VALUE<out v2>													(. v1.append((OosValue)v2); .)
 		}
-		BSC																	(. v1.append("]"); .)
+		']'																	(. v1.append("]"); .)
 	.
 	
     VALUE<out BaseLangObject bloOut>										(. var v = new OosValue(); bloOut = (BaseLangObject)v;  .)
@@ -92,7 +87,7 @@ PRODUCTIONS
 			NAMESPACE<out blo>												(. oosTreeBase.addChild(blo); .)
 			|
 			CLASS<out blo>													(. oosTreeBase.addChild(blo); .)
-			|IF(FollowedBy("function"))
+			|IF(scanner.FollowedBy("function"))
 			GLOBALFUNCTION<out blo>											(. oosTreeBase.addChild(blo); .)
 			|
 			GLOBALVARIABLE<out blo>											(. oosTreeBase.addChild(blo); .)
@@ -102,17 +97,17 @@ PRODUCTIONS
 	=
 		"namespace"
 		FQIDENT																(. n.Name = t.val; .)
-		BCO
+		'{'
 		{
 			NAMESPACE<out blo>												(. n.addChild(blo); .)
 			|
 			CLASS<out blo>													(. n.addChild(blo); .)
-			|IF(FollowedBy("function"))
+			|IF(scanner.FollowedBy("function"))
 			GLOBALFUNCTION<out blo>											(. n.addChild(blo); .)
 			|
 			GLOBALVARIABLE<out blo>											(. n.addChild(blo); .)
 		}
-		BCC
+		'}'
 		[LINETERMINATOR {LINETERMINATOR}]
 	.
 	CLASS<out BaseLangObject bloOut>										(. var c = new OosClass(); bloOut = (BaseLangObject)c; BaseLangObject blo; .)
@@ -127,43 +122,54 @@ PRODUCTIONS
 				FQIDENT														(. c.ParentClasses.Add(t.val); .)
 			}
 		]
-		BCO
+		'{'
 		{
 			CLASS<out blo>													(. c.addChild(blo); blo.setParent(c); .)
 			|
 			CLASSCONSTRUCTOR<out blo>										(. c.addChild(blo); blo.setParent(c); ((BaseFunctionObject)blo).Name = c.Name; .)
-			|IF(FollowedBy("function"))
-			GLOBALFUNCTION<out blo>											(. c.addChild(blo); blo.setParent(c); .)
 			|
-			GLOBALVARIABLE<out blo>											(. c.addChild(blo); blo.setParent(c); .)
-			|IF(FollowedByWO("function"))
-			CLASSFUNCTION<out blo>											(. c.addChild(blo); blo.setParent(c); .)
+			( IF(scanner.FollowedBy("function"))
+				GLOBALFUNCTION<out blo>										(. c.addChild(blo); blo.setParent(c); .)
+				|
+				GLOBALVARIABLE<out blo>										(. c.addChild(blo); blo.setParent(c); .)
+			)
 			|
-			CLASSVARIABLE<out blo>											(. c.addChild(blo); blo.setParent(c); .)
+			( IF(scanner.FollowedByWO("function"))
+				CLASSFUNCTION<out blo>										(. c.addChild(blo); blo.setParent(c); .)
+				|
+				CLASSVARIABLE<out blo>										(. c.addChild(blo); blo.setParent(c); .)
+			)
 		}
-		BCC
+		'}'
 		[LINETERMINATOR {LINETERMINATOR}]
 	.
 	ARGLIST<out ListString l>												(. l = new ListString(); .)
 	=
-		BRO
-		{
-			FQIDENT															(. l.Add(t.val); .)
-		}
-		BRC
+		'('
+		[
+			FQIDENT
+			{
+				','
+				FQIDENT														(. l.Add(t.val); .)
+			}
+		]
+		')'
 	.
 	CLASSCONSTRUCTOR<out BaseLangObject bloOut>								(. var cf = new OosClassFunction(); bloOut = (BaseLangObject)cf; BaseLangObject blo; ListString argL;.)
 	=
 		"constructor"
 		ARGLIST<out argL>													(. cf.ArgList = argL.getList(); .)
-		BCO
+		'{'
 			{
 				(
 					CODEINSTRUCTION<out blo>								(. cf.addChild(blo); .)
 					LINETERMINATOR {LINETERMINATOR}
 				)
+				|
+				CODEINSTRUCTION_OPTIONALSC<out blo>							(. cf.addChild(blo); .)
+				[LINETERMINATOR {LINETERMINATOR}]
 			}
-		BCC
+		'}'
 		[LINETERMINATOR {LINETERMINATOR}]
 	.
 	CLASSFUNCTION<out BaseLangObject bloOut>								(. var cf = new OosClassFunction(); bloOut = (BaseLangObject)cf; BaseLangObject blo; ListString argL; ClassEncapsulation e;.)
@@ -172,16 +178,22 @@ PRODUCTIONS
 			ENCAPSULATION<out e>											(. cf.Encapsulation = e; .)
 		]
 		"function"
+		[
+			"override"														(. cf.OverrideBase = true; .)
+		]
 		FQIDENT																(. cf.Name = t.val; .)
 		ARGLIST<out argL>													(. cf.ArgList = argL.getList(); .)
-		BCO
+		'{'
 			{
 				(
 					CODEINSTRUCTION<out blo>								(. cf.addChild(blo); .)
 					LINETERMINATOR {LINETERMINATOR}
 				)
+				|
+				CODEINSTRUCTION_OPTIONALSC<out blo>							(. cf.addChild(blo); .)
+				[LINETERMINATOR {LINETERMINATOR}]
 			}
-		BCC
+		'}'
 		[LINETERMINATOR {LINETERMINATOR}]
 	.
 	GLOBALFUNCTION<out BaseLangObject bloOut>								(. var gf = new OosGlobalFunction(); bloOut = (BaseLangObject)gf; BaseLangObject blo; ListString argL;.)
@@ -190,14 +202,17 @@ PRODUCTIONS
 		"function"
 		FQIDENT																(. gf.Name = t.val; .)
 		ARGLIST<out argL>													(. gf.ArgList = argL.getList(); .)
-		BCO
+		'{'
 			{
 				(
 					CODEINSTRUCTION<out blo>								(. gf.addChild(blo); .)
 					LINETERMINATOR {LINETERMINATOR}
 				)
+				|
+				CODEINSTRUCTION_OPTIONALSC<out blo>							(. gf.addChild(blo); .)
+				[LINETERMINATOR {LINETERMINATOR}]
 			}
-		BCC
+		'}'
 		[LINETERMINATOR {LINETERMINATOR}]
 	.
 	CLASSVARIABLE<out BaseLangObject bloOut>								(. var cv = new OosClassVariable(); bloOut = (BaseLangObject)cv; ClassEncapsulation e; BaseLangObject blo; .)
@@ -224,56 +239,69 @@ PRODUCTIONS
 		]
 		LINETERMINATOR {LINETERMINATOR}
 	.
-	EXPRESSION<out BaseLangObject bloOut>									(. var e = new OosExpression(); bloOut = (BaseLangObject)e; BaseLangObject blo; .)
+	EXPRESSION_OPERATOR<out ExpressionOperator eo>							(. eo = ExpressionOperator.Plus; .)
 	=
-		[ BRO ]
-		[ BRO ]
 		(
-			FUNCTIONCALL<out blo>											(. e.LInstruction = blo; .)
-			|
-			VALUE<out blo>													(. e.LInstruction = blo; .)
-			|
-			OBJECTCREATION<out blo>											(. e.LInstruction = blo; .)
-			|
-			FQIDENT															(. e.LInstruction = new OosVariable(t.val); .)
-			|
-			LOCALIDENT														(. e.LInstruction = new OosVariable(t.val); .)
+			'&'																(. eo = ExpressionOperator.And; .)
+			[
+				'&'															(. eo = ExpressionOperator.AndAnd; .)
+			]
 		)
-		[ BRC ]
+		|
+		(
+			'|'																(. eo = ExpressionOperator.Or; .)
+			[
+				'|'															(. eo = ExpressionOperator.OrOr; .)
+			]
+		)
+		|
+		(
+			"=="															(. eo = ExpressionOperator.Equals; .)
+			[
+				'='															(. eo = ExpressionOperator.ExplicitEquals; .)
+			]
+		)
+		|
+		'+'																	(. eo = ExpressionOperator.Plus; .)
+		|
+		'-'																	(. eo = ExpressionOperator.Minus; .)
+		|
+		'*'																	(. eo = ExpressionOperator.Multiplication; .)
+		|
+		'/'																	(. eo = ExpressionOperator.Division; .)
+	.
+	EXPRESSION_SINGLE<out BaseLangObject bloOut>							(. bloOut = null; .)
+	=
+		VALUE<out bloOut>
+		|
+		OBJECTCREATION<out bloOut>
+		|IF(scanner.FollowedBy("("))
+		FUNCTIONCALL<out bloOut>
+		|
+		FQIDENT																(. bloOut = new OosVariable(t.val); .)
+		|
+		LOCALIDENT															(. bloOut = new OosVariable(t.val); .)
+	.
+	EXPRESSION_HELPER<out BaseLangObject bloOut>							(. var e = new OosExpression(); bloOut = (BaseLangObject)e; BaseLangObject blo; ExpressionOperator eo; .)
+	=
+		[
+			'!'																(. e.Negate = true; .)
+		]
+		EXPRESSION_SINGLE<out blo>											(. e.LInstruction = blo; .)
 		{
-			(
-				(
-					'&'														(. e.Op = ExpressionOperator.And; .)
-					[
-						'&'													(. e.Op = ExpressionOperator.AndAnd; .)
-					]
-				)
-				|
-				(
-					'|'														(. e.Op = ExpressionOperator.Or; .)
-					[
-						'|'													(. e.Op = ExpressionOperator.OrOr; .)
-					]
-				)
-				|
-				(
-					"=="													(. e.Op = ExpressionOperator.Equals; .)
-					[
-						'='													(. e.Op = ExpressionOperator.ExplicitEquals; .)
-					]
-				)
-				|
-				'+'															(. e.Op = ExpressionOperator.Plus; .)
-				|
-				'-'															(. e.Op = ExpressionOperator.Minus; .)
-				|
-				'*'															(. e.Op = ExpressionOperator.Multiplication; .)
-				|
-				'/'															(. e.Op = ExpressionOperator.Division; .)
-			)
+			EXPRESSION_OPERATOR<out eo>										(. e.Op = eo; .)
 			EXPRESSION<out blo>												(. e.RInstruction = blo; .)
-			[ BRC ]
 		}
+	.
+	EXPRESSION<out BaseLangObject bloOut>									(. bloOut = null; .)
+	=
+		(
+			'('
+			EXPRESSION_HELPER<out bloOut>
+			')'
+		)
+		|
+		EXPRESSION_HELPER<out bloOut>
 	.
 	LOCALVARIABLE<out BaseLangObject bloOut>								(. var lv = new OosLocalVariable(); bloOut = (BaseLangObject)lv; BaseLangObject blo; .)
 	=
@@ -284,7 +312,7 @@ PRODUCTIONS
 			EXPRESSION<out blo>												(. lv.Value = blo; .)
 		]
 	.
-	ASSIGNMENT<out BaseLangObject bloOut>									(. string v1; string v2; bloOut = null; BaseLangObject blo; .)
+	ASSIGNMENT<out BaseLangObject bloOut>									(. string v1 = ""; string v2 = ""; bloOut = null; BaseLangObject blo; .)
 	=
 		(
 			FQIDENT															(. v1 = t.val; .)
@@ -292,18 +320,20 @@ PRODUCTIONS
 			LOCALIDENT														(. v1 = t.val; .)
 		)
 		[
-			BSO
+			'['
 				UINTEGER													(. v2 = t.val; .)
-			BSC
+			']'
 		]
 		(
-			(																(. var obj = new OosQuickAssignment(); qa.Variable = new OosVariable(v1); qa.ArrayPosition = v2; bloOut = (BaseLangObject)obj; .)
-				"++"														(. obj.QuickAssignmentType = QuickAssignmentTypes.PlusPlus; .)
-				|
-				"--"														(. obj.QuickAssignmentType = QuickAssignmentTypes.MinusMinus; .)
+			(																(. var obj = new OosQuickAssignment(); obj.Variable = new OosVariable(v1); obj.ArrayPosition = v2; bloOut = (BaseLangObject)obj; .)
+				(
+					"++"													(. obj.QuickAssignmentType = QuickAssignmentTypes.PlusPlus; .)
+					|
+					"--"													(. obj.QuickAssignmentType = QuickAssignmentTypes.MinusMinus; .)
+				)
 			)
 			|
-			(																(. var obj = new OosVariableAssignment(); qa.Variable = new OosVariable(v1); qa.ArrayPosition = v2; bloOut = (BaseLangObject)obj; AssignmentOperators ao; .)
+			(																(. var obj = new OosVariableAssignment(); obj.Variable = new OosVariable(v1); obj.ArrayPosition = v2; bloOut = (BaseLangObject)obj; AssignmentOperators ao; .)
 				ASSIGNMENTOPERATORS<out ao>									(. obj.AssignmentOperator = ao; .)
 				EXPRESSION<out blo>											(. obj.Value = blo; .)
 			)
@@ -311,23 +341,31 @@ PRODUCTIONS
 	.
 	CALLLIST<out ListBaseLangObject l>										(. l = new ListBaseLangObject(); BaseLangObject blo; .)
 	=
-		BRO
-		{
+		'('
+		[
 			EXPRESSION<out blo>												(. l.Add(blo); .)
-		}
-		BRC
+			{
+				','
+				EXPRESSION<out blo>											(. l.Add(blo); .)
+			}
+		]
+		')'
 	.
 	FUNCTIONCALL<out BaseLangObject bloOut>									(. var fc = new OosFunctionCall(); bloOut = (BaseLangObject)fc; ListBaseLangObject cl; .)
 	=
-		FQIDENT																(. fc.Name = t.val; .)
+		(
+			FQIDENT															(. fc.Name = t.val; .)
+			|
+			LOCALIDENT														(. fc.Name = t.val; .)
+		)
 		CALLLIST<out cl>													(. fc.ArgList = cl.getList(); .)
 	.
 	TYPEOF<out BaseLangObject bloOut>										(. var to = new OosTypeOf(); bloOut = (BaseLangObject)to; BaseLangObject blo; .)
 	=
 		("typeof" | "typeOf")
-		BRO
+		'('
 		EXPRESSION<out blo>													(. to.Argument = blo; .)
-		BRC
+		')'
 	.
 	INSTANCEOF<out BaseLangObject bloOut>									(. var io = new OosInstanceOf(); bloOut = (BaseLangObject)io; BaseLangObject blo; .)
 	=
@@ -341,38 +379,70 @@ PRODUCTIONS
 		FQIDENT																(. oc.Name = t.val; .)
 		CALLLIST<out cl>													(. oc.ArgList = cl.getList(); .)
 	.
-	CODEINSTRUCTION<out BaseLangObject bloOut>								(. var ci = new OosCodeInstruction(); bloOut = (BaseLangObject)ci; ci.Suffix = ""; BaseLangObject blo; .)
+	CODEINSTRUCTION_OPTIONALSC<out BaseLangObject bloOut>					(. bloOut = null; .)
 	=
-		FUNCTIONCALL<out blo>												(. ci.Instruction = blo; ci.Suffix = ";"; .)
+		FORLOOP<out bloOut>
 		|
-		ASSIGNMENT<out blo>													(. ci.Instruction = blo; .)
+		WHILELOOP<out bloOut>
 		|
-		LOCALVARIABLE<out blo>												(. ci.Instruction = blo; .)
+		IFELSE<out bloOut>
 		|
-		FORLOOP<out blo>													(. ci.Instruction = blo; .)
+		TRYCATCH<out bloOut>
 		|
-		WHILELOOP<out blo>													(. ci.Instruction = blo; .)
+		SWITCH<out bloOut>
+	.
+	CODEINSTRUCTION<out BaseLangObject bloOut>								(. bloOut = null; .)
+	=
+		THROWINSTRUCTION<out bloOut>
 		|
-		IFELSE<out blo>														(. ci.Instruction = blo; .)
+		RETURNINSTRUCTION<out bloOut>
 		|
-		TRYCATCH<out blo>													(. ci.Instruction = blo; .)
+		BREAKINSTRUCTION<out bloOut>
 		|
-		THROWINSTRUCTION<out blo>											(. ci.Instruction = blo; .)
+		TYPEOF<out bloOut>
 		|
-		RETURNINSTRUCTION<out blo>											(. ci.Instruction = blo; .)
+		LOCALVARIABLE<out bloOut>
+		|IF(scanner.FollowedBy("("))
+		FUNCTIONCALL<out bloOut>
+		|IF(scanner.FollowedBy(new string[] { "instanceof", "instanceOf" }))
+		INSTANCEOF<out bloOut>
 		|
-		BREAKINSTRUCTION<out blo>											(. ci.Instruction = blo; .)
+		ASSIGNMENT<out bloOut>
+	.
+	CODEBODY<BaseLangObject bloOut>											(. BaseLangObject blo; .)
+	=
+		(
+			(
+				CODEINSTRUCTION<out blo>									(. bloOut.addChild(blo); .)
+				LINETERMINATOR {LINETERMINATOR}
+			)
+			|
+			(
+				CODEINSTRUCTION_OPTIONALSC<out blo>							(. bloOut.addChild(blo); .)
+				[ LINETERMINATOR { LINETERMINATOR } ]
+			)
+		)
 		|
-		TYPEOF<out blo>														(. ci.Instruction = blo; .)
-		|
-		INSTANCEOF<out blo>													(. ci.Instruction = blo; .)
-		|
-		SWITCH<out blo>														(. ci.Instruction = blo; .)
+		(
+			'{'
+			{
+				(
+					CODEINSTRUCTION<out blo>								(. bloOut.addChild(blo); .)
+					LINETERMINATOR {LINETERMINATOR}
+				)
+				|
+				(
+					CODEINSTRUCTION_OPTIONALSC<out blo>						(. bloOut.addChild(blo); .)
+					[ LINETERMINATOR { LINETERMINATOR } ]
+				)
+			}
+			'}'
+		)
 	.
 	FORLOOP<out BaseLangObject bloOut>										(. var fl = new OosForLoop(); bloOut = (BaseLangObject)fl; BaseLangObject blo; .)
 	=
 		"for"
-		BRO
+		'('
 			[
 				ASSIGNMENT<out blo>											(. fl.Arg1 = blo; .)
 			]
@@ -384,42 +454,16 @@ PRODUCTIONS
 			[
 				ASSIGNMENT<out blo>											(. fl.Arg1 = blo; .)
 			]
-		BRC
-		(
-			[
-				CODEINSTRUCTION<out blo>									(. fl.addChild(blo); .)
-				|
-				(
-					BCO
-					{
-						CODEINSTRUCTION<out blo>							(. fl.addChild(blo); .)
-						LINETERMINATOR {LINETERMINATOR}
-					}
-					BCC
-				)
-			]
-		)
+		')'
+		CODEBODY<bloOut>
 	.
 	WHILELOOP<out BaseLangObject bloOut>									(. var wl = new OosWhileLoop(); bloOut = (BaseLangObject)wl; BaseLangObject blo; .)
 	=
 		"while"
-		BRO
+		'('
 		EXPRESSION<out blo>													(. wl.Expression = blo; .)
-		BRC
-		(
-			[
-				CODEINSTRUCTION<out blo>									(. wl.addChild(blo); .)
-				|
-				(
-					BCO
-					{
-						CODEINSTRUCTION<out blo>							(. wl.addChild(blo); .)
-						LINETERMINATOR {LINETERMINATOR}
-					}
-					BCC
-				)
-			]
-		)
+		')'
+		CODEBODY<bloOut>
 	.
 	CASE<out BaseLangObject bloOut>											(. var c = new OosCase(); bloOut = (BaseLangObject)c; BaseLangObject blo; .)
 	=
@@ -432,56 +476,29 @@ PRODUCTIONS
 			"default"
 		)
 		':'
-		BCO
-		{
-			CODEINSTRUCTION<out blo>										(. c.addChild(blo); .)
-			LINETERMINATOR {LINETERMINATOR}
-		}
-		BCC
+		CODEBODY<bloOut>
 	.
 	SWITCH<out BaseLangObject bloOut>										(. var s = new OosSwitch(); bloOut = (BaseLangObject)s; BaseLangObject blo; .)
 	=
 		"switch"
-		BRO
+		'('
 		EXPRESSION<out blo>													(. s.Expression = blo; .)
-		BRC
-		BCO
+		')'
+		'{'
 			{
 				CASE<out blo>												(. s.addChild(blo); .)
 			}
-		BCC
+		'}'
 	.
-	TRYCATCH<out BaseLangObject bloOut>										(. var tc = new OosTryCatch(); bloOut = (BaseLangObject)tc; BaseLangObject blo; .)
+	TRYCATCH<out BaseLangObject bloOut>										(. var tc = new OosTryCatch(); bloOut = (BaseLangObject)tc; .)
 	=
 		"try"
-		(
-			CODEINSTRUCTION<out blo>										(. tc.addTryChild(blo); .)
-			|
-			(
-				BCO
-				{
-					CODEINSTRUCTION<out blo>								(. tc.addTryChild(blo); .)
-					LINETERMINATOR {LINETERMINATOR}
-				}
-				BCC
-			)
-		)
-		"catch"
-		BRO
+		CODEBODY<bloOut>
+		"catch"																(. tc.markEnd(); .)
+		'('
 		FQIDENT																(. tc.CatchVariable = new OosVariable(t.val); .)
-		BRC
-		(
-			CODEINSTRUCTION<out blo>										(. tc.addCatchChild(blo); .)
-			|
-			(
-				BCO
-				{
-					CODEINSTRUCTION<out blo>								(. tc.addCatchChild(blo); .)
-					LINETERMINATOR {LINETERMINATOR}
-				}
-				BCC
-			)
-		)
+		')'
+		CODEBODY<bloOut>
 	.
 	THROWINSTRUCTION<out BaseLangObject bloOut>								(. var tr = new OosThrow(); bloOut = (BaseLangObject)tr; BaseLangObject blo; .)
 	=
@@ -500,35 +517,13 @@ PRODUCTIONS
 	IFELSE<out BaseLangObject bloOut>										(. var ie = new OosIfElse(); bloOut = (BaseLangObject)ie; BaseLangObject blo; .)
 	=
 		"if"
-		BRO
+		'('
 		EXPRESSION<out blo>													(. ie.Expression = blo; .)
-		BRC
-		(
-			CODEINSTRUCTION<out blo>										(. ie.addIfChild(blo); .)
-			|
-			(
-				BCO
-				{
-					CODEINSTRUCTION<out blo>								(. ie.addIfChild(blo); .)
-					LINETERMINATOR {LINETERMINATOR}
-				}
-				BCC
-			)
-		)
+		')'
+		CODEBODY<bloOut>
 		[
-			"else"
-			(
-				CODEINSTRUCTION<out blo>									(. ie.addElseChild(blo); .)
-				|
-				(
-					BCO
-					{
-						CODEINSTRUCTION<out blo>							(. ie.addElseChild(blo); .)
-						LINETERMINATOR {LINETERMINATOR}
-					}
-					BCC
-				)
-			)
+			"else"															(. ie.markEnd(); .)
+			CODEBODY<bloOut>
 		]
 	.
 END OOS.

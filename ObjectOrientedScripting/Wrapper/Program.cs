@@ -51,23 +51,24 @@ namespace Wrapper
             }
             try
             {
-                Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
-                compiler.Preprocess(proj);
-                Logger.Instance.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
-                Logger.Instance.log(Logger.LogLevel.INFO, "-----  Starting compiling  -----");
-                compiler.Compile(proj);
-                Logger.Instance.log(Logger.LogLevel.INFO, "-----  Compiling is  done  -----");
-                Logger.Instance.log(Logger.LogLevel.INFO, "----- Starting translating -----");
-                compiler.Translate(proj);
-                Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
+              Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
+              compiler.Preprocess(proj);
+              Logger.Instance.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
+              Logger.Instance.log(Logger.LogLevel.INFO, "-----  Starting compiling  -----");
+              compiler.Compile(proj);
+              Logger.Instance.log(Logger.LogLevel.INFO, "-----  Compiling is  done  -----");
+              Logger.Instance.log(Logger.LogLevel.INFO, "----- Starting translating -----");
+              compiler.Translate(proj);
+              Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
             }
             catch (Exception ex)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to patch project:");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to generate project:");
                 Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
             }
-            Console.WriteLine("\nPress ENTER to continue");
-            Console.Read();
+            Logger.Instance.close();
+            Console.WriteLine("\nPress ANY key to continue");
+            Console.ReadKey();
         }
     }
 }

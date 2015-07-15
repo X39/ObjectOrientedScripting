@@ -10,5 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     {
         ClassEncapsulation encapsulation;
         public ClassEncapsulation Encapsulation { get { return encapsulation; } set { encapsulation = value; } }
+        bool overrideBase;
+        public bool OverrideBase { get { return this.overrideBase; } set { this.overrideBase = value; } }
     }
 }

@@ -10,25 +10,18 @@ namespace Compiler.OOS_LanguageObjects
     {
         int lastIfInstruction;
 
-        public BaseLangObject Expression { get { return this.Children[0]; } set { this.Children[0] = value; value.setParent(this); } }
+        public BaseLangObject Expression { get { return this.Children[0]; } set { this.Children[0] = value; if(value != null) value.setParent(this); } }
         private List<BaseLangObject> IfInstructions { get { return this.Children.GetRange(1, lastIfInstruction - 1); } }
         private List<BaseLangObject> ElseInstructions { get { return this.Children.GetRange(lastIfInstruction, this.Children.Count - lastIfInstruction); } }
 
         public OosIfElse()
         {
-            lastIfInstruction = 0;
+            lastIfInstruction = 1;
             this.addChild(null);
         }
-        public void addIfChild(BaseLangObject blo)
+        public void markEnd()
         {
-            this.addChild(blo);
-            if (lastIfInstruction != this.Children.Count - 1)
-                throw new Exception();
-            lastIfInstruction++;
-        }
-        public void addElseChild(BaseLangObject blo)
-        {
-            this.addChild(blo);
+            lastIfInstruction = this.Children.Count - lastIfInstruction;
         }
 
     }

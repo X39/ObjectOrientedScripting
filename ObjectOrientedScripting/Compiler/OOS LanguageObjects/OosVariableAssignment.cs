@@ -10,8 +10,8 @@ namespace Compiler.OOS_LanguageObjects
     {
         AssignmentOperators assignmentOperator;
         public AssignmentOperators AssignmentOperator { get { return assignmentOperator; } set { assignmentOperator = value; } }
-        public BaseLangObject Variable { get { return this.Children[0]; } set { this.Children[0] = value; value.setParent(this); } }
-        public BaseLangObject Value { get { return this.Children[1]; } set { this.Children[1] = value; value.setParent(this); } }
+        public BaseLangObject Variable { get { return this.Children[0]; } set { this.Children[0] = value; if(value != null) value.setParent(this); } }
+        public BaseLangObject Value { get { return this.Children[1]; } set { this.Children[1] = value; if(value != null) value.setParent(this); } }
         string arrayPosition;
         public string ArrayPosition { get { return arrayPosition; } set { arrayPosition = value; } }
 
