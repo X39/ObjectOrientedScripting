@@ -10,7 +10,12 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
     {
         List<string> list;
 
-        public void add(string o)
+        public ListString()
+        {
+            list = new List<string>();
+        }
+
+        public void Add(string o)
         {
             list.Add(o);
         }

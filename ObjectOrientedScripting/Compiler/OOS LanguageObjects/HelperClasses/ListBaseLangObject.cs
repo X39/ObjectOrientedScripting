@@ -10,7 +10,12 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
     {
         List<BaseLangObject> list;
 
-        public void add(BaseLangObject o)
+        public ListBaseLangObject()
+        {
+            list = new List<BaseLangObject>();
+        }
+
+        public void Add(BaseLangObject o)
         {
             list.Add(o);
         }

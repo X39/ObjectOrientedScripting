@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compiler.OOS_LanguageObjects.LangObjects
+namespace Compiler.OOS_LanguageObjects
 {
-    class OosCodeInstruction : BaseLangObject
+    public class OosCodeInstruction : BaseLangObject
     {
-        BaseLangObject Instruction { get { return this.Children[0]; } set { this.Children[0] = value; } }
+        public BaseLangObject Instruction { get { return this.Children[0]; } set { this.Children[0] = value; value.setParent(this); } }
         string suffix;
-        string Suffix { get { return suffix; } set { suffix = value; } }
+        public string Suffix { get { return suffix; } set { suffix = value; } }
         public OosCodeInstruction()
         {
             this.addChild(null);

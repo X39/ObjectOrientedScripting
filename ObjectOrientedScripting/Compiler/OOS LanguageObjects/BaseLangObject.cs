@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public partial class BaseLangObject
+    public class BaseLangObject
     {
         BaseLangObject parent;
         public BaseLangObject Parent { get { return parent; } set { parent = value; } }
@@ -16,15 +16,25 @@ namespace Compiler.OOS_LanguageObjects
         public BaseLangObject()
         {
             parent = null;
+            children = new List<BaseLangObject>();
         }
 
         public void addChild(BaseLangObject obj)
         {
             children.Add(obj);
+            if (obj == null)
+                return;
+            if (obj.getParent() != null)
+                throw new Exception("ToBeCreated, Please create a bug message if you experience this exception");
+            obj.setParent(obj);
         }
         public void setParent(BaseLangObject obj)
         {
             parent = obj;
+        }
+        public BaseLangObject getParent()
+        {
+            return this.parent;
         }
 
 

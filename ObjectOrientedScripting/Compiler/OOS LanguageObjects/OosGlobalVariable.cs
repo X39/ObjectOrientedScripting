@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects
     public class OosClassVariable : BaseVariableObject
     {
         ClassEncapsulation encapsulation;
-        ClassEncapsulation Encapsulation { get { return encapsulation; } set { encapsulation = value; } }
+        public ClassEncapsulation Encapsulation { get { return encapsulation; } set { encapsulation = value; } }
     }
 }

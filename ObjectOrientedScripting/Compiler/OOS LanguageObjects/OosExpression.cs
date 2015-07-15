@@ -10,8 +10,8 @@ namespace Compiler.OOS_LanguageObjects
     {
         ExpressionOperator op;
         public ExpressionOperator Op { get { return op; } set { op = value; } }
-        public BaseLangObject LInstruction { get { return this.Children[0]; } set { this.Children[0] = value; } }
-        public BaseLangObject RInstruction { get { return this.Children[1]; } set { this.Children[1] = value; } }
+        public BaseLangObject LInstruction { get { return this.Children[0]; } set { this.Children[0] = value; value.setParent(this); } }
+        public BaseLangObject RInstruction { get { return this.Children[1]; } set { this.Children[1] = value; value.setParent(this); } }
         public OosExpression()
         {
             this.addChild(null);
