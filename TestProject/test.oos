@@ -10,8 +10,8 @@ somethingWithArgs((, approved))
 somethingWithArgs({a,p,r,o,v,e,d})
 namespace testNamespace
 {
-	#include "cFoo.def"
-	#include "cBar.def"
+	#include "cFoo.oos"
+	#include "cBar.oos"
 }
 class testObj
 {
