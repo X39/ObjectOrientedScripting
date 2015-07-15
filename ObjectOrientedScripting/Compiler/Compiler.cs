@@ -20,9 +20,14 @@ namespace Wrapper
         public void Translate(Project proj)
         {
             //Read compiled file
-            StreamReader reader = new StreamReader(proj.Buildfolder + "_compile_.obj");
-            Namespace oos = Namespace.parse(reader, null, "namespace oos {");
-            reader.Close();
+
+            Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
+            Parser parser = new Parser(scanner);
+            parser.Parse();
+            BaseLangObject blo;
+            parser.getBaseObject(out blo);
+            
+            return;
 
             //Write namespace tree to disk
             //TODO: write namespace tree to disk
@@ -39,8 +44,26 @@ namespace Wrapper
             if (!File.Exists(proj.Buildfolder + "_compile_.obj"))
                 File.Create(proj.Buildfolder + "_compile_.obj");
              */
-            File.Move(proj.Buildfolder + "_preprocess_.obj", proj.Buildfolder + "_compile_.obj");
-            Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
+            var filePath = proj.Buildfolder + "_preprocess_.obj";
+            var newPath = proj.Buildfolder + "_compile_.obj";
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    if (File.Exists(newPath))
+                        File.Delete(newPath);
+                    File.Move(filePath, newPath);
+                    Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
+                    break;
+                }
+                catch(IOException e)
+                {
+                    System.Threading.Thread.Sleep(500);
+                    if (i == 2)
+                        throw e;
+                    continue;
+                }
+            }
         }
         #endregion
         #region PreProcessing
@@ -54,7 +77,23 @@ namespace Wrapper
                 File.Create(proj.Buildfolder + "_preprocess_.obj");
 
             //Prepare some stuff needed for preprocessing
-            StreamWriter writer = new StreamWriter(proj.Buildfolder + "_preprocess_.obj", false, Encoding.Unicode, 1024);
+            StreamWriter writer = null;
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                   writer = new StreamWriter(proj.Buildfolder + "_preprocess_.obj", false, Encoding.UTF8, 1024);
+                    break;
+                }
+                catch (IOException e)
+                {
+                    Logger.Instance.log(Logger.LogLevel.WARNING, e.Message + " Trying again (" + (i + 1) + "/3)");
+                    System.Threading.Thread.Sleep(500);
+                    if (i == 2)
+                        throw e;
+                    continue;
+                }
+            }
             Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
             //Start actual preprocessing
@@ -138,11 +177,18 @@ namespace Wrapper
                             throw new Exception("Include contains self reference. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //process the file before continuing with this
-                        if (!preprocessFile(ifdefs, defines, proj, newFile, writer))
+                        try
                         {
-                            //A sub file encountered an error, so stop here to prevent useles waste of ressources
-                            reader.Close();
-                            return false;
+                            if (!preprocessFile(ifdefs, defines, proj, newFile, writer))
+                            {
+                                //A sub file encountered an error, so stop here to prevent useles waste of ressources
+                                reader.Close();
+                                return false;
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            throw new Exception(e.Message + ", from " + filePath);
                         }
                         break;
                     case "#define":

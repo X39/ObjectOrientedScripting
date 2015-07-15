@@ -3,10 +3,10 @@
 	<project>
 		<title>exampleProject</title>
 		<author>X39</author>
-    <pboName>X39_OOS_ExampleProject</pboName>
+		<pboName>X39_OOS_ExampleProject</pboName>
 		<mainfile>./example.oos</mainfile>
-    <outputfolder>./output/</outputfolder>
-    <buildfolder>./build/</buildfolder>
+		<outputfolder>./output/</outputfolder>
+		<buildfolder>./build/</buildfolder>
 	</project>
 	<translator>
 		<version>1.0</version>

@@ -10,8 +10,8 @@ somethingWithArgs((, approved))
 somethingWithArgs({a,p,r,o,v,e,d})
 namespace testNamespace
 {
-	#include "cFoo.def"
-	#include "cBar.def"
+	#include "cFoo.oos"
+	#include "cBar.oos"
 }
 class testObj
 {
@@ -25,13 +25,13 @@ class testObj
 		this.testFncPublic("arg1", "arg2");
 		testFncStatic("arg1", "arg2");
 	}
-	public var testVarPublic;
-	static public var testVarStatic;
+	public auto testVarPublic;
+	static auto testVarStatic;
 	public function testFncPublic(arg1, arg2)
 	{
 		SQF::diag_log(SQF::str(arg1));
 	}
-	static public function testFncStatic(arg1, arg2)
+	static function testFncStatic(arg1, arg2)
 	{
 		SQF::diag_log(SQF::str(arg2));
 		return "";
@@ -41,14 +41,14 @@ class testObj
 static function preInit()
 {
 	SQF::diag_log("preInit");
-	var obj = new testObj();
-	obj.testFncPublic("preInitArg1", "preInitArg2");
+	auto _obj = new testObj();
+	_obj.testFncPublic("preInitArg1", "preInitArg2");
 	testObj.testFncStatic("preInitArg1", "preInitArg2");
-	obj.testFncStatic("preInitArg1", "preInitArg2");
-	var foo = new testNamespace::cFoo();
-	foo.foobar("normal foo");
+	_obj.testFncStatic("preInitArg1", "preInitArg2");
+	auto _foo = new testNamespace::cFoo();
+	_foo.foobar("normal foo");
 	//rpt log now contains "class foo normal foo";
-	var bar = new testNamespace::cBar();
-	foo.foobar("normal bar");
+	auto _bar = new testNamespace::cBar();
+	_foo.foobar("normal bar");
 	//rpt log now contains "class foo superbar \n class bar normal bar"
 }
