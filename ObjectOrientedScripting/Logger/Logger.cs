@@ -9,12 +9,16 @@ public class Logger
 {
     public enum LogLevel
     {
-        INFO = 0,
+        DEBUG = 0,
+        VERBOSE,
+        INFO,
         WARNING,
         ERROR,
         CONTINUE
     }
     private static readonly string[] logLevelTranslated = {
+        "[DEBUG]  ",
+        "[VERBOSE]",
         "[INFO]   ",
         "[WARNING]",
         "[ERROR]  ",
@@ -23,10 +27,14 @@ public class Logger
     private static Logger _instance;
     public static Logger Instance { get { if (_instance == null) _instance = new Logger(); return _instance; } }
     private StreamWriter fstream;
+    private LogLevel lastLogLevel;
+    private LogLevel minLogLevel;
     public Logger()
     {
         String filePath = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss") + ".log";
         this.fstream = new StreamWriter(new FileStream(filePath, FileMode.CreateNew));
+        lastLogLevel = LogLevel.CONTINUE;
+        minLogLevel = LogLevel.INFO;
     }
     ~Logger()
     {
@@ -34,6 +42,10 @@ public class Logger
     }
     public void log(LogLevel l, string msg)
     {
+        if (l != LogLevel.CONTINUE)
+            lastLogLevel = l;
+        if (lastLogLevel < minLogLevel)
+            return;
         String line = logLevelTranslated[(int)l] + "\t" + msg;
         Console.WriteLine(line);
         fstream.WriteLine(line);

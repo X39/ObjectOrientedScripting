@@ -11,8 +11,8 @@ namespace Compiler.OOS_LanguageObjects
         int lastTryInstruction;
 
         public BaseLangObject CatchVariable { get { return this.Children[0]; } set { this.Children[0] = value; if(value != null) value.setParent(this); } }
-        private List<BaseLangObject> TryInstructions { get { return this.Children.GetRange(1, lastTryInstruction - 1); } }
-        private List<BaseLangObject> CatchInstructions { get { return this.Children.GetRange(lastTryInstruction, this.Children.Count - lastTryInstruction); } }
+        public List<BaseLangObject> TryInstructions { get { return this.Children.GetRange(1, lastTryInstruction - 1); } }
+        public List<BaseLangObject> CatchInstructions { get { return this.Children.GetRange(lastTryInstruction, this.Children.Count - lastTryInstruction); } }
 
         public OosTryCatch()
         {

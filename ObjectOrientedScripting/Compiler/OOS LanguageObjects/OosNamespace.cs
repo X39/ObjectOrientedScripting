@@ -20,7 +20,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (Parent == null)
                 return this.name;
-            if (Parent is OosNamespace)
+            else if (Parent is OosNamespace)
             {
                 return ((OosNamespace)Parent).getNormalizedName() + "_" + this.name;
             }

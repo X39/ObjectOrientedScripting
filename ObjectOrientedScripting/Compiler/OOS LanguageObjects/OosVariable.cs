@@ -10,6 +10,71 @@ namespace Compiler.OOS_LanguageObjects
     {
         string name;
         public string Name { get { return this.name; } set { this.name = value; } }
+        public bool HasObjectAccess
+        {
+            get
+            {
+                return this.name.Contains('.');
+            }
+        }
+        public bool HasNamespace
+        {
+            get
+            {
+                return this.name.Contains("::");
+            }
+        }
+        public bool HasThisKeyword
+        {
+            get
+            {
+                return this.name.StartsWith("this.");
+            }
+        }
+
+        public bool IsLocal
+        {
+            get
+            {
+                return Name.StartsWith("_");
+            }
+        }
+
+        public string FunctionName
+        {
+            get
+            {
+                return this.name.Remove(0, this.name.IndexOf('.') + 1);
+            }
+        }
+
+        public string NamespaceName
+        {
+            get
+            {
+                var index = this.name.IndexOf('.');
+                string s;
+                if (index == -1)
+                    s = this.name;
+                else
+                    s = this.name.Remove(index);
+                return s;
+            }
+        }
+        public string NormalizedNamespaceName
+        {
+            get
+            {
+                string s = NamespaceName;
+                int index = s.LastIndexOf("::");
+                if(index != -1)
+                    s = (s.Substring(0, index) + "_fnc" + s.Substring(index)).Replace("::", "_");
+                if (s.StartsWith("_"))
+                    s = s.Remove(0, 1);
+                
+                return "oos_" + s;
+            }
+        }
         public OosVariable(string s)
         {
             this.name = s;

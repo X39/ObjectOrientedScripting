@@ -14,6 +14,7 @@ namespace Compiler.OOS_LanguageObjects
         public BaseLangObject Value { get { return this.Children[1]; } set { this.Children[1] = value; if(value != null) value.setParent(this); } }
         string arrayPosition;
         public string ArrayPosition { get { return arrayPosition; } set { arrayPosition = value; } }
+        public bool IsArrayAssignment { get { return arrayPosition != ""; } }
 
         public OosVariableAssignment()
         {

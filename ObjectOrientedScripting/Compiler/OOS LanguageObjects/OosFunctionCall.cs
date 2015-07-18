@@ -6,31 +6,14 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class OosFunctionCall : BaseLangObject, Interfaces.iName, Interfaces.iNormalizedName
+    public class OosFunctionCall : BaseLangObject
     {
-        string name;
-        public string Name { get { return name; } set { name = value; } }
-        public List<BaseLangObject> ArgList { get { return this.Children; } set { this.Children = value; } }
+        public BaseLangObject Identifier { get { return this.Children[0]; } set { this.Children[0] = value; if(value != null) value.setParent(this); } }
+        public List<BaseLangObject> ArgList { get { return this.Children.GetRange(1, this.Children.Count - 1); } }
 
         public OosFunctionCall()
         {
-            name = "";
+            this.addChild(null);
         }
-
-        public string getNormalizedName()
-        {
-            if (Parent == null)
-                return this.name;
-            Type parentType = Parent.GetType();
-            if (parentType.Equals(typeof(Interfaces.iNormalizedName)))
-            {
-                return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_" + this.name;
-            }
-            else
-            {
-                throw new Ex.InvalidParent();
-            }
-        }
-
     }
 }

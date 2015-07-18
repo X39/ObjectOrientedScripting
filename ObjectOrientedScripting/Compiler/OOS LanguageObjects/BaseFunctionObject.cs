@@ -26,7 +26,11 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (Parent == null)
                 return this.name;
-            if (Parent is Interfaces.iNormalizedName)
+            if (Parent is OosContainer)
+            {
+                return this.name;
+            }
+            else if (Parent is Interfaces.iNormalizedName)
             {
                 return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_fnc_" + this.name;
             }

@@ -59,6 +59,7 @@
     <Compile Include="OOS LanguageObjects\OosBreak.cs" />
     <Compile Include="OOS LanguageObjects\OosReturn.cs" />
     <Compile Include="OOS LanguageObjects\OosIfElse.cs" />
+    <Compile Include="OOS LanguageObjects\OosIsSet.cs" />
     <Compile Include="OOS LanguageObjects\OosTryCatch.cs" />
     <Compile Include="OOS LanguageObjects\OosSwitch.cs" />
     <Compile Include="OOS LanguageObjects\OosThrow.cs" />

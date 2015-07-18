@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (Parent == null)
                 return this.name;
-            if (Parent is OosNamespace || Parent is OosClass)
+            else if (Parent is OosNamespace || Parent is OosClass)
             {
                 return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_" + this.name;
             }

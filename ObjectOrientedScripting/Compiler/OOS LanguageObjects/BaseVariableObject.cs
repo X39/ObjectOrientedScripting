@@ -12,6 +12,7 @@ namespace Compiler.OOS_LanguageObjects
         public string Name { get { return this.name; } set { this.name = value; } }
         BaseLangObject value;
         public BaseLangObject Value { get { return this.value; } set { this.value = value; } }
+        public bool HasValue { get { return this.value != null; }}
 
         public BaseVariableObject()
         {
@@ -23,9 +24,9 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (Parent == null)
                 return this.name;
-            if (Parent is Interfaces.iNormalizedName)
+            else if (Parent is Interfaces.iNormalizedName)
             {
-                return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_var_" + this.name;
+                return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_fnc_" + this.name;
             }
             else
             {
