@@ -126,7 +126,7 @@ PRODUCTIONS
 		{
 			CLASS<out blo>													(. c.addChild(blo); blo.setParent(c); .)
 			|
-			CLASSCONSTRUCTOR<out blo>										(. c.addChild(blo); blo.setParent(c); ((BaseFunctionObject)blo).Name = c.Name; .)
+			CLASSCONSTRUCTOR<out blo>										(. c.addChild(blo); blo.setParent(c); ((BaseFunctionObject)blo).Name = "constructor"; .)
 			|
 			( IF(scanner.FollowedBy("function"))
 				GLOBALFUNCTION<out blo>										(. c.addChild(blo); blo.setParent(c); .)
@@ -147,15 +147,15 @@ PRODUCTIONS
 	=
 		'('
 		[
-			FQIDENT
+			LOCALIDENT														(. l.Add(t.val); .)
 			{
 				','
-				FQIDENT														(. l.Add(t.val); .)
+				LOCALIDENT													(. l.Add(t.val); .)
 			}
 		]
 		')'
 	.
-	CLASSCONSTRUCTOR<out BaseLangObject bloOut>								(. var cf = new OosClassFunction(); bloOut = (BaseLangObject)cf; BaseLangObject blo; ListString argL;.)
+	CLASSCONSTRUCTOR<out BaseLangObject bloOut>								(. var cf = new OosClassFunction(); cf.Encapsulation = ClassEncapsulation.PUBLIC; bloOut = (BaseLangObject)cf; BaseLangObject blo; ListString argL;.)
 	=
 		"constructor"
 		ARGLIST<out argL>													(. cf.ArgList = argL.getList(); .)
@@ -239,7 +239,7 @@ PRODUCTIONS
 		]
 		LINETERMINATOR {LINETERMINATOR}
 	.
-	EXPRESSION_OPERATOR<out ExpressionOperator eo>							(. eo = ExpressionOperator.Plus; .)
+	EXPRESSION_OPERATOR<out ExpressionOperator eo>							(. eo = ExpressionOperator.NA; .)
 	=
 		(
 			'&'																(. eo = ExpressionOperator.And; .)
@@ -274,13 +274,18 @@ PRODUCTIONS
 	=
 		VALUE<out bloOut>
 		|
+		ISSET<out bloOut>
+		|
 		OBJECTCREATION<out bloOut>
-		|IF(scanner.FollowedBy("("))
-		FUNCTIONCALL<out bloOut>
 		|
-		FQIDENT																(. bloOut = new OosVariable(t.val); .)
-		|
-		LOCALIDENT															(. bloOut = new OosVariable(t.val); .)
+		(
+			IF(scanner.FollowedBy("("))
+			FUNCTIONCALL<out bloOut>
+			|
+			FQIDENT															(. bloOut = new OosVariable(t.val); .)
+			|
+			LOCALIDENT														(. bloOut = new OosVariable(t.val); .)
+		)
 	.
 	EXPRESSION_HELPER<out BaseLangObject bloOut>							(. var e = new OosExpression(); bloOut = (BaseLangObject)e; BaseLangObject blo; ExpressionOperator eo; .)
 	=
@@ -354,11 +359,11 @@ PRODUCTIONS
 	FUNCTIONCALL<out BaseLangObject bloOut>									(. var fc = new OosFunctionCall(); bloOut = (BaseLangObject)fc; ListBaseLangObject cl; .)
 	=
 		(
-			FQIDENT															(. fc.Name = t.val; .)
+			FQIDENT															(. fc.Identifier = new OosVariable(t.val); .)
 			|
-			LOCALIDENT														(. fc.Name = t.val; .)
+			LOCALIDENT														(. fc.Identifier = new OosVariable(t.val); .)
 		)
-		CALLLIST<out cl>													(. fc.ArgList = cl.getList(); .)
+		CALLLIST<out cl>													(. fc.Children.AddRange(cl.getList()); .)
 	.
 	TYPEOF<out BaseLangObject bloOut>										(. var to = new OosTypeOf(); bloOut = (BaseLangObject)to; BaseLangObject blo; .)
 	=
@@ -376,8 +381,8 @@ PRODUCTIONS
 	OBJECTCREATION<out BaseLangObject bloOut>								(. var oc = new OosObjectCreation(); bloOut = (BaseLangObject)oc; ListBaseLangObject cl; .)
 	=
 		"new"
-		FQIDENT																(. oc.Name = t.val; .)
-		CALLLIST<out cl>													(. oc.ArgList = cl.getList(); .)
+		FQIDENT																(. oc.Identifier = new OosVariable(t.val); .)
+		CALLLIST<out cl>													(. oc.Children.AddRange(cl.getList()); .)
 	.
 	CODEINSTRUCTION_OPTIONALSC<out BaseLangObject bloOut>					(. bloOut = null; .)
 	=
@@ -408,6 +413,8 @@ PRODUCTIONS
 		INSTANCEOF<out bloOut>
 		|
 		ASSIGNMENT<out bloOut>
+		|
+		ISSET<out bloOut>
 	.
 	CODEBODY<BaseLangObject bloOut>											(. BaseLangObject blo; .)
 	=
@@ -510,6 +517,13 @@ PRODUCTIONS
 		"return"
 		EXPRESSION<out blo>													(. tr.Expression = blo; .)
 	.
+	ISSET<out BaseLangObject bloOut>										(. var obj = new OosIsSet(); bloOut = (BaseLangObject)obj; BaseLangObject blo; .)
+	=
+		"isset"
+		'('
+		EXPRESSION<out blo>													(. obj.Expression = blo; .)
+		')'
+	.
 	BREAKINSTRUCTION<out BaseLangObject bloOut>								(. var b = new OosBreak(); bloOut = (BaseLangObject)b; .)
 	=
 		"break"
@@ -520,9 +534,9 @@ PRODUCTIONS
 		'('
 		EXPRESSION<out blo>													(. ie.Expression = blo; .)
 		')'
-		CODEBODY<bloOut>
+		CODEBODY<bloOut>													(. ie.markEnd(); .)
 		[
-			"else"															(. ie.markEnd(); .)
+			"else"
 			CODEBODY<bloOut>
 		]
 	.
