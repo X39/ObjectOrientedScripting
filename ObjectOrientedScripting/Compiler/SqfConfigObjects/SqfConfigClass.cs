@@ -33,7 +33,7 @@ namespace Compiler.SqfConfigObjects
             {
                 c.write(writer, tabCount + 1);
             }
-            writer.WriteLine(tab + "}");
+            writer.WriteLine(tab + "};");
         }
     }
 }
