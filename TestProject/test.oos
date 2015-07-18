@@ -15,25 +15,25 @@ namespace testNamespace
 }
 class testObj
 {
-	public function testObj()
+	constructor()
 	{
 		this.testVarPublic = "";
-		if(!isset(testVarStatic))
+		if(!isset(::testObj::testVarStatic))
 		{
 			testVarStatic = "";
 		}
 		this.testFncPublic("arg1", "arg2");
-		testFncStatic("arg1", "arg2");
+		::testObj::testFncStatic("arg1", "arg2");
 	}
 	public auto testVarPublic;
 	static auto testVarStatic;
-	public function testFncPublic(arg1, arg2)
+	public function testFncPublic(_arg1, _arg2)
 	{
-		SQF::diag_log(SQF::str(arg1));
+		::SQF::diag_log(SQF::str(_arg1));
 	}
-	static function testFncStatic(arg1, arg2)
+	static function testFncStatic(_arg1, _arg2)
 	{
-		SQF::diag_log(SQF::str(arg2));
+		::SQF::diag_log(SQF::str(_arg2));
 		return "";
 	}
 }
@@ -41,9 +41,9 @@ class testObj
 static function preInit()
 {
 	SQF::diag_log("preInit");
-	auto _obj = new testObj();
+	auto _obj = new ::testObj();
 	_obj.testFncPublic("preInitArg1", "preInitArg2");
-	testObj.testFncStatic("preInitArg1", "preInitArg2");
+	::testObj::testFncStatic("preInitArg1", "preInitArg2");
 	_obj.testFncStatic("preInitArg1", "preInitArg2");
 	auto _foo = new testNamespace::cFoo();
 	_foo.foobar("normal foo");
