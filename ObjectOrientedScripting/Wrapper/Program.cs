@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Wrapper
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -42,6 +42,7 @@ namespace Wrapper
                 Assembly assembly = Assembly.LoadFrom(@"D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Compiler\bin\Debug\Compiler.dll");
                 Type type = assembly.GetType("Wrapper.Compiler", true);
                 compiler = (ICompiler)Activator.CreateInstance(type);
+                
             }
             catch(Exception ex)
             {
@@ -49,8 +50,8 @@ namespace Wrapper
                 Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
                 return;
             }
-            try
-            {
+            //try
+            //{
               Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
               compiler.Preprocess(proj);
               Logger.Instance.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
@@ -60,12 +61,13 @@ namespace Wrapper
               Logger.Instance.log(Logger.LogLevel.INFO, "----- Starting translating -----");
               compiler.Translate(proj);
               Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to generate project:");
-                Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to generate project:");
+            //    Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
+            //}
+            
             Logger.Instance.close();
             Console.WriteLine("\nPress ANY key to continue");
             Console.ReadKey();

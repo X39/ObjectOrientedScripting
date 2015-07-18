@@ -32,7 +32,7 @@ public class Parser {
 	public Token t;    // last recognized token
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
-	BaseLangObject oosTreeBase;
+	OosContainer oosTreeBase;
 
 
 
@@ -42,7 +42,7 @@ public class Parser {
 		oosTreeBase = null;
 	}
 	
-    public void getBaseObject(out BaseLangObject blo)
+    public void getBaseContainer(out OosContainer blo)
     {
         blo =  oosTreeBase;
     }
@@ -569,8 +569,13 @@ public class Parser {
 
 	void FUNCTIONCALL(out BaseLangObject bloOut) {
 		var fc = new OosFunctionCall(); bloOut = (BaseLangObject)fc; ListBaseLangObject cl; 
-		Expect(5);
-		fc.Name = t.val; 
+		if (la.kind == 5) {
+			Get();
+			fc.Name = t.val; 
+		} else if (la.kind == 6) {
+			Get();
+			fc.Name = t.val; 
+		} else SynErr(70);
 		CALLLIST(out cl);
 		fc.ArgList = cl.getList(); 
 	}
@@ -611,7 +616,7 @@ public class Parser {
 		} else if (la.kind == 6) {
 			Get();
 			v1 = t.val; 
-		} else SynErr(70);
+		} else SynErr(71);
 		if (la.kind == 10) {
 			Get();
 			Expect(1);
@@ -633,7 +638,7 @@ public class Parser {
 			obj.AssignmentOperator = ao; 
 			EXPRESSION(out blo);
 			obj.Value = blo; 
-		} else SynErr(71);
+		} else SynErr(72);
 	}
 
 	void CALLLIST(out ListBaseLangObject l) {
@@ -657,7 +662,7 @@ public class Parser {
 			Get();
 		} else if (la.kind == 44) {
 			Get();
-		} else SynErr(72);
+		} else SynErr(73);
 		Expect(26);
 		EXPRESSION(out blo);
 		to.Argument = blo; 
@@ -672,7 +677,7 @@ public class Parser {
 			Get();
 		} else if (la.kind == 46) {
 			Get();
-		} else SynErr(73);
+		} else SynErr(74);
 		EXPRESSION(out blo);
 		io.RArgument = blo; 
 	}
@@ -813,7 +818,7 @@ public class Parser {
 				}
 			}
 			Expect(23);
-		} else SynErr(74);
+		} else SynErr(75);
 	}
 
 	void CASE(out BaseLangObject bloOut) {
@@ -824,7 +829,7 @@ public class Parser {
 			c.Value = blo; 
 		} else if (la.kind == 51) {
 			Get();
-		} else SynErr(75);
+		} else SynErr(76);
 		Expect(25);
 		CODEBODY(bloOut);
 	}
@@ -933,12 +938,13 @@ public class Errors {
 			case 67: s = "invalid EXPRESSION"; break;
 			case 68: s = "invalid EXPRESSION_OPERATOR"; break;
 			case 69: s = "invalid EXPRESSION_SINGLE"; break;
-			case 70: s = "invalid ASSIGNMENT"; break;
+			case 70: s = "invalid FUNCTIONCALL"; break;
 			case 71: s = "invalid ASSIGNMENT"; break;
-			case 72: s = "invalid TYPEOF"; break;
-			case 73: s = "invalid INSTANCEOF"; break;
-			case 74: s = "invalid CODEBODY"; break;
-			case 75: s = "invalid CASE"; break;
+			case 72: s = "invalid ASSIGNMENT"; break;
+			case 73: s = "invalid TYPEOF"; break;
+			case 74: s = "invalid INSTANCEOF"; break;
+			case 75: s = "invalid CODEBODY"; break;
+			case 76: s = "invalid CASE"; break;
 
 			default: s = "error " + n; break;
 		}

@@ -32,7 +32,7 @@ public class Parser {
 	public Token t;    // last recognized token
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
-	BaseLangObject oosTreeBase;
+	OosContainer oosTreeBase;
 
 
 
@@ -42,7 +42,7 @@ public class Parser {
 		oosTreeBase = null;
 	}
 	
-    public void getBaseObject(out BaseLangObject blo)
+    public void getBaseContainer(out OosContainer blo)
     {
         blo =  oosTreeBase;
     }
@@ -176,7 +176,7 @@ public class Parser {
 	}
 
 	void OOS() {
-		oosTreeBase = new BaseLangObject(); BaseLangObject blo; 
+		oosTreeBase = new OosContainer(); BaseLangObject blo; 
 		while (la.kind == 21 || la.kind == 24 || la.kind == 31) {
 			if (la.kind == 21) {
 				NAMESPACE(out blo);

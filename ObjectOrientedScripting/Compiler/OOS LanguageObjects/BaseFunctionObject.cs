@@ -26,10 +26,9 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (Parent == null)
                 return this.name;
-            Type parentType = Parent.GetType();
-            if (parentType.Equals(typeof(Interfaces.iNormalizedName)))
+            if (Parent is Interfaces.iNormalizedName)
             {
-                return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_" + this.name;
+                return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_fnc_" + this.name;
             }
             else
             {

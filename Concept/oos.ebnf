@@ -81,7 +81,7 @@ PRODUCTIONS
 		|
 		'='																	(. ao = AssignmentOperators.Equals; .)
 	.
-	OOS																		(. oosTreeBase = new BaseLangObject(); BaseLangObject blo; .)
+	OOS																		(. oosTreeBase = new OosContainer(); BaseLangObject blo; .)
 	=
 		{
 			NAMESPACE<out blo>												(. oosTreeBase.addChild(blo); .)

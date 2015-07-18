@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Wrapper;
 using Compiler;
+using Compiler.SqfConfigObjects;
 using Compiler.OOS_LanguageObjects;
 using System.IO;
 
@@ -24,13 +25,308 @@ namespace Wrapper
             Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
             Parser parser = new Parser(scanner);
             parser.Parse();
-            BaseLangObject blo;
-            parser.getBaseObject(out blo);
-            
-            return;
-
-            //Write namespace tree to disk
-            //TODO: write namespace tree to disk
+            OosContainer container;
+            parser.getBaseContainer(out container);
+            SqfConfigFile file = new SqfConfigFile("config.cpp");
+            SqfConfigClass cfgClass = new SqfConfigClass("cfgFunctions");
+            file.addChild(cfgClass);
+            WriteOutTree(container, proj.OutputFolder, cfgClass, null);
+        }
+        public void WriteOutTree(BaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer)
+        {
+            string curPath = path;
+            #region OosNamespace
+            if (container is OosNamespace)
+            {
+                OosNamespace obj = (OosNamespace)container;
+                if (curPath.EndsWith("\\"))
+                    curPath += obj.Name;
+                else
+                    curPath += '\\' + obj.Name;
+                Directory.CreateDirectory(curPath);
+                SqfConfigClass cfgClass = null;
+                SqfConfigClass cfgClass_GenericFunctions = null;
+                foreach (BaseLangObject container2 in obj.Children)
+                {
+                    if (!(container2 is OosNamespace))
+                    {
+                        if (cfgClass == null)
+                        {
+                            cfgClass = new SqfConfigClass(obj.getNormalizedName());
+                            configObj.addChild(cfgClass);
+                        }
+                        if (container2 is OosGlobalFunction)
+                        {
+                            if (cfgClass_GenericFunctions == null)
+                            {
+                                cfgClass_GenericFunctions = new SqfConfigClass("generic");
+                                cfgClass.addChild(cfgClass_GenericFunctions);
+                            }
+                            WriteOutTree(container2, curPath, cfgClass_GenericFunctions, writer);
+                        }
+                        else if (container2 is OosGlobalVariable)
+                        {
+                            continue; //Will be added in last step
+                        }
+                        else if (container2 is OosClass)
+                        {
+                            WriteOutTree(container2, curPath, cfgClass, writer);
+                        }
+                        else
+                        {
+                            throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
+                        }
+                    }
+                    else
+                    {
+                        WriteOutTree(container2, curPath, configObj, writer);
+                    }
+                }
+            }
+            #endregion
+            #region OosClass
+            else if (container is OosClass)
+            {
+                OosClass obj = (OosClass)container;
+                if (curPath.EndsWith("\\"))
+                    curPath += obj.Name;
+                else
+                    curPath += '\\' + obj.Name;
+                Directory.CreateDirectory(curPath);
+                SqfConfigClass cfgClass = new SqfConfigClass(obj.Name);
+                configObj.addChild(cfgClass);
+                BaseFunctionObject constructor = null;
+                List<OosClassFunction> classFunctions = new List<OosClassFunction>();
+                List<OosClassVariable> classVariables = new List<OosClassVariable>();
+                foreach (BaseLangObject container2 in obj.Children)
+                {
+                    if (container2 is OosClass)
+                    {
+                        WriteOutTree(container2, curPath, configObj, writer);
+                    }
+                    else if (container2 is OosGlobalFunction)
+                    {
+                        WriteOutTree(container2, curPath, cfgClass, writer);
+                    }
+                    else if (container2 is OosClassFunction)
+                    {
+                        if (((BaseFunctionObject)container2).Name == "constructor")
+                            if (constructor != null)
+                                throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
+                            else
+                                constructor = (BaseFunctionObject)container2;
+                        else
+                            classFunctions.Add((OosClassFunction)container2);
+                    }
+                    else if (container2 is OosClassVariable)
+                    {
+                        classVariables.Add((OosClassVariable)container2);
+                    }
+                    else if (container2 is OosGlobalVariable)
+                    {
+                        continue; //Will be added in last step
+                    }
+                    else
+                    {
+                        throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
+                    }
+                }
+                //Handle constructor manually (as it has obviously more to do then the generic DoSomething functions ... or do you want a non-functional object do you?)
+                string constructorPath = curPath + '\\' + "___constructor___.sqf";
+                StreamWriter newWriter = new StreamWriter(constructorPath);
+                cfgClass.addChild(new SqfConfigField("___constructor___", "file = \"" + constructorPath + "\"; preInit = 0; postInit = 0; recompile = 0; ext = \".sqf\";"));
+                newWriter.WriteLine("private \"_obj\";");
+                newWriter.Write("_obj = [\n\t[nil");
+                foreach (OosClassVariable container2 in classVariables)
+                    newWriter.Write(",\"" + container2.Name + '"');
+                foreach (OosClassFunction container2 in classFunctions)
+                    newWriter.Write(",\"" + container2.Name + '"');
+                newWriter.Write("],\n\t[\n\t\t{throw \"UNKNOWN FUNCTION\";}");
+                foreach (OosClassVariable container2 in classVariables)
+                {
+                    newWriter.Write(',');
+                    WriteOutTree(container2, curPath, cfgClass, newWriter);
+                }
+                foreach (OosClassFunction container2 in classFunctions)
+                {
+                    newWriter.Write(",\n\t\t{\n");
+                    WriteOutTree(container2, curPath, cfgClass, newWriter);
+                    newWriter.Write("\n\t\t}");
+                }
+                newWriter.Write("],[");
+                newWriter.Write('"' + obj.Name + '"');
+                newWriter.Write(", [\"" + obj.Name + '"');
+                foreach (var container2 in obj.ParentClasses)
+                    newWriter.Write(",\"" + container2 + '"');
+                newWriter.Write(']');
+                newWriter.Write("]];");
+                WriteOutTree(constructor, curPath, cfgClass, newWriter);
+                newWriter.Flush();
+                newWriter.Close();
+            }
+            #endregion
+            #region OosGlobalFunction
+            else if (container is OosGlobalFunction)
+            {//TODO
+                OosGlobalFunction obj = (OosGlobalFunction)container;
+                if (curPath.EndsWith("\\"))
+                    curPath += obj.Name;
+                else
+                    curPath += '\\' + obj.Name + ".sqf";
+                writer = new StreamWriter(curPath);
+                if (obj.Name == "preInit" || obj.Name == "postInit")
+                {
+                    if (obj.Name == "preInit")
+                    {
+                        var cont = obj.getFirstOf<OosContainer>();
+                        var l = cont.getAllChildrenOf<OosGlobalVariable>(true);
+                        foreach (var o in l)
+                        {
+                            writer.Write("if(isNil\"" + o.getNormalizedName() + "\") then {missionNamespace setVariable[\"" + o.getNormalizedName() + "\",");
+                            WriteOutTree(o.Value, curPath, configObj, writer);
+                            writer.Write("];};");
+                        }
+                        configObj.addChild(new SqfConfigField(obj.getNormalizedName(), "file = \"" + curPath + "\"; preInit = 1; postInit = 0; recompile = 0; ext = \".sqf\";"));
+                    }
+                    else
+                        configObj.addChild(new SqfConfigField(obj.getNormalizedName(), "file = \"" + curPath + "\"; preInit = 0; postInit = 1; recompile = 0; ext = \".sqf\";"));
+                }
+                else
+                    configObj.addChild(new SqfConfigField(obj.getNormalizedName(), "file = \"" + curPath + "\"; preInit = 0; postInit = 0; recompile = 0; ext = \".sqf\";"));
+                List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
+                writer.Write("private[");
+                for (int i = 0; i < vars.Count; i++)
+                {
+                    var v = vars[i];
+                    writer.Write(i == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
+                }
+                writer.WriteLine("];");
+                foreach (BaseLangObject container2 in obj.Children)
+                    
+                writer.Flush();
+                writer.Close();
+            }
+            #endregion
+            #region OosClassFunction
+            else if (container is OosClassFunction)
+            {//TODO
+                OosClassFunction obj = (OosClassFunction)container;
+                List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
+                writer.Write("private[");
+                for (int i = 0; i < vars.Count; i++)
+                {
+                    var v = vars[i];
+                    writer.Write(i == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
+                }
+                writer.WriteLine("];");
+                foreach (BaseLangObject container2 in obj.Children)
+                    WriteOutTree(container2, curPath, configObj, writer);
+            }
+            #endregion
+            #region OosClassVariable
+            else if (container is OosClassVariable)
+            {//TODO
+            }
+            #endregion
+            #region OosBreak
+            else if (container is OosBreak)
+            {//TODO
+            }
+            #endregion
+            #region OosSwitch
+            else if (container is OosSwitch)
+            {//TODO
+            }
+            #endregion
+            #region OosCase
+            else if (container is OosCase)
+            {//TODO
+            }
+            #endregion
+            #region OosExpression
+            else if (container is OosExpression)
+            {//TODO
+            }
+            #endregion
+            #region OosForLoop
+            else if (container is OosForLoop)
+            {//TODO
+            }
+            #endregion
+            #region OosFunctionCall
+            else if (container is OosFunctionCall)
+            {//TODO
+            }
+            #endregion
+            #region OosIfElse
+            else if (container is OosIfElse)
+            {//TODO
+            }
+            #endregion
+            #region OosInstanceOf
+            else if (container is OosInstanceOf)
+            {//TODO
+            }
+            #endregion
+            #region OosLocalVariable
+            else if (container is OosLocalVariable)
+            {//TODO
+            }
+            #endregion
+            #region OosObjectCreation
+            else if (container is OosObjectCreation)
+            {//TODO
+            }
+            #endregion
+            #region OosLocalVariable
+            else if (container is OosLocalVariable)
+            {//TODO
+            }
+            #endregion
+            #region OosQuickAssignment
+            else if (container is OosQuickAssignment)
+            {//TODO
+            }
+            #endregion
+            #region OosReturn
+            else if (container is OosReturn)
+            {//TODO
+            }
+            #endregion
+            #region OosTryCatch
+            else if (container is OosTryCatch)
+            {//TODO
+            }
+            #endregion
+            #region OosThrow
+            else if (container is OosThrow)
+            {//TODO
+            }
+            #endregion
+            #region OosValue
+            else if (container is OosValue)
+            {//TODO
+            }
+            #endregion
+            #region OosVariable
+            else if (container is OosVariable)
+            {//TODO
+            }
+            #endregion
+            #region OosVariableAssignment
+            else if (container is OosVariableAssignment)
+            {//TODO
+            }
+            #endregion
+            #region OosWhileLoop
+            else if (container is OosWhileLoop)
+            {//TODO
+            }
+            #endregion
+            else
+            {
+                //throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
+            }
         }
         #endregion
         #region Compiling
@@ -41,8 +337,6 @@ namespace Wrapper
             if (!Directory.Exists(proj.Buildfolder))
                 Directory.CreateDirectory(proj.Buildfolder);
             //Check if result file is existing, create it if it is not
-            if (!File.Exists(proj.Buildfolder + "_compile_.obj"))
-                File.Create(proj.Buildfolder + "_compile_.obj");
              */
             var filePath = proj.Buildfolder + "_preprocess_.obj";
             var newPath = proj.Buildfolder + "_compile_.obj";
@@ -50,13 +344,11 @@ namespace Wrapper
             {
                 try
                 {
-                    if (File.Exists(newPath))
-                        File.Delete(newPath);
-                    File.Move(filePath, newPath);
+                    File.Copy(filePath, newPath, true);
                     Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
                     break;
                 }
-                catch(IOException e)
+                catch (IOException e)
                 {
                     System.Threading.Thread.Sleep(500);
                     if (i == 2)
@@ -72,17 +364,13 @@ namespace Wrapper
             //Make sure the build directory exists and create it if needed
             if (!Directory.Exists(proj.Buildfolder))
                 Directory.CreateDirectory(proj.Buildfolder);
-            //Check if result file is existing, create it if it is not
-            if (!File.Exists(proj.Buildfolder + "_preprocess_.obj"))
-                File.Create(proj.Buildfolder + "_preprocess_.obj");
-
             //Prepare some stuff needed for preprocessing
             StreamWriter writer = null;
             for (int i = 0; i < 3; i++)
             {
                 try
                 {
-                   writer = new StreamWriter(proj.Buildfolder + "_preprocess_.obj", false, Encoding.UTF8, 1024);
+                    writer = new StreamWriter(proj.Buildfolder + "_preprocess_.obj", false, Encoding.UTF8, 1024);
                     break;
                 }
                 catch (IOException e)
@@ -137,7 +425,7 @@ namespace Wrapper
                         foreach (PPDefine def in defines.Values)
                             s = def.replace(s);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         //Catch possible exceptions from define parsing
                         Logger.Instance.log(Logger.LogLevel.ERROR, "Experienced some error while parsing existing defines.");
@@ -186,14 +474,14 @@ namespace Wrapper
                                 return false;
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             throw new Exception(e.Message + ", from " + filePath);
                         }
                         break;
                     case "#define":
                         //The user wants to define something here
-                        while(s.EndsWith("\\"))
+                        while (s.EndsWith("\\"))
                         {
                             afterDefine += reader.ReadLine();
                             filelinenumber++;
@@ -205,7 +493,7 @@ namespace Wrapper
                         if (index < 0 || (index2 < index && index2 >= 0))
                             index = afterDefine.IndexOf('(');
                         //check that we really got a define with a value here, if not just take the entire length as no value is needed and only value provided
-                        if(index < 0)
+                        if (index < 0)
                             index = afterDefine.Length;
                         if (defines.ContainsKey(afterDefine.Substring(0, index)))
                         {

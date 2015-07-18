@@ -26,7 +26,7 @@ namespace Compiler.OOS_LanguageObjects
                 return;
             if (obj.getParent() != null)
                 throw new Exception("ToBeCreated, Please create a bug message if you experience this exception");
-            obj.setParent(obj);
+            obj.setParent(this);
         }
         public void setParent(BaseLangObject obj)
         {
@@ -38,17 +38,42 @@ namespace Compiler.OOS_LanguageObjects
         }
 
 
-        public T getFirstOf<T>(Type t) where T: BaseLangObject
+        public T getFirstOf<T>() where T: BaseLangObject
         {
-            if (this.GetType().Equals(t))
+            if (this is T)
                 return (T)this;
             else
             {
                 if (this.parent != null)
-                    return this.parent.getFirstOf<T>(t);
+                    return this.parent.getFirstOf<T>();
                 else
                     return null;
             }
+        }
+
+        public List<T> getAllChildrenOf<T>(bool fullSearch = false) where T : BaseLangObject
+        {
+            List<T> l = new List<T>();
+            foreach (var obj in this.Children)
+            {
+                if (obj is T)
+                    l.Add((T)obj);
+                if (fullSearch)
+                    l.AddRange(obj.getAllChildrenOf<T>());
+            }
+            return l;
+        }
+        public bool isTypeInChildTree<T>() where T : BaseLangObject
+        {
+            foreach (var obj in this.Children)
+            {
+                if (obj is T)
+                    return true;
+                else
+                    if (obj.isTypeInChildTree<T>())
+                        return true;
+            }
+            return false;
         }
 
     }

@@ -41,7 +41,7 @@ public class Parser {
 	public Token t;    // last recognized token
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
-	BaseLangObject oosTreeBase;
+	OosContainer oosTreeBase;
 
 -->declarations
 
@@ -51,7 +51,7 @@ public class Parser {
 		oosTreeBase = null;
 	}
 	
-    public void getBaseObject(out BaseLangObject blo)
+    public void getBaseContainer(out OosContainer blo)
     {
         blo =  oosTreeBase;
     }

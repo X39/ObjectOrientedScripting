@@ -43,6 +43,7 @@
     <Compile Include="Exceptions\ParsingException.cs" />
     <Compile Include="Exceptions\InvalidParent.cs" />
     <Compile Include="OOS LanguageObjects\BaseFunctionObject.cs" />
+    <Compile Include="OOS LanguageObjects\OosContainer.cs" />
     <Compile Include="OOS LanguageObjects\BaseLangObject.cs" />
     <Compile Include="OOS LanguageObjects\BaseVariableObject.cs" />
     <Compile Include="OOS LanguageObjects\enums.cs" />
@@ -79,6 +80,10 @@
     <Compile Include="PPDefine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
+    <Compile Include="SqfConfigObjects\iSqfConfig.cs" />
+    <Compile Include="SqfConfigObjects\SqfConfigClass.cs" />
+    <Compile Include="SqfConfigObjects\SqfConfigField.cs" />
+    <Compile Include="SqfConfigObjects\SqfConfigFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Logger\Logger.csproj">

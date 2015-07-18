@@ -24,8 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (Parent == null)
                 return this.name;
-            Type parentType = Parent.GetType();
-            if (parentType.Equals(typeof(OosNamespace)) || parentType.Equals(typeof(OosClass)))
+            if (Parent is OosNamespace || Parent is OosClass)
             {
                 return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_" + this.name;
             }
