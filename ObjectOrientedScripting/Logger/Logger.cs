@@ -34,13 +34,22 @@ public class Logger
     public Logger()
     {
         String filePath = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss") + ".log";
-        this.fstream = new StreamWriter(new FileStream(filePath, FileMode.CreateNew));
+        try
+        {
+            this.fstream = new StreamWriter(new FileStream(filePath, FileMode.CreateNew));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Could not initiate the logger: " + ex.Message);
+            this.fstream = null;
+        }
         lastLogLevel = LogLevel.CONTINUE;
         minLogLevel = LogLevel.INFO;
     }
     ~Logger()
     {
-        this.fstream.Close();
+        if (this.fstream != null)
+            this.fstream.Close();
     }
     public void log(LogLevel l, string msg)
     {
@@ -50,10 +59,12 @@ public class Logger
             return;
         String line = logLevelTranslated[(int)l] + "\t" + msg;
         Console.WriteLine(line);
-        fstream.WriteLine(line);
+        if (this.fstream != null)
+            fstream.WriteLine(line);
     }
     public void close()
     {
         this.fstream.Close();
+        this.fstream = null;
     }
 }
