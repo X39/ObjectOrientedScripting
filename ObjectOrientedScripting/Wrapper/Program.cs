@@ -15,6 +15,7 @@ namespace Wrapper
             if (args.Length == 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "No Parameter provided");
+                Logger.Instance.close();
                 return;
             }
             string path = "";
