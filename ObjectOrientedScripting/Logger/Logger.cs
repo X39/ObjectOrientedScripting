@@ -27,8 +27,10 @@ public class Logger
     private static Logger _instance;
     public static Logger Instance { get { if (_instance == null) _instance = new Logger(); return _instance; } }
     private StreamWriter fstream;
+
     private LogLevel lastLogLevel;
     private LogLevel minLogLevel;
+    public LogLevel LoggingLevel { get { return minLogLevel; } set { minLogLevel = value; } }
     public Logger()
     {
         String filePath = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss") + ".log";

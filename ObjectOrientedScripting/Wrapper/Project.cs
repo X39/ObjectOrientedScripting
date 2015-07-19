@@ -25,18 +25,12 @@ namespace Wrapper
             set { this._author = value; }
             get { return this._author; }
         }
-        private string _pboName;
-        public string PboName
-        {
-            set { this._pboName = value; }
-            get { return this._pboName; }
-        }
         private string _mainfile;
         public string Mainfile
         {
             set
             {
-                if(value.Length > 2 && value[1] == ':' && (value[2] == '/' || value[2] == '\\'))
+                if (value.Length > 2 && value[1] == ':' && (value[2] == '/' || value[2] == '\\'))
                     this._mainfile = value.Replace('/', '\\');
                 else if (value.StartsWith("./") || value.StartsWith(".\\"))
                     this._mainfile = _projectPath + value.Substring(2).Replace('/', '\\');
@@ -73,8 +67,17 @@ namespace Wrapper
             }
             get { return this._buildfolder; }
         }
+        private Version _compiler_version;
+        public Version CompilerVersion
+        {
+            set { this._compiler_version = value; }
+            get { return this._compiler_version; }
+        }
 
-        private Project() {}
+        private Project()
+        {
+            _compiler_version = null;
+        }
         static public Project openProject(string file)
         {
             if (file == null)
@@ -86,22 +89,26 @@ namespace Wrapper
             XmlDocument reader = new XmlDocument();
             reader.Load(file);
             XmlNode projectNode = reader.SelectSingleNode("/root/project");
+            XmlNode compilerNode = reader.SelectSingleNode("/root/compiler");
             Project proj = new Project();
             proj._projectPath = file.Remove((file.Contains("\\") ? file.LastIndexOf('\\') : file.LastIndexOf('/')) + 1);
             foreach (XmlNode node in projectNode.ChildNodes)
             {
-                     if (node.Name.Equals("title", StringComparison.OrdinalIgnoreCase))
-                         proj.ProjectTitle = node.InnerText;
+                if (node.Name.Equals("title", StringComparison.OrdinalIgnoreCase))
+                    proj.ProjectTitle = node.InnerText;
                 else if (node.Name.Equals("author", StringComparison.OrdinalIgnoreCase))
-                         proj.Author = node.InnerText;
+                    proj.Author = node.InnerText;
                 else if (node.Name.Equals("mainfile", StringComparison.OrdinalIgnoreCase))
-                         proj.Mainfile = node.InnerText;
+                    proj.Mainfile = node.InnerText;
                 else if (node.Name.Equals("outputfolder", StringComparison.OrdinalIgnoreCase))
-                         proj.OutputFolder = node.InnerText;
+                    proj.OutputFolder = node.InnerText;
                 else if (node.Name.Equals("buildfolder", StringComparison.OrdinalIgnoreCase))
-                         proj.Buildfolder = node.InnerText;
-                else if (node.Name.Equals("pboName", StringComparison.OrdinalIgnoreCase))
-                         proj.PboName = node.InnerText;
+                    proj.Buildfolder = node.InnerText;
+            }
+            foreach (XmlAttribute att in compilerNode.Attributes)
+            {
+                if (att.Name.Equals("version", StringComparison.OrdinalIgnoreCase))
+                    proj.CompilerVersion = new Version(att.Value);
             }
             return proj;
         }

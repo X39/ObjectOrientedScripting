@@ -22,6 +22,11 @@ namespace Wrapper
             _side = -1;
             _rev = -1;
             _extra = "";
+            if (s.Contains("-"))
+            {
+                this.Extra = s.Remove(0, s.IndexOf('-') + 1);
+                s = s.Substring(0, s.IndexOf('-'));
+            }
             string[] sArr = s.Split('.');
             switch(sArr.Length)
             {
@@ -37,12 +42,10 @@ namespace Wrapper
                     this.Main = Convert.ToInt32(sArr[0]);
                     break;
             }
-            if (s.Contains("-"))
-                this.Extra = s.Remove(0, s.IndexOf('-'));
         }
         public override string ToString()
         {
-            return _main + (_side >= 0 ? "." + _side : "") + (_rev >= 0 ? "." + _rev : "") + (_extra.Length > 0 ? "-" + _extra : "");
+            return _main + (_side >= 0 ? "." + _side : ".0") + (_rev >= 0 ? "." + _rev : ".0") + (_extra.Length > 0 ? "-" + _extra : "");
         }
         public static bool operator <(Version x, Version y)
         {

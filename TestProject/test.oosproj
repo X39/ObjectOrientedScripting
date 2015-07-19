@@ -3,12 +3,9 @@
 	<project>
 		<title>testProject</title>
 		<author>X39</author>
-		<pboName>X39_OOS_TestProject</pboName>
 		<mainfile>./test.oos</mainfile>
 		<outputfolder>./output/</outputfolder>
 		<buildfolder>./build/</buildfolder>
 	</project>
-	<translator>
-		<version>1.0</version>
-	</translator>
+	<compiler version="0.1.0-ALPHA" />
 </root>
