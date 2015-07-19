@@ -10,7 +10,6 @@ CHARACTERS
   CHARACTER = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".
   UNDERSCORE = '_'.
   OTHER = ANY - '/' - '*'. 
-  ALL = ANY.
   STRINGCHARS = ANY - '\n' - '\r' - '"'.
 
 TOKENS
@@ -395,6 +394,8 @@ PRODUCTIONS
 		TRYCATCH<out bloOut>
 		|
 		SWITCH<out bloOut>
+		|
+		NATIVE<out bloOut>
 	.
 	CODEINSTRUCTION<out BaseLangObject bloOut>								(. bloOut = null; .)
 	=
@@ -523,6 +524,15 @@ PRODUCTIONS
 		'('
 		EXPRESSION<out blo>													(. obj.Expression = blo; .)
 		')'
+	.
+	NATIVE<out BaseLangObject bloOut>										(. var obj = new OosNative(); bloOut = (BaseLangObject)obj; .)
+	=
+		"native"
+		ANY																	(. obj.nativeCode += t.val; .)
+		{
+			ANY																(. obj.nativeCode += " " + t.val; .)
+		}
+		"endnative"
 	.
 	BREAKINSTRUCTION<out BaseLangObject bloOut>								(. var b = new OosBreak(); bloOut = (BaseLangObject)b; .)
 	=

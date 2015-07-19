@@ -57,6 +57,7 @@
     <Compile Include="OOS LanguageObjects\OosExpression.cs" />
     <Compile Include="OOS LanguageObjects\OosCase.cs" />
     <Compile Include="OOS LanguageObjects\OosBreak.cs" />
+    <Compile Include="OOS LanguageObjects\OosNative.cs" />
     <Compile Include="OOS LanguageObjects\OosReturn.cs" />
     <Compile Include="OOS LanguageObjects\OosIfElse.cs" />
     <Compile Include="OOS LanguageObjects\OosIsSet.cs" />

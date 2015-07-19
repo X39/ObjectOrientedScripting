@@ -41,10 +41,10 @@ class testObj
 static function preInit()
 {
 	SQF::diag_log("preInit");
+	native diag_log "test"; endnative;
 	auto _obj = new ::testObj();
 	_obj.testFncPublic("preInitArg1", "preInitArg2");
 	::testObj::testFncStatic("preInitArg1", "preInitArg2");
-	_obj.testFncStatic("preInitArg1", "preInitArg2");
 	auto _foo = new testNamespace::cFoo();
 	_foo.foobar("normal foo");
 	//rpt log now contains "class foo normal foo";
