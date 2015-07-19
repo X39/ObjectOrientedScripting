@@ -231,3 +231,4 @@ $RECYCLE.BIN/
 *.lnk
 /TestProject/output
 /TestProject/build
+/Output
