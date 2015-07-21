@@ -623,6 +623,11 @@ namespace Wrapper
                 writer.WriteLine(tab + "}");
                 writer.WriteLine(tab + "catch");
                 writer.WriteLine(tab + "{");
+                var varAssignment = new OosVariableAssignment();
+                varAssignment.Variable = obj.CatchVariable;
+                varAssignment.Value = new OosValue("_exception");
+                varAssignment.AssignmentOperator = AssignmentOperators.Equals;
+                WriteOutTree(proj, varAssignment, curPath, configObj, writer, tabCount + 1);
                 foreach (var blo in obj.CatchInstructions)
                 {
                     WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
