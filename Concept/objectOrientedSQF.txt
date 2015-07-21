@@ -1,62 +1,62 @@
-ObjectOrientedSQF - Syntax Document V1.2
+ObjectOrientedSQF - Syntax Document V2.0
 ----------------------------------------
 
-allowed characters for names (REGEX validation: ^[_a-zA-Z][_a-zA-Z0-9]+$:
+allowed characters for function/non-local variable names (REGEX validation: ^[a-zA-Z][_a-zA-Z0-9]+$:
 	- A-Z			-	Everywhere
 	- a-z			-	Everywhere
+	- 0-9			-	Not at the very begining (0arr is not allowed, arr0 is)
+	- _				-	Not at the very begining (_arr is not allowed, arr_ is)
+
+allowed characters for local variable names (REGEX validation: ^_[_a-zA-Z0-9]+$:
+	- A-Z			-	Not at the very begining (_arr is not allowed, arr_ is)
+	- a-z			-	Not at the very begining (_arr is not allowed, arr_ is)
 	- 0-9			-	Not at the very begining (0arr is not allowed, arr0 is)
 	- _				-	Everywhere
 
 reserved instructions:
-	- static		-	Used to declare a variable/function as "global" for the object (not local to the instance)
-	- public		-	Function/Variable is accessible from anywhere (default)
-	- protected		-	Function/Variable is accessible from children only
-	- private		-	Function/Variable is accessible only from this very object (children also wont be able to access it)
-	- var			-	Tells the translator that the following name is a variable
-	- function		-	Tells the translator that the following name is a function
-	- class			-	Tells the translator that a new class gets defined in the following scope
-	- new			-	Creates a new instance of an object/array
-	- return		-	Return out of a function
-	- if			-	if statement
-	- else			-	used in combination with if
-	- case			-	used in combination with switch
-	- default		-	used in combination with switch
-	- for			-	for statement
-	- foreach		-	for each element in array
-	- in			-	used in combination with foreach
-	- while			-	while statement
-	- do			-	used in combination with while
-	- namespace		-	used to create a new namespace instance
-	- this			-	self reference in an instance
-	- isset			-	isNil equivalence
-	- toString		-	str equivalence
-	- override		-	used to override a parents function (invalid if no parent present or parent does not has given function, also invalid if missing on overridden function)
-	- native		-	used to directly execute one line of SQF code. Example: native _foo = 'bar';
-	- nil			-	value type to unset something
-	- working		-	reserved for future use
-	- simulation	-	reserved for future use
-	- switch		-	reserved for future use
-	- break			-	reserved for future use
-	- try			-	reserved for future use
-	- catch			-	reserved for future use
-	- throw			-	reserved for future use
-	- instanceof	-	reserved for future use
+	- static
+	- public
+	- private
+	- auto
+	- function
+	- class
+	- new
+	- return
+	- if
+	- else
+	- case
+	- default
+	- for
+	- while
+	- do
+	- namespace
+	- this
+	- isset
+	- toString
+	- override
+	- native
+	- switch
+	- break
+	- try
+	- catch
+	- throw
+	- instanceof
 
 reserved characters:
-	- []			-	Array markers
-	- ()			-	ExecuteFirst brackets OR function parameter section
-	- {}			-	Scope range
-	- =				-	"Assign" operator (left takes value of right, in case of arrays left will get a reference only (use new for a copy))
-	- +-*/%			-	Arithmetical operators
-	- & | == && || !-	logical operators (&& and || are lazy evaluation operators)
-	- ?:			-	Short hand if (<condition> ? <returnWhenTrue> : <returnWhenFalse>)
-	- #				-	Preprocessor directive (if not first char besides tabs and whitespace then it is considered as error)
-	- //			-	Line comment
-	- /* */			-	Block comment
-	- /** */		-	Function/Variable/Class/Namespace comment (used for documentation, follows the JavaDocs syntax)
+	- []					-	Array markers
+	- ()					-	ExecuteFirst brackets OR function parameter section
+	- {}					-	Scope range
+	- = += -= /= *= ++ --	- 	"Assign" operator (left takes value of right, in case of arrays left will get a reference only (use new for a copy))
+	- +-*/%					-	Arithmetical operators
+	- & | == && || !		-	logical operators (&& and || are lazy evaluation operators)
+	- ?:					-	Short hand if (<condition> ? <returnWhenTrue> : <returnWhenFalse>)
+	- #						-	Preprocessor directive (if not first char besides tabs and whitespace then it is considered as error)
+	- //					-	Line comment
+	- /* */					-	Block comment
+	- /** */				-	Function/Variable/Class/Namespace comment (used for documentation, follows the JavaDocs syntax)
 
 reserved namespaces:
-	- SQF			-	Contains ALL native SQF functions (all SQF stuff is considered as function! Also, no validation is performed if it is correct)
+	- SQF					-	Contains ALL native SQF functions (all SQF stuff is considered as function! Also, no validation is performed if it is correct)
 
 preprocessor directives:
 	- include "<relativeFilepath>"							-	Includes a files content to this spot
@@ -72,84 +72,151 @@ Entry Points:
 	function postInit()
 
 Control Structures:
-	object syntax:
-		//define object
-		class <objectName> : <parentObject1>, <parentObject2> , <parentObjectN>
+	Namespaces:
+		namespace <namespacename>
 		{
-			//Magic Functions:
-			//Constructor
-			<public|protected|private> function <objectName>(<arg1>,  <arg2>, <argN>)
+			[...]
+			class
+			namespace
+			static function
+			static variable
+			[...]
 		}
-		//create new instance
-		new <objectName>(<arg1>,  <arg2>, <argN>)
-		//access stuff inside of an object
-		<objectName>.<something>
-	
-	namespace syntax:
-		//define namespace
-		namespace <namespaceName>
+	Classes:
+		class <classname> : <parentclass1>, <parentclass2>, <parentclassN>
 		{
-			
+			constructor(arg1, arg2, argn)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+			[...]
+			class function
+			class variable
+			static functions
+			static variables
+			[...]
 		}
-		//access stuff inside of an namespace
-		<namespaceName>::<something>
-	
-	function syntax:
-		<static|public|protected|private> function <functionName>(<arg1>, <arg2>, <argN>)
+		
+	class/static function syntax:
+		<static|public|private> function <functionname>(<arg1name>, <arg2name>, <argNname>)
 		{
-			
-		}
-	
-	variable syntax:
-		<static|public|protected|private> var <variableName>
-	
-	for syntax:
-		for(<beforeLoop>;<exitCondition>;<endOfCycle>)
-		{
-			
-		}
-
-	foreach syntax:
-		foreach(var <varName> in <EXPRESSION>)
-		{
-			
+			[...]
+			codeinstructions
+			[...]
 		}
 	
-	while syntax:
-		//check before code
-		while(<exitCondition>)
-		{
-			
-		}
+	class/static variable syntax:
+		<static|public|private> auto <variableName>;
 	
-	if syntax:
-		//full
-		if(<condition>)
-		{
+	CodeInstructions:	
+		for (supports single instruction):
+			for(<beforeLoop>;<exitCondition>;<endOfCycle>)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+		
+		while (supports single instruction):
+			//check before code
+			while(<exitCondition>)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+		
+		break:
+			break;
+		
+		if else (supports single instruction):
+			//full
+			if(<condition>)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+			else
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+			//only if
+			if(<condition>)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+		switch:
+			switch(<expression>)
+			{
+				case <value>: { //supports single instruction
+					[...]
+					codeinstructions
+					[...]
+				}
+				default : { //supports single instruction
+					[...]
+					codeinstructions
+					[...]
+				}
+			}
+		
+		try catch:
+			try
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+			catch(<identifier>)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
+		
+		throw:
+			throw <value/identifier>;
+		
+		native code:
+			native <anything MultiLine is supported> endnative
+		
+		return:
+			return <value/identifier>;
 			
-		}
-		else
-		{
-			
-		}
-		//only if
-		if(<condition>)
-		{
-			
-		}
-
-Definitions:
+		isset:
+			isset(<identifier>);
+		
+		assignment:
+			//New local variable
+			auto <identifier>;
+			auto <identifier> = <value|identifier>;
+			//reasigning a value
+			<identifier> = <value|identifier>;
+			<identifier> += <value|identifier>;
+			<identifier> -= <value|identifier>;
+			<identifier> *= <value|identifier>;
+			<identifier> /= <value|identifier>;
+			<identifier>++;
+			<identifier>--;
+		
+		object creation:
+			new <classname>
+		
+		expression:
+			<expression|ident|value> && <expression|ident|value>	//Lazy And
+			<expression|ident|value> || <expression|ident|value>	//Lazy Or
+			<expression|ident|value> & <expression|ident|value>		//And
+			<expression|ident|value> | <expression|ident|value>		//Or
+			<expression|ident|value> == <expression|ident|value>	//Equals
+			<expression|ident|value> === <expression|ident|value>	//Strikt equals (translate to IsEqualTo)
+Notes:
 	Class:
 		- A Class ALWAYS has a constructor (not existing constructor = empty constructor)
-		- A Constructor can be encapsulated as private/protected thus making it "impossible" to create an object outside of given functio
-
-Notes:
-	In First itteration it is not planned to do a lot of features due to the time which would be required to implement them
-	A short overview (might not be complete):
-	- TryCatch and throw
-	- Switch
-	- PreProcessor stringification
-	- PreProcessor merging
-	- SingleLine ifElse/while/for/foreach/...
-	- full validation of variables etc. (everywhere just lazy stuff is used as its faster to implement, further improvements for each object is planned)
-	- stuff that requires more meta information in the different objects (instanceof for example)
+		- A Constructor can be encapsulated as private thus making it "impossible" to create an object outside of given function
