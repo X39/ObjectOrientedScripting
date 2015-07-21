@@ -11,8 +11,8 @@ namespace Compiler.OOS_LanguageObjects
         int lastLArg;
         string instructionName;
         public string InstructionName { get { return instructionName; } set { instructionName = value; } }
-        public List<BaseLangObject> LArgs { get { return this.Children.GetRange(1, lastLArg); } }
-        public List<BaseLangObject> RArgs { get { return this.Children.GetRange(lastLArg + 1, this.Children.Count - (lastLArg + 1)); } }
+        public List<BaseLangObject> LArgs { get { return this.Children.GetRange(0, lastLArg); } }
+        public List<BaseLangObject> RArgs { get { return this.Children.GetRange(lastLArg, this.Children.Count - lastLArg); } }
 
         public OosSqfCall()
         {
@@ -21,7 +21,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public void markEnd()
         {
-            lastLArg = this.Children.Count - 1;
+            lastLArg = this.Children.Count;
         }
     }
 }

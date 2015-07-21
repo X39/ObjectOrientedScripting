@@ -31,6 +31,10 @@ namespace Compiler.OOS_LanguageObjects
         Minus,
         Multiplication,
         Division,
+        Larger,
+        LargerEquals,
+        Smaller,
+        SmallerEquals,
         NA
     }
     public enum QuickAssignmentTypes

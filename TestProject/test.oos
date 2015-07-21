@@ -37,18 +37,56 @@ class testObj
 		return "";
 	}
 }
-
+static function returnTrue()
+{
+	return true;
+}
 static function preInit()
 {
 	SQF::diag_log("preInit");
-	native diag_log "test"; endnative;
+	startnative diag_log "test"; endnative;
 	auto _obj = new ::testObj();
 	_obj.testFncPublic("preInitArg1", "preInitArg2");
 	::testObj::testFncStatic("preInitArg1", "preInitArg2");
 	auto _foo = new testNamespace::cFoo();
 	_foo.foobar("normal foo");
-	//rpt log now contains "class foo normal foo";
+
 	auto _bar = new testNamespace::cBar();
 	_foo.foobar("normal bar");
-	//rpt log now contains "class foo superbar \n class bar normal bar"
+
+	auto _testing = 0;
+	
+	for(auto _test = 0; _test < 10; _test++)
+	{
+		SQF diag_log("test");
+	}
+	switch(native(alive player))
+	{
+		case true :
+		{
+			try
+			{
+				throw "foobar";
+			}
+			catch(test)
+			{
+				SQF diag_log(test);
+			}
+		}
+		default :
+		{
+			if(returnTrue())
+			{
+				SQF systemChat("aprooved");
+			}
+			else
+			{
+				SQF systemChat("nop");
+			}
+		}
+	}
+	while(true)
+	{
+		break;
+	}
 }

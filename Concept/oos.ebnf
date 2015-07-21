@@ -25,6 +25,7 @@ TOKENS
 	
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO '\n'
+COMMENTS FROM '#' TO '\n'
 IGNORE '\t' + '\r' + '\n'
 	
 PRODUCTIONS
@@ -36,6 +37,10 @@ PRODUCTIONS
 		DOUBLE																(. v.Value = t.val; .)
 		|
 		INTEGER																(. v.Value = t.val; .)
+		|
+		UDOUBLE																(. v.Value = t.val; .)
+		|
+		UINTEGER															(. v.Value = t.val; .)
 	.
 	
 	ARRAY<out BaseLangObject bloOut>										(. var v1 = new OosValue(); bloOut = (BaseLangObject)v1;  BaseLangObject v2; .)
@@ -48,7 +53,6 @@ PRODUCTIONS
 		}
 		']'																	(. v1.append("]"); .)
 	.
-	
     VALUE<out BaseLangObject bloOut>										(. var v = new OosValue(); bloOut = (BaseLangObject)v;  .)
 	=
 		SCALAR<out bloOut>
@@ -57,11 +61,12 @@ PRODUCTIONS
 		|
 		ARRAY<out bloOut>
 		|
-		"true"																(. v.Value = t.val; .)
-		|
-		"false"																(. v.Value = t.val; .)
+		(
+			"true"															(. v.Value = t.val; .)
+			|
+			"false"															(. v.Value = t.val; .)
+		)
 	.
-	
 	ENCAPSULATION<out ClassEncapsulation e>									(. e = ClassEncapsulation.PUBLIC; .)
 	=
 		"private"															(. e = ClassEncapsulation.PRIVATE; .)
@@ -268,12 +273,20 @@ PRODUCTIONS
 		'*'																	(. eo = ExpressionOperator.Multiplication; .)
 		|
 		'/'																	(. eo = ExpressionOperator.Division; .)
+		|
+		'>'																	(. eo = ExpressionOperator.Larger; .)
+		|
+		">="																(. eo = ExpressionOperator.LargerEquals; .)
+		|
+		'<'																	(. eo = ExpressionOperator.Smaller; .)
+		|
+		"<="																(. eo = ExpressionOperator.SmallerEquals; .)
 	.
 	EXPRESSION_SINGLE<out BaseLangObject bloOut>							(. bloOut = null; .)
 	=
-		VALUE<out bloOut>
-		|
 		ISSET<out bloOut>
+		|
+		VALUE<out bloOut>
 		|
 		OBJECTCREATION<out bloOut>
 		|
@@ -287,6 +300,8 @@ PRODUCTIONS
 		)
 		|
 		SQFCALL<out bloOut>
+		|
+		NATIVESINGLE<out bloOut>
 	.
 	EXPRESSION_HELPER<out BaseLangObject bloOut>							(. var e = new OosExpression(); bloOut = (BaseLangObject)e; BaseLangObject blo; ExpressionOperator eo; .)
 	=
@@ -308,8 +323,6 @@ PRODUCTIONS
 		)
 		|
 		EXPRESSION_HELPER<out bloOut>
-		|
-		NATIVESINGLE<out bloOut>
 	.
 	LOCALVARIABLE<out BaseLangObject bloOut>								(. var lv = new OosLocalVariable(); bloOut = (BaseLangObject)lv; BaseLangObject blo; .)
 	=
@@ -478,6 +491,8 @@ PRODUCTIONS
 		'('
 			[
 				ASSIGNMENT<out blo>											(. fl.Arg1 = blo; .)
+				|
+				LOCALVARIABLE<out blo>										(. fl.Arg1 = blo; .)
 			]
 			LINETERMINATOR
 			[
@@ -503,7 +518,7 @@ PRODUCTIONS
 		(
 			(
 				"case"
-				VALUE<out blo>												(. c.Value = blo; .)
+				VALUE<out blo>											(. c.Value = blo; .)
 			)
 			|
 			"default"

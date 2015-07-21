@@ -487,6 +487,26 @@ namespace Wrapper
                         WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
+                    case ExpressionOperator.Larger:
+                        writer.Write(" > (");
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
+                        writer.Write(")");
+                        break;
+                    case ExpressionOperator.LargerEquals:
+                        writer.Write(" >= (");
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
+                        writer.Write(")");
+                        break;
+                    case ExpressionOperator.Smaller:
+                        writer.Write(" < (");
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
+                        writer.Write(")");
+                        break;
+                    case ExpressionOperator.SmallerEquals:
+                        writer.Write(" <= (");
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
+                        writer.Write(")");
+                        break;
                 }
             }
             #endregion
