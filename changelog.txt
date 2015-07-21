@@ -1,0 +1,11 @@
+Version 0.2.0-ALPHA
+    |v- New Parameters for Wrapper.exe
+    ||- "sc=<FILE>"    Used to check the syntax of some document
+    ||- "dll=<FILE>"   Forces given dll (ignores project settings)' + AnsiChar(#10) +
+    |\- "log[=<FILE>]" Enables LogToFile (with optional file parameter)' + AnsiChar(#10) +
+    |- Compiler: Fixed TryCatch
+    |- Compiler: Fixed Expressions
+    |- Compiler: Implemented class inheritance
+    |- Compiler: Implemented public/private encapsulation
+    |- Wrapper: Fixed ArgumentDetection (foo=bar was not detected)' + AnsiChar(#10) +
+    \- Logger: Disabled logToFile per default'
