@@ -23,6 +23,7 @@ namespace Wrapper
             bool createEmptyProject = false;
             string checkSyntaxFile = "";
             string dllPath = "";
+            bool exitAfterParamReading = false;
             foreach (string s in args)
             {
                 if (s.StartsWith("-"))
@@ -43,13 +44,8 @@ namespace Wrapper
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -sc=<FILE>    checks the syntax of the file");
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -dll=<FILE>   forces given dll for project");
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -log[=<FILE>] writes log output to file");
-                            Logger.Instance.close();
-                            if (anyKey)
-                            {
-                                Console.WriteLine("\nPress ANY key to continue");
-                                Console.ReadKey();
-                            }
-                            return;
+                            exitAfterParamReading = true;
+                            break;
                         case "v":
                             if (Logger.Instance.LoggingLevel > Logger.LogLevel.VERBOSE)
                                 Logger.Instance.LoggingLevel = Logger.LogLevel.VERBOSE;
@@ -68,13 +64,8 @@ namespace Wrapper
                             if (count == -1)
                             {
                                 Logger.Instance.log(Logger.LogLevel.ERROR, "No path to DLL provided");
-                                Logger.Instance.close();
-                                if (anyKey)
-                                {
-                                    Console.WriteLine("\nPress ANY key to continue");
-                                    Console.ReadKey();
-                                }
-                                return;
+                                exitAfterParamReading = true;
+                                break;
                             }
                             dllPath = s.Substring(count + 1);
                             break;
@@ -89,12 +80,8 @@ namespace Wrapper
                             {
                                 Logger.Instance.log(Logger.LogLevel.ERROR, "No file provided for syntax checking");
                                 Logger.Instance.close();
-                                if (anyKey)
-                                {
-                                    Console.WriteLine("\nPress ANY key to continue");
-                                    Console.ReadKey();
-                                }
-                                return;
+                                exitAfterParamReading = true;
+                                break;
                             }
                             checkSyntaxFile = s.Substring(count + 1);
                             break;
@@ -104,6 +91,16 @@ namespace Wrapper
                 {
                     path = s;
                 }
+            }
+            if(exitAfterParamReading)
+            {
+                Logger.Instance.close();
+                if (anyKey)
+                {
+                    Console.WriteLine("\nPress ANY key to continue");
+                    Console.ReadKey();
+                }
+                return;
             }
             Logger.Instance.log(Logger.LogLevel.VERBOSE, "extended output is enabled");
             Logger.Instance.log(Logger.LogLevel.DEBUG, "Debug output is enabled");
