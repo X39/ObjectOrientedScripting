@@ -14,7 +14,7 @@ namespace Wrapper
         {
             if (args.Length == 0)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "No Parameter provided");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "No Parameter provided, use \"<programm> -help\" for help");
                 Logger.Instance.close();
                 return;
             }
@@ -150,7 +150,7 @@ namespace Wrapper
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.1.0-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.2.0-ALPHA\" />");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!File.Exists(path + "Main.oos"))
