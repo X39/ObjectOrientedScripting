@@ -35,14 +35,13 @@ namespace Wrapper
                     {
                         case "help":
                             Logger.Instance.log(Logger.LogLevel.INFO, "Usage: <EXECUTABLE> [<PARAMS>] <PATH>");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -help         Outputs this help page");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -v            Enables VERBOSE logging mode");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -d            Enables DEBUG logging mode");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -a            Automation mode (no ANY key message)");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -gen          Generates empty project at path");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -sc=<FILE>    checks the syntax of the file");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -dll=<FILE>   forces given dll for project");
-                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -log[=<FILE>] writes log output to file");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -help       Outputs this help page");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -v          Enables VERBOSE logging mode");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -d          Enables DEBUG logging mode");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -a          Automation mode (no ANY key message)");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -gen        Generates empty project at path");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -sc=<FILE>  checks the syntax of the file");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -dll=<FILE> forces given dll for project");
                             Logger.Instance.close();
                             if (anyKey)
                             {
@@ -65,7 +64,7 @@ namespace Wrapper
                             createEmptyProject = true;
                             break;
                         case "dll":
-                            if (count == -1)
+                            if(count == -1)
                             {
                                 Logger.Instance.log(Logger.LogLevel.ERROR, "No path to DLL provided");
                                 Logger.Instance.close();
@@ -78,14 +77,8 @@ namespace Wrapper
                             }
                             dllPath = s.Substring(count + 1);
                             break;
-                        case "log":
-                            string logfile = "";
-                            if (count != -1)
-                                logfile = s.Substring(count + 1);
-                            Logger.Instance.setLogFile(logfile);
-                            break;
                         case "sc":
-                            if (count == -1)
+                            if(count == -1)
                             {
                                 Logger.Instance.log(Logger.LogLevel.ERROR, "No file provided for syntax checking");
                                 Logger.Instance.close();
@@ -129,7 +122,7 @@ namespace Wrapper
                 }
                 return;
             }
-            if (createEmptyProject)
+            if(createEmptyProject)
             {
 
                 try
@@ -204,7 +197,7 @@ namespace Wrapper
             {
                 //ToDo: Dont pick "default" compiler and instead pick by version number (need to scan filesystem for this + have a compiler rdy for usage ...)
                 string compilerPath = "";
-                string compilerVersion = proj.CompilerVersion.ToString();
+                    string compilerVersion = proj.CompilerVersion.ToString();
                 if (compilerVersion == "")
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, "Compiler version of given project is either not set or empty");
