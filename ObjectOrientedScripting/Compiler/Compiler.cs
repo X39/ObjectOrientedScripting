@@ -161,6 +161,18 @@ namespace Wrapper
                 int objectIdentifiersCount = 0;
                 foreach (OosClassVariable blo in classVariables)
                 {
+                    newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : blo.Name) + '"');
+                    objectIdentifiersCount++;
+                }
+                foreach (OosClassFunction blo in classFunctions)
+                {
+                    newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : blo.Name) + '"');
+                    objectIdentifiersCount++;
+                }
+                newWriter.Write("],\n\t[");
+                objectIdentifiersCount = 0;
+                foreach (OosClassVariable blo in classVariables)
+                {
                     newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + blo.Name + '"');
                     objectIdentifiersCount++;
                 }
@@ -536,7 +548,7 @@ namespace Wrapper
                 WriteOutTree(proj, obj.RArgument, path, configObj, writer, tabCount);
                 writer.Write(" in ((");
                 WriteOutTree(proj, obj.LArgument, path, configObj, writer, tabCount);
-                writer.Write(" select 2) select 1)");//select META class informations --> select class instances
+                writer.Write(" select 3) select 1)");//select META class informations --> select class instances
             }
             #endregion
             #region OosLocalVariable
@@ -667,20 +679,21 @@ namespace Wrapper
             else if (container is OosVariable)
             {
                 var obj = (OosVariable)container;
+                char tableAccess = obj.getFirstOf<OosClass>() != null ? '1' : '0';
 
                 if (obj.HasObjectAccess)
                 {
                     if (obj.HasThisKeyword)
                     {
-                        writer.Write("((_obj select 1) select (((_obj select 0) find \"" + obj.FunctionName + "\") + 1))");
+                        writer.Write("((_obj select 2) select (((_obj select " + tableAccess + ") find \"" + obj.FunctionName + "\") + 1))");
                     }
                     else if (obj.HasNamespace)
                     {
-                        writer.Write("((" + obj.NormalizedNamespaceName + " select 1) select (((" + obj.NormalizedNamespaceName + " select 0) find \"" + obj.FunctionName + "\") + 1))");
+                        writer.Write("((" + obj.NormalizedNamespaceName + " select 2) select (((" + obj.NormalizedNamespaceName + " select " + tableAccess + ") find \"" + obj.FunctionName + "\") + 1))");
                     }
                     else if (obj.IsLocal)
                     {
-                        writer.Write("((" + obj.NamespaceName + " select 1) select (((" + obj.NamespaceName + " select 0) find \"" + obj.FunctionName + "\") + 1))");
+                        writer.Write("((" + obj.NamespaceName + " select 2) select (((" + obj.NamespaceName + " select " + tableAccess + ") find \"" + obj.FunctionName + "\") + 1))");
                     }
                     else
                     {
@@ -705,12 +718,13 @@ namespace Wrapper
                 var ident = (OosVariable)obj.Variable;
                 if (ident.HasObjectAccess && !obj.IsArrayAssignment)
                 {
+                    char tableAccess = obj.getFirstOf<OosClass>() != null ? '1' : '0';
                     if (ident.HasThisKeyword)
-                        writer.Write("(_obj select 1) set [((_obj select 0) find \"" + ident.FunctionName + "\") + 1, ");
+                        writer.Write("(_obj select 2) set [((_obj select " + tableAccess + ") find \"" + ident.FunctionName + "\") + 1, ");
                     else if (ident.HasNamespace)
-                        writer.Write("(" + ident.NormalizedNamespaceName + " select 1) set [((" + ident.NormalizedNamespaceName + " select 0) find \"" + ident.FunctionName + "\") + 1, ");
+                        writer.Write("(" + ident.NormalizedNamespaceName + " select 2) set [((" + ident.NormalizedNamespaceName + " select " + tableAccess + ") find \"" + ident.FunctionName + "\") + 1, ");
                     else if (ident.IsLocal)
-                        writer.Write("(" + ident.NamespaceName + " select 1) set [((" + ident.NamespaceName + " select 0) find \"" + ident.FunctionName + "\") + 1, ");
+                        writer.Write("(" + ident.NamespaceName + " select 2) set [((" + ident.NamespaceName + " select " + tableAccess + ") find \"" + ident.FunctionName + "\") + 1, ");
                     else
                         throw new Exception("Non-registered exception was raised, if you ever experience this then please create a bug. Compiler.WriteOutTree");
                 }
