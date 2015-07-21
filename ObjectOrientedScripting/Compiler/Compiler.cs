@@ -720,22 +720,25 @@ namespace Wrapper
 
                 if (!(obj.Parent is OosExpression))
                     writer.Write(tab);
-                if(lArgs.Count > 0)
+                if (lArgs.Count > 0)
                 {
-                    writer.Write('[');
+                    if (lArgs.Count > 1)
+                        writer.Write('[');
                     counter = 0;
-                    foreach(var o in lArgs)
+                    foreach (var o in lArgs)
                     {
-                        if(counter != 0)
+                        if (counter != 0)
                             writer.Write(',');
                         WriteOutTree(proj, o, path, configObj, writer, tabCount);
                     }
-                    writer.Write(']');
+                    if (lArgs.Count > 1)
+                        writer.Write(']');
                 }
                 writer.Write(obj.InstructionName);
                 if (rArgs.Count > 0)
                 {
-                    writer.Write('[');
+                    if (rArgs.Count > 1)
+                        writer.Write('[');
                     counter = 0;
                     foreach (var o in rArgs)
                     {
@@ -743,7 +746,8 @@ namespace Wrapper
                             writer.Write(',');
                         WriteOutTree(proj, o, path, configObj, writer, tabCount);
                     }
-                    writer.Write(']');
+                    if (rArgs.Count > 1)
+                        writer.Write(']');
                 }
             }
             #endregion
