@@ -15,18 +15,28 @@ namespace Wrapper
     {
         public Version getVersion()
         {
-            return new Version("0.1.0-a");
+            return new Version("0.1.0-ALPHA");
+        }
+        void CheckSyntax(string filepath)
+        {
+            Scanner scanner = new Scanner(filepath);
+            Parser parser = new Parser(scanner);
+            parser.Parse();
         }
         #region Translating
         public void Translate(Project proj)
         {
             //Read compiled file
-
             Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
             Parser parser = new Parser(scanner);
             parser.Parse();
             OosContainer container;
             parser.getBaseContainer(out container);
+            if(parser.errors.count > 0)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found, cannot continue with Translating!");
+                return;
+            }
             SqfConfigFile file = new SqfConfigFile("config.cpp");
             SqfConfigClass cfgClass = new SqfConfigClass("cfgFunctions");
             file.addChild(cfgClass);
