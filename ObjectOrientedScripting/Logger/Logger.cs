@@ -39,7 +39,7 @@ public class Logger
     }
     ~Logger()
     {
-        this.fstream.Close();
+        this.close();
     }
     public void setLogFile(string path)
     {
