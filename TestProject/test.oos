@@ -75,7 +75,7 @@ static function preInit()
 		}
 		default :
 		{
-			if(returnTrue())
+			if(::returnTrue())
 			{
 				SQF systemChat("aprooved");
 			}

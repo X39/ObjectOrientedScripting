@@ -395,8 +395,11 @@ namespace Wrapper
                 writer.WriteLine(") do");
                 writer.WriteLine(tab + "{");
                 foreach (var blo in obj.Instructions)
+                {
                     WriteOutTree(proj, blo, path, configObj, writer, tabCount + 1);
-                writer.WriteLine(tab + "}");
+                    writer.WriteLine();
+                }
+                writer.Write(tab + "}");
             }
             #endregion
             #region OosCase
@@ -406,7 +409,7 @@ namespace Wrapper
                 writer.Write(tab);
                 if (obj.IsDefault)
                 {
-                    writer.Write("default {");
+                    writer.WriteLine("default {");
                 }
                 else
                 {
@@ -422,7 +425,7 @@ namespace Wrapper
                     else
                         writer.WriteLine(";");
                 }
-                writer.WriteLine(tab + "};");
+                writer.Write(tab + "};");
             }
             #endregion
             #region OosExpression
@@ -515,11 +518,12 @@ namespace Wrapper
             {
                 var obj = (OosForLoop)container;
                 WriteOutTree(proj, obj.Arg1, path, configObj, writer, tabCount);
+                writer.WriteLine(';');
                 writer.Write(tab + "while {");
                 WriteOutTree(proj, obj.Arg2, path, configObj, writer, tabCount);
                 writer.WriteLine("} do");
                 writer.WriteLine(tab + "{");
-                writer.WriteLine(tab + "scopeName \"breakable\";");
+                writer.WriteLine(tab + "\tscopeName \"breakable\";");
                 foreach (var blo in obj.Instructions)
                 {
                     WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
@@ -528,8 +532,10 @@ namespace Wrapper
                     else
                         writer.WriteLine(";");
                 }
+                writer.WriteLine(tab + '\t');
                 WriteOutTree(proj, obj.Arg3, path, configObj, writer, tabCount);
-                writer.WriteLine(tab + "}");
+                writer.WriteLine(';');
+                writer.Write(tab + "}");
             }
             #endregion
             #region OosFunctionCall & OosObjectCreation
@@ -695,6 +701,7 @@ namespace Wrapper
                 varAssignment.Value = new OosValue("_exception");
                 varAssignment.AssignmentOperator = AssignmentOperators.Equals;
                 WriteOutTree(proj, varAssignment, curPath, configObj, writer, tabCount + 1);
+                writer.WriteLine(';');
                 foreach (var blo in obj.CatchInstructions)
                 {
                     WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
@@ -703,14 +710,14 @@ namespace Wrapper
                     else
                         writer.WriteLine(";");
                 }
-                writer.WriteLine(tab + "}");
+                writer.Write(tab + "}");
             }
             #endregion
             #region OosThrow
             else if (container is OosThrow)
             {
                 var obj = (OosThrow)container;
-                writer.WriteLine(tab + "throw ");
+                writer.Write(tab + "throw ");
                 WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
             }
             #endregion
@@ -870,7 +877,7 @@ namespace Wrapper
                 WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
                 writer.WriteLine("} do");
                 writer.WriteLine(tab + "{");
-                writer.WriteLine(tab + "scopeName \"breakable\";");
+                writer.WriteLine(tab + "\tscopeName \"breakable\";");
                 foreach (var blo in obj.Instructions)
                 {
                     WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);

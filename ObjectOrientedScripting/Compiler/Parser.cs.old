@@ -814,12 +814,12 @@ public class Parser {
 		Expect(7);
 		if (StartOf(6)) {
 			EXPRESSION(out blo);
-			fl.Arg1 = blo; 
+			fl.Arg2 = blo; 
 		}
 		Expect(7);
 		if (la.kind == 5 || la.kind == 6) {
 			ASSIGNMENT(out blo);
-			fl.Arg1 = blo; 
+			fl.Arg3 = blo; 
 		}
 		Expect(27);
 		CODEBODY(bloOut);
@@ -958,7 +958,7 @@ public class Parser {
 		var c = new OosCase(); bloOut = (BaseLangObject)c; BaseLangObject blo; 
 		if (la.kind == 55) {
 			Get();
-			EXPRESSION(out blo);
+			VALUE(out blo);
 			c.Value = blo; 
 		} else if (la.kind == 56) {
 			Get();

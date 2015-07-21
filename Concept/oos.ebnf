@@ -495,12 +495,10 @@ PRODUCTIONS
 				LOCALVARIABLE<out blo>										(. fl.Arg1 = blo; .)
 			]
 			LINETERMINATOR
-			[
-				EXPRESSION<out blo>											(. fl.Arg1 = blo; .)
-			]
+			EXPRESSION<out blo>												(. fl.Arg2 = blo; .)
 			LINETERMINATOR
 			[
-				ASSIGNMENT<out blo>											(. fl.Arg1 = blo; .)
+				ASSIGNMENT<out blo>											(. fl.Arg3 = blo; .)
 			]
 		')'
 		CODEBODY<bloOut>
