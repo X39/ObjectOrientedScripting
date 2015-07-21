@@ -22,6 +22,7 @@ namespace Wrapper
             bool anyKey = true;
             bool createEmptyProject = false;
             string checkSyntaxFile = "";
+            string dllPath = "";
             foreach (string s in args)
             {
                 if (s.StartsWith("-"))
@@ -29,7 +30,8 @@ namespace Wrapper
                     int count = s.IndexOf('=');
                     if (count == -1)
                         count = s.Length - 1;
-                    switch (s.Substring(1, count))
+                    string switchstring = s.Substring(1, count - 1);
+                    switch (switchstring)
                     {
                         case "help":
                             Logger.Instance.log(Logger.LogLevel.INFO, "Usage: <EXECUTABLE> [<PARAMS>] <PATH>");
@@ -39,6 +41,7 @@ namespace Wrapper
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -a          Automation mode (no ANY key message)");
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -gen        Generates empty project at path");
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -sc=<FILE>  checks the syntax of the file");
+                            Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -dll=<FILE> forces given dll for project");
                             Logger.Instance.close();
                             if (anyKey)
                             {
@@ -59,6 +62,20 @@ namespace Wrapper
                             break;
                         case "gen":
                             createEmptyProject = true;
+                            break;
+                        case "dll":
+                            if(count == -1)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, "No path to DLL provided");
+                                Logger.Instance.close();
+                                if (anyKey)
+                                {
+                                    Console.WriteLine("\nPress ANY key to continue");
+                                    Console.ReadKey();
+                                }
+                                return;
+                            }
+                            dllPath = s.Substring(count + 1);
                             break;
                         case "sc":
                             if(count == -1)
@@ -192,13 +209,20 @@ namespace Wrapper
                     }
                     return;
                 }
-                foreach (var f in Directory.EnumerateFiles("./"))
+                if (dllPath == "")
                 {
-                    if (f.Contains(compilerVersion))
+                    foreach (var f in Directory.EnumerateFiles("./"))
                     {
-                        compilerPath = f;
-                        break;
+                        if (f.Contains(compilerVersion))
+                        {
+                            compilerPath = f;
+                            break;
+                        }
                     }
+                }
+                else
+                {
+                    compilerPath = dllPath;
                 }
                 if (compilerPath == "")
                 {
