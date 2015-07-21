@@ -20,7 +20,7 @@ public class Parser {
 	public const int _LINETERMINATOR = 7;
 	public const int _STRING = 8;
 	public const int _COMMA = 9;
-	public const int maxT = 63;
+	public const int maxT = 64;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -107,7 +107,7 @@ public class Parser {
 		} else if (la.kind == 3) {
 			Get();
 			v.Value = t.val; 
-		} else SynErr(64);
+		} else SynErr(65);
 	}
 
 	void ARRAY(out BaseLangObject bloOut) {
@@ -141,7 +141,7 @@ public class Parser {
 		} else if (la.kind == 13) {
 			Get();
 			v.Value = t.val; 
-		} else SynErr(65);
+		} else SynErr(66);
 	}
 
 	void ENCAPSULATION(out ClassEncapsulation e) {
@@ -152,7 +152,7 @@ public class Parser {
 		} else if (la.kind == 15) {
 			Get();
 			e = ClassEncapsulation.PUBLIC; 
-		} else SynErr(66);
+		} else SynErr(67);
 	}
 
 	void ASSIGNMENTOPERATORS(out AssignmentOperators ao) {
@@ -172,7 +172,7 @@ public class Parser {
 		} else if (la.kind == 20) {
 			Get();
 			ao = AssignmentOperators.Equals; 
-		} else SynErr(67);
+		} else SynErr(68);
 	}
 
 	void OOS() {
@@ -443,11 +443,11 @@ public class Parser {
 
 	void CODEINSTRUCTION(out BaseLangObject bloOut) {
 		bloOut = null; 
-		if (la.kind == 55) {
+		if (la.kind == 56) {
 			THROWINSTRUCTION(out bloOut);
-		} else if (la.kind == 56) {
+		} else if (la.kind == 57) {
 			RETURNINSTRUCTION(out bloOut);
-		} else if (la.kind == 60) {
+		} else if (la.kind == 61) {
 			BREAKINSTRUCTION(out bloOut);
 		} else if (la.kind == 43 || la.kind == 44) {
 			TYPEOF(out bloOut);
@@ -459,39 +459,41 @@ public class Parser {
 			INSTANCEOF(out bloOut);
 		} else if (la.kind == 5 || la.kind == 6) {
 			ASSIGNMENT(out bloOut);
-		} else if (la.kind == 57) {
+		} else if (la.kind == 58) {
 			ISSET(out bloOut);
-		} else SynErr(68);
+		} else if (la.kind == 48) {
+			SQFCALL(out bloOut);
+		} else SynErr(69);
 	}
 
 	void CODEINSTRUCTION_OPTIONALSC(out BaseLangObject bloOut) {
 		bloOut = null; 
 		switch (la.kind) {
-		case 48: {
+		case 49: {
 			FORLOOP(out bloOut);
 			break;
 		}
-		case 49: {
+		case 50: {
 			WHILELOOP(out bloOut);
 			break;
 		}
-		case 61: {
+		case 62: {
 			IFELSE(out bloOut);
 			break;
 		}
-		case 53: {
+		case 54: {
 			TRYCATCH(out bloOut);
 			break;
 		}
-		case 52: {
+		case 53: {
 			SWITCH(out bloOut);
 			break;
 		}
-		case 58: {
+		case 59: {
 			NATIVE(out bloOut);
 			break;
 		}
-		default: SynErr(69); break;
+		default: SynErr(70); break;
 		}
 	}
 
@@ -503,7 +505,7 @@ public class Parser {
 			Expect(27);
 		} else if (StartOf(4)) {
 			EXPRESSION_HELPER(out bloOut);
-		} else SynErr(70);
+		} else SynErr(71);
 	}
 
 	void EXPRESSION_OPERATOR(out ExpressionOperator eo) {
@@ -556,7 +558,7 @@ public class Parser {
 			eo = ExpressionOperator.Division; 
 			break;
 		}
-		default: SynErr(71); break;
+		default: SynErr(72); break;
 		}
 	}
 
@@ -564,7 +566,7 @@ public class Parser {
 		bloOut = null; 
 		if (StartOf(5)) {
 			VALUE(out bloOut);
-		} else if (la.kind == 57) {
+		} else if (la.kind == 58) {
 			ISSET(out bloOut);
 		} else if (la.kind == 47) {
 			OBJECTCREATION(out bloOut);
@@ -578,12 +580,12 @@ public class Parser {
 				Get();
 				bloOut = new OosVariable(t.val); 
 			}
-		} else SynErr(72);
+		} else SynErr(73);
 	}
 
 	void ISSET(out BaseLangObject bloOut) {
 		var obj = new OosIsSet(); bloOut = (BaseLangObject)obj; BaseLangObject blo; 
-		Expect(57);
+		Expect(58);
 		Expect(26);
 		EXPRESSION(out blo);
 		obj.Expression = blo; 
@@ -607,7 +609,7 @@ public class Parser {
 		} else if (la.kind == 6) {
 			Get();
 			fc.Identifier = new OosVariable(t.val); 
-		} else SynErr(73);
+		} else SynErr(74);
 		CALLLIST(out cl);
 		fc.Children.AddRange(cl.getList()); 
 	}
@@ -648,7 +650,7 @@ public class Parser {
 		} else if (la.kind == 6) {
 			Get();
 			v1 = t.val; 
-		} else SynErr(74);
+		} else SynErr(75);
 		if (la.kind == 10) {
 			Get();
 			Expect(1);
@@ -670,7 +672,7 @@ public class Parser {
 			obj.AssignmentOperator = ao; 
 			EXPRESSION(out blo);
 			obj.Value = blo; 
-		} else SynErr(75);
+		} else SynErr(76);
 	}
 
 	void CALLLIST(out ListBaseLangObject l) {
@@ -694,7 +696,7 @@ public class Parser {
 			Get();
 		} else if (la.kind == 44) {
 			Get();
-		} else SynErr(76);
+		} else SynErr(77);
 		Expect(26);
 		EXPRESSION(out blo);
 		to.Argument = blo; 
@@ -709,14 +711,14 @@ public class Parser {
 			Get();
 		} else if (la.kind == 46) {
 			Get();
-		} else SynErr(77);
+		} else SynErr(78);
 		EXPRESSION(out blo);
 		io.RArgument = blo; 
 	}
 
 	void FORLOOP(out BaseLangObject bloOut) {
 		var fl = new OosForLoop(); bloOut = (BaseLangObject)fl; BaseLangObject blo; 
-		Expect(48);
+		Expect(49);
 		Expect(26);
 		if (la.kind == 5 || la.kind == 6) {
 			ASSIGNMENT(out blo);
@@ -738,7 +740,7 @@ public class Parser {
 
 	void WHILELOOP(out BaseLangObject bloOut) {
 		var wl = new OosWhileLoop(); bloOut = (BaseLangObject)wl; BaseLangObject blo; 
-		Expect(49);
+		Expect(50);
 		Expect(26);
 		EXPRESSION(out blo);
 		wl.Expression = blo; 
@@ -748,14 +750,14 @@ public class Parser {
 
 	void IFELSE(out BaseLangObject bloOut) {
 		var ie = new OosIfElse(); bloOut = (BaseLangObject)ie; BaseLangObject blo; 
-		Expect(61);
+		Expect(62);
 		Expect(26);
 		EXPRESSION(out blo);
 		ie.Expression = blo; 
 		Expect(27);
 		CODEBODY(bloOut);
 		ie.markEnd(); 
-		if (la.kind == 62) {
+		if (la.kind == 63) {
 			Get();
 			CODEBODY(bloOut);
 		}
@@ -763,9 +765,9 @@ public class Parser {
 
 	void TRYCATCH(out BaseLangObject bloOut) {
 		var tc = new OosTryCatch(); bloOut = (BaseLangObject)tc; 
-		Expect(53);
-		CODEBODY(bloOut);
 		Expect(54);
+		CODEBODY(bloOut);
+		Expect(55);
 		tc.markEnd(); 
 		Expect(26);
 		Expect(5);
@@ -776,13 +778,13 @@ public class Parser {
 
 	void SWITCH(out BaseLangObject bloOut) {
 		var s = new OosSwitch(); bloOut = (BaseLangObject)s; BaseLangObject blo; 
-		Expect(52);
+		Expect(53);
 		Expect(26);
 		EXPRESSION(out blo);
 		s.Expression = blo; 
 		Expect(27);
 		Expect(22);
-		while (la.kind == 50 || la.kind == 51) {
+		while (la.kind == 51 || la.kind == 52) {
 			CASE(out blo);
 			s.addChild(blo); 
 		}
@@ -791,33 +793,56 @@ public class Parser {
 
 	void NATIVE(out BaseLangObject bloOut) {
 		var obj = new OosNative(); bloOut = (BaseLangObject)obj; 
-		Expect(58);
+		Expect(59);
 		Get();
 		obj.nativeCode += t.val; 
 		while (StartOf(9)) {
 			Get();
 			obj.nativeCode += " " + t.val; 
 		}
-		Expect(59);
+		Expect(60);
 	}
 
 	void THROWINSTRUCTION(out BaseLangObject bloOut) {
 		var tr = new OosThrow(); bloOut = (BaseLangObject)tr; BaseLangObject blo; 
-		Expect(55);
+		Expect(56);
 		EXPRESSION(out blo);
 		tr.Expression = blo; 
 	}
 
 	void RETURNINSTRUCTION(out BaseLangObject bloOut) {
 		var tr = new OosReturn(); bloOut = (BaseLangObject)tr; BaseLangObject blo; 
-		Expect(56);
+		Expect(57);
 		EXPRESSION(out blo);
 		tr.Expression = blo; 
 	}
 
 	void BREAKINSTRUCTION(out BaseLangObject bloOut) {
 		var b = new OosBreak(); bloOut = (BaseLangObject)b; 
-		Expect(60);
+		Expect(61);
+	}
+
+	void SQFCALL(out BaseLangObject bloOut) {
+		var obj = new OosSqfCall(); bloOut = (BaseLangObject)obj; BaseLangObject blo; 
+		Expect(48);
+		if (la.kind == 26) {
+			Get();
+			while (StartOf(8)) {
+				EXPRESSION(out blo);
+				obj.addChild(blo); 
+			}
+			Expect(27);
+		}
+		Expect(5);
+		obj.InstructionName = t.val; obj.markEnd(); 
+		if (la.kind == 26) {
+			Get();
+			while (StartOf(8)) {
+				EXPRESSION(out blo);
+				obj.addChild(blo); 
+			}
+			Expect(27);
+		}
 	}
 
 	void CODEBODY(BaseLangObject bloOut) {
@@ -862,18 +887,18 @@ public class Parser {
 				}
 			}
 			Expect(23);
-		} else SynErr(78);
+		} else SynErr(79);
 	}
 
 	void CASE(out BaseLangObject bloOut) {
 		var c = new OosCase(); bloOut = (BaseLangObject)c; BaseLangObject blo; 
-		if (la.kind == 50) {
+		if (la.kind == 51) {
 			Get();
 			VALUE(out blo);
 			c.Value = blo; 
-		} else if (la.kind == 51) {
+		} else if (la.kind == 52) {
 			Get();
-		} else SynErr(79);
+		} else SynErr(80);
 		Expect(25);
 		CODEBODY(bloOut);
 	}
@@ -890,16 +915,16 @@ public class Parser {
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _T,_T,_x,_x, _T,_T,_x,_T, _T,_T,_T,_x, _T,_T,_x,_x, _x},
-		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _T,_x,_x,_x, _x},
-		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_T, _T,_x,_x,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _T,_T,_T,_x, _x,_T,_T,_x, _T,_T,_T,_T, _x,_T,_T,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_x,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_x,_x,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_T, _T,_x}
 
 	};
 } // end Parser
@@ -961,38 +986,39 @@ public class Errors {
 			case 45: s = "\"instanceof\" expected"; break;
 			case 46: s = "\"instanceOf\" expected"; break;
 			case 47: s = "\"new\" expected"; break;
-			case 48: s = "\"for\" expected"; break;
-			case 49: s = "\"while\" expected"; break;
-			case 50: s = "\"case\" expected"; break;
-			case 51: s = "\"default\" expected"; break;
-			case 52: s = "\"switch\" expected"; break;
-			case 53: s = "\"try\" expected"; break;
-			case 54: s = "\"catch\" expected"; break;
-			case 55: s = "\"throw\" expected"; break;
-			case 56: s = "\"return\" expected"; break;
-			case 57: s = "\"isset\" expected"; break;
-			case 58: s = "\"native\" expected"; break;
-			case 59: s = "\"endnative\" expected"; break;
-			case 60: s = "\"break\" expected"; break;
-			case 61: s = "\"if\" expected"; break;
-			case 62: s = "\"else\" expected"; break;
-			case 63: s = "??? expected"; break;
-			case 64: s = "invalid SCALAR"; break;
-			case 65: s = "invalid VALUE"; break;
-			case 66: s = "invalid ENCAPSULATION"; break;
-			case 67: s = "invalid ASSIGNMENTOPERATORS"; break;
-			case 68: s = "invalid CODEINSTRUCTION"; break;
-			case 69: s = "invalid CODEINSTRUCTION_OPTIONALSC"; break;
-			case 70: s = "invalid EXPRESSION"; break;
-			case 71: s = "invalid EXPRESSION_OPERATOR"; break;
-			case 72: s = "invalid EXPRESSION_SINGLE"; break;
-			case 73: s = "invalid FUNCTIONCALL"; break;
-			case 74: s = "invalid ASSIGNMENT"; break;
+			case 48: s = "\"SQF\" expected"; break;
+			case 49: s = "\"for\" expected"; break;
+			case 50: s = "\"while\" expected"; break;
+			case 51: s = "\"case\" expected"; break;
+			case 52: s = "\"default\" expected"; break;
+			case 53: s = "\"switch\" expected"; break;
+			case 54: s = "\"try\" expected"; break;
+			case 55: s = "\"catch\" expected"; break;
+			case 56: s = "\"throw\" expected"; break;
+			case 57: s = "\"return\" expected"; break;
+			case 58: s = "\"isset\" expected"; break;
+			case 59: s = "\"native\" expected"; break;
+			case 60: s = "\"endnative\" expected"; break;
+			case 61: s = "\"break\" expected"; break;
+			case 62: s = "\"if\" expected"; break;
+			case 63: s = "\"else\" expected"; break;
+			case 64: s = "??? expected"; break;
+			case 65: s = "invalid SCALAR"; break;
+			case 66: s = "invalid VALUE"; break;
+			case 67: s = "invalid ENCAPSULATION"; break;
+			case 68: s = "invalid ASSIGNMENTOPERATORS"; break;
+			case 69: s = "invalid CODEINSTRUCTION"; break;
+			case 70: s = "invalid CODEINSTRUCTION_OPTIONALSC"; break;
+			case 71: s = "invalid EXPRESSION"; break;
+			case 72: s = "invalid EXPRESSION_OPERATOR"; break;
+			case 73: s = "invalid EXPRESSION_SINGLE"; break;
+			case 74: s = "invalid FUNCTIONCALL"; break;
 			case 75: s = "invalid ASSIGNMENT"; break;
-			case 76: s = "invalid TYPEOF"; break;
-			case 77: s = "invalid INSTANCEOF"; break;
-			case 78: s = "invalid CODEBODY"; break;
-			case 79: s = "invalid CASE"; break;
+			case 76: s = "invalid ASSIGNMENT"; break;
+			case 77: s = "invalid TYPEOF"; break;
+			case 78: s = "invalid INSTANCEOF"; break;
+			case 79: s = "invalid CODEBODY"; break;
+			case 80: s = "invalid CASE"; break;
 
 			default: s = "error " + n; break;
 		}

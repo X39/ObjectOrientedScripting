@@ -516,7 +516,7 @@ namespace Wrapper
             else if (container is OosFunctionCall)
             {
                 var obj = (OosFunctionCall)container;
-                writer.Write(tab + "[");
+                writer.Write(obj.Parent is OosExpression ? "[" : tab + "[");
                 var argList = obj.ArgList;
                 int argCounter = 0;
                 OosVariable ident = (OosVariable)obj.Identifier;
@@ -708,6 +708,43 @@ namespace Wrapper
             {
                 var obj = (OosValue)container;
                 writer.Write(obj.Value);
+            }
+            #endregion
+            #region OosSqfCall
+            else if (container is OosSqfCall)
+            {
+                var obj = (OosSqfCall)container;
+                var lArgs = obj.LArgs;
+                var rArgs = obj.RArgs;
+                var counter = 0;
+
+                if (!(obj.Parent is OosExpression))
+                    writer.Write(tab);
+                if(lArgs.Count > 0)
+                {
+                    writer.Write('[');
+                    counter = 0;
+                    foreach(var o in lArgs)
+                    {
+                        if(counter != 0)
+                            writer.Write(',');
+                        WriteOutTree(proj, o, path, configObj, writer, tabCount);
+                    }
+                    writer.Write(']');
+                }
+                writer.Write(obj.InstructionName);
+                if (rArgs.Count > 0)
+                {
+                    writer.Write('[');
+                    counter = 0;
+                    foreach (var o in rArgs)
+                    {
+                        if (counter != 0)
+                            writer.Write(',');
+                        WriteOutTree(proj, o, path, configObj, writer, tabCount);
+                    }
+                    writer.Write(']');
+                }
             }
             #endregion
             #region OosVariable

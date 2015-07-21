@@ -416,6 +416,27 @@ PRODUCTIONS
 		ASSIGNMENT<out bloOut>
 		|
 		ISSET<out bloOut>
+		|
+		SQFCALL<out bloOut>
+	.
+	SQFCALL<out BaseLangObject bloOut>										(. var obj = new OosSqfCall(); bloOut = (BaseLangObject)obj; BaseLangObject blo; .)
+	=
+		"SQF"
+		[
+			'('
+			{
+				EXPRESSION<out blo>											(. obj.addChild(blo); .)
+			}
+			')'
+		]
+		FQIDENT																(. obj.InstructionName = t.val; obj.markEnd(); .)
+		[
+			'('
+			{
+				EXPRESSION<out blo>											(. obj.addChild(blo); .)
+			}
+			')'
+		]
 	.
 	CODEBODY<BaseLangObject bloOut>											(. BaseLangObject blo; .)
 	=
