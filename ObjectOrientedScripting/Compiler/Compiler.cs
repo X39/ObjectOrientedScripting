@@ -32,7 +32,7 @@ namespace Wrapper
             parser.Parse();
             OosContainer container;
             parser.getBaseContainer(out container);
-            if(parser.errors.count > 0)
+            if (parser.errors.count > 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found, cannot continue with Translating!");
                 return;
@@ -101,6 +101,14 @@ namespace Wrapper
             else if (container is OosClass)
             {//ToDo: Find all base classes and merge the functions into this one
                 OosClass obj = (OosClass)container;
+
+                //Get parent classes
+                List<OosClass> parentClasses = new List<OosClass>();
+                List<BaseFunctionObject> constructorsParentClasses = new List<BaseFunctionObject>();
+                foreach (var c in obj.getFirstOf<OosContainer>().getAllChildrenOf<OosClass>())
+                    if (obj.ParentClasses.Contains(c.Name))
+                        parentClasses.Add(c);
+
                 if (curPath.EndsWith("\\"))
                     curPath += obj.Name;
                 else
@@ -144,6 +152,28 @@ namespace Wrapper
                         throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
                     }
                 }
+                foreach (var c in parentClasses)
+                {
+                    BaseFunctionObject parentsConstructor = null;
+                    foreach (BaseLangObject blo in obj.Children)
+                    {
+                        if (blo is OosClassFunction)
+                        {
+                            if (((BaseFunctionObject)blo).Name == "constructor")
+                                if (parentsConstructor != null)
+                                    throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
+                                else
+                                    parentsConstructor = (BaseFunctionObject)blo;
+                            else
+                                classFunctions.Add((OosClassFunction)blo);
+                        }
+                        else if (blo is OosClassVariable)
+                        {
+                            classVariables.Add((OosClassVariable)blo);
+                        }
+                    }
+                    constructorsParentClasses.Add(parentsConstructor);
+                }
                 //Handle constructor manually (as it has obviously more to do then the generic DoSomething functions ... or do you want a non-functional object do you?)
                 string constructorPath = curPath + '\\' + "___constructor___eol.sqf";
                 StreamWriter newWriter = new StreamWriter(constructorPath);
@@ -156,6 +186,9 @@ namespace Wrapper
                 tmpCfgClass.addChild(new SqfConfigField("ext", "\".sqf\""));
                 tmpCfgClass.addChild(new SqfConfigField("preInit", "0"));
                 tmpCfgClass.addChild(new SqfConfigField("postInit", "0"));
+
+
+
                 newWriter.WriteLine("private \"_obj\";");
                 newWriter.Write("_obj = [\n\t[");
                 int objectIdentifiersCount = 0;
@@ -198,6 +231,8 @@ namespace Wrapper
                     newWriter.Write(",\"" + blo + '"');
                 newWriter.WriteLine("]]");
                 newWriter.WriteLine("];");
+                foreach (var bfo in constructorsParentClasses)
+                    WriteOutTree(proj, bfo, curPath, cfgClass, newWriter);
                 WriteOutTree(proj, constructor, curPath, cfgClass, newWriter);
                 newWriter.WriteLine("_obj");
                 newWriter.Flush();
