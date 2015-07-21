@@ -823,7 +823,7 @@ public class Parser {
 	}
 
 	void SQFCALL(out BaseLangObject bloOut) {
-        var obj = new OosSqfCall(); bloOut = (BaseLangObject)obj; BaseLangObject blo; 
+		var obj = new OosSqfCall(); bloOut = (BaseLangObject)obj; BaseLangObject blo; 
 		Expect(48);
 		if (la.kind == 26) {
 			Get();
@@ -835,12 +835,14 @@ public class Parser {
 		}
 		Expect(5);
 		obj.InstructionName = t.val; obj.markEnd(); 
-		Expect(26);
-		while (StartOf(8)) {
-			EXPRESSION(out blo);
-			obj.addChild(blo); 
+		if (la.kind == 26) {
+			Get();
+			while (StartOf(8)) {
+				EXPRESSION(out blo);
+				obj.addChild(blo); 
+			}
+			Expect(27);
 		}
-		Expect(27);
 	}
 
 	void CODEBODY(BaseLangObject bloOut) {

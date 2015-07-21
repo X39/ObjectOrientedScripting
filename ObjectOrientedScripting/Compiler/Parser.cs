@@ -580,6 +580,8 @@ public class Parser {
 				Get();
 				bloOut = new OosVariable(t.val); 
 			}
+		} else if (la.kind == 48) {
+			SQFCALL(out bloOut);
 		} else SynErr(73);
 	}
 
@@ -614,6 +616,29 @@ public class Parser {
 		fc.Children.AddRange(cl.getList()); 
 	}
 
+	void SQFCALL(out BaseLangObject bloOut) {
+		var obj = new OosSqfCall(); bloOut = (BaseLangObject)obj; BaseLangObject blo; 
+		Expect(48);
+		if (la.kind == 26) {
+			Get();
+			while (StartOf(6)) {
+				EXPRESSION(out blo);
+				obj.addChild(blo); 
+			}
+			Expect(27);
+		}
+		Expect(5);
+		obj.InstructionName = t.val; obj.markEnd(); 
+		if (la.kind == 26) {
+			Get();
+			while (StartOf(6)) {
+				EXPRESSION(out blo);
+				obj.addChild(blo); 
+			}
+			Expect(27);
+		}
+	}
+
 	void EXPRESSION_HELPER(out BaseLangObject bloOut) {
 		var e = new OosExpression(); bloOut = (BaseLangObject)e; BaseLangObject blo; ExpressionOperator eo; 
 		if (la.kind == 40) {
@@ -622,7 +647,7 @@ public class Parser {
 		}
 		EXPRESSION_SINGLE(out blo);
 		e.LInstruction = blo; 
-		while (StartOf(6)) {
+		while (StartOf(7)) {
 			EXPRESSION_OPERATOR(out eo);
 			e.Op = eo; 
 			EXPRESSION(out blo);
@@ -666,7 +691,7 @@ public class Parser {
 				Get();
 				obj.QuickAssignmentType = QuickAssignmentTypes.MinusMinus; 
 			}
-		} else if (StartOf(7)) {
+		} else if (StartOf(8)) {
 			var obj = new OosVariableAssignment(); obj.Variable = new OosVariable(v1); obj.ArrayPosition = v2; bloOut = (BaseLangObject)obj; AssignmentOperators ao; 
 			ASSIGNMENTOPERATORS(out ao);
 			obj.AssignmentOperator = ao; 
@@ -678,7 +703,7 @@ public class Parser {
 	void CALLLIST(out ListBaseLangObject l) {
 		l = new ListBaseLangObject(); BaseLangObject blo; 
 		Expect(26);
-		if (StartOf(8)) {
+		if (StartOf(6)) {
 			EXPRESSION(out blo);
 			l.Add(blo); 
 			while (la.kind == 9) {
@@ -725,7 +750,7 @@ public class Parser {
 			fl.Arg1 = blo; 
 		}
 		Expect(7);
-		if (StartOf(8)) {
+		if (StartOf(6)) {
 			EXPRESSION(out blo);
 			fl.Arg1 = blo; 
 		}
@@ -822,29 +847,6 @@ public class Parser {
 		Expect(61);
 	}
 
-	void SQFCALL(out BaseLangObject bloOut) {
-		var obj = new OosSqfCall(); bloOut = (BaseLangObject)obj; BaseLangObject blo; 
-		Expect(48);
-		if (la.kind == 26) {
-			Get();
-			while (StartOf(8)) {
-				EXPRESSION(out blo);
-				obj.addChild(blo); 
-			}
-			Expect(27);
-		}
-		Expect(5);
-		obj.InstructionName = t.val; obj.markEnd(); 
-		if (la.kind == 26) {
-			Get();
-			while (StartOf(8)) {
-				EXPRESSION(out blo);
-				obj.addChild(blo); 
-			}
-			Expect(27);
-		}
-	}
-
 	void CODEBODY(BaseLangObject bloOut) {
 		BaseLangObject blo; 
 		if (StartOf(2)) {
@@ -919,11 +921,11 @@ public class Parser {
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _T,_T,_T,_x, _x,_T,_T,_x, _T,_T,_T,_T, _x,_T,_T,_x, _x,_x},
 		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_x,_x, _x,_x},
-		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_T, _T,_x,_x,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_T, _T,_T,_T,_x, _T,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_T, _T,_x}
 
 	};

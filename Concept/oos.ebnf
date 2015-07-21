@@ -285,6 +285,8 @@ PRODUCTIONS
 			|
 			LOCALIDENT														(. bloOut = new OosVariable(t.val); .)
 		)
+		|
+		SQFCALL<out bloOut>
 	.
 	EXPRESSION_HELPER<out BaseLangObject bloOut>							(. var e = new OosExpression(); bloOut = (BaseLangObject)e; BaseLangObject blo; ExpressionOperator eo; .)
 	=
