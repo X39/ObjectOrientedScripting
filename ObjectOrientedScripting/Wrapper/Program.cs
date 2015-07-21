@@ -29,7 +29,7 @@ namespace Wrapper
                 {
                     int count = s.IndexOf('=');
                     if (count == -1)
-                        count = s.Length - 1;
+                        count = s.Length;
                     string switchstring = s.Substring(1, count - 1);
                     switch (switchstring)
                     {
