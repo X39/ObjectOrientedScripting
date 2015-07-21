@@ -17,7 +17,7 @@ namespace Wrapper
         {
             return new Version("0.1.0-ALPHA");
         }
-        void CheckSyntax(string filepath)
+        public void CheckSyntax(string filepath)
         {
             Scanner scanner = new Scanner(filepath);
             Parser parser = new Parser(scanner);
