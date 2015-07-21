@@ -34,15 +34,6 @@ public class Logger
     public Logger()
     {
         String filePath = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss") + ".log";
-        try
-        {
-            this.fstream = new StreamWriter(new FileStream(filePath, FileMode.CreateNew));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Could not initiate the logger: " + ex.Message);
-            this.fstream = null;
-        }
         lastLogLevel = LogLevel.CONTINUE;
         minLogLevel = LogLevel.INFO;
     }
@@ -50,6 +41,20 @@ public class Logger
     {
         if (this.fstream != null)
             this.fstream.Close();
+    }
+    public void setLogFile(string path)
+    {
+        if (this.fstream != null)
+            this.close();
+        try
+        {
+            this.fstream = new StreamWriter(new FileStream(path == "" ? DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss") + ".log" : path, FileMode.CreateNew));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Could not initiate the logger: " + ex.Message);
+            this.fstream = null;
+        }
     }
     public void log(LogLevel l, string msg)
     {
