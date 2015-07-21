@@ -382,59 +382,62 @@ namespace Wrapper
             else if (container is OosExpression)
             {
                 var obj = (OosExpression)container;
-                writer.Write("(");
+                if (obj.Negate)
+                    writer.Write("!(");
+                else
+                    writer.Write("(");
                 WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
                 writer.Write(")");
                 switch (obj.Op)
                 {
                     case ExpressionOperator.And:
                         writer.Write(" && (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.AndAnd:
                         writer.Write(" && {");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write("}");
                         break;
                     case ExpressionOperator.Or:
                         writer.Write(" || (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.OrOr:
                         writer.Write(" || {");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write("}");
                         break;
                     case ExpressionOperator.Equals:
                         writer.Write(" == (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.ExplicitEquals:
                         writer.Write(" isEqualTo (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.Minus:
                         writer.Write(" - (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.Plus:
                         writer.Write(" + (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.Multiplication:
                         writer.Write(" * (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                     case ExpressionOperator.Division:
                         writer.Write(" / (");
-                        WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
+                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
                         writer.Write(")");
                         break;
                 }
