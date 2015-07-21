@@ -39,8 +39,7 @@ public class Logger
     }
     ~Logger()
     {
-        if (this.fstream != null)
-            this.fstream.Close();
+        this.fstream.Close();
     }
     public void setLogFile(string path)
     {
@@ -69,6 +68,8 @@ public class Logger
     }
     public void close()
     {
+        if (this.fstream == null)
+            return;
         this.fstream.Close();
         this.fstream = null;
     }
