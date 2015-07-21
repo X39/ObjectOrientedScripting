@@ -105,7 +105,8 @@ namespace Wrapper
                 //Get parent classes
                 List<OosClass> parentClasses = new List<OosClass>();
                 List<BaseFunctionObject> constructorsParentClasses = new List<BaseFunctionObject>();
-                foreach (var c in obj.getFirstOf<OosContainer>().getAllChildrenOf<OosClass>())
+                var allClasses = obj.getFirstOf<OosContainer>().getAllChildrenOf<OosClass>(true);
+                foreach (var c in allClasses)
                     if (obj.ParentClasses.Contains(c.Name))
                         parentClasses.Add(c);
 
@@ -155,7 +156,7 @@ namespace Wrapper
                 foreach (var c in parentClasses)
                 {
                     BaseFunctionObject parentsConstructor = null;
-                    foreach (BaseLangObject blo in obj.Children)
+                    foreach (BaseLangObject blo in c.Children)
                     {
                         if (blo is OosClassFunction)
                         {
@@ -194,12 +195,12 @@ namespace Wrapper
                 int objectIdentifiersCount = 0;
                 foreach (OosClassVariable blo in classVariables)
                 {
-                    newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : blo.Name) + '"');
+                    newWriter.Write((objectIdentifiersCount > 0 ? "," : "") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : '"' + blo.Name + '"'));
                     objectIdentifiersCount++;
                 }
                 foreach (OosClassFunction blo in classFunctions)
                 {
-                    newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : blo.Name) + '"');
+                    newWriter.Write((objectIdentifiersCount > 0 ? "," : "") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : '"' + blo.Name + '"'));
                     objectIdentifiersCount++;
                 }
                 newWriter.Write("],\n\t[");
@@ -532,7 +533,7 @@ namespace Wrapper
                     else
                         writer.WriteLine(";");
                 }
-                writer.WriteLine(tab + '\t');
+                writer.Write(tab + '\t');
                 WriteOutTree(proj, obj.Arg3, path, configObj, writer, tabCount);
                 writer.WriteLine(';');
                 writer.Write(tab + "}");

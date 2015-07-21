@@ -4,4 +4,12 @@ class cFoo
 	{
 		SQF::diag_log("class foo " + _someRandomArg);
 	}
+	public function test(_test, _test2)
+	{
+	
+	}
+	private function test2(_test, _test2)
+	{
+	
+	}
 }
