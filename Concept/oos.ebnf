@@ -308,6 +308,8 @@ PRODUCTIONS
 		)
 		|
 		EXPRESSION_HELPER<out bloOut>
+		|
+		NATIVESINGLE<out bloOut>
 	.
 	LOCALVARIABLE<out BaseLangObject bloOut>								(. var lv = new OosLocalVariable(); bloOut = (BaseLangObject)lv; BaseLangObject blo; .)
 	=
@@ -397,7 +399,7 @@ PRODUCTIONS
 		|
 		SWITCH<out bloOut>
 		|
-		NATIVE<out bloOut>
+		NATIVEMULTI<out bloOut>
 	.
 	CODEINSTRUCTION<out BaseLangObject bloOut>								(. bloOut = null; .)
 	=
@@ -548,14 +550,24 @@ PRODUCTIONS
 		EXPRESSION<out blo>													(. obj.Expression = blo; .)
 		')'
 	.
-	NATIVE<out BaseLangObject bloOut>										(. var obj = new OosNative(); bloOut = (BaseLangObject)obj; .)
+	NATIVEMULTI<out BaseLangObject bloOut>										(. var obj = new OosNative(); bloOut = (BaseLangObject)obj; .)
 	=
-		"native"
+		"startnative"
 		ANY																	(. obj.nativeCode += t.val; .)
 		{
 			ANY																(. obj.nativeCode += " " + t.val; .)
 		}
 		"endnative"
+	.
+	NATIVESINGLE<out BaseLangObject bloOut>									(. var obj = new OosNative(); bloOut = (BaseLangObject)obj; .)
+	=
+		"native"
+		'('
+		ANY																	(. obj.nativeCode += t.val; .)
+		{
+			ANY																(. obj.nativeCode += " " + t.val; .)
+		}
+		')'
 	.
 	BREAKINSTRUCTION<out BaseLangObject bloOut>								(. var b = new OosBreak(); bloOut = (BaseLangObject)b; .)
 	=
