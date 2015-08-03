@@ -188,7 +188,7 @@ namespace Wrapper
                 tmpCfgClass.addChild(new SqfConfigField("preInit", "0"));
                 tmpCfgClass.addChild(new SqfConfigField("postInit", "0"));
 
-                
+
 
                 newWriter.WriteLine("private \"_obj\";");
                 newWriter.Write("_obj = [\n\t[");
@@ -233,10 +233,8 @@ namespace Wrapper
                 newWriter.WriteLine("]]");
                 newWriter.WriteLine("];");
                 foreach (var bfo in constructorsParentClasses)
-                    if (bfo != null)
-                        WriteOutTree(proj, bfo, curPath, cfgClass, newWriter);
-                if (constructor != null)
-                    WriteOutTree(proj, constructor, curPath, cfgClass, newWriter);
+                    WriteOutTree(proj, bfo, curPath, cfgClass, newWriter);
+                WriteOutTree(proj, constructor, curPath, cfgClass, newWriter);
                 newWriter.WriteLine("_obj");
                 newWriter.Flush();
                 newWriter.Close();
@@ -299,6 +297,19 @@ namespace Wrapper
                     tmpCfgClass.addChild(new SqfConfigField("postInit", "0"));
                 }
                 List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
+                writer.Write("private[");
+                int privateCounter = 0;
+                foreach (var v in obj.ArgList)
+                {
+                    writer.Write(privateCounter == 0 ? '"' + v + '"' : ",\"" + v + '"');
+                    privateCounter++;
+                }
+                foreach (var v in vars)
+                {
+                    writer.Write(privateCounter == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
+                    privateCounter++;
+                }
+                writer.WriteLine("];");
                 writer.WriteLine("scopeName \"fnc\";");
                 writer.Write(tab + "params [\"_obj\"");
                 int argCounter = 0;
@@ -325,11 +336,25 @@ namespace Wrapper
             {
                 OosClassFunction obj = (OosClassFunction)container;
                 List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
+                writer.Write(tab + "private[");
+                int privateCounter = 0;
+                foreach (var v in obj.ArgList)
+                {
+                    writer.Write(privateCounter == 0 ? '"' + v + '"' : ",\"" + v + '"');
+                    privateCounter++;
+                }
+                foreach (var v in vars)
+                {
+                    writer.Write(privateCounter == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
+                    privateCounter++;
+                }
+                writer.WriteLine("];");
                 writer.WriteLine(tab + "scopeName \"fnc\";");
                 writer.Write(tab + "params [\"_obj\"");
                 foreach (var v in obj.ArgList)
                 {
                     writer.Write(",\"" + v + '"');
+                    privateCounter++;
                 }
                 writer.WriteLine("];");
                 foreach (BaseLangObject blo in obj.Children)
@@ -736,12 +761,10 @@ namespace Wrapper
                     }
                     if (lArgs.Count > 1)
                         writer.Write(']');
-                    writer.Write(' ');
                 }
                 writer.Write(obj.InstructionName);
                 if (rArgs.Count > 0)
                 {
-                    writer.Write(' ');
                     if (rArgs.Count > 1)
                         writer.Write('[');
                     counter = 0;
