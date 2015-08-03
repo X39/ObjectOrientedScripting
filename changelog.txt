@@ -1,3 +1,9 @@
+Version 0.3.1-ALPHA
+    |- Compiler: Fixed warning messages popping up during write out when
+    |            a class has no constructor
+    |- Compiler: Imrpooved SQF syntax output (removed "private[...]" instruction
+	|            from functions as "params" marks them private to scope already)
+
 Version 0.3.0-ALPHA
     |- Compiler: changed block native code from:
     |                native <instructions> endnative
@@ -6,7 +12,7 @@ Version 0.3.0-ALPHA
     |- Compiler: Added "native(<instructions>)" specially for expressions
     |            (will be merged at some point with the block native again)
     |- Compiler: Added SQF Call instruction:
-    |                SQF [ (>arg1>, <argN>) ] <instruction> [ (>arg1>, <argN>) ]
+    |                SQF [ (<arg1>, <argN>) ] <instruction> [ (<arg1>, <argN>) ]
     |- Compiler: Added missing detection for
     |            unsigned integer/double values in VALUE
     |- Compiler: Added missing detection for
