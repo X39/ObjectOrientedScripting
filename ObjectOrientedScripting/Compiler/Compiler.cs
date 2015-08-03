@@ -299,11 +299,6 @@ namespace Wrapper
                 List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
                 writer.Write("private[");
                 int privateCounter = 0;
-                foreach (var v in obj.ArgList)
-                {
-                    writer.Write(privateCounter == 0 ? '"' + v + '"' : ",\"" + v + '"');
-                    privateCounter++;
-                }
                 foreach (var v in vars)
                 {
                     writer.Write(privateCounter == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
@@ -338,11 +333,6 @@ namespace Wrapper
                 List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
                 writer.Write(tab + "private[");
                 int privateCounter = 0;
-                foreach (var v in obj.ArgList)
-                {
-                    writer.Write(privateCounter == 0 ? '"' + v + '"' : ",\"" + v + '"');
-                    privateCounter++;
-                }
                 foreach (var v in vars)
                 {
                     writer.Write(privateCounter == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
@@ -354,7 +344,6 @@ namespace Wrapper
                 foreach (var v in obj.ArgList)
                 {
                     writer.Write(",\"" + v + '"');
-                    privateCounter++;
                 }
                 writer.WriteLine("];");
                 foreach (BaseLangObject blo in obj.Children)
