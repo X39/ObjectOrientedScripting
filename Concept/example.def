@@ -1,0 +1,31 @@
+#define TESTB
+#define TEST5
+#define TEST6 //test6
+
+#ifdef TESTB
+	//testb is defined
+#else
+	//testb is not defined
+#endif
+
+#ifdef TEST2
+	//test2 is defined
+#else
+	//test2 is not defined
+#endif
+
+#ifdef TEST3
+	#ifdef TEST4
+		//test3 is defined & test4 is defined
+	#else
+		//test3 is defined & test4 is not defined
+	#endif
+#else
+	#ifdef TEST5
+		//test3 is not defined & test5 is defined
+	#else
+		//test3 is not defined & test5 is not defined
+	#endif
+#endif
+
+TEST6
