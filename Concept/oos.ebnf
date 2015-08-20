@@ -283,21 +283,29 @@ COMPILER OOS
 		=
 			VARTYPE
 			T_IDENT
-			[
-				OP_ASSIGNMENT
-			]
-			TERMINATOR
 		.
 		CODEINSTRUCTIONSC
 		=
+			NEWVARIABLE
+			|
+			OP_ASSIGNMENT
 		.
 		CODEINSTRUCTIONNSC
 		=
+		OP_FOR
+		|
+		OP_WHILE
+		|
+		OP_IFELSE
+		|
+		OP_SWITCH
+		|
+		OP_TRYCATCH
 		.
 		CODEINSTRUCTION
 		=
 			(
-				CODEINSTRUCTIOSC
+				CODEINSTRUCTIONSC
 				TERMINATOR
 			)
 			|
@@ -305,7 +313,165 @@ COMPILER OOS
 		.
 		OP_ASSIGNMENT
 		=
+			(
+				NEWVARIABLE
+				|
+				T_IDENT
+			)
 			'='
-			(* TODO: finish *)
+			(
+				{
+					OP_ASSIGNMENT
+				}
+				|
+				EXPRESSION
+			)
+		.
+		OP_FOR
+		=
+			"for"
+			'('
+			[
+				OP_ASSIGNMENT
+			]
+			TERMINATOR
+			EXP_BOOL
+			TERMINATOR
+			CODEINSTRUCTIONSC
+			')'
+			(
+				(
+					'{'
+					{
+						CODEINSTRUCTION
+					}
+					'}'
+				)
+				|
+				CODEINSTRUCTION
+			)
+		.
+		OP_WHILE
+		=
+			"while"
+			'('
+			EXP_BOOL
+			')'
+			(
+				(
+					'{'
+					{
+						CODEINSTRUCTION
+					}
+					'}'
+				)
+				|
+				CODEINSTRUCTION
+			)
+		.
+		OP_IFELSE
+		=
+			"if"
+			'('
+			EXP_BOOL
+			')'
+			(
+				(
+					'{'
+					{
+						CODEINSTRUCTION
+					}
+					'}'
+				)
+				|
+				CODEINSTRUCTION
+			)
+			[
+				"else"
+				(
+					(
+						'{'
+						{
+							CODEINSTRUCTION
+						}
+						'}'
+					)
+					|
+					CODEINSTRUCTION
+				)
+			]
+		.
+		OP_TRYCATCH
+		=
+			"try"
+			'{'
+			{
+				CODEINSTRUCTION
+			}
+			'}'
+			"catch"
+			'('
+			NEWVARIABLE
+			')'
+			'{'
+			{
+				CODEINSTRUCTION
+			}
+			'}'
+		.
+		OP_BREAK
+		=
+		.
+		OP_THROW
+		=
+		.
+		OP_RETURN
+		=
+		.
+		OP_SWITCH
+		=
+			"switch"
+			'('
+			EXPRESSION
+			')'
+			'{'
+			{
+				(
+					"case"
+					EXPRESSION
+					':'
+					{
+						"case"
+						EXPRESSION
+						':'
+					}
+					{
+						CODEINSTRUCTION
+					}
+					(
+						OP_BREAK
+						|
+						OP_THROW
+						|
+						OP_RETURN
+					)
+				)
+				|
+				(
+					"default"
+					':'
+					{
+						CODEINSTRUCTION
+					}
+					(
+						OP_BREAK
+						|
+						OP_THROW
+						|
+						OP_RETURN
+					)
+				)
+			}
+			'}'
 		.
 END OOS.
