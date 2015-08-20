@@ -1,75 +1,96 @@
-oos_fnc_class_cFoo____constructor___ = {
-	_obj = [
-		[nil, "foobar"],
-		[{throw "UNKNOWN FUNCTION";}, {
-			diag_log "class foo" + (_this select 1);
-		}]
-	];
-	_obj
-}
-oos_fnc_class_cBar____constructor___ = {
-	_obj = [
-		[nil, "foobar"],
-		[{throw "UNKNOWN FUNCTION";}, {
-			diag_log "class foo" + (_this select 1);
-			diag_log "class bar" + (_this select 1);
-		}]
-	];
-	_obj
-}
-oos_fnc_class_testObj_testVarStatic = nil;
-oos_fnc_class_testObj_testFncStatic = {
-	private["___returnValue___"];
-	scopeName "functionScope";
-	_this call {
-		//SQF::diag_log(SQF::str(arg2));
-		diag_log str (_this select 1);
-		//return "";
-		___returnValue___ = "";
-		breakTo "functionScope";
-	};
-	___returnValue___
+OOS_testObj_fnc_testFncStatic = {
+	private["_arg1","_arg2"];
+	scopeName "fnc";
+	params ["_obj""_arg1","_arg2"];
+	
+	diag_log(str(_arg2));
+	("") breakOut "fnc";
 };
-oos_fnc_class_testObj____constructor___ = {
+OOS_testObj_fnc____constructor___eol = {
+	private "_obj";
 	_obj = [
-		["testFncPublic", "testVarPublic"],
-		[{throw "UNKNOWN FUNCTION";}, {
-			diag_log str (_this select 1);
-		}, nil]
+		["testVarPublic","testFncPublic"],
+		["testVarPublic","testFncPublic"],
+		[
+			{throw "UNKNOWN FUNCTION";},
+			nil,
+			{
+				private["_arg1","_arg2"];
+				scopeName "fnc";
+				params ["_obj","_arg1","_arg2"];
+				diag_log(str(_arg1));
+
+			}
+		],
+		["testObj", ["testObj"]]
 	];
-	//this.testVarPublic = ""
-	_index = ((_obj select 0) find "testVarPublic");
-	if(_index == -1) then {throw "Unknown object variable ""testVarPublic""";};
-	_obj set[_index, ""];
-	//if(!isset(testVarStatic))
-	//{
-	//	testVarStatic = "";
-	//}
-	if(isNil "oos_fnc_class_testObj_testVarStatic") then
+	private[];
+	scopeName "fnc";
+	params ["_obj"];
+	
+	(_obj select 2) set [((_obj select 1) find "testVarPublic") + 1, ("")];
+	if(!(isNil {(oos_testObj_fnc_testVarStatic)})) then
 	{
-		oos_fnc_class_testObj_testVarStatic = "";
+		testVarStatic = ("");
 	};
-	//this.testFncPublic("arg1", "arg2");
-	["arg1", "arg2"] call ((_obj select 1) select (((_obj select 0) find "testFncPublic") + 1));
-	//testFncStatic("arg1", "arg2");
+	[_obj, ("arg1"), ("arg2")] call ((_obj select 2) select (((_obj select 1) find "testFncPublic") + 1));
+	[ ("arg1"), ("arg2")] call oos_testObj_fnc_testFncStatic;
 	_obj
+};
+
+OOS_fnc_returnTrue = {
+	private[];
+	scopeName "fnc";
+	params ["_obj"];
+	
+	(true) breakOut "fnc";
 }
-preInit = {
-	private ["_obj", "_foo", "_bar"];
-	//SQF::diag_log("preInit");
-	diag_log "preInit";
-	//var obj = new testObj();
-	_obj = [] call oos_fnc_class_testObj____constructor___;
-	//obj.testFncPublic("preInitArg1", "preInitArg2");
-	[_obj, "preInitArg1", "preInitArg2"] call ((_obj select 1) select (((_obj select 0) find "testFncPublic") + 1));
-	//testObj::testFncStatic("preInitArg1", "preInitArg2");
-	[_obj, "preInitArg1", "preInitArg2"] call oos_fnc_class_testObj_testFncStatic;
-	//var foo = new cFoo();
-	_foo = [] call oos_fnc_class_cFoo____constructor___;
-	//foo.foobar("normal foo");
-	[_foo, "normal foo"] call ((_obj select 1) select (((_obj select 0) find "foobar") + 1));
-	//var bar = new cBar();
-	_bar = [] call oos_fnc_class_cBar____constructor___;
-	//foo.foobar("normal bar");
-	[_bar, "normal bar"] call ((_obj select 1) select (((_obj select 0) find "foobar") + 1));
+OOS_fnc_preInit = {
+	if(isNil"OOS_testObj_fnc_testVarStatic") then {missionNamespace setVariable["OOS_testObj_fnc_testVarStatic",nil];};
+	
+	private["_obj","_testing"];
+	scopeName "fnc";
+	params ["_obj"];
+	
+	diag_log("preInit");
+	_obj = ([] call oos_fnc_testObj____constructor___eol);
+	[_obj, ("preInitArg1"), ("preInitArg2")] call ((_obj select 2) select (((_obj select 0) find "testFncPublic") + 1));
+	[ ("preInitArg1"), ("preInitArg2")] call oos_testObj_fnc_testFncStatic;
+	_testing = (0);
+	_test = (0);
+	while {(_test) < ((10))} do
+	{
+		scopeName "breakable";
+		diag_log("test");
+		_test = _test - 1;
+	};
+	switch ((alive(player))) do
+	{
+		case true: {
+			try
+			{
+			}
+			catch
+			{
+				test = _exception;
+				throw ("foobar");
+				diag_log(test);
+			};
+		};
+		default {
+			if(([] call oos_fnc_returnTrue)) then
+			{
+				systemChat("aprooved");
+			}
+			else
+			{
+				systemChat("nop");
+			};
+		};
+	};
+	while {(true)} do
+	{
+		scopeName "breakable";
+		breakOut "breakable";
+	};
 };
