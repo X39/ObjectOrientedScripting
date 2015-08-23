@@ -13,9 +13,44 @@ namespace Wrapper
 {
     public class Compiler : ICompiler
     {
+        string configFileName;
+        bool addFunctionsClass;
+        public Compiler()
+        {
+            configFileName = "config.cpp";
+            addFunctionsClass = true;
+        }
+        public void setFlags(string[] strArr)
+        {
+            foreach (var s in strArr)
+            {
+                int count = s.IndexOf('=');
+                if (count == -1)
+                    count = s.Length;
+                string switchstring = s.Substring(1, count - 1);
+                switch (switchstring)
+                {
+                    case "CLFN":
+                        if (count == -1)
+                        {
+                            Logger.Instance.log(Logger.LogLevel.ERROR, "Missing output file");
+                            Logger.Instance.close();
+                            throw new Exception("Missing output file");
+                        }
+                        configFileName = s.Substring(count + 1);
+                        break;
+                    case "NFNC":
+                        addFunctionsClass = false;
+                        break;
+                    default:
+                        Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
+                        break;
+                }
+            }
+        }
         public Version getVersion()
         {
-            return new Version("0.3.0-ALPHA");
+            return new Version("0.4.0-ALPHA");
         }
         public void CheckSyntax(string filepath)
         {
@@ -37,9 +72,13 @@ namespace Wrapper
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found, cannot continue with Translating!");
                 return;
             }
-            SqfConfigFile file = new SqfConfigFile("config.cpp");
-            SqfConfigClass cfgClass = new SqfConfigClass("cfgFunctions");
-            file.addChild(cfgClass);
+            SqfConfigFile file = new SqfConfigFile(configFileName);
+            iSqfConfig cfgClass = file;
+            if (addFunctionsClass)
+            {
+                cfgClass = new SqfConfigClass("cfgFunctions");
+                file.addChild(cfgClass);
+            }
             WriteOutTree(proj, container, proj.OutputFolder, cfgClass, null);
             //Create config.cpp file
             file.writeOut(proj.OutputFolder);
@@ -61,7 +100,7 @@ namespace Wrapper
                 SqfConfigClass cfgClass_GenericFunctions = null;
                 foreach (BaseLangObject blo in obj.Children)
                 {
-                    if (!(blo is OosNamespace))
+                    if (!(blo is OosNamespace) && !(blo is OosClass))
                     {
                         if (cfgClass == null)
                         {
@@ -80,10 +119,6 @@ namespace Wrapper
                         else if (blo is OosGlobalVariable)
                         {
                             continue; //Will be added in last step
-                        }
-                        else if (blo is OosClass)
-                        {
-                            WriteOutTree(proj, blo, curPath, cfgClass, writer);
                         }
                         else
                         {
@@ -115,7 +150,10 @@ namespace Wrapper
                 else
                     curPath += '\\' + obj.Name;
                 Directory.CreateDirectory(curPath);
-                SqfConfigClass cfgClass = new SqfConfigClass(obj.Name);
+                SqfConfigClass cfgClass = new SqfConfigClass(obj.getNormalizedName());
+                configObj.addChild(cfgClass);
+                configObj = cfgClass;
+                cfgClass = new SqfConfigClass(obj.Name);
                 configObj.addChild(cfgClass);
                 BaseFunctionObject constructor = null;
                 List<OosClassFunction> classFunctions = new List<OosClassFunction>();
@@ -176,11 +214,11 @@ namespace Wrapper
                     constructorsParentClasses.Add(parentsConstructor);
                 }
                 //Handle constructor manually (as it has obviously more to do then the generic DoSomething functions ... or do you want a non-functional object do you?)
-                string constructorPath = curPath + '\\' + "___constructor___eol.sqf";
+                string constructorPath = curPath + '\\' + "class____constructor.sqf";
                 StreamWriter newWriter = new StreamWriter(constructorPath);
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Handling file:");
                 Logger.Instance.log(Logger.LogLevel.CONTINUE, constructorPath);
-                var tmpCfgClass = new SqfConfigClass(obj.Name + "____constructor___eol");
+                var tmpCfgClass = new SqfConfigClass("class____constructor");
                 cfgClass.addChild(tmpCfgClass);
                 tmpCfgClass.addChild(new SqfConfigField("file", "\"" + constructorPath.Substring(proj.OutputFolder.Length) + "\""));
                 tmpCfgClass.addChild(new SqfConfigField("recompile", "0"));
@@ -251,7 +289,9 @@ namespace Wrapper
                 writer = new StreamWriter(curPath);
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Handling file:");
                 Logger.Instance.log(Logger.LogLevel.CONTINUE, curPath);
-                var tmpCfgClass = new SqfConfigClass(obj.getNormalizedName());
+                var s = obj.getNormalizedName();
+                var retIndex = s.IndexOf("fnc_");
+                var tmpCfgClass = new SqfConfigClass(s.Substring(retIndex < 0 ? 0 : retIndex + 4));
                 configObj.addChild(tmpCfgClass);
                 tmpCfgClass.addChild(new SqfConfigField("file", "\"" + curPath.Substring(proj.OutputFolder.Length) + "\""));
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Configfile dir:");
@@ -555,7 +595,7 @@ namespace Wrapper
                 writer.Write("] call ");
                 WriteOutTree(proj, obj.Identifier, path, configObj, writer, tabCount + 1);
                 if (container is OosObjectCreation)
-                    writer.Write("____constructor___eol");
+                    writer.Write("class____constructor");
             }
             #endregion
             #region OosIfElse

@@ -67,8 +67,13 @@ namespace Compiler.OOS_LanguageObjects
             {
                 string s = NamespaceName;
                 int index = s.LastIndexOf("::");
-                if(index != -1)
-                    s = (s.Substring(0, index) + "_fnc" + s.Substring(index)).Replace("::", "_");
+                if (index != -1)
+                {
+                    if (this.Parent is OosObjectCreation)
+                        s = s.Replace("::", "_") + "_fnc_";
+                    else
+                        s = (s.Substring(0, index) + "_fnc" + s.Substring(index)).Replace("::", "_");
+                }
                 if (s.StartsWith("_"))
                     s = s.Remove(0, 1);
                 
