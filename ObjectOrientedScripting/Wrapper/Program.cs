@@ -10,13 +10,14 @@ namespace Wrapper
 {
     public class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+            var exitCode = -1;
             if (args.Length == 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "No Parameter provided, use \"<programm> -help\" for help");
                 Logger.Instance.close();
-                return;
+                return exitCode;
             }
             string path = "";
             bool anyKey = true;
@@ -24,6 +25,7 @@ namespace Wrapper
             string checkSyntaxFile = "";
             string dllPath = "";
             bool exitAfterParamReading = false;
+            List<string> compilerFlags = new List<string>();
             foreach (string s in args)
             {
                 if (s.StartsWith("-"))
@@ -45,6 +47,7 @@ namespace Wrapper
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -dll=<FILE>   forces given dll for project");
                             Logger.Instance.log(Logger.LogLevel.CONTINUE, "     -log[=<FILE>] writes log output to file");
                             exitAfterParamReading = true;
+                            exitCode = 0;
                             break;
                         case "v":
                             if (Logger.Instance.LoggingLevel > Logger.LogLevel.VERBOSE)
@@ -87,6 +90,10 @@ namespace Wrapper
                             break;
                     }
                 }
+                else if(s.StartsWith("/"))
+                {
+                    compilerFlags.Add(s);
+                }
                 else
                 {
                     path = s;
@@ -100,7 +107,7 @@ namespace Wrapper
                     Console.WriteLine("\nPress ANY key to continue");
                     Console.ReadKey();
                 }
-                return;
+                return exitCode;
             }
             Logger.Instance.log(Logger.LogLevel.VERBOSE, "extended output is enabled");
             Logger.Instance.log(Logger.LogLevel.DEBUG, "Debug output is enabled");
@@ -113,7 +120,7 @@ namespace Wrapper
                     Console.WriteLine("\nPress ANY key to continue");
                     Console.ReadKey();
                 }
-                return;
+                return exitCode;
             }
             if (checkSyntaxFile != "" && !File.Exists(checkSyntaxFile))
             {
@@ -124,7 +131,7 @@ namespace Wrapper
                     Console.WriteLine("\nPress ANY key to continue");
                     Console.ReadKey();
                 }
-                return;
+                return exitCode;
             }
             if (createEmptyProject)
             {
@@ -147,7 +154,7 @@ namespace Wrapper
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.3.0-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.4.0-ALPHA\" />");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!File.Exists(path + "Main.oos"))
@@ -177,7 +184,7 @@ namespace Wrapper
                     Console.WriteLine("\nPress ANY key to continue");
                     Console.ReadKey();
                 }
-                return;
+                return exitCode;
             }
             Project proj;
             ICompiler compiler;
@@ -195,7 +202,7 @@ namespace Wrapper
                     Console.WriteLine("\nPress ANY key to continue");
                     Console.ReadKey();
                 }
-                return;
+                return exitCode;
             }
             try
             {
@@ -211,11 +218,11 @@ namespace Wrapper
                         Console.WriteLine("\nPress ANY key to continue");
                         Console.ReadKey();
                     }
-                    return;
+                    return exitCode;
                 }
                 if (dllPath == "")
                 {
-                    foreach (var f in Directory.EnumerateFiles("./"))
+                    foreach (var f in Directory.EnumerateFiles(System.Reflection.Assembly.GetExecutingAssembly().CodeBase))
                     {
                         if (f.Contains(compilerVersion))
                         {
@@ -237,7 +244,7 @@ namespace Wrapper
                         Console.WriteLine("\nPress ANY key to continue");
                         Console.ReadKey();
                     }
-                    return;
+                    return exitCode;
                 }
                 Assembly assembly = Assembly.LoadFrom(compilerPath);
                 Type type = assembly.GetType("Wrapper.Compiler", true);
@@ -254,7 +261,7 @@ namespace Wrapper
                     Console.WriteLine("\nPress ANY key to continue");
                     Console.ReadKey();
                 }
-                return;
+                return exitCode;
             }
             if (checkSyntaxFile != "")
             {
@@ -264,6 +271,7 @@ namespace Wrapper
             {
                 try
                 {
+                    compiler.setFlags(compilerFlags.ToArray());
                     Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
                     compiler.Preprocess(proj);
                     Logger.Instance.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
@@ -273,6 +281,7 @@ namespace Wrapper
                     Logger.Instance.log(Logger.LogLevel.INFO, "----- Starting translating -----");
                     compiler.Translate(proj);
                     Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
+                    exitCode = 0;
                 }
                 catch (Exception ex)
                 {
@@ -287,6 +296,7 @@ namespace Wrapper
                 Console.WriteLine("\nPress ANY key to continue");
                 Console.ReadKey();
             }
+            return exitCode;
         }
     }
 }
