@@ -34,6 +34,7 @@ Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\R
 Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.1.0-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.2.0-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.3.0-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.4.0-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Logger.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -48,35 +49,48 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
-'Version 0.3.0-ALPHA                                                             ' + AnsiChar(#10) +
-'    |- Compiler: changed block native code from:                                ' + AnsiChar(#10) +
-'    |                native <instructions> endnative                            ' + AnsiChar(#10) +
-'    |            to:                                                            ' + AnsiChar(#10) +
-'    |                startnative <instructions> endnative                       ' + AnsiChar(#10) +
-'    |- Compiler: Added "native(<instructions>)" specially for expressions       ' + AnsiChar(#10) +
-'    |            (will be merged at some point with the block native again)     ' + AnsiChar(#10) +
-'    |- Compiler: Added SQF Call instruction:                                    ' + AnsiChar(#10) +
-'    |                SQF [ (>arg1>, <argN>) ] <instruction> [ (>arg1>, <argN>) ]' + AnsiChar(#10) +
-'    |- Compiler: Added missing detection for                                    ' + AnsiChar(#10) +
-'    |            unsigned integer/double values in VALUE                        ' + AnsiChar(#10) +
-'    |- Compiler: Added missing detection for                                    ' + AnsiChar(#10) +
-'    |            >, >=, <, <= operations in EXPRESSION                          ' + AnsiChar(#10) +
-'    |- Compiler: Added missing LOCALVARIABLE alternative for FORLOOP            ' + AnsiChar(#10) +
-'    |- Compiler: Fixed FORLOOP                                                  ' + AnsiChar(#10) +
-'    |- Compiler: PrettyPrint sqf output improved                                ' + AnsiChar(#10) +
-'                                                                                ' + AnsiChar(#10) +
-'Version 0.2.0-ALPHA                                                             ' + AnsiChar(#10) +
-'    |v- New Parameters for Wrapper.exe                                          ' + AnsiChar(#10) +
-'    ||- "sc=<FILE>"    Used to check the syntax of some document                ' + AnsiChar(#10) +
-'    ||- "dll=<FILE>"   Forces given dll (ignores project settings)              ' + AnsiChar(#10) +
-'    |\- "log[=<FILE>]" Enables LogToFile (with optional file parameter)         ' + AnsiChar(#10) +
-'    |- Compiler: Fixed TryCatch                                                 ' + AnsiChar(#10) +
-'    |- Compiler: Fixed Expressions                                              ' + AnsiChar(#10) +
-'    |- Compiler: Implemented class inheritance                                  ' + AnsiChar(#10) +
-'    |- Compiler: Implemented public/private encapsulation                       ' + AnsiChar(#10) +
-'    |- Compiler: when parsing error was found the objectTree                    ' + AnsiChar(#10) +
-'    |            wont get written out anymore                                   ' + AnsiChar(#10) +
-'    |- Wrapper: Fixed ArgumentDetection (foo=bar was not detected)              ' + AnsiChar(#10) +
-'    \- Logger: Disabled logToFile per default                                   '
-    );
+    'Version 0.4.0-ALPHA                                                             ' + AnsiChar(#10) +
+    '    |- Wrapper: Now returns -1 if was not successfully                          ' + AnsiChar(#10) +
+    '    |- Wrapper: Added "setFlags(string[])" function to ICompiler interface      ' + AnsiChar(#10) +
+    '    |- Wrapper: Fixed compilerDLL search location                               ' + AnsiChar(#10) +
+    '    |           Working dir (applicationside) was checked                       ' + AnsiChar(#10) +
+    '    |           and not executable dir                                          ' + AnsiChar(#10) +
+    '    |- Compiler: Fixed naming of functions in output config file                ' + AnsiChar(#10) +
+    '    |            being incorrect                                                ' + AnsiChar(#10) +
+    '    |- Compiler: Added flag /CLFN with STRING value ("/CLFN=blabla.cfg")        ' + AnsiChar(#10) +
+    '    |            Sets how the output config will be named                       ' + AnsiChar(#10) +
+    '    |- Compiler: Added flag /NFNC                                               ' + AnsiChar(#10) +
+    '    \            Removes the CfgFunctions class from the config file            ' + AnsiChar(#10) +
+    '                                                                                ' + AnsiChar(#10) +
+    'Version 0.3.0-ALPHA                                                             ' + AnsiChar(#10) +
+    '    |- Compiler: changed block native code from:                                ' + AnsiChar(#10) +
+    '    |                native <instructions> endnative                            ' + AnsiChar(#10) +
+    '    |            to:                                                            ' + AnsiChar(#10) +
+    '    |                startnative <instructions> endnative                       ' + AnsiChar(#10) +
+    '    |- Compiler: Added "native(<instructions>)" specially for expressions       ' + AnsiChar(#10) +
+    '    |            (will be merged at some point with the block native again)     ' + AnsiChar(#10) +
+    '    |- Compiler: Added SQF Call instruction:                                    ' + AnsiChar(#10) +
+    '    |                SQF [ (>arg1>, <argN>) ] <instruction> [ (>arg1>, <argN>) ]' + AnsiChar(#10) +
+    '    |- Compiler: Added missing detection for                                    ' + AnsiChar(#10) +
+    '    |            unsigned integer/double values in VALUE                        ' + AnsiChar(#10) +
+    '    |- Compiler: Added missing detection for                                    ' + AnsiChar(#10) +
+    '    |            >, >=, <, <= operations in EXPRESSION                          ' + AnsiChar(#10) +
+    '    |- Compiler: Added missing LOCALVARIABLE alternative for FORLOOP            ' + AnsiChar(#10) +
+    '    |- Compiler: Fixed FORLOOP                                                  ' + AnsiChar(#10) +
+    '    \- Compiler: PrettyPrint sqf output improved                                ' + AnsiChar(#10) +
+    '                                                                                ' + AnsiChar(#10) +
+    'Version 0.2.0-ALPHA                                                             ' + AnsiChar(#10) +
+    '    |v- New Parameters for Wrapper.exe                                          ' + AnsiChar(#10) +
+    '    ||- "sc=<FILE>"    Used to check the syntax of some document                ' + AnsiChar(#10) +
+    '    ||- "dll=<FILE>"   Forces given dll (ignores project settings)              ' + AnsiChar(#10) +
+    '    |\- "log[=<FILE>]" Enables LogToFile (with optional file parameter)         ' + AnsiChar(#10) +
+    '    |- Compiler: Fixed TryCatch                                                 ' + AnsiChar(#10) +
+    '    |- Compiler: Fixed Expressions                                              ' + AnsiChar(#10) +
+    '    |- Compiler: Implemented class inheritance                                  ' + AnsiChar(#10) +
+    '    |- Compiler: Implemented public/private encapsulation                       ' + AnsiChar(#10) +
+    '    |- Compiler: when parsing error was found the objectTree                    ' + AnsiChar(#10) +
+    '    |            wont get written out anymore                                   ' + AnsiChar(#10) +
+    '    |- Wrapper: Fixed ArgumentDetection (foo=bar was not detected)              ' + AnsiChar(#10) +
+    '    \- Logger: Disabled logToFile per default                                   '
+  );
 end;
