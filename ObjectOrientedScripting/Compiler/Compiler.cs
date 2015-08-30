@@ -31,18 +31,18 @@ namespace Wrapper
             Parser parser = new Parser(scanner);
             parser.Parse();
             OosContainer container;
-            parser.getBaseContainer(out container);
+            //parser.getBaseContainer(out container);
             if (parser.errors.count > 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found, cannot continue with Translating!");
                 return;
             }
-            SqfConfigFile file = new SqfConfigFile("config.cpp");
-            SqfConfigClass cfgClass = new SqfConfigClass("cfgFunctions");
-            file.addChild(cfgClass);
-            WriteOutTree(proj, container, proj.OutputFolder, cfgClass, null);
-            //Create config.cpp file
-            file.writeOut(proj.OutputFolder);
+            //SqfConfigFile file = new SqfConfigFile("config.cpp");
+            //SqfConfigClass cfgClass = new SqfConfigClass("cfgFunctions");
+            //file.addChild(cfgClass);
+            //WriteOutTree(proj, container, proj.OutputFolder, cfgClass, null);
+            ////Create config.cpp file
+            //file.writeOut(proj.OutputFolder);
         }
         public void WriteOutTree(Project proj, BaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
         {
