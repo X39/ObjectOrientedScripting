@@ -2,13 +2,17 @@ COMPILER OOS
 	CHARACTERS
 		DIGIT = "0123456789".
 		CHARACTER = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".
-		ACHARACTER = "!|§$%&/*+-()=?`´#~ß}][{-_". (* Missing ones: " \ ' *)
+        ACHARACTER = "!|§$%&/*+-()=?`´#~ß}][{-_".
 
 	TOKENS
 		T_SCALAR = [ '-' ] DIGIT { DIGIT } [ '.' DIGIT { DIGIT } ].
 		T_STRING = '"' { CHARACTER | ACHARACTER | DIGIT | "\"" | "\'" | "\\" | "\n" | "\r" | "\t" } '"'.
-		T_IDENT = ( CHARACTER | '_' ) { CHARACTER | '_' | DIGIT }.
+		T_IDENT = ["::"] ( CHARACTER | '_' ) { "::" | CHARACTER | '_' | DIGIT } [ '.' ( CHARACTER | '_' | DIGIT ) { CHARACTER | '_' | DIGIT } ].
 		T_TERMINATOR = ';'.
+		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | '>' | ">=" | '<' | "<=".
+		T_ASSIGNEMENTCHAR = '='.
+		T_ROUNDBRACKETOPEN = '('.
+		T_ROUNDBRACKETCLOSE = ')'.
 		
 	COMMENTS FROM "/*" TO "*/" NESTED
 	COMMENTS FROM "//" TO '\n'
@@ -23,137 +27,85 @@ COMPILER OOS
 				T_TERMINATOR
 			}
 		.
-		GIDENT
-		=
-			"::"
-			T_IDENT
-			{
-				"::"
-				T_IDENT
-			}
-		.
-		RIDENT
-		=
-			T_IDENT
-			{
-				"::"
-				T_IDENT
-			}
-		.
 		IDENT
 		=
-			RIDENT
-			|
-			GIDENT
-		.
-		INSTANCEACCESS
-		=
-			IDENT
-			'.'
 			T_IDENT
 		.
 		ENCAPSULATION
 		=
 			"public"
+			|
 			"private"
+			|
 			"protected"
 		.
 		VARTYPE
 		=
 			"scalar"
+			|
 			"bool"
+			|
 			"string"
-			IDENT
 		.
 		STRING
 		=
 			T_STRING
 		.
-		EXP_BOOL
+		BOOLEAN
+		=
+			"true"
+			|
+			"false"
+		.
+		VALUE
+		=
+			STRING
+			|
+			T_SCALAR
+			|
+			BOOLEAN
+		.
+		EXPRESSION_HELPER
 		=
 			[
 				'!'
 			]
 			(
-				"true"
+				VALUE
 				|
-				"false"
+				OP_NEWINSTANCE
 				|
-				IDENT
+				(
+					IDENT
+					BODY_FUNCTIONCALL
+				)
 				|
-				EXP_SCALAR
-				|
-				EXP_STRING
+				OP_SQFCALL
 			)
 			{
-				(
-					"=="
-					|
-					"!="
-					|
-					"&&"
-					|
-					"||"
-				)
+				T_EXPOP
 				EXPRESSION
 			}
-		.
-		EXP_SCALAR
-		=
-			(
-				T_SCALAR
-				|
-				IDENT
-			)
-			[
-				(
-					(
-						'>'
-						[
-							'='
-						]
-					)
-					|
-					(
-						'<'
-						[
-							'='
-						]
-					)
-					|
-					"=="
-				)
-				EXP_SCALAR
-			]
-		.
-		EXP_STRING
-		=
-			(
-				STRING
-				|
-				IDENT
-			)
-			"=="
-			(
-				STRING
-				|
-				IDENT
-			)
-			
 		.
 		EXPRESSION
 		=
 			(
-				'('
-				EXP_BOOL
-				')'
+				T_ROUNDBRACKETOPEN
+				EXPRESSION_HELPER
+				T_ROUNDBRACKETCLOSE
 			)
 			|
-			EXP_BOOL
+			EXPRESSION_HELPER
 		.
-		
-		XSL
+		OOS
 		=
+			(
+				NAMESPACE
+				|
+				CLASS
+				|
+				INTERFACE
+			)
 			{
 				NAMESPACE
 				|
@@ -174,9 +126,12 @@ COMPILER OOS
 				|
 				INTERFACE
 				|
-				GFUNCTION
-				|
-				GVARIABLE
+				(
+					"static"
+					NEWVARIABLE
+					|
+					FUNCTION
+				)
 			}
 			'}'
 		.
@@ -186,25 +141,18 @@ COMPILER OOS
 			T_IDENT
 			[
 				':'
-				(
-					RIDENT
-					|
-					GIDENT
-				)
+				IDENT
 				{
-					','					
-					(
-						RIDENT
-						|
-						GIDENT
-					)
+					','		
+					IDENT
 				}
 			]
 			'{'
 			{
-				CFUNCTION
+				ENCAPSULATION
+				FUNCTION
 				|
-				CVARIABLE
+				NEWVARIABLE
 			}
 			'}'
 		.
@@ -214,49 +162,30 @@ COMPILER OOS
 			T_IDENT
 			'{'
 			{
-				IFUNCTION
+				ENCAPSULATION
+				VFUNCTION
 			}
 			'}'
 		.
-		GFUNCTION
-		=
-			"static"
-			FUNCTION
-		.
-		CFUNCTION
-		=
-			ENCAPSULATION
-			FUNCTION
-		.
-		IFUNCTION
-		=
-			ENCAPSULATION
-			VFUNCTION
-		.
-		GVARIABLE
-		=
-			"static"
-			NEWVARIABLE
-		.
-		CVARIABLE
-		=
-			ENCAPSULATION
-			NEWVARIABLE
-		.
 		FUNCTION
 		=
-			T_IDENT
-			'('
+			(
+				VARTYPE
+				|
+				"void"
+			)
+			IDENT
+			T_ROUNDBRACKETOPEN
 				[
 					VARTYPE
-					T_IDENT
+					IDENT
 					{
 						','
 						VARTYPE
-						T_IDENT
+						IDENT
 					}
 				]
-			')'
+			T_ROUNDBRACKETCLOSE
 			'{'
 				{
 					CODEINSTRUCTION
@@ -267,8 +196,13 @@ COMPILER OOS
 		VFUNCTION
 		=
 			"virtual"
+			(
+				VARTYPE
+				|
+				"void"
+			)
 			T_IDENT
-			'('
+			T_ROUNDBRACKETOPEN
 				[
 					VARTYPE
 					{
@@ -276,7 +210,7 @@ COMPILER OOS
 						VARTYPE
 					}
 				]
-			')'
+			T_ROUNDBRACKETCLOSE
 			TERMINATOR
 		.
 		NEWVARIABLE
@@ -284,66 +218,93 @@ COMPILER OOS
 			VARTYPE
 			T_IDENT
 		.
-		CODEINSTRUCTIONSC
+		AUTOVARIABLE
 		=
-			NEWVARIABLE
-			|
-			OP_ASSIGNMENT
+			"auto"
+			T_IDENT
 		.
-		CODEINSTRUCTIONNSC
+		CODEINSTRUCTION_SC
 		=
-		OP_FOR
-		|
-		OP_WHILE
-		|
-		OP_IFELSE
-		|
-		OP_SWITCH
-		|
-		OP_TRYCATCH
+			OP_THROW
+			|
+			OP_RETURN
+			|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) )
+			(
+				IDENT
+				BODY_FUNCTIONCALL
+			)
+			|IF( peekCompare(_T_IDENT, _T_ASSIGNEMENTCHAR) )
+			(
+				IDENT
+				BODY_ASSIGNMENT
+			)
+			|
+			(
+				NEWVARIABLE
+				[
+					BODY_ASSIGNMENT
+				]
+			)
+			|
+			(
+				AUTOVARIABLE
+				BODY_ASSIGNMENT
+			)
+			|
+			EXPRESSION
+		.
+		CODEINSTRUCTION_NSC
+		=
+			OP_FOR
+			|
+			OP_WHILE
+			|
+			OP_IFELSE
+			|
+			OP_SWITCH
+			|
+			OP_TRYCATCH
 		.
 		CODEINSTRUCTION
 		=
 			(
-				CODEINSTRUCTIONSC
+				CODEINSTRUCTION_SC
 				TERMINATOR
 			)
 			|
-			CODEINSTRUCTIONSC
+			CODEINSTRUCTION_NSC
 		.
-		OP_ASSIGNMENT
+		BODY_ASSIGNMENT
 		=
-			(
-				NEWVARIABLE
-				|
-				T_IDENT
-			)
-			'='
-			(
-				{
-					OP_ASSIGNMENT
-				}
-				|
-				EXPRESSION
-			)
+			T_ASSIGNEMENTCHAR
+			EXPRESSION
 		.
 		OP_FOR
 		=
 			"for"
-			'('
+			T_ROUNDBRACKETOPEN
 			[
-				OP_ASSIGNMENT
+				CODEINSTRUCTION_SC
 			]
 			TERMINATOR
-			EXP_BOOL
+			[
+				EXPRESSION
+			]
 			TERMINATOR
-			CODEINSTRUCTIONSC
-			')'
+			[
+				CODEINSTRUCTION_SC
+			]
+			T_ROUNDBRACKETCLOSE
 			(
 				(
 					'{'
 					{
 						CODEINSTRUCTION
+						|
+						(
+							OP_BREAK
+							TERMINATOR
+						)
 					}
 					'}'
 				)
@@ -354,14 +315,19 @@ COMPILER OOS
 		OP_WHILE
 		=
 			"while"
-			'('
-			EXP_BOOL
-			')'
+			T_ROUNDBRACKETOPEN
+			EXPRESSION
+			T_ROUNDBRACKETCLOSE
 			(
 				(
 					'{'
 					{
 						CODEINSTRUCTION
+						|
+						(
+							OP_BREAK
+							TERMINATOR
+						)
 					}
 					'}'
 				)
@@ -369,12 +335,17 @@ COMPILER OOS
 				CODEINSTRUCTION
 			)
 		.
+		OP_NEWINSTANCE
+		=
+			"new"
+			IDENT
+		.
 		OP_IFELSE
 		=
 			"if"
-			'('
-			EXP_BOOL
-			')'
+			T_ROUNDBRACKETOPEN
+			EXPRESSION
+			T_ROUNDBRACKETCLOSE
 			(
 				(
 					'{'
@@ -410,9 +381,9 @@ COMPILER OOS
 			}
 			'}'
 			"catch"
-			'('
+			T_ROUNDBRACKETOPEN
 			NEWVARIABLE
-			')'
+			T_ROUNDBRACKETCLOSE
 			'{'
 			{
 				CODEINSTRUCTION
@@ -421,19 +392,26 @@ COMPILER OOS
 		.
 		OP_BREAK
 		=
+			"break"
 		.
 		OP_THROW
 		=
+			"throw"
+			EXPRESSION
 		.
 		OP_RETURN
 		=
+			"return"
+			[
+				EXPRESSION
+			]
 		.
 		OP_SWITCH
 		=
 			"switch"
-			'('
+			T_ROUNDBRACKETOPEN
 			EXPRESSION
-			')'
+			T_ROUNDBRACKETCLOSE
 			'{'
 			{
 				(
@@ -473,5 +451,36 @@ COMPILER OOS
 				)
 			}
 			'}'
+		.
+		OP_SQFCALL
+		=
+			"SQF"
+			[
+				T_ROUNDBRACKETOPEN
+				{
+					EXPRESSION
+				}
+				T_ROUNDBRACKETCLOSE
+			]
+			T_IDENT
+			[
+				T_ROUNDBRACKETOPEN
+				{
+					EXPRESSION
+				}
+				T_ROUNDBRACKETCLOSE
+			]
+		.
+		BODY_FUNCTIONCALL
+		=
+			T_ROUNDBRACKETOPEN
+			[
+				EXPRESSION
+				{
+					','
+					EXPRESSION
+				}
+			]
+			T_ROUNDBRACKETCLOSE
 		.
 END OOS.
