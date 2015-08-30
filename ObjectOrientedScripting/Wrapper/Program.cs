@@ -117,7 +117,7 @@ namespace Wrapper
             }
             if (checkSyntaxFile != "" && !File.Exists(checkSyntaxFile))
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open checkSyntax as it does not exists (typo?).");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open file for checkSyntax as it does not exists (typo?).");
                 Logger.Instance.close();
                 if (anyKey)
                 {
