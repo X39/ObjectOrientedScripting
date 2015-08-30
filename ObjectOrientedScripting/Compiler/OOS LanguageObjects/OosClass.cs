@@ -26,7 +26,8 @@ namespace Compiler.OOS_LanguageObjects
                 return this.name;
             else if (Parent is OosNamespace || Parent is OosClass)
             {
-                return ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_" + this.name;
+                var retString = ((Interfaces.iNormalizedName)Parent).getNormalizedName() + "_" + this.name;
+                return retString;
             }
             else
             {
