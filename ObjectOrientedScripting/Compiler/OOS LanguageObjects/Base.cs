@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class OosNative : BaseLangObject
+    public class Base : pBaseLangObject
     {
-        public string nativeCode;
-
-        public OosNative()
-        {
-            nativeCode = "";
-        }
+        public Base() : base(null) {}
+        public void doFinalize() {}
     }
 }

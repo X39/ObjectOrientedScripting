@@ -6,40 +6,29 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public enum ClassEncapsulation
+    public enum Encapsulation
     {
-        PRIVATE,
-        PUBLIC
+        Private,
+        Protected,
+        Public,
+        Static,
+        NA   //NA
     }
-    public enum AssignmentOperators
+    public enum VarType
     {
-        PlusEquals,
-        MinusEquals,
-        MultipliedEquals,
-        DividedEquals,
-        Equals
+        Scalar,
+        Bool,
+        String,
+        Auto,
+        Void
     }
-    public enum ExpressionOperator
+    enum IdentType
     {
-        AndAnd,
-        And,
-        OrOr,
-        Or,
-        ExplicitEquals,
-        Equals,
-        Plus,
-        Minus,
-        Multiplication,
-        Division,
-        Larger,
-        LargerEquals,
-        Smaller,
-        SmallerEquals,
+        Name,
+        GlobalAccess,
+        RelativeAccess,
+        GlobalAccess_Instance,
+        RelativeAccess_Instance,
         NA
-    }
-    public enum QuickAssignmentTypes
-    {
-        PlusPlus,
-        MinusMinus
     }
 }

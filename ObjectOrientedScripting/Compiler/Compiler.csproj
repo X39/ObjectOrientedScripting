@@ -40,45 +40,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler.cs" />
-    <Compile Include="Exceptions\ParsingException.cs" />
-    <Compile Include="Exceptions\InvalidParent.cs" />
-    <Compile Include="OOS LanguageObjects\BaseFunctionObject.cs" />
-    <Compile Include="OOS LanguageObjects\OosContainer.cs" />
-    <Compile Include="OOS LanguageObjects\BaseLangObject.cs" />
-    <Compile Include="OOS LanguageObjects\BaseVariableObject.cs" />
-    <Compile Include="OOS LanguageObjects\enums.cs" />
-    <Compile Include="OOS LanguageObjects\HelperClasses\ListBaseLangObject.cs" />
-    <Compile Include="OOS LanguageObjects\HelperClasses\ListString.cs" />
+    <Compile Include="Exceptions\InvalidIdentType.cs" />
+    <Compile Include="OOS LanguageObjects\VariableAssignment.cs" />
+    <Compile Include="OOS LanguageObjects\Variable.cs" />
+    <Compile Include="OOS LanguageObjects\VirtualFunction.cs" />
+    <Compile Include="OOS LanguageObjects\Ident.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iName.cs" />
-    <Compile Include="OOS LanguageObjects\Interfaces\iNormalizedName.cs" />
-    <Compile Include="OOS LanguageObjects\OosClass.cs" />
-    <Compile Include="OOS LanguageObjects\OosClassFunction.cs" />
-    <Compile Include="OOS LanguageObjects\OosClassVariable.cs" />
-    <Compile Include="OOS LanguageObjects\OosExpression.cs" />
-    <Compile Include="OOS LanguageObjects\OosCase.cs" />
-    <Compile Include="OOS LanguageObjects\OosBreak.cs" />
-    <Compile Include="OOS LanguageObjects\OosSqfCall.cs" />
-    <Compile Include="OOS LanguageObjects\OosNative.cs" />
-    <Compile Include="OOS LanguageObjects\OosReturn.cs" />
-    <Compile Include="OOS LanguageObjects\OosIfElse.cs" />
-    <Compile Include="OOS LanguageObjects\OosIsSet.cs" />
-    <Compile Include="OOS LanguageObjects\OosTryCatch.cs" />
-    <Compile Include="OOS LanguageObjects\OosSwitch.cs" />
-    <Compile Include="OOS LanguageObjects\OosThrow.cs" />
-    <Compile Include="OOS LanguageObjects\OosWhileLoop.cs" />
-    <Compile Include="OOS LanguageObjects\OosFunctionCall.cs" />
-    <Compile Include="OOS LanguageObjects\OosGlobalFunction.cs" />
-    <Compile Include="OOS LanguageObjects\OosGlobalVariable.cs" />
-    <Compile Include="OOS LanguageObjects\OosForLoop.cs" />
-    <Compile Include="OOS LanguageObjects\OosInstanceOf.cs" />
-    <Compile Include="OOS LanguageObjects\OosLocalVariable.cs" />
-    <Compile Include="OOS LanguageObjects\OosNamespace.cs" />
-    <Compile Include="OOS LanguageObjects\OosObjectCreation.cs" />
-    <Compile Include="OOS LanguageObjects\OosQuickAssignment.cs" />
-    <Compile Include="OOS LanguageObjects\OosTypeOf.cs" />
-    <Compile Include="OOS LanguageObjects\OosValue.cs" />
-    <Compile Include="OOS LanguageObjects\OosVariable.cs" />
-    <Compile Include="OOS LanguageObjects\OosVariableAssignment.cs" />
+    <Compile Include="OOS LanguageObjects\Function.cs" />
+    <Compile Include="OOS LanguageObjects\oosInterface.cs" />
+    <Compile Include="OOS LanguageObjects\oosClass.cs" />
+    <Compile Include="OOS LanguageObjects\Namespace.cs" />
+    <Compile Include="OOS LanguageObjects\enums.cs" />
+    <Compile Include="OOS LanguageObjects\Partials\pBaseLangObject.cs" />
+    <Compile Include="OOS LanguageObjects\Base.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="PPDefine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,7 +75,9 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="OOS LanguageObjects\HelperClasses\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

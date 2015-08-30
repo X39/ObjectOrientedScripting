@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class oosClass : pBaseLangObject, Interfaces.iName
+    public class VirtualFunction : pBaseLangObject, Interfaces.iName
     {
         private Ident name;
         public Ident Name { get { return name; } set { if (!name.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); name = value; } }
-        private List<pBaseLangObject> parentClasses;
-        
+        public VarType functionVarType;
+        public List<VarType> argTypes;
+
+
         public string FullyQualifiedName
         {
             get
@@ -27,20 +29,15 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 parentList.Reverse();
                 foreach (Interfaces.iName it in parentList)
-                    s += it.Name.OriginalValue;
-                s += this.Name.OriginalValue;
+                    s += it.Name;
+                s += "_fnc_" + this.Name.OriginalValue;
                 return s;
             }
         }
-        public oosClass(pBaseLangObject parent) : base(parent)
-        {
-            this.parentClasses = new List<pBaseLangObject>();
+        public VirtualFunction(pBaseLangObject parent) : base(parent) 
+        { 
+            argTypes = new List<VarType>(); 
         }
         virtual void doFinalize() {}
-
-        public void addParentClass(pBaseLangObject blo)
-        {
-            this.parentClasses.Add(blo);
-        }
     }
 }

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    interface iName
+    public interface iName
     {
-        string Name { get; set; }
+        Ident Name {get; set;}
+        public string FullyQualifiedName { get; }
     }
 }

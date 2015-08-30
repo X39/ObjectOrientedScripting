@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class oosClass : pBaseLangObject, Interfaces.iName
+    public class oosInterface : pBaseLangObject, Interfaces.iName
     {
         private Ident name;
         public Ident Name { get { return name; } set { if (!name.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); name = value; } }
-        private List<pBaseLangObject> parentClasses;
         
         public string FullyQualifiedName
         {
@@ -32,15 +31,7 @@ namespace Compiler.OOS_LanguageObjects
                 return s;
             }
         }
-        public oosClass(pBaseLangObject parent) : base(parent)
-        {
-            this.parentClasses = new List<pBaseLangObject>();
-        }
+        public oosInterface(pBaseLangObject parent) : base(parent) {}
         virtual void doFinalize() {}
-
-        public void addParentClass(pBaseLangObject blo)
-        {
-            this.parentClasses.Add(blo);
-        }
     }
 }

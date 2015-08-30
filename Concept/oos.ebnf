@@ -10,7 +10,7 @@ COMPILER OOS
 		T_IDENT = ["::"] ( CHARACTER | '_' ) { "::" | CHARACTER | '_' | DIGIT } [ '.' ( CHARACTER | '_' | DIGIT ) { CHARACTER | '_' | DIGIT } ].
 		T_TERMINATOR = ';'.
 		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | '>' | ">=" | '<' | "<=".
-		T_ASSIGNEMENTCHAR = '='.
+		T_ASSIGNMENTCHAR = '='.
 		T_ROUNDBRACKETOPEN = '('.
 		T_ROUNDBRACKETCLOSE = ')'.
 		
@@ -27,35 +27,35 @@ COMPILER OOS
 				T_TERMINATOR
 			}
 		.
-		IDENT
+		IDENT<out pBaseLangObject obj, pBaseLangObject parent>
 		=
-			T_IDENT
+			T_IDENT (. obj = new Ident(parent, t.val); .)
 		.
-		ENCAPSULATION
+		ENCAPSULATION<out Encapsulation e>
 		=
-			"public"
+			"public" (. e = Encapsulation.Public; .)
 			|
-			"private"
+			"private" (. e = Encapsulation.Private; .)
 			|
-			"protected"
+			"protected" (. e = Encapsulation.Protected; .)
 		.
-		VARTYPE
+		VARTYPE<out VarTypes e>
 		=
-			"scalar"
+			"scalar" (. e = VarTypes.Scalar; .)
 			|
-			"bool"
+			"bool" (. e = VarTypes.Bool; .)
 			|
-			"string"
+			"string" (. e = VarTypes.String; .)
 		.
-		STRING
+		STRING<out string o>
 		=
-			T_STRING
+			T_STRING (. o = t.val; .)
 		.
-		BOOLEAN
+		BOOLEAN<out bool flag>
 		=
-			"true"
+			"true" (. flag = true; .)
 			|
-			"false"
+			"false" (. flag = false; .)
 		.
 		VALUE
 		=
@@ -97,187 +97,177 @@ COMPILER OOS
 			|
 			EXPRESSION_HELPER
 		.
-		OOS
+		OOS (. Base obj = new Base(); pBaseLangObject blo; .)
 		=
-			(
-				NAMESPACE
-				|
-				CLASS
-				|
-				INTERFACE
-			)
 			{
-				NAMESPACE
+				NAMESPACE<out blo, obj> (. base.addChild(blo); .)
 				|
-				CLASS
+				CLASS<out blo> (. base.addChild(blo); .)
 				|
-				INTERFACE
+				INTERFACE<out blo> (. base.addChild(blo); .)
 			}
 		.
-		NAMESPACE
+		NAMESPACE<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new Namespace(parent); pBaseLangObject blo; .)
 		=
 			"namespace"
-			T_IDENT
+			IDENT<out blo, obj> (. try{ obj.Name = blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			'{'
 			{
-				NAMESPACE
+				NAMESPACE<out blo, obj> (. base.addChild(blo); .)
 				|
-				CLASS
+				CLASS<out blo, obj> (. base.addChild(blo); .)
 				|
-				INTERFACE
+				INTERFACE<out blo, obj> (. base.addChild(blo); .)
 				|
 				(
 					"static"
-					NEWVARIABLE
+					NEWVARIABLE<out blo, obj, Encapsulation.Static> (. base.addChild(blo); .)
 					|
-					FUNCTION
+					FUNCTION<out blo, obj, Encapsulation.Static> (. base.addChild(blo); .)
 				)
 			}
 			'}'
 		.
-		CLASS
+		CLASS<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new oosClass(parent); pBaseLangObject blo; .)
 		=
 			"class"
-			T_IDENT
+			IDENT<out blo, obj> (. try{ obj.Name = blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			[
 				':'
-				IDENT
+				IDENT<out blo> (. obj.addParentClass(blo); .)
 				{
-					','		
-					IDENT
+					','
+					IDENT<out blo> (. obj.addParentClass(blo); .)
 				}
 			]
 			'{'
-			{
-				ENCAPSULATION
-				FUNCTION
+			{ (. Encapsulation e; .)
+				ENCAPSULATION<out e>
+				FUNCTION<out blo, obj, e> (. base.addChild(blo); .)
 				|
-				NEWVARIABLE
+				NEWVARIABLE<out blo, obj, e> (. base.addChild(blo); .)
 			}
 			'}'
 		.
-		INTERFACE
+		INTERFACE<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new oosInterface(parent); pBaseLangObject blo; .)
 		=
 			"interface"
-			T_IDENT
+			IDENT<out blo, obj> (. obj.Name = blo; .)
 			'{'
 			{
-				ENCAPSULATION
-				VFUNCTION
+				VFUNCTION<out blo, obj> (. base.addChild(blo); .)
 			}
 			'}'
 		.
-		FUNCTION
+		FUNCTION<out pBaseLangObject obj, pBaseLangObject parent, Encapsulation e> (. obj = new Function(parent); pBaseLangObject blo; VarType v; .)
 		=
 			(
-				VARTYPE
+				VARTYPE<out v> (. obj.functionVarType = v; .)
 				|
-				"void"
+				"void" (. obj.functionVarType = VarType.Void; .)
 			)
-			IDENT
+			IDENT<out blo, obj> (. try{ obj.Name = blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			T_ROUNDBRACKETOPEN
-				[
-					VARTYPE
-					IDENT
-					{
-						','
-						VARTYPE
-						IDENT
-					}
-				]
-			T_ROUNDBRACKETCLOSE
-			'{'
+			[
+				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
 				{
-					CODEINSTRUCTION
+					','
+					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
 				}
+			]
+			T_ROUNDBRACKETCLOSE (. obj.markArgListEnd() .)
+			'{'
+			{
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
+			}
 			'}'
 			
 		.
-		VFUNCTION
+		VFUNCTION<out pBaseLangObject obj, pBaseLangObject parent, Encapsulation e> (. obj = new VirtualFunction(parent); pBaseLangObject blo; VarType v; .)
 		=
 			"virtual"
 			(
-				VARTYPE
+				VARTYPE<out v> (. obj.functionVarType = v; .)
 				|
-				"void"
+				"void" (. obj.functionVarType = VarType.Void; .)
 			)
-			T_IDENT
+			IDENT<out blo, obj> (. try{ obj.Name = blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			T_ROUNDBRACKETOPEN
-				[
-					VARTYPE
-					{
-						','
-						VARTYPE
-					}
-				]
+			[
+				VARTYPE<out v> (. obj.argTypes.Add(v); .)
+				{
+					','
+					VARTYPE<out v> (. obj.argTypes.Add(v); .)
+				}
+			]
 			T_ROUNDBRACKETCLOSE
 			TERMINATOR
 		.
-		NEWVARIABLE
+		NEWVARIABLE<out pBaseLangObject obj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. obj = new Variable(parent); obj.encapsulation = e; pBaseLangObject blo; VarType v; .)
 		=
-			VARTYPE
-			T_IDENT
+			VARTYPE<out v> (. obj.varType = v; .)
+			IDENT<out blo, obj> (. try{ obj.Name = blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 		.
-		AUTOVARIABLE
+		AUTOVARIABLE<out pBaseLangObject obj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. obj = new Variable(parent); obj.encapsulation = e; pBaseLangObject blo; .)
 		=
-			"auto"
-			T_IDENT
+			"auto"(. obj.varType = VarType.Auto; .)
+			IDENT<out blo, obj> (. try{ obj.Name = blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 		.
-		CODEINSTRUCTION_SC
+		CODEINSTRUCTION_SC<out pBaseLangObject obj, pBaseLangObject parent> (. pBaseLangObject blo; .)
 		=
-			OP_THROW
+			OP_THROW<obj, parent>
 			|
-			OP_RETURN
+			OP_RETURN<obj, parent>
 			|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) )
 			(
-				IDENT
-				BODY_FUNCTIONCALL
+				IDENT<obj, parent>
+				BODY_FUNCTIONCALL<blo, obj> (. obj.addChild(blo); .)
 			)
-			|IF( peekCompare(_T_IDENT, _T_ASSIGNEMENTCHAR) )
+			|IF( peekCompare(_T_IDENT, _T_ASSIGNMENTCHAR) )
 			(
-				IDENT
-				BODY_ASSIGNMENT
+				IDENT<obj, parent>
+				BODY_ASSIGNMENT<blo, obj> (. obj.addChild(blo); .)
 			)
 			|
 			(
-				NEWVARIABLE
+				NEWVARIABLE<obj, parent>
 				[
-					BODY_ASSIGNMENT
+					BODY_ASSIGNMENT<blo, obj> (. obj.addChild(blo); .)
 				]
 			)
 			|
 			(
-				AUTOVARIABLE
-				BODY_ASSIGNMENT
+				AUTOVARIABLE<obj, parent>
+				BODY_ASSIGNMENT<blo, obj> (. obj.addChild(blo); .)
 			)
 			|
-			EXPRESSION
+			EXPRESSION<obj, parent>
 		.
-		CODEINSTRUCTION_NSC
+		CODEINSTRUCTION_NSC<out pBaseLangObject obj, pBaseLangObject parent>
 		=
-			OP_FOR
+			OP_FOR<obj, parent>
 			|
-			OP_WHILE
+			OP_WHILE<obj, parent>
 			|
-			OP_IFELSE
+			OP_IFELSE<obj, parent>
 			|
-			OP_SWITCH
+			OP_SWITCH<obj, parent>
 			|
-			OP_TRYCATCH
+			OP_TRYCATCH<obj, parent>
 		.
-		CODEINSTRUCTION
+		CODEINSTRUCTION<out pBaseLangObject obj, pBaseLangObject parent>
 		=
 			(
-				CODEINSTRUCTION_SC
+				CODEINSTRUCTION_SC<obj, parent>
 				TERMINATOR
 			)
 			|
-			CODEINSTRUCTION_NSC
+			CODEINSTRUCTION_NSC<obj, parent>
 		.
-		BODY_ASSIGNMENT
+		BODY_ASSIGNMENT<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new VariableAssignment(parent); pBaseLangObject blo; .)
 		=
-			T_ASSIGNEMENTCHAR
-			EXPRESSION
+			T_ASSIGNMENTCHAR (. obj.operation = t.val; .)
+			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 		.
 		OP_FOR
 		=
