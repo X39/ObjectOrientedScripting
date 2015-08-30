@@ -1,14 +1,14 @@
 class cFoo
 {
-	public function foobar(_someRandomArg)
+	public void foobar(string _someRandomArg)
 	{
 		SQF::diag_log("class foo " + _someRandomArg);
 	}
-	public function test(_test, _test2)
+	public void test(string _test, string _test2)
 	{
 	
 	}
-	private function test2(_test, _test2)
+	private void test2(string _test, string _test2)
 	{
 	
 	}

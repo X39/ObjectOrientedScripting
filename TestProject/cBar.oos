@@ -1,6 +1,6 @@
 class cBar : cFoo
 {
-	public function override foobar(_someRandomArg)
+	public void foobar(string _someRandomArg)
 	{
 		SQF::diag_log("class bar " + _someRandomArg);
 	}

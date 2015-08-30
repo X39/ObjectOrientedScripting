@@ -1,6 +1,6 @@
 #include "test.def"
 #define SOMEDEF //testmore
-#define somethingWithArgs(TEST) //test TEST
+#define somethingWithArgs(TEST) //test TEST TEST6
 
 SOMEDEF
 TEST6
@@ -27,25 +27,25 @@ class testObj
 	}
 	public auto testVarPublic;
 	static auto testVarStatic;
-	public function testFncPublic(_arg1, _arg2)
+	public void testFncPublic(string _arg1, string _arg2)
 	{
 		SQF diag_log(SQF str(_arg1));
 	}
-	static function testFncStatic(_arg1, _arg2)
+	static void testFncStatic(string _arg1, string _arg2)
 	{
 		SQF diag_log(SQF str(_arg2));
 		return "";
 	}
 }
-static function returnTrue()
+static bool returnTrue()
 {
 	return true;
 }
-static function preInit()
+static void preInit()
 {
 	SQF diag_log("preInit");
 	startnative diag_log "test"; endnative;
-	auto _obj = new ::testObj();
+    auto _obj = new ::testObj();
 	_obj.testFncPublic("preInitArg1", "preInitArg2");
 	::testObj::testFncStatic("preInitArg1", "preInitArg2");
 	auto _foo = new testNamespace::cFoo();
