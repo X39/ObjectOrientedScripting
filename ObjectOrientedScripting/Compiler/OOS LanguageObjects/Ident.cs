@@ -19,7 +19,10 @@ namespace Compiler.OOS_LanguageObjects
         public bool HasInstanceAccess { get { return this.originalValue.Contains('.'); } }
         
 
-        public Ident(pBaseLangObject parent) : base(parent) { }
+        public Ident(pBaseLangObject parent, string origVal) : base(parent) 
+        {
+            this.originalValue = origVal;
+        }
         virtual void doFinalize() {}
         public IdentType getIdentType()
         {

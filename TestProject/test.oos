@@ -13,6 +13,10 @@ namespace testNamespace
 	#include "cFoo.oos"
 	#include "cBar.oos"
 }
+interface testInterface
+{
+	void interfaceFnc(string, scalar, scalar);
+}
 class testObj
 {
 	constructor()

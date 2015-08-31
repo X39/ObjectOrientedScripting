@@ -43,6 +43,12 @@ COMPILER OOS
 		=
 			"scalar" (. e = VarTypes.Scalar; .)
 			|
+			"int" (. e = VarTypes.Scalar; .)
+			|
+			"double" (. e = VarTypes.Scalar; .)
+			|
+			"float" (. e = VarTypes.Scalar; .)
+			|
 			"bool" (. e = VarTypes.Bool; .)
 			|
 			"string" (. e = VarTypes.String; .)
@@ -269,208 +275,214 @@ COMPILER OOS
 			T_ASSIGNMENTCHAR (. obj.operation = t.val; .)
 			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 		.
-		OP_FOR
+		BODY_FUNCTIONCALL<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new VariableAssignment(parent); pBaseLangObject blo; .)
+		=
+			T_ROUNDBRACKETOPEN
+			[
+				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
+				{
+					','
+					EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
+				}
+			]
+			T_ROUNDBRACKETCLOSE
+		.
+		OP_FOR<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new For(parent); pBaseLangObject blo; .)
 		=
 			"for"
 			T_ROUNDBRACKETOPEN
 			[
-				CODEINSTRUCTION_SC
+				CODEINSTRUCTION_SC<out blo, obj> (. obj.forArg1 = blo; .)
 			]
 			TERMINATOR
 			[
-				EXPRESSION
+				EXPRESSION<out blo, obj> (. obj.forArg2 = blo; .)
 			]
 			TERMINATOR
 			[
-				CODEINSTRUCTION_SC
+				CODEINSTRUCTION_SC<out blo, obj> (. obj.forArg3 = blo; .)
 			]
 			T_ROUNDBRACKETCLOSE
 			(
 				(
 					'{'
 					{
-						CODEINSTRUCTION
+						CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 						|
 						(
-							OP_BREAK
+							OP_BREAK<out blo, obj> (. obj.addChild(blo); .)
 							TERMINATOR
 						)
 					}
 					'}'
 				)
 				|
-				CODEINSTRUCTION
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
 		.
-		OP_WHILE
+		OP_WHILE<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new While(parent); pBaseLangObject blo; .)
 		=
 			"while"
 			T_ROUNDBRACKETOPEN
-			EXPRESSION
+			EXPRESSION<out blo, obj> (. obj.expression = blo; .)
 			T_ROUNDBRACKETCLOSE
 			(
 				(
 					'{'
 					{
-						CODEINSTRUCTION
+						CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 						|
 						(
-							OP_BREAK
+							OP_BREAK<out blo, obj> (. obj.addChild(blo); .)
 							TERMINATOR
 						)
 					}
 					'}'
 				)
 				|
-				CODEINSTRUCTION
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
 		.
-		OP_NEWINSTANCE
+		OP_NEWINSTANCE<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new NewInstance(parent); pBaseLangObject blo; .)
 		=
 			"new"
-			IDENT
+			IDENT<out blo, obj> (. obj.addChild(blo); .)
 		.
-		OP_IFELSE
+		OP_IFELSE<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new IfElse(parent); pBaseLangObject blo; .)
 		=
 			"if"
 			T_ROUNDBRACKETOPEN
-			EXPRESSION
+			EXPRESSION<out blo, obj> (. obj.expression = blo; .)
 			T_ROUNDBRACKETCLOSE
 			(
 				(
 					'{'
 					{
-						CODEINSTRUCTION
+						CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 					}
 					'}'
 				)
 				|
-				CODEINSTRUCTION
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
 			[
-				"else"
+				"else" (. obj.markIfEnd(); .)
 				(
 					(
 						'{'
 						{
-							CODEINSTRUCTION
+							CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 						}
 						'}'
 					)
 					|
-					CODEINSTRUCTION
+					CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 				)
 			]
 		.
-		OP_TRYCATCH
+		OP_TRYCATCH<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new TryCatch(parent); pBaseLangObject blo; .)
 		=
 			"try"
 			'{'
 			{
-				CODEINSTRUCTION
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			}
 			'}'
 			"catch"
 			T_ROUNDBRACKETOPEN
-			NEWVARIABLE
-			T_ROUNDBRACKETCLOSE
+			NEWVARIABLE<out blo, obj> (. obj.expression = blo; .)
+			T_ROUNDBRACKETCLOSE<out blo, obj> (. obj.markIfEnd(); .)
 			'{'
 			{
-				CODEINSTRUCTION
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			}
 			'}'
 		.
-		OP_BREAK
+		OP_BREAK<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new Break(parent); pBaseLangObject blo; .)
 		=
 			"break"
 		.
-		OP_THROW
+		OP_THROW<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new Throw(parent); pBaseLangObject blo; .)
 		=
 			"throw"
-			EXPRESSION
+			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 		.
-		OP_RETURN
+		OP_RETURN<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new Return(parent); pBaseLangObject blo; .)
 		=
 			"return"
 			[
-				EXPRESSION
+				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 			]
 		.
-		OP_SWITCH
+		OP_SWITCH<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new Switch(parent); pBaseLangObject case; pBaseLangObject blo; .)
 		=
 			"switch"
 			T_ROUNDBRACKETOPEN
-			EXPRESSION
+			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 			T_ROUNDBRACKETCLOSE
 			'{'
 			{
 				(
-					"case"
-					EXPRESSION
+					"case" (. case = new Case(obj); obj.addChild(case); .)
+					EXPRESSION<out blo, obj> (. case.expression = blo; .)
 					':'
 					{
 						"case"
-						EXPRESSION
+						EXPRESSION<out blo, obj> (. case.addChild(blo); .)
 						':'
 					}
 					{
-						CODEINSTRUCTION
+						CODEINSTRUCTION<out blo, obj> (. case.addChild(blo); .)
 					}
 					(
-						OP_BREAK
+						OP_BREAK<out blo, obj> (. case.endOfCase = blo; .)
 						|
-						OP_THROW
+						OP_THROW<out blo, obj> (. case.endOfCase = blo; .)
 						|
-						OP_RETURN
+						OP_RETURN<out blo, obj> (. case.endOfCase = blo; .)
 					)
 				)
 				|
 				(
-					"default"
-					':'
+					(
+						(
+							"default" (. case = new Case(obj); obj.addChild(case); case.expression = new Indet(case, "default"); .)
+							':'
+						)
+						|
+						"default:" (. case = new Case(obj); obj.addChild(case); case.expression = new Indet(case, "default"); .)
+					)
 					{
-						CODEINSTRUCTION
+						CODEINSTRUCTION<out blo, obj> (. case.addChild(blo); .)
 					}
 					(
-						OP_BREAK
+						OP_BREAK (. case.endOfCase = blo; .)
 						|
-						OP_THROW
+						OP_THROW (. case.endOfCase = blo; .)
 						|
-						OP_RETURN
+						OP_RETURN (. case.endOfCase = blo; .)
 					)
 				)
 			}
 			'}'
 		.
-		OP_SQFCALL
+		OP_SQFCALL<out pBaseLangObject obj, pBaseLangObject parent> (. obj = new SqfCall(parent); pBaseLangObject blo; .)
 		=
 			"SQF"
 			[
 				T_ROUNDBRACKETOPEN
 				{
-					EXPRESSION
+					EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				}
 				T_ROUNDBRACKETCLOSE
 			]
-			T_IDENT
+			IDENT<out pBaseLangObject obj, pBaseLangObject parent> (. obj.Name = obj; .)
 			[
-				T_ROUNDBRACKETOPEN
+				T_ROUNDBRACKETOPEN (. obj.markEnd(); .)
 				{
-					EXPRESSION
+					EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				}
 				T_ROUNDBRACKETCLOSE
 			]
-		.
-		BODY_FUNCTIONCALL
-		=
-			T_ROUNDBRACKETOPEN
-			[
-				EXPRESSION
-				{
-					','
-					EXPRESSION
-				}
-			]
-			T_ROUNDBRACKETCLOSE
 		.
 END OOS.
