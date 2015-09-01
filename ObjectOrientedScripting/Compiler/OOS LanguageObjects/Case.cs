@@ -17,6 +17,6 @@ namespace Compiler.OOS_LanguageObjects
             this.children.Add(null);
             this.children.Add(null);
         }
-        virtual void doFinalize() {}
+        public override void doFinalize() { }
     }
 }

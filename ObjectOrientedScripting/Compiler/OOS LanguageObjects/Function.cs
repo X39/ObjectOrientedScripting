@@ -8,10 +8,10 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Function : pBaseLangObject, Interfaces.iName
     {
-        private Ident name;
-        public Ident Name { get { return name; } set { if (!name.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); name = value; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
         public VarType functionVarType;
         private int argListEnd;
+        public Encapsulation encapsulation;
 
         public readonly List<pBaseLangObject> ArgList { get { return this.children.GetRange(0, argListEnd); } }
         public readonly List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(argListEnd, this.children.Count - argListEnd); } }
@@ -36,8 +36,11 @@ namespace Compiler.OOS_LanguageObjects
                 return s;
             }
         }
-        public Function(pBaseLangObject parent) : base(parent) { }
-        virtual void doFinalize() {}
+        public Function(pBaseLangObject parent) : base(parent)
+        {
+            this.children.Add(null);
+        }
+        public override void doFinalize() { }
         public void markArgListEnd()
         {
             argListEnd = this.children.Count;

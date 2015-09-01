@@ -42,6 +42,7 @@
     <Compile Include="Compiler.cs" />
     <Compile Include="Exceptions\InvalidIdentType.cs" />
     <Compile Include="OOS LanguageObjects\Case.cs" />
+    <Compile Include="OOS LanguageObjects\Expression.cs" />
     <Compile Include="OOS LanguageObjects\SqfCall.cs" />
     <Compile Include="OOS LanguageObjects\Switch.cs" />
     <Compile Include="OOS LanguageObjects\Return.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="OOS LanguageObjects\TryCatch.cs" />
     <Compile Include="OOS LanguageObjects\IfElse.cs" />
     <Compile Include="OOS LanguageObjects\NewInstance.cs" />
+    <Compile Include="OOS LanguageObjects\Value.cs" />
     <Compile Include="OOS LanguageObjects\While.cs" />
     <Compile Include="OOS LanguageObjects\For.cs" />
     <Compile Include="OOS LanguageObjects\FunctionCall.cs" />

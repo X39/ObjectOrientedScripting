@@ -12,7 +12,7 @@ namespace Compiler.OOS_LanguageObjects
         public string operation;
         public string FullyQualifiedName { get { return ((Interfaces.iName)Parent).FullyQualifiedName; } }
 
-        public VariableAssignment(pBaseLangObject parent) : base(parent) { }
-        virtual void doFinalize() {}
+        public VariableAssignment(pBaseLangObject parent) : base(parent) {}
+        public override void doFinalize() { }
     }
 }

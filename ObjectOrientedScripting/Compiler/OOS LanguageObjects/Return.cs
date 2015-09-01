@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects
     public class Return : pBaseLangObject
     {
         public Return(pBaseLangObject parent) : base(parent) { }
-        virtual void doFinalize() {}
+        public override void doFinalize() { }
     }
 }

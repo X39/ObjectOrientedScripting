@@ -19,7 +19,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(null);
         }
-        virtual void doFinalize() {}
+        public override void doFinalize() { }
         public void markIfEnd()
         {
             ifEnd = this.children.Count;

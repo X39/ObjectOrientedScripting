@@ -8,7 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class SqfCall : pBaseLangObject, Interfaces.iName
     {
-        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!((Ident)this.children[0]).IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
         public string FullyQualifiedName { get { return this.Name.OriginalValue; } }
 
         public readonly List<pBaseLangObject> LArgs { get { return this.children.GetRange(0, endMarker); } }
@@ -21,8 +21,8 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(null);
         }
-        virtual void doFinalize() {}
-        void markEnd()
+        public override void doFinalize() { }
+        public void markEnd()
         {
             this.endMarker = this.children.Count;
         }

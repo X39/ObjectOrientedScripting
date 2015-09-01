@@ -8,7 +8,6 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Ident : pBaseLangObject, Interfaces.iName
     {
-        private Ident name;
         public Ident Name { get { return this; } set { throw new Exception("Cannot set Ident of an Ident"); } }
         public string FullyQualifiedName { get { return this.Name.OriginalValue; } }
         private string originalValue;
@@ -23,7 +22,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.originalValue = origVal;
         }
-        virtual void doFinalize() {}
+        public override void doFinalize() { }
         public IdentType getIdentType()
         {
             if (IsSimpleIdentifier)

@@ -11,7 +11,7 @@ namespace Compiler.OOS_LanguageObjects
         public Ident Name { get { return ((Interfaces.iName)Parent).Name; } set { ((Interfaces.iName)Parent).Name = value; } }
         public string FullyQualifiedName { get { return ((Interfaces.iName)Parent).FullyQualifiedName; } }
 
-        public FunctionCall(pBaseLangObject parent) : base(parent) { }
-        virtual void doFinalize() {}
+        public FunctionCall(pBaseLangObject parent) : base(parent) {}
+        public override void doFinalize() { }
     }
 }

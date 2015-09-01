@@ -8,8 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class oosClass : pBaseLangObject, Interfaces.iName
     {
-        private Ident name;
-        public Ident Name { get { return name; } set { if (!name.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); name = value; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
         private List<pBaseLangObject> parentClasses;
         
         public string FullyQualifiedName
@@ -35,8 +34,9 @@ namespace Compiler.OOS_LanguageObjects
         public oosClass(pBaseLangObject parent) : base(parent)
         {
             this.parentClasses = new List<pBaseLangObject>();
+            this.children.Add(null);
         }
-        virtual void doFinalize() {}
+        public override void doFinalize() { }
 
         public void addParentClass(pBaseLangObject blo)
         {

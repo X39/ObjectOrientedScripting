@@ -8,15 +8,14 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Variable : pBaseLangObject, Interfaces.iName
     {
-        private Ident name;
         public Ident Name
         {
-            get { return name; }
+            get { return ((Ident)this.children[0]); }
             set
             {
-                if(this.encapsulation == Encapsulation.NA && !name.IsSimpleIdentifier)
+                if (this.encapsulation == Encapsulation.NA && !value.IsSimpleIdentifier)
                     throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name);
-                name = value;
+                this.children[0] = value;
             }
         }
         public VarType varType;
@@ -45,6 +44,6 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         public Variable(pBaseLangObject parent) : base(parent) { }
-        virtual void doFinalize() {}
+        public override void doFinalize() { }
     }
 }
