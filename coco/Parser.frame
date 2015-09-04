@@ -55,9 +55,16 @@ public class Parser {
 		foreach(int i in values)
 		{
 			if(i != -1 && t.kind != i)
+			{
+				scanner.ResetPeek();
 				return false;
-			t = t.next;
+			}
+            if (t.next == null)
+                t = scanner.Peek();
+            else
+                t = t.next;
 		}
+        scanner.ResetPeek();
 		return true;
 	}
 	
