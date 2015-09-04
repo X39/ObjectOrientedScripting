@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects.Interfaces
     public interface iName
     {
         Ident Name {get; set;}
-        public string FullyQualifiedName { get; }
+        string FullyQualifiedName { get; }
     }
 }

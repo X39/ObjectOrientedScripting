@@ -11,8 +11,8 @@ namespace Compiler.OOS_LanguageObjects
         public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
         public string FullyQualifiedName { get { return this.Name.OriginalValue; } }
 
-        public readonly List<pBaseLangObject> LArgs { get { return this.children.GetRange(0, endMarker); } }
-        public readonly List<pBaseLangObject> RArgs { get { return this.children.GetRange(endMarker, this.children.Count - endMarker); } }
+        public List<pBaseLangObject> LArgs { get { return this.children.GetRange(0, endMarker); } }
+        public List<pBaseLangObject> RArgs { get { return this.children.GetRange(endMarker, this.children.Count - endMarker); } }
 
         private int endMarker;
 

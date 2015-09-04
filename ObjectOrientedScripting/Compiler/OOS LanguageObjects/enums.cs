@@ -20,9 +20,10 @@ namespace Compiler.OOS_LanguageObjects
         Bool,
         String,
         Auto,
-        Void
+        Void,
+        Object
     }
-    enum IdentType
+    public enum IdentType
     {
         Name,
         GlobalAccess,

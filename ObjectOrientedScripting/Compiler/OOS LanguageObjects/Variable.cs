@@ -43,7 +43,10 @@ namespace Compiler.OOS_LanguageObjects
             }
         }
 
-        public Variable(pBaseLangObject parent) : base(parent) { }
+        public Variable(pBaseLangObject parent) : base(parent)
+        {
+            this.addChild(null);
+        }
         public override void doFinalize() { }
     }
 }

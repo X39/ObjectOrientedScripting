@@ -65,7 +65,7 @@ namespace Wrapper
             Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
             Parser parser = new Parser(scanner);
             parser.Parse();
-            OosContainer container;
+            //OosContainer container;
             //parser.getBaseContainer(out container);
             if (parser.errors.count > 0)
             {
@@ -83,7 +83,7 @@ namespace Wrapper
             ////Create config.cpp file
             //file.writeOut(proj.OutputFolder);
         }
-        public void WriteOutTree(Project proj, BaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
+/*        public void WriteOutTree(Project proj, BaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
         {
             string curPath = path;
             string tab = new string('\t', tabCount);
@@ -929,6 +929,7 @@ namespace Wrapper
                 //throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
             }
         }
+*/
         #endregion
         #region Compiling
         public void Compile(Project proj)

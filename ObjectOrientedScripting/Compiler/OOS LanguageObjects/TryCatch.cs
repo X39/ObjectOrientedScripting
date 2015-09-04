@@ -12,8 +12,8 @@ namespace Compiler.OOS_LanguageObjects
         private int ifEnd;
 
         public pBaseLangObject expression { get { return this.children[0]; } set { this.children[0] = value; } }
-        public readonly List<pBaseLangObject> IfInstructions { get { return this.children.GetRange(1, ifEnd); } }
-        public readonly List<pBaseLangObject> ElseInstructions { get { return this.children.GetRange(ifEnd, this.children.Count - ifEnd); } }
+        public List<pBaseLangObject> IfInstructions { get { return this.children.GetRange(1, ifEnd); } }
+        public List<pBaseLangObject> ElseInstructions { get { return this.children.GetRange(ifEnd, this.children.Count - ifEnd); } }
 
         public TryCatch(pBaseLangObject parent) : base(parent)
         {

@@ -65,6 +65,6 @@ namespace Compiler.OOS_LanguageObjects
             return false;
         }
 
-        public virtual void doFinalize();
+        public virtual void doFinalize() { }
     }
 }

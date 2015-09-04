@@ -13,8 +13,8 @@ namespace Compiler.OOS_LanguageObjects
         private int argListEnd;
         public Encapsulation encapsulation;
 
-        public readonly List<pBaseLangObject> ArgList { get { return this.children.GetRange(0, argListEnd); } }
-        public readonly List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(argListEnd, this.children.Count - argListEnd); } }
+        public List<pBaseLangObject> ArgList { get { return this.children.GetRange(0, argListEnd); } }
+        public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(argListEnd, this.children.Count - argListEnd); } }
 
         public string FullyQualifiedName
         {

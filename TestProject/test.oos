@@ -19,7 +19,7 @@ interface testInterface
 }
 class testObj
 {
-	constructor()
+	public testObj()
 	{
 		this.testVarPublic = "";
 		if(!isset(::testObj::testVarStatic))
@@ -29,8 +29,8 @@ class testObj
 		this.testFncPublic("arg1", "arg2");
 		::testObj::testFncStatic("arg1", "arg2");
 	}
-	public auto testVarPublic;
-	static auto testVarStatic;
+	public string testVarPublic;
+	static string testVarStatic;
 	public void testFncPublic(string _arg1, string _arg2)
 	{
 		SQF diag_log(SQF str(_arg1));
@@ -48,7 +48,6 @@ static bool returnTrue()
 static void preInit()
 {
 	SQF diag_log("preInit");
-	startnative diag_log "test"; endnative;
     auto _obj = new ::testObj();
 	_obj.testFncPublic("preInitArg1", "preInitArg2");
 	::testObj::testFncStatic("preInitArg1", "preInitArg2");
@@ -64,21 +63,19 @@ static void preInit()
 	{
 		SQF diag_log("test");
 	}
-	switch(native(alive player))
+	switch(SQF alive (SQF player))
 	{
-		case true :
-		{
+		case true:
 			try
 			{
 				throw "foobar";
 			}
-			catch(test)
+			catch(object test)
 			{
 				SQF diag_log(test);
 			}
-		}
-		default :
-		{
+			break;
+		default:
 			if(::returnTrue())
 			{
 				SQF systemChat("aprooved");
@@ -87,7 +84,7 @@ static void preInit()
 			{
 				SQF systemChat("nop");
 			}
-		}
+			break;
 	}
 	while(true)
 	{

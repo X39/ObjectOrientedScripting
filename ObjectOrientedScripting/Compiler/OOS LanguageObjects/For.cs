@@ -11,7 +11,7 @@ namespace Compiler.OOS_LanguageObjects
         public pBaseLangObject forArg1 { get { return this.children[0]; } set { this.children[0] = value; } }
         public pBaseLangObject forArg2 { get { return this.children[1]; } set { this.children[1] = value; } }
         public pBaseLangObject forArg3 { get { return this.children[2]; } set { this.children[2] = value; } }
-        public readonly List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(3, this.children.Count - 3); } }
+        public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(3, this.children.Count - 3); } }
 
         public For(pBaseLangObject parent) : base(parent)
         {
