@@ -15,10 +15,12 @@ namespace Wrapper
     {
         string configFileName;
         bool addFunctionsClass;
+        //List<PPDefine> flagDefines;
         public Compiler()
         {
             configFileName = "config.cpp";
             addFunctionsClass = true;
+            //flagDefines = new List<PPDefine>();
         }
         public void setFlags(string[] strArr)
         {
@@ -28,7 +30,7 @@ namespace Wrapper
                 if (count == -1)
                     count = s.Length;
                 string switchstring = s.Substring(1, count - 1);
-                switch (switchstring)
+                switch (switchstring.ToUpper())
                 {
                     case "CLFN":
                         if (count == -1)
@@ -42,6 +44,10 @@ namespace Wrapper
                     case "NFNC":
                         addFunctionsClass = false;
                         break;
+                    //case "DEFINE":
+                    //    addFunctionsClass = false;
+                    //    flagDefines.Add(new PPDefine('#' + s.Substring(count + 1)));
+                    //    break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
                         break;
@@ -67,9 +73,10 @@ namespace Wrapper
             parser.Parse();
             //OosContainer container;
             //parser.getBaseContainer(out container);
-            if (parser.errors.count > 0)
+            int errCount = parser.errors.count + parser.BaseObject.finalize();
+            if (errCount > 0)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found, cannot continue with Translating!");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
                 return;
             }
             //SqfConfigFile file = new SqfConfigFile(configFileName);

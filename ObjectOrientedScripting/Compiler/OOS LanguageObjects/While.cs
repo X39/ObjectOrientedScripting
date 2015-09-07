@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(null);
         }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

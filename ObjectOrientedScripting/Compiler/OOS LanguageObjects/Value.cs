@@ -15,6 +15,6 @@ namespace Compiler.OOS_LanguageObjects
             varType = VarType.Void;
             value = "";
         }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

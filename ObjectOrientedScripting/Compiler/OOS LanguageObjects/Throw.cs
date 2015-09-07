@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects
     public class Throw : pBaseLangObject
     {
         public Throw(pBaseLangObject parent) : base(parent) { }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects
     public class Base : pBaseLangObject
     {
         public Base() : base(null) {}
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

@@ -10,7 +10,13 @@ namespace Compiler.OOS_LanguageObjects
     {
         public pBaseLangObject lExpression { get { return this.children[0]; } set { this.children[0] = value; } }
         public pBaseLangObject rExpression { get { return this.children[1]; } set { this.children[1] = value; } }
-
+        public VarTypeObject ExpressionType
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
         public string expOperator;
         public bool negate;
 
@@ -22,6 +28,6 @@ namespace Compiler.OOS_LanguageObjects
             negate = false;
             expOperator = "";
         }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

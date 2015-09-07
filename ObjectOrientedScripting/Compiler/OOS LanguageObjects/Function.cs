@@ -9,7 +9,7 @@ namespace Compiler.OOS_LanguageObjects
     public class Function : pBaseLangObject, Interfaces.iName
     {
         public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
-        public VarType functionVarType;
+        public VarTypeObject varType;
         private int argListEnd;
         public Encapsulation encapsulation;
 
@@ -39,8 +39,9 @@ namespace Compiler.OOS_LanguageObjects
         public Function(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
+            varType = null;
         }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
         public void markArgListEnd()
         {
             argListEnd = this.children.Count;

@@ -9,6 +9,6 @@ namespace Compiler.OOS_LanguageObjects
     public class Break : pBaseLangObject
     {
         public Break(pBaseLangObject parent) : base(parent) {}
-        public override void doFinalize() {}
+        public override int doFinalize() { return 0; }
     }
 }

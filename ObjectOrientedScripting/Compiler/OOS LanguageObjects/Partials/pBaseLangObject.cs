@@ -22,11 +22,14 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(blo);
         }
-        public void finalize()
+        public int finalize()
         {
+            int errCount = 0;
             foreach (pBaseLangObject blo in children)
-                blo.finalize();
-            this.doFinalize();
+                if(blo != null)
+                    errCount += blo.finalize();
+            errCount += this.doFinalize();
+            return errCount;
         }
         public T getFirstOf<T>() where T : pBaseLangObject
         {
@@ -40,15 +43,19 @@ namespace Compiler.OOS_LanguageObjects
                     return null;
             }
         }
-        public List<T> getAllChildrenOf<T>(bool fullSearch = false) where T : pBaseLangObject
+        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null) where T : pBaseLangObject
         {
             List<T> l = new List<T>();
             foreach (var obj in this.children)
             {
+                if (obj == null)
+                    continue;
+                if (obj == stopObject)
+                    break;
                 if (obj is T)
                     l.Add((T)obj);
                 if (fullSearch)
-                    l.AddRange(obj.getAllChildrenOf<T>());
+                    l.AddRange(obj.getAllChildrenOf<T>(fullSearch, stopObject));
             }
             return l;
         }
@@ -65,6 +72,6 @@ namespace Compiler.OOS_LanguageObjects
             return false;
         }
 
-        public virtual void doFinalize() { }
+        public virtual int doFinalize() { return 0; }
     }
 }

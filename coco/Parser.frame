@@ -44,9 +44,13 @@ public class Parser {
 
 -->declarations
 
+	private Base baseObject;
+	public Base BaseObject { get { return baseObject; } }
+	
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
+		baseObject = null;
 	}
 	
 	bool peekCompare(params int[] values)
@@ -67,6 +71,7 @@ public class Parser {
         scanner.ResetPeek();
 		return true;
 	}
+	
 	
 	void SynErr (int n) {
 		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);

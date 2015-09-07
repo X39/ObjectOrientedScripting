@@ -33,9 +33,13 @@ public class Parser {
 
 
 
+	private Base baseObject;
+	public Base BaseObject { get { return baseObject; } }
+	
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
+		baseObject = null;
 	}
 	
 	bool peekCompare(params int[] values)
@@ -56,6 +60,7 @@ public class Parser {
         scanner.ResetPeek();
 		return true;
 	}
+	
 	
 	void SynErr (int n) {
 		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
@@ -118,7 +123,7 @@ public class Parser {
 
 	void IDENT(out pBaseLangObject outObj, pBaseLangObject parent) {
 		Expect(3);
-		var obj = new Ident(parent, t.val); outObj = obj;
+		var obj = new Ident(parent, t.val, t.line, t.col); outObj = obj;
 	}
 
 	void ENCAPSULATION(out Encapsulation e) {
@@ -178,7 +183,7 @@ public class Parser {
 	}
 
 	void BOOLEAN(out bool flag) {
-		flag = false; 
+		flag = la.val == "true"; Get(); return; 
 		if (la.kind == 21) {
 			Get();
 			flag = true; 
@@ -196,6 +201,9 @@ public class Parser {
 		} else if (la.kind == 1) {
 			Get();
 			obj.varType = VarType.Scalar; obj.value = t.val; 
+		} else if (la.val == "true" || la.val == "false") {
+			BOOLEAN(out flag);
+			obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); 
 		} else if (la.kind == 21 || la.kind == 22) {
 			BOOLEAN(out flag);
 			obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); 
@@ -208,11 +216,14 @@ public class Parser {
 			Get();
 			obj.negate = true; 
 		}
-		if (StartOf(1)) {
+		if (la.kind == 36) {
+			OP_NEWINSTANCE(out blo, obj);
+			obj.lExpression = blo; 
+		} else if (la.val == "true" || la.val == "false" ) {
 			VALUE(out blo, obj);
 			obj.lExpression = blo; 
-		} else if (la.kind == 36) {
-			OP_NEWINSTANCE(out blo, obj);
+		} else if (StartOf(1)) {
+			VALUE(out blo, obj);
 			obj.lExpression = blo; 
 		} else if (la.kind == 3) {
 			IDENT(out blo, obj);
@@ -251,7 +262,7 @@ public class Parser {
 	}
 
 	void BODY_FUNCTIONCALL(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new VariableAssignment(parent); outObj = obj; pBaseLangObject blo; 
+		var obj = new FunctionCall(parent); outObj = obj; pBaseLangObject blo; 
 		Expect(7);
 		if (StartOf(2)) {
 			EXPRESSION(out blo, obj);
@@ -276,7 +287,7 @@ public class Parser {
 			}
 			Expect(8);
 		}
-		IDENT(out blo, parent);
+		IDENT(out blo, outObj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 		if (la.kind == 7) {
 			Get();
@@ -301,7 +312,7 @@ public class Parser {
 	}
 
 	void OOS() {
-		var obj = new Base(); pBaseLangObject blo; 
+		var obj = new Base(); baseObject = obj; pBaseLangObject blo; 
 		while (StartOf(4)) {
 			if (la.kind == 27) {
 				NAMESPACE(out blo, obj);
@@ -387,6 +398,9 @@ public class Parser {
 			} else if (StartOf(5)) {
 				FUNCTION(out blo, obj, e);
 				obj.addChild(blo); 
+			} else if (la.kind == 3) {
+				CONSTRUCTOR(out blo, obj, e);
+				obj.addChild(blo); 
 			} else SynErr(58);
 		}
 		Expect(10);
@@ -398,7 +412,7 @@ public class Parser {
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		Expect(9);
-		while (StartOf(8)) {
+		while (StartOf(5)) {
 			VFUNCTION(out blo, obj);
 			obj.addChild(blo); 
 		}
@@ -406,9 +420,14 @@ public class Parser {
 	}
 
 	void NEWVARIABLE(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA) {
-		var obj = new Variable(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
-		VARTYPE(out v);
-		obj.varType = v; 
+		var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
+		if (StartOf(8)) {
+			VARTYPE(out v);
+			obj.varType = new VarTypeObject(v);; 
+		} else if (la.kind == 3) {
+			IDENT(out blo, obj);
+			obj.varType = new VarTypeObject((Ident)blo); 
+		} else SynErr(59);
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 	}
@@ -416,14 +435,39 @@ public class Parser {
 	void FUNCTION(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e) {
 		var obj = new Function(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
 		if (StartOf(8)) {
-			if (StartOf(9)) {
-				VARTYPE(out v);
-				obj.functionVarType = v; 
-			} else {
+			VARTYPE(out v);
+			obj.varType = new VarTypeObject(v); 
+		} else if (la.kind == 32) {
+			Get();
+			obj.varType = new VarTypeObject(VarType.Void); 
+		} else if (la.kind == 3) {
+			IDENT(out blo, obj);
+			obj.varType = new VarTypeObject((Ident)blo); 
+		} else SynErr(60);
+		IDENT(out blo, obj);
+		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
+		Expect(7);
+		if (StartOf(9)) {
+			NEWVARIABLE(out blo, obj);
+			obj.addChild(blo); 
+			while (la.kind == 30) {
 				Get();
-				obj.functionVarType = VarType.Void; 
+				NEWVARIABLE(out blo, obj);
+				obj.addChild(blo); 
 			}
 		}
+		Expect(8);
+		obj.markArgListEnd(); 
+		Expect(9);
+		while (StartOf(10)) {
+			CODEINSTRUCTION(out blo, obj);
+			obj.addChild(blo); 
+		}
+		Expect(10);
+	}
+
+	void CONSTRUCTOR(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e) {
+		var obj = new Function(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 		Expect(7);
@@ -448,23 +492,36 @@ public class Parser {
 
 	void VFUNCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new VirtualFunction(parent); outObj = obj; pBaseLangObject blo; VarType v; 
-		if (StartOf(9)) {
+		if (StartOf(8)) {
 			VARTYPE(out v);
-			obj.functionVarType = v; 
+			obj.varType = new VarTypeObject(v); 
 		} else if (la.kind == 32) {
 			Get();
-			obj.functionVarType = VarType.Void; 
-		} else SynErr(59);
+			obj.varType = new VarTypeObject(VarType.Void); 
+		} else if (la.kind == 3) {
+			IDENT(out blo, obj);
+			obj.varType = new VarTypeObject((Ident)blo); 
+		} else SynErr(61);
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 		Expect(7);
 		if (StartOf(9)) {
-			VARTYPE(out v);
-			obj.argTypes.Add(v); 
+			if (StartOf(8)) {
+				VARTYPE(out v);
+				obj.argTypes.Add(new VarTypeObject(v)); 
+			} else {
+				IDENT(out blo, obj);
+				obj.argTypes.Add(new VarTypeObject((Ident)blo)); 
+			}
 			while (la.kind == 30) {
 				Get();
-				VARTYPE(out v);
-				obj.argTypes.Add(v); 
+				if (StartOf(8)) {
+					VARTYPE(out v);
+					obj.argTypes.Add(new VarTypeObject(v)); 
+				} else if (la.kind == 3) {
+					IDENT(out blo, obj);
+					obj.argTypes.Add(new VarTypeObject((Ident)blo)); 
+				} else SynErr(62);
 			}
 		}
 		Expect(8);
@@ -478,13 +535,13 @@ public class Parser {
 			TERMINATOR();
 		} else if (StartOf(12)) {
 			CODEINSTRUCTION_NSC(out outObj, parent);
-		} else SynErr(60);
+		} else SynErr(63);
 	}
 
 	void AUTOVARIABLE(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA) {
-		var obj = new Variable(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; 
+		var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; 
 		Expect(33);
-		obj.varType = VarType.Auto; 
+		obj.varType = new VarTypeObject(VarType.Auto); 
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 	}
@@ -503,7 +560,7 @@ public class Parser {
 			IDENT(out outObj, parent);
 			BODY_ASSIGNMENT(out blo, outObj);
 			outObj.addChild(blo); 
-		} else if (StartOf(9)) {
+		} else if (peekCompare(_T_IDENT, _T_IDENT) ) {
 			NEWVARIABLE(out outObj, parent);
 			if (la.kind == 6) {
 				BODY_ASSIGNMENT(out blo, outObj);
@@ -515,7 +572,7 @@ public class Parser {
 			outObj.addChild(blo); 
 		} else if (StartOf(2)) {
 			EXPRESSION(out outObj, parent);
-		} else SynErr(61);
+		} else SynErr(64);
 	}
 
 	void OP_THROW(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -554,7 +611,7 @@ public class Parser {
 			OP_SWITCH(out outObj, parent);
 		} else if (la.kind == 39) {
 			OP_TRYCATCH(out outObj, parent);
-		} else SynErr(62);
+		} else SynErr(65);
 	}
 
 	void OP_FOR(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -592,7 +649,7 @@ public class Parser {
 		} else if (StartOf(10)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(63);
+		} else SynErr(66);
 	}
 
 	void OP_WHILE(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -618,7 +675,7 @@ public class Parser {
 		} else if (StartOf(10)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(64);
+		} else SynErr(67);
 	}
 
 	void OP_IFELSE(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -638,7 +695,7 @@ public class Parser {
 		} else if (StartOf(10)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(65);
+		} else SynErr(68);
 		if (la.kind == 38) {
 			Get();
 			obj.markIfEnd(); 
@@ -652,7 +709,7 @@ public class Parser {
 			} else if (StartOf(10)) {
 				CODEINSTRUCTION(out blo, obj);
 				obj.addChild(blo); 
-			} else SynErr(66);
+			} else SynErr(69);
 		}
 	}
 
@@ -693,15 +750,15 @@ public class Parser {
 					OP_RETURN(out blo, obj);
 					caseObj.endOfCase = blo; 
 					TERMINATOR();
-				} else SynErr(67);
+				} else SynErr(70);
 			} else {
 				if (la.kind == 46) {
 					Get();
-					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = new Ident(caseObj, "default"); 
+					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = new Ident(caseObj, "default", t.line, t.col); 
 					Expect(29);
 				} else {
 					Get();
-					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = new Ident(caseObj, "default"); 
+					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = new Ident(caseObj, "default", t.line, t.col); 
 				}
 				while (StartOf(10)) {
 					CODEINSTRUCTION(out blo, obj);
@@ -710,13 +767,16 @@ public class Parser {
 				if (la.kind == 41) {
 					OP_BREAK(out blo, obj);
 					caseObj.endOfCase = blo; 
+					TERMINATOR();
 				} else if (la.kind == 42) {
 					OP_THROW(out blo, obj);
 					caseObj.endOfCase = blo; 
+					TERMINATOR();
 				} else if (la.kind == 43) {
 					OP_RETURN(out blo, obj);
 					caseObj.endOfCase = blo; 
-				} else SynErr(68);
+					TERMINATOR();
+				} else SynErr(71);
 			}
 		}
 		Expect(10);
@@ -734,7 +794,7 @@ public class Parser {
 		Expect(40);
 		Expect(7);
 		NEWVARIABLE(out blo, obj);
-		obj.expression = blo; 
+		obj.variable = blo; 
 		Expect(8);
 		obj.markIfEnd(); 
 		Expect(9);
@@ -770,8 +830,8 @@ public class Parser {
 		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x},
@@ -848,16 +908,19 @@ public class Errors {
 			case 56: s = "invalid OOS"; break;
 			case 57: s = "invalid NAMESPACE"; break;
 			case 58: s = "invalid CLASS"; break;
-			case 59: s = "invalid VFUNCTION"; break;
-			case 60: s = "invalid CODEINSTRUCTION"; break;
-			case 61: s = "invalid CODEINSTRUCTION_SC"; break;
-			case 62: s = "invalid CODEINSTRUCTION_NSC"; break;
-			case 63: s = "invalid OP_FOR"; break;
-			case 64: s = "invalid OP_WHILE"; break;
-			case 65: s = "invalid OP_IFELSE"; break;
-			case 66: s = "invalid OP_IFELSE"; break;
-			case 67: s = "invalid OP_SWITCH"; break;
-			case 68: s = "invalid OP_SWITCH"; break;
+			case 59: s = "invalid NEWVARIABLE"; break;
+			case 60: s = "invalid FUNCTION"; break;
+			case 61: s = "invalid VFUNCTION"; break;
+			case 62: s = "invalid VFUNCTION"; break;
+			case 63: s = "invalid CODEINSTRUCTION"; break;
+			case 64: s = "invalid CODEINSTRUCTION_SC"; break;
+			case 65: s = "invalid CODEINSTRUCTION_NSC"; break;
+			case 66: s = "invalid OP_FOR"; break;
+			case 67: s = "invalid OP_WHILE"; break;
+			case 68: s = "invalid OP_IFELSE"; break;
+			case 69: s = "invalid OP_IFELSE"; break;
+			case 70: s = "invalid OP_SWITCH"; break;
+			case 71: s = "invalid OP_SWITCH"; break;
 
 			default: s = "error " + n; break;
 		}

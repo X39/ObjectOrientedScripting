@@ -13,7 +13,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             get
             {
-                string s = "";
+                string s = "::";
                 List<Interfaces.iName> parentList = new List<Interfaces.iName>();
                 pBaseLangObject curParent = Parent;
                 while (curParent != null)
@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 parentList.Reverse();
                 foreach (Interfaces.iName it in parentList)
-                    s += it.Name.OriginalValue;
+                    s += it.Name.OriginalValue + "::";
                 s += this.Name.OriginalValue;
                 return s;
             }
@@ -34,6 +34,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(null);
         }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

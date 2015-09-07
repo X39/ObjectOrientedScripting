@@ -9,8 +9,8 @@ namespace Compiler.OOS_LanguageObjects
     public class VirtualFunction : pBaseLangObject, Interfaces.iName
     {
         public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
-        public VarType functionVarType;
-        public List<VarType> argTypes;
+        public VarTypeObject varType;
+        public List<VarTypeObject> argTypes;
 
 
         public string FullyQualifiedName
@@ -35,9 +35,10 @@ namespace Compiler.OOS_LanguageObjects
         }
         public VirtualFunction(pBaseLangObject parent) : base(parent) 
         {
-            argTypes = new List<VarType>();
+            argTypes = new List<VarTypeObject>();
             this.children.Add(null);
+            varType = null;
         }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }

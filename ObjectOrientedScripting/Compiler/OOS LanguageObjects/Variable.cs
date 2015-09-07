@@ -18,7 +18,7 @@ namespace Compiler.OOS_LanguageObjects
                 this.children[0] = value;
             }
         }
-        public VarType varType;
+        public VarTypeObject varType;
         public Encapsulation encapsulation;
         public string FullyQualifiedName
         {
@@ -43,10 +43,39 @@ namespace Compiler.OOS_LanguageObjects
             }
         }
 
-        public Variable(pBaseLangObject parent) : base(parent)
+        private int line;
+        private int pos;
+
+        public Variable(pBaseLangObject parent, int line, int pos) : base(parent)
         {
             this.addChild(null);
+            varType = null;
+            this.line = line;
+            this.pos = pos;
         }
-        public override void doFinalize() { }
+        public override int doFinalize() {
+            var assign = this.getAllChildrenOf<VariableAssignment>();
+            if(assign.Count > 0)
+            {
+                var expList = assign[0].getAllChildrenOf<Expression>();
+                if (expList.Count <= 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0000, this.line, this.pos));
+                    return 1;
+                }
+                var expression = expList[0];
+                var type = expression.ExpressionType;
+                if(this.varType.varType == VarType.Auto)
+                {
+                    this.varType = type;
+                }
+                if(!this.varType.Equals(type))
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0001, this.line, this.pos));
+                    return 1;
+                }
+            }
+            return 0;
+        }
     }
 }

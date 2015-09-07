@@ -10,6 +10,6 @@ namespace Compiler.OOS_LanguageObjects
     {
 
         public NewInstance(pBaseLangObject parent) : base(parent) { }
-        public override void doFinalize() { }
+        public override int doFinalize() { return 0; }
     }
 }
