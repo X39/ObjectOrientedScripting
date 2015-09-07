@@ -2,7 +2,7 @@ class cFoo
 {
 	public void foobar(string _someRandomArg)
 	{
-		SQF::diag_log("class foo " + _someRandomArg);
+		SQF diag_log("class foo " + _someRandomArg);
 	}
 	public void test(string _test, string _test2)
 	{

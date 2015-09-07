@@ -211,7 +211,7 @@ public class Parser {
 	}
 
 	void EXPRESSION_HELPER(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new Expression(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; 
+		var obj = new Expression(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; 
 		if (la.kind == 23) {
 			Get();
 			obj.negate = true; 

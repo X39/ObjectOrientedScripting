@@ -126,7 +126,7 @@ namespace Compiler.OOS_LanguageObjects
             else if (this.Parent is Expression)
             {
                 var obj = getVariableReferenceOfFQN(this.FullyQualifiedName);
-                if (this.referencedObject == null)
+                if (obj == null)
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0008, this.line, this.pos));
                     errCount++;
@@ -163,10 +163,11 @@ namespace Compiler.OOS_LanguageObjects
             var varList = this.getFirstOf<Base>().getAllChildrenOf<Function>(true, this);
             foreach (var it in varList)
             {
-                if (it.Name.FullyQualifiedName == fqn)
-                {
+                var fqn2 = it.Name.FullyQualifiedName;
+                if (fqn2 == fqn)
                     return new Tuple<Function,VirtualFunction>(it, null);
-                }
+                if(fqn2.StartsWith(fqn) && fqn.EndsWith(fqn2.Remove(0, fqn.Length)))
+                    return new Tuple<Function, VirtualFunction>(it, null);
             }
            var varList2 = this.getFirstOf<Base>().getAllChildrenOf<VirtualFunction>(true, this);
            foreach (var it in varList2)

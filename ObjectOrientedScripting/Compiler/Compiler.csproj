@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Compiler.cs" />
     <Compile Include="ErrorStringResolver.cs" />
+    <Compile Include="Exceptions\TypeMissmatch.cs" />
     <Compile Include="Exceptions\InvalidIdentType.cs" />
     <Compile Include="OOS LanguageObjects\Case.cs" />
     <Compile Include="OOS LanguageObjects\Expression.cs" />

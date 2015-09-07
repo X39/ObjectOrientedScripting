@@ -22,10 +22,7 @@ class testObj
 	public testObj()
 	{
 		this.testVarPublic = "";
-		if(!isset(::testObj::testVarStatic))
-		{
-			testVarStatic = "";
-		}
+		testVarStatic = "";
 		this.testFncPublic("arg1", "arg2");
 		::testObj::testFncStatic("arg1", "arg2");
 	}

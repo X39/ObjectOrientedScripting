@@ -2,6 +2,6 @@ class cBar : cFoo
 {
 	public void foobar(string _someRandomArg)
 	{
-		SQF::diag_log("class bar " + _someRandomArg);
+		SQF diag_log("class bar " + _someRandomArg);
 	}
 }

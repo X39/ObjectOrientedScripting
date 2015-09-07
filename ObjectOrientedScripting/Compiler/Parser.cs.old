@@ -395,11 +395,11 @@ public class Parser {
 				NEWVARIABLE(out blo, obj, e);
 				obj.addChild(blo); 
 				TERMINATOR();
+			} else if (peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) ) {
+				CONSTRUCTOR(out blo, obj, e);
+				obj.addChild(blo); 
 			} else if (StartOf(5)) {
 				FUNCTION(out blo, obj, e);
-				obj.addChild(blo); 
-			} else if (la.kind == 3) {
-				CONSTRUCTOR(out blo, obj, e);
 				obj.addChild(blo); 
 			} else SynErr(58);
 		}
