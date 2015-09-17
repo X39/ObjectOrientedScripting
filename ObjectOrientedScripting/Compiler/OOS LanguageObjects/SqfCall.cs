@@ -8,6 +8,22 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class SqfCall : pBaseLangObject, Interfaces.iName
     {
+        private class SupportInfoObject
+        {
+            public string SqfCommand;
+            public string LType;
+            public string RType;
+            public string outType;
+            public enum type
+            {
+                b,
+                u,
+                n,
+                t
+            }
+        }
+        private static List<SupportInfoObject> supportInfoList;
+
         public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
         public string FullyQualifiedName { get { return this.Name.OriginalValue; } }
 
@@ -25,6 +41,10 @@ namespace Compiler.OOS_LanguageObjects
         public void markEnd()
         {
             this.endMarker = this.children.Count;
+        }
+        public static void readSupportInfoList(string pathToFile)
+        {
+            supportInfoList = new List<SupportInfoObject>();
         }
     }
 }

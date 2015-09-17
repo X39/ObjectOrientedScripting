@@ -21,7 +21,8 @@ namespace Compiler.OOS_LanguageObjects
         String,
         Auto,
         Void,
-        Object
+        Object,
+        Other
     }
     public class VarTypeObject
     {
@@ -29,7 +30,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.ident = i;
             this.varType = VarType.Object;
-        }
+        } 
         public VarTypeObject(VarType v)
         {
             this.ident = null;
