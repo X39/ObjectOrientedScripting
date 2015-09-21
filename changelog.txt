@@ -1,3 +1,6 @@
+Version 0.4.1-ALPHA  
+    |- Wrapper: Fixed -gen is not working if file is not existing
+	|           (also if file was existing ... but expected error then)
 Version 0.4.0-ALPHA                                                             
     |- Wrapper: Now returns -1 if was not successfully                          
     |- Wrapper: Added "setFlags(string[])" function to ICompiler interface      
