@@ -111,28 +111,6 @@ namespace Wrapper
             }
             Logger.Instance.log(Logger.LogLevel.VERBOSE, "extended output is enabled");
             Logger.Instance.log(Logger.LogLevel.DEBUG, "Debug output is enabled");
-            if (!File.Exists(path))
-            {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open project file as it does not exists (typo?).");
-                Logger.Instance.close();
-                if (anyKey)
-                {
-                    Console.WriteLine("\nPress ANY key to continue");
-                    Console.ReadKey();
-                }
-                return exitCode;
-            }
-            if (checkSyntaxFile != "" && !File.Exists(checkSyntaxFile))
-            {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open checkSyntax as it does not exists (typo?).");
-                Logger.Instance.close();
-                if (anyKey)
-                {
-                    Console.WriteLine("\nPress ANY key to continue");
-                    Console.ReadKey();
-                }
-                return exitCode;
-            }
             if (createEmptyProject)
             {
 
@@ -178,6 +156,28 @@ namespace Wrapper
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, ex.Message);
                 }
+                Logger.Instance.close();
+                if (anyKey)
+                {
+                    Console.WriteLine("\nPress ANY key to continue");
+                    Console.ReadKey();
+                }
+                return exitCode;
+            }
+            if (!File.Exists(path))
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open project file as it does not exists (typo?).");
+                Logger.Instance.close();
+                if (anyKey)
+                {
+                    Console.WriteLine("\nPress ANY key to continue");
+                    Console.ReadKey();
+                }
+                return exitCode;
+            }
+            if (checkSyntaxFile != "" && !File.Exists(checkSyntaxFile))
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Cannot open checkSyntax as it does not exists (typo?).");
                 Logger.Instance.close();
                 if (anyKey)
                 {
