@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class Variable : pBaseLangObject, Interfaces.iName
+    public class Variable : pBaseLangObject, Interfaces.iName, Interfaces.iHasType
     {
         public Ident Name
         {
@@ -19,6 +19,7 @@ namespace Compiler.OOS_LanguageObjects
             }
         }
         public VarTypeObject varType;
+        public VarTypeObject ReferencedType { get { return this.varType; } }
         public Encapsulation encapsulation;
         public string FullyQualifiedName
         {
@@ -58,24 +59,46 @@ namespace Compiler.OOS_LanguageObjects
             if(assign.Count > 0)
             {
                 var expList = assign[0].getAllChildrenOf<Expression>();
-                if (expList.Count <= 0)
+                var newArrayList = assign[0].getAllChildrenOf<NewArray>();
+                if (expList.Count <= 0 && newArrayList.Count <= 0)
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0000, this.line, this.pos));
                     return 1;
                 }
-                var expression = expList[0];
-                var type = expression.ExpressionType;
-                if(this.varType.varType == VarType.Auto)
+                if (newArrayList.Count <= 0)
                 {
-                    this.varType = type;
+                    var expression = expList[0];
+                    var type = expression.ReferencedType;
+                    if (this.varType.varType == VarType.Auto)
+                    {
+                        this.varType = type;
+                    }
+                    if (!this.varType.Equals(type))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0001, this.line, this.pos));
+                        return 1;
+                    }
                 }
-                if(!this.varType.Equals(type))
+                else
                 {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0001, this.line, this.pos));
-                    return 1;
+                    var arr = newArrayList[0];
+                    var type = arr.ReferencedType;
+                    if (this.varType.varType == VarType.Auto)
+                    {
+                        this.varType = type;
+                    }
+                    if (!this.varType.Equals(type))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0001, this.line, this.pos));
+                        return 1;
+                    }
                 }
             }
             return 0;
+        }
+        public override string ToString()
+        {
+            return this.FullyQualifiedName;
         }
     }
 }

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class Expression : pBaseLangObject
+    public class Expression : pBaseLangObject, Interfaces.iHasType
     {
         public pBaseLangObject lExpression { get { return this.children[0]; } set { this.children[0] = value; } }
         public pBaseLangObject rExpression { get { return this.children[1]; } set { this.children[1] = value; } }
-        public VarTypeObject ExpressionType
+        public VarTypeObject ReferencedType
         {
             get
             {
@@ -19,7 +19,7 @@ namespace Compiler.OOS_LanguageObjects
                 VarTypeObject oType = null;
                 if (lExpression is Expression)
                 {
-                    lType = ((Expression)lExpression).ExpressionType;
+                    lType = ((Expression)lExpression).ReferencedType;
                 }
                 else if (lExpression is Variable)
                 {
@@ -29,6 +29,10 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     lType = ((Ident)lExpression).ReferencedType;
                 }
+                else if (lExpression is Cast)
+                {
+                    lType = ((Cast)lExpression).ReferencedType;
+                }
                 else if (lExpression is NewInstance)
                 {
                     lType = ((Ident)lExpression.children[0]).ReferencedType;
@@ -37,11 +41,19 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     throw new NotImplementedException();
                 }
+                else if (lExpression is Value)
+                {
+                    lType = new VarTypeObject(((Value)lExpression).varType);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
                 if (rExpression != null)
                 {
                     if (rExpression is Expression)
                     {
-                        rType = ((Expression)rExpression).ExpressionType;
+                        rType = ((Expression)rExpression).ReferencedType;
                     }
                     else if (rExpression is Variable)
                     {
@@ -51,11 +63,23 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         rType = ((Ident)rExpression).ReferencedType;
                     }
+                    else if (rExpression is Cast)
+                    {
+                        rType = ((Cast)lExpression).ReferencedType;
+                    }
                     else if (rExpression is NewInstance)
                     {
                         rType = ((Ident)rExpression.children[0]).ReferencedType;
                     }
                     else if (rExpression is SqfCall)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (rExpression is Value)
+                    {
+                        rType = new VarTypeObject(((Value)lExpression).varType);
+                    }
+                    else
                     {
                         throw new NotImplementedException();
                     }
@@ -92,7 +116,9 @@ namespace Compiler.OOS_LanguageObjects
         public bool negate;
 
         private int line;
+        public int Line { get { return this.line; } }
         private int pos;
+        public int Pos { get { return this.pos; } }
 
         public Expression(pBaseLangObject parent, int line, int pos) : base(parent)
         {
@@ -100,6 +126,8 @@ namespace Compiler.OOS_LanguageObjects
             this.children.Add(null);
             negate = false;
             expOperator = "";
+            this.line = line;
+            this.pos = pos;
         }
         public override int doFinalize() { return 0; }
     }

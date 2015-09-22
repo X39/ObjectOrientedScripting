@@ -22,7 +22,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(blo);
         }
-        public int finalize()
+        public virtual int finalize()
         {
             int errCount = 0;
             foreach (pBaseLangObject blo in children)
@@ -34,7 +34,9 @@ namespace Compiler.OOS_LanguageObjects
         public T getFirstOf<T>() where T : pBaseLangObject
         {
             if (this is T)
+            {
                 return (T)this;
+            }
             else
             {
                 if (this.parent != null)
@@ -43,21 +45,37 @@ namespace Compiler.OOS_LanguageObjects
                     return null;
             }
         }
+        public T getLastOf<T>() where T : pBaseLangObject
+        {
+            if (this.parent == null)
+                return null;
+            if(this.parent is T)
+                return this.parent.getLastOf<T>();
+            if (this is T)
+                return (T)this;
+            return null;
+        }
         public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null) where T : pBaseLangObject
         {
             List<T> l = new List<T>();
+            private_getAllChildrenOf<T>(l, fullSearch, stopObject);
+            return l;
+        }
+        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject) where T : pBaseLangObject
+        {
             foreach (var obj in this.children)
             {
                 if (obj == null)
                     continue;
                 if (obj == stopObject)
-                    break;
+                    return true;
                 if (obj is T)
                     l.Add((T)obj);
                 if (fullSearch)
-                    l.AddRange(obj.getAllChildrenOf<T>(fullSearch, stopObject));
+                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject))
+                        return true;
             }
-            return l;
+            return false;
         }
         public bool isTypeInChildTree<T>() where T : pBaseLangObject
         {

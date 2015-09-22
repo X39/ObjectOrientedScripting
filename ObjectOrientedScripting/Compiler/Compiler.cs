@@ -15,12 +15,12 @@ namespace Wrapper
     {
         string configFileName;
         bool addFunctionsClass;
-        //List<PPDefine> flagDefines;
+        List<PPDefine> flagDefines;
         public Compiler()
         {
             configFileName = "config.cpp";
             addFunctionsClass = true;
-            //flagDefines = new List<PPDefine>();
+            flagDefines = new List<PPDefine>();
         }
         public void setFlags(string[] strArr)
         {
@@ -44,10 +44,10 @@ namespace Wrapper
                     case "NFNC":
                         addFunctionsClass = false;
                         break;
-                    //case "DEFINE":
-                    //    addFunctionsClass = false;
-                    //    flagDefines.Add(new PPDefine('#' + s.Substring(count + 1)));
-                    //    break;
+                    case "DEFINE":
+                        addFunctionsClass = false;
+                        flagDefines.Add(new PPDefine('#' + s.Substring(count + 1)));
+                        break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
                         break;
@@ -941,12 +941,15 @@ namespace Wrapper
         #region Compiling
         public void Compile(Project proj)
         {
-            /*
-            //Make sure the build directory exists and create it if needed
-            if (!Directory.Exists(proj.Buildfolder))
-                Directory.CreateDirectory(proj.Buildfolder);
-            //Check if result file is existing, create it if it is not
-             */
+            Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version, thus its just a plain \"CheckSyntax\" ... im sorry :(");
+            Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
+            Parser parser = new Parser(scanner);
+            parser.Parse();
+            //OosContainer container;
+            //parser.getBaseContainer(out container);
+            int errCount = parser.errors.count;
+            if (errCount > 0)
+                throw new Exception("Errors found (" + errCount + "), cannot continue with Compile!");
             var filePath = proj.Buildfolder + "_preprocess_.obj";
             var newPath = proj.Buildfolder + "_compile_.obj";
             for (int i = 0; i < 3; i++)
@@ -954,7 +957,6 @@ namespace Wrapper
                 try
                 {
                     File.Copy(filePath, newPath, true);
-                    Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version");
                     break;
                 }
                 catch (IOException e)
@@ -992,6 +994,8 @@ namespace Wrapper
                 }
             }
             Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
+            foreach(var it in flagDefines)
+                defines.Add(it.Name, it);
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
             //Start actual preprocessing
             preprocessFile(ifdefs, defines, proj, proj.Mainfile, writer);

@@ -22,7 +22,10 @@ namespace Compiler.OOS_LanguageObjects
         Auto,
         Void,
         Object,
-        Other
+        Other,
+        ScalarArray,
+        BoolArray,
+        StringArray
     }
     public class VarTypeObject
     {
@@ -44,6 +47,8 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             if (((VarTypeObject)obj).varType != this.varType)
                 return false;
+            if (this.varType != VarType.Object)
+                return true;
             return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
         }
     }
@@ -52,8 +57,6 @@ namespace Compiler.OOS_LanguageObjects
         Name,
         GlobalAccess,
         RelativeAccess,
-        GlobalAccess_Instance,
-        RelativeAccess_Instance,
         NA
     }
 }

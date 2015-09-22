@@ -42,5 +42,9 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.parentClasses.Add(blo);
         }
+        public override string ToString()
+        {
+            return this.FullyQualifiedName;
+        }
     }
 }

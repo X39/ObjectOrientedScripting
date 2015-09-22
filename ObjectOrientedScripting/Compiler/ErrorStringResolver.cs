@@ -10,6 +10,7 @@ namespace Compiler
     {
         public enum ErrorCodeEnum
         {
+            UNKNOWN,
             C0000,
             C0001,
             C0002,
@@ -19,7 +20,14 @@ namespace Compiler
             C0006,
             C0007,
             C0008,
-            C0009
+            C0009, //Unused
+            C0010,
+            C0011,
+            C0012,
+            C0013,
+            C0014,
+            C0015,
+            C0016
         }
         public static string resolve(ErrorCodeEnum errCode, int line = -1, int pos = -1)
         {
@@ -35,12 +43,24 @@ namespace Compiler
                     return "Type missmatch for EXPRESSION and VariableAssignment";
                 case ErrorCodeEnum.C0002:
                     return "Could not locate CLASS for THIS reference";
-                case ErrorCodeEnum.C0003:
+                case ErrorCodeEnum.C0003: case ErrorCodeEnum.C0008: case ErrorCodeEnum.C0009:
                     return "Could not locate VARIABLE for instance access";
                 case ErrorCodeEnum.C0004: case ErrorCodeEnum.C0005: case ErrorCodeEnum.C0006: case ErrorCodeEnum.C0007:
                     return "Could not locate function object for IDENT";
-                case ErrorCodeEnum.C0008: case ErrorCodeEnum.C0009:
-                    return "Could not locate variable object for IDENT";
+                case ErrorCodeEnum.C0010:
+                    return "this reference can just be used with instance access";
+                case ErrorCodeEnum.C0011:
+                    return "NewArray has unknown child (!= Expression)";
+                case ErrorCodeEnum.C0012:
+                    return "Array type is not consistent (TypeMissmatch)";
+                case ErrorCodeEnum.C0013:
+                    return "Variable gets invalid type assigned";
+                case ErrorCodeEnum.C0014:
+                    return "Instance access on non-object ident";
+                case ErrorCodeEnum.C0015:
+                    return "Cannot cast non-object to object";
+                case ErrorCodeEnum.C0016:
+                    return "Cannot cast object to non-object but string";
                 default:
                     return "Unknown Error";
             }

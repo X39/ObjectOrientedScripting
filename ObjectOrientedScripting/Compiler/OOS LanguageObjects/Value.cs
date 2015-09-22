@@ -16,5 +16,9 @@ namespace Compiler.OOS_LanguageObjects
             value = "";
         }
         public override int doFinalize() { return 0; }
+        public override string ToString()
+        {
+            return this.value;
+        }
     }
 }

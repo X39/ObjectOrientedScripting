@@ -16,26 +16,7 @@ namespace Compiler.OOS_LanguageObjects
         public List<pBaseLangObject> ArgList { get { return this.children.GetRange(0, argListEnd); } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(argListEnd, this.children.Count - argListEnd); } }
 
-        public string FullyQualifiedName
-        {
-            get
-            {
-                string s = "";
-                List<Interfaces.iName> parentList = new List<Interfaces.iName>();
-                pBaseLangObject curParent = Parent;
-                while (curParent != null)
-                {
-                    if (curParent is Interfaces.iName)
-                        parentList.Add((Interfaces.iName)curParent);
-                    curParent = curParent.Parent;
-                }
-                parentList.Reverse();
-                foreach (Interfaces.iName it in parentList)
-                    s += it.Name;
-                s += "_fnc_" + this.Name.OriginalValue;
-                return s;
-            }
-        }
+        public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
         public Function(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
@@ -45,6 +26,10 @@ namespace Compiler.OOS_LanguageObjects
         public void markArgListEnd()
         {
             argListEnd = this.children.Count;
+        }
+        public override string ToString()
+        {
+            return this.FullyQualifiedName;
         }
     }
 }

@@ -35,5 +35,9 @@ namespace Compiler.OOS_LanguageObjects
             this.children.Add(null);
         }
         public override int doFinalize() { return 0; }
+        public override string ToString()
+        {
+            return this.FullyQualifiedName;
+        }
     }
 }

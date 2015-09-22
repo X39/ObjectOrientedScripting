@@ -11,6 +11,9 @@ namespace Compiler
         private string _name;
         private string[] _arguments;
         private string _value;
+        public string Name { get { return this._name; } }
+        public string[] Arguments { get { return this._arguments; } }
+        public string Value { get { return this._value; } }
 
         public PPDefine(string s)
         {
