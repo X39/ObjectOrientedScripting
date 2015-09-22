@@ -20,7 +20,7 @@ namespace Compiler
             C0006,
             C0007,
             C0008,
-            C0009, //Unused
+            C0009,
             C0010,
             C0011,
             C0012,
@@ -43,10 +43,12 @@ namespace Compiler
                     return "Type missmatch for EXPRESSION and VariableAssignment";
                 case ErrorCodeEnum.C0002:
                     return "Could not locate CLASS for THIS reference";
-                case ErrorCodeEnum.C0003: case ErrorCodeEnum.C0008: case ErrorCodeEnum.C0009:
+                case ErrorCodeEnum.C0003: case ErrorCodeEnum.C0008:
                     return "Could not locate VARIABLE for instance access";
                 case ErrorCodeEnum.C0004: case ErrorCodeEnum.C0005: case ErrorCodeEnum.C0006: case ErrorCodeEnum.C0007:
                     return "Could not locate function object for IDENT";
+                case ErrorCodeEnum.C0009:
+                    return "this reference used inside of static function";
                 case ErrorCodeEnum.C0010:
                     return "this reference can just be used with instance access";
                 case ErrorCodeEnum.C0011:

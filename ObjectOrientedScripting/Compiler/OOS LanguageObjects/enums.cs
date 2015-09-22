@@ -12,7 +12,7 @@ namespace Compiler.OOS_LanguageObjects
         Protected,
         Public,
         Static,
-        NA   //NA
+        NA
     }
     public enum VarType
     {

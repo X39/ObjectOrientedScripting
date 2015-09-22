@@ -82,12 +82,21 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 if (this.IsSelfReference)
                 {
-                    this.referencedObject = this.getFirstOf<oosClass>();
-                    this.referencedType = new VarTypeObject(this);
-                    if (this.referencedObject == null)
+                    var fnc = this.getFirstOf<Function>();
+                    if (fnc.encapsulation == Encapsulation.Static || fnc.encapsulation == Encapsulation.NA)
                     {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0002, this.line, this.pos));
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0009, this.line, this.pos));
                         errCount++;
+                    }
+                    else
+                    {
+                        this.referencedObject = this.getFirstOf<oosClass>();
+                        this.referencedType = new VarTypeObject(this);
+                        if (this.referencedObject == null)
+                        {
+                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0002, this.line, this.pos));
+                            errCount++;
+                        }
                     }
                 }
                 else

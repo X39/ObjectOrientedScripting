@@ -13,7 +13,7 @@ namespace Compiler.OOS_LanguageObjects
         private int argListEnd;
         public Encapsulation encapsulation;
 
-        public List<pBaseLangObject> ArgList { get { return this.children.GetRange(0, argListEnd); } }
+        public List<pBaseLangObject> ArgList { get { return this.children.GetRange(1, argListEnd); } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(argListEnd, this.children.Count - argListEnd); } }
 
         public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
@@ -25,7 +25,7 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize() { return 0; }
         public void markArgListEnd()
         {
-            argListEnd = this.children.Count;
+            argListEnd = this.children.Count - 1;
         }
         public override string ToString()
         {
