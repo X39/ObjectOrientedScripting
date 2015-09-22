@@ -16,6 +16,7 @@ namespace Wrapper
         string configFileName;
         bool addFunctionsClass;
         List<PPDefine> flagDefines;
+        public static readonly string endl = "\r\n";
         public Compiler()
         {
             configFileName = "config.cpp";
@@ -79,864 +80,426 @@ namespace Wrapper
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
                 return;
             }
-            //SqfConfigFile file = new SqfConfigFile(configFileName);
-            //iSqfConfig cfgClass = file;
-            //if (addFunctionsClass)
-            //{
-            //    cfgClass = new SqfConfigClass("cfgFunctions");
-            //    file.addChild(cfgClass);
-            //}
-            //WriteOutTree(proj, container, proj.OutputFolder, cfgClass, null);
-            ////Create config.cpp file
-            //file.writeOut(proj.OutputFolder);
+            SqfConfigFile file = new SqfConfigFile(configFileName);
+            iSqfConfig cfgClass = file;
+            if (addFunctionsClass)
+            {
+                cfgClass = new SqfConfigClass("cfgFunctions");
+                file.addChild(cfgClass);
+            }
+            WriteOutTree(proj, parser.BaseObject, proj.OutputFolder, cfgClass, null);
+            //Create config.cpp file
+            file.writeOut(proj.OutputFolder);
         }
-/*        public void WriteOutTree(Project proj, BaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
+        private void updateTabcount(ref string s, ref int tabCount, int change)
+        {
+            tabCount += change;
+            string tab = new string('\t', tabCount);
+        }
+        public void WriteOutTree(Project proj, pBaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
         {
             string curPath = path;
             string tab = new string('\t', tabCount);
-            #region OosNamespace
-            if (container is OosNamespace)
-            {
-                OosNamespace obj = (OosNamespace)container;
-                if (curPath.EndsWith("\\"))
-                    curPath += obj.Name;
-                else
-                    curPath += '\\' + obj.Name;
-                Directory.CreateDirectory(curPath);
-                SqfConfigClass cfgClass = null;
-                SqfConfigClass cfgClass_GenericFunctions = null;
-                foreach (BaseLangObject blo in obj.Children)
-                {
-                    if (!(blo is OosNamespace) && !(blo is OosClass))
-                    {
-                        if (cfgClass == null)
-                        {
-                            cfgClass = new SqfConfigClass(obj.getNormalizedName());
-                            configObj.addChild(cfgClass);
-                        }
-                        if (blo is OosGlobalFunction)
-                        {
-                            if (cfgClass_GenericFunctions == null)
-                            {
-                                cfgClass_GenericFunctions = new SqfConfigClass("generic");
-                                cfgClass.addChild(cfgClass_GenericFunctions);
-                            }
-                            WriteOutTree(proj, blo, curPath, cfgClass_GenericFunctions, writer);
-                        }
-                        else if (blo is OosGlobalVariable)
-                        {
-                            continue; //Will be added in last step
-                        }
-                        else
-                        {
-                            throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
-                        }
-                    }
-                    else
-                    {
-                        WriteOutTree(proj, blo, curPath, configObj, writer);
-                    }
-                }
-            }
-            #endregion
-            #region OosClass
-            else if (container is OosClass)
-            {//ToDo: Find all base classes and merge the functions into this one
-                OosClass obj = (OosClass)container;
-
-                //Get parent classes
-                List<OosClass> parentClasses = new List<OosClass>();
-                List<BaseFunctionObject> constructorsParentClasses = new List<BaseFunctionObject>();
-                var allClasses = obj.getFirstOf<OosContainer>().getAllChildrenOf<OosClass>(true);
-                foreach (var c in allClasses)
-                    if (obj.ParentClasses.Contains(c.Name))
-                        parentClasses.Add(c);
-
-                if (curPath.EndsWith("\\"))
-                    curPath += obj.Name;
-                else
-                    curPath += '\\' + obj.Name;
-                Directory.CreateDirectory(curPath);
-                SqfConfigClass cfgClass = new SqfConfigClass(obj.getNormalizedName());
-                configObj.addChild(cfgClass);
-                configObj = cfgClass;
-                cfgClass = new SqfConfigClass(obj.Name);
-                configObj.addChild(cfgClass);
-                BaseFunctionObject constructor = null;
-                List<OosClassFunction> classFunctions = new List<OosClassFunction>();
-                List<OosClassVariable> classVariables = new List<OosClassVariable>();
-                foreach (BaseLangObject blo in obj.Children)
-                {
-                    if (blo is OosClass)
-                    {
-                        WriteOutTree(proj, blo, curPath, configObj, writer);
-                    }
-                    else if (blo is OosGlobalFunction)
-                    {
-                        WriteOutTree(proj, blo, curPath, cfgClass, writer);
-                    }
-                    else if (blo is OosClassFunction)
-                    {
-                        if (((BaseFunctionObject)blo).Name == "constructor")
-                            if (constructor != null)
-                                throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
-                            else
-                                constructor = (BaseFunctionObject)blo;
-                        else
-                            classFunctions.Add((OosClassFunction)blo);
-                    }
-                    else if (blo is OosClassVariable)
-                    {
-                        classVariables.Add((OosClassVariable)blo);
-                    }
-                    else if (blo is OosGlobalVariable)
-                    {
-                        continue; //Will be added in last step
-                    }
-                    else
-                    {
-                        throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
-                    }
-                }
-                foreach (var c in parentClasses)
-                {
-                    BaseFunctionObject parentsConstructor = null;
-                    foreach (BaseLangObject blo in c.Children)
-                    {
-                        if (blo is OosClassFunction)
-                        {
-                            if (((BaseFunctionObject)blo).Name == "constructor")
-                                if (parentsConstructor != null)
-                                    throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
-                                else
-                                    parentsConstructor = (BaseFunctionObject)blo;
-                            else
-                                classFunctions.Add((OosClassFunction)blo);
-                        }
-                        else if (blo is OosClassVariable)
-                        {
-                            classVariables.Add((OosClassVariable)blo);
-                        }
-                    }
-                    constructorsParentClasses.Add(parentsConstructor);
-                }
-                //Handle constructor manually (as it has obviously more to do then the generic DoSomething functions ... or do you want a non-functional object do you?)
-                string constructorPath = curPath + '\\' + "class____constructor.sqf";
-                StreamWriter newWriter = new StreamWriter(constructorPath);
-                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Handling file:");
-                Logger.Instance.log(Logger.LogLevel.CONTINUE, constructorPath);
-                var tmpCfgClass = new SqfConfigClass("class____constructor");
-                cfgClass.addChild(tmpCfgClass);
-                tmpCfgClass.addChild(new SqfConfigField("file", "\"" + constructorPath.Substring(proj.OutputFolder.Length) + "\""));
-                tmpCfgClass.addChild(new SqfConfigField("recompile", "0"));
-                tmpCfgClass.addChild(new SqfConfigField("ext", "\".sqf\""));
-                tmpCfgClass.addChild(new SqfConfigField("preInit", "0"));
-                tmpCfgClass.addChild(new SqfConfigField("postInit", "0"));
-
-
-
-                newWriter.WriteLine("private \"_obj\";");
-                newWriter.Write("_obj = [\n\t[");
-                int objectIdentifiersCount = 0;
-                foreach (OosClassVariable blo in classVariables)
-                {
-                    newWriter.Write((objectIdentifiersCount > 0 ? "," : "") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : '"' + blo.Name + '"'));
-                    objectIdentifiersCount++;
-                }
-                foreach (OosClassFunction blo in classFunctions)
-                {
-                    newWriter.Write((objectIdentifiersCount > 0 ? "," : "") + (blo.Encapsulation == ClassEncapsulation.PRIVATE ? "nil" : '"' + blo.Name + '"'));
-                    objectIdentifiersCount++;
-                }
-                newWriter.Write("],\n\t[");
-                objectIdentifiersCount = 0;
-                foreach (OosClassVariable blo in classVariables)
-                {
-                    newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + blo.Name + '"');
-                    objectIdentifiersCount++;
-                }
-                foreach (OosClassFunction blo in classFunctions)
-                {
-                    newWriter.Write((objectIdentifiersCount > 0 ? ",\"" : "\"") + blo.Name + '"');
-                    objectIdentifiersCount++;
-                }
-                newWriter.Write("],\n\t[\n\t\t{throw \"UNKNOWN FUNCTION\";}");
-                foreach (OosClassVariable blo in classVariables)
-                {
-                    newWriter.Write(",\n\t\t");
-                    WriteOutTree(proj, blo, curPath, cfgClass, newWriter, 3);
-                }
-                foreach (OosClassFunction blo in classFunctions)
-                {
-                    newWriter.Write(",\n\t\t{\n");
-                    WriteOutTree(proj, blo, curPath, cfgClass, newWriter, 3);
-                    newWriter.Write("\n\t\t}");
-                }
-                newWriter.Write("\n\t],\n\t[\"" + obj.Name + "\", [\"" + obj.Name + '"');
-                foreach (var blo in obj.ParentClasses)
-                    newWriter.Write(",\"" + blo + '"');
-                newWriter.WriteLine("]]");
-                newWriter.WriteLine("];");
-                foreach (var bfo in constructorsParentClasses)
-                    WriteOutTree(proj, bfo, curPath, cfgClass, newWriter);
-                WriteOutTree(proj, constructor, curPath, cfgClass, newWriter);
-                newWriter.WriteLine("_obj");
-                newWriter.Flush();
-                newWriter.Close();
-            }
-            #endregion
-            #region OosGlobalFunction
-            else if (container is OosGlobalFunction)
-            {
-                OosGlobalFunction obj = (OosGlobalFunction)container;
-                if (curPath.EndsWith("\\"))
-                    curPath += obj.Name;
-                else
-                    curPath += '\\' + obj.Name + ".sqf";
-                writer = new StreamWriter(curPath);
-                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Handling file:");
-                Logger.Instance.log(Logger.LogLevel.CONTINUE, curPath);
-                var s = obj.getNormalizedName();
-                var retIndex = s.IndexOf("fnc_");
-                var tmpCfgClass = new SqfConfigClass(s.Substring(retIndex < 0 ? 0 : retIndex + 4));
-                configObj.addChild(tmpCfgClass);
-                tmpCfgClass.addChild(new SqfConfigField("file", "\"" + curPath.Substring(proj.OutputFolder.Length) + "\""));
-                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Configfile dir:");
-                Logger.Instance.log(Logger.LogLevel.CONTINUE, curPath.Substring(proj.OutputFolder.Length));
-                tmpCfgClass.addChild(new SqfConfigField("recompile", "0"));
-                tmpCfgClass.addChild(new SqfConfigField("ext", "\".sqf\""));
-                if (obj.Name == "preInit" || obj.Name == "postInit")
-                {
-                    if (obj.Name == "preInit")
-                    {
-                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Located PreInit function");
-                        var cont = obj.getFirstOf<OosContainer>();
-                        var l = cont.getAllChildrenOf<OosGlobalVariable>(true);
-                        foreach (var o in l)
-                        {
-                            writer.Write("if(isNil\"" + o.getNormalizedName() + "\") then {missionNamespace setVariable[\"" + o.getNormalizedName() + "\",");
-                            Logger.Instance.log(Logger.LogLevel.VERBOSE, "Writing out GlobalVariable '" + o.getNormalizedName() + "'");
-
-                            if (o.Value == null)
-                            {
-                                writer.Write("nil");
-                            }
-                            else
-                            {
-                                WriteOutTree(proj, o.Value, curPath, configObj, writer);
-                                Logger.Instance.log(Logger.LogLevel.CONTINUE, "with the value '" + o.getNormalizedName() + "'");
-                            }
-                            writer.WriteLine("];};");
-                        }
-                        tmpCfgClass.addChild(new SqfConfigField("preInit", "1"));
-                        tmpCfgClass.addChild(new SqfConfigField("postInit", "0"));
-                    }
-                    else
-                    {
-                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Located PostInit function");
-                        tmpCfgClass.addChild(new SqfConfigField("preInit", "0"));
-                        tmpCfgClass.addChild(new SqfConfigField("postInit", "1"));
-                    }
-                }
-                else
-                {
-                    tmpCfgClass.addChild(new SqfConfigField("preInit", "0"));
-                    tmpCfgClass.addChild(new SqfConfigField("postInit", "0"));
-                }
-                List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
-                writer.Write("private[");
-                int privateCounter = 0;
-                foreach (var v in vars)
-                {
-                    writer.Write(privateCounter == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
-                    privateCounter++;
-                }
-                writer.WriteLine("];");
-                writer.WriteLine("scopeName \"fnc\";");
-                writer.Write(tab + "params [\"_obj\"");
-                int argCounter = 0;
-                foreach (var v in obj.ArgList)
-                {
-                    writer.Write(argCounter == 0 ? '"' + v + '"' : ",\"" + v + '"');
-                    argCounter++;
-                }
-                writer.WriteLine("];");
-                foreach (BaseLangObject blo in obj.Children)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.Flush();
-                writer.Close();
-            }
-            #endregion
-            #region OosClassFunction
-            else if (container is OosClassFunction)
-            {
-                OosClassFunction obj = (OosClassFunction)container;
-                List<OosLocalVariable> vars = obj.getAllChildrenOf<OosLocalVariable>();
-                writer.Write(tab + "private[");
-                int privateCounter = 0;
-                foreach (var v in vars)
-                {
-                    writer.Write(privateCounter == 0 ? '"' + v.Name + '"' : ",\"" + v.Name + '"');
-                    privateCounter++;
-                }
-                writer.WriteLine("];");
-                writer.WriteLine(tab + "scopeName \"fnc\";");
-                writer.Write(tab + "params [\"_obj\"");
-                foreach (var v in obj.ArgList)
-                {
-                    writer.Write(",\"" + v + '"');
-                }
-                writer.WriteLine("];");
-                foreach (BaseLangObject blo in obj.Children)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-            }
-            #endregion
-            #region OosClassVariable
-            else if (container is OosClassVariable)
-            {
-                var obj = (OosClassVariable)container;
-                if (obj.HasValue)
-                {
-                    WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                }
-                else
-                {
-                    writer.Write("nil");
-                }
-            }
-            #endregion
-            #region OosBreak
-            else if (container is OosBreak)
-            {
-                writer.Write(tab + "breakOut \"breakable\"");
-            }
-            #endregion
-            #region OosSwitch
-            else if (container is OosSwitch)
-            {
-                var obj = (OosSwitch)container;
-                writer.Write(tab + "switch (");
-                WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
-                writer.WriteLine(") do");
-                writer.WriteLine(tab + "{");
-                foreach (var blo in obj.Instructions)
-                {
-                    WriteOutTree(proj, blo, path, configObj, writer, tabCount + 1);
-                    writer.WriteLine();
-                }
-                writer.Write(tab + "}");
-            }
-            #endregion
-            #region OosCase
-            else if (container is OosCase)
-            {
-                var obj = (OosCase)container;
-                writer.Write(tab);
-                if (obj.IsDefault)
-                {
-                    writer.WriteLine("default {");
-                }
-                else
-                {
-                    writer.Write("case ");
-                    WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                    writer.WriteLine(": {");
-                }
-                foreach (var blo in obj.Instructions)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.Write(tab + "};");
-            }
-            #endregion
-            #region OosExpression
-            else if (container is OosExpression)
-            {
-                var obj = (OosExpression)container;
-                if (obj.Negate)
-                    writer.Write("!(");
-                else
-                    writer.Write("(");
-                WriteOutTree(proj, obj.LInstruction, path, configObj, writer, 0);
-                writer.Write(")");
-                switch (obj.Op)
-                {
-                    case ExpressionOperator.And:
-                        writer.Write(" && (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.AndAnd:
-                        writer.Write(" && {");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write("}");
-                        break;
-                    case ExpressionOperator.Or:
-                        writer.Write(" || (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.OrOr:
-                        writer.Write(" || {");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write("}");
-                        break;
-                    case ExpressionOperator.Equals:
-                        writer.Write(" == (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.ExplicitEquals:
-                        writer.Write(" isEqualTo (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.Minus:
-                        writer.Write(" - (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.Plus:
-                        writer.Write(" + (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.Multiplication:
-                        writer.Write(" * (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.Division:
-                        writer.Write(" / (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.Larger:
-                        writer.Write(" > (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.LargerEquals:
-                        writer.Write(" >= (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.Smaller:
-                        writer.Write(" < (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                    case ExpressionOperator.SmallerEquals:
-                        writer.Write(" <= (");
-                        WriteOutTree(proj, obj.RInstruction, path, configObj, writer, 0);
-                        writer.Write(")");
-                        break;
-                }
-            }
-            #endregion
-            #region OosForLoop
-            else if (container is OosForLoop)
-            {
-                var obj = (OosForLoop)container;
-                WriteOutTree(proj, obj.Arg1, path, configObj, writer, tabCount);
-                writer.WriteLine(';');
-                writer.Write(tab + "while {");
-                WriteOutTree(proj, obj.Arg2, path, configObj, writer, tabCount);
-                writer.WriteLine("} do");
-                writer.WriteLine(tab + "{");
-                writer.WriteLine(tab + "\tscopeName \"breakable\";");
-                foreach (var blo in obj.Instructions)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.Write(tab + '\t');
-                WriteOutTree(proj, obj.Arg3, path, configObj, writer, tabCount);
-                writer.WriteLine(';');
-                writer.Write(tab + "}");
-            }
-            #endregion
-            #region OosFunctionCall & OosObjectCreation
-            else if (container is OosFunctionCall)
-            {
-                var obj = (OosFunctionCall)container;
-                writer.Write(obj.Parent is OosExpression ? "[" : tab + "[");
-                var argList = obj.ArgList;
-                int argCounter = 0;
-                OosVariable ident = (OosVariable)obj.Identifier;
-                if (ident.HasObjectAccess)
-                {
-                    if (ident.HasThisKeyword)
-                        writer.Write("_obj");
-                    else if (ident.IsLocal)
-                        writer.Write(ident.NamespaceName);
-                    else
-                        writer.Write(ident.NormalizedNamespaceName);
-                    argCounter++;
-                }
-                foreach (var o in argList)
-                {
-                    writer.Write(argCounter == 0 ? " " : ", ");
-                    WriteOutTree(proj, o, path, configObj, writer, tabCount + 1);
-                    argCounter++;
-                }
-                writer.Write("] call ");
-                WriteOutTree(proj, obj.Identifier, path, configObj, writer, tabCount + 1);
-                if (container is OosObjectCreation)
-                    writer.Write("class____constructor");
-            }
-            #endregion
-            #region OosIfElse
-            else if (container is OosIfElse)
-            {
-                var obj = (OosIfElse)container;
-                writer.Write(tab + "if(");
-                WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
-                writer.WriteLine(") then");
-                writer.WriteLine(tab + "{");
-                foreach (var blo in obj.IfInstructions)
-                {
-                    WriteOutTree(proj, blo, path, configObj, writer, tabCount + 1);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.Write(tab + "}");
-                if (obj.HasElse)
-                {
-                    writer.WriteLine();
-                    writer.WriteLine(tab + "else");
-                    writer.WriteLine(tab + "{");
-                    foreach (var blo in obj.ElseInstructions)
-                    {
-                        WriteOutTree(proj, blo, path, configObj, writer, tabCount + 1);
-                        if (blo is OosNative)
-                            writer.WriteLine();
-                        else
-                            writer.WriteLine(";");
-                    }
-                    writer.Write(tab + "}");
-                }
-            }
-            #endregion
-            #region OosInstanceOf
-            else if (container is OosInstanceOf)
-            {
-                var obj = (OosInstanceOf)container;
-                WriteOutTree(proj, obj.RArgument, path, configObj, writer, tabCount);
-                writer.Write(" in ((");
-                WriteOutTree(proj, obj.LArgument, path, configObj, writer, tabCount);
-                writer.Write(" select 3) select 1)");//select META class informations --> select class instances
-            }
-            #endregion
-            #region OosLocalVariable
-            else if (container is OosLocalVariable)
-            {
-                var obj = (OosLocalVariable)container;
-                if (obj.HasValue)
-                {
-                    writer.Write(tab + obj.Name);
-                    writer.Write(" = ");
-                    WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                }
-            }
-            #endregion
-            #region OosQuickAssignment
-            else if (container is OosQuickAssignment)
-            {
-                var obj = (OosQuickAssignment)container;
-                writer.Write(tab);
-                WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                if (obj.IsArrayAssignment)
-                {
-                    writer.Write(" set [" + obj.ArrayPosition + ",");
-                    switch (obj.QuickAssignmentType)
-                    {
-                        case QuickAssignmentTypes.MinusMinus: // --
-                            WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                            writer.Write(" + 1");
-                            break;
-                        case QuickAssignmentTypes.PlusPlus: // ++
-                            WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                            writer.Write(" - 1");
-                            break;
-                    }
-                    writer.WriteLine("]");
-                }
-                else
-                {
-                    writer.Write(" = ");
-                    switch (obj.QuickAssignmentType)
-                    {
-                        case QuickAssignmentTypes.MinusMinus: // --
-                            WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                            writer.Write(" + 1");
-                            break;
-                        case QuickAssignmentTypes.PlusPlus: // ++
-                            WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                            writer.Write(" - 1");
-                            break;
-                    }
-                }
-            }
-            #endregion
-            #region OosReturn
-            else if (container is OosReturn)
-            {
-                var obj = (OosReturn)container;
-                writer.Write(tab);
-                WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
-                writer.Write(" breakOut \"fnc\"");
-            }
-            #endregion
-            #region OosNative
-            else if (container is OosNative)
-            {
-                var obj = (OosNative)container;
-                writer.Write(tab + obj.nativeCode);
-            }
-            #endregion
-            #region OosTryCatch
-            else if (container is OosTryCatch)
-            {
-                var obj = (OosTryCatch)container;
-                writer.WriteLine(tab + "try");
-                writer.WriteLine(tab + "{");
-                foreach (var blo in obj.TryInstructions)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.WriteLine(tab + "}");
-                writer.WriteLine(tab + "catch");
-                writer.WriteLine(tab + "{");
-                var varAssignment = new OosVariableAssignment();
-                varAssignment.Variable = obj.CatchVariable;
-                varAssignment.Value = new OosValue("_exception");
-                varAssignment.AssignmentOperator = AssignmentOperators.Equals;
-                WriteOutTree(proj, varAssignment, curPath, configObj, writer, tabCount + 1);
-                writer.WriteLine(';');
-                foreach (var blo in obj.CatchInstructions)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.Write(tab + "}");
-            }
-            #endregion
-            #region OosThrow
-            else if (container is OosThrow)
-            {
-                var obj = (OosThrow)container;
-                writer.Write(tab + "throw ");
-                WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
-            }
-            #endregion
-            #region OosIsSet
-            else if (container is OosIsSet)
-            {
-                var obj = (OosIsSet)container;
-                writer.Write(tab + "isNil {");
-                WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
-                writer.Write("}");
-            }
-            #endregion
-            #region OosValue
-            else if (container is OosValue)
-            {
-                var obj = (OosValue)container;
-                writer.Write(obj.Value);
-            }
-            #endregion
-            #region OosSqfCall
-            else if (container is OosSqfCall)
-            {
-                var obj = (OosSqfCall)container;
-                var lArgs = obj.LArgs;
-                var rArgs = obj.RArgs;
-                var counter = 0;
-
-                if (!(obj.Parent is OosExpression))
-                    writer.Write(tab);
-                if (lArgs.Count > 0)
-                {
-                    if (lArgs.Count > 1)
-                        writer.Write('[');
-                    counter = 0;
-                    foreach (var o in lArgs)
-                    {
-                        if (counter != 0)
-                            writer.Write(',');
-                        WriteOutTree(proj, o, path, configObj, writer, tabCount);
-                    }
-                    if (lArgs.Count > 1)
-                        writer.Write(']');
-                }
-                writer.Write(obj.InstructionName);
-                if (rArgs.Count > 0)
-                {
-                    if (rArgs.Count > 1)
-                        writer.Write('[');
-                    counter = 0;
-                    foreach (var o in rArgs)
-                    {
-                        if (counter != 0)
-                            writer.Write(',');
-                        WriteOutTree(proj, o, path, configObj, writer, tabCount);
-                    }
-                    if (rArgs.Count > 1)
-                        writer.Write(']');
-                }
-            }
-            #endregion
-            #region OosVariable
-            else if (container is OosVariable)
-            {
-                var obj = (OosVariable)container;
-                char tableAccess = obj.getFirstOf<OosClass>() != null ? '1' : '0';
-
-                if (obj.HasObjectAccess)
-                {
-                    if (obj.HasThisKeyword)
-                    {
-                        writer.Write("((_obj select 2) select (((_obj select " + tableAccess + ") find \"" + obj.FunctionName + "\") + 1))");
-                    }
-                    else if (obj.HasNamespace)
-                    {
-                        writer.Write("((" + obj.NormalizedNamespaceName + " select 2) select (((" + obj.NormalizedNamespaceName + " select " + tableAccess + ") find \"" + obj.FunctionName + "\") + 1))");
-                    }
-                    else if (obj.IsLocal)
-                    {
-                        writer.Write("((" + obj.NamespaceName + " select 2) select (((" + obj.NamespaceName + " select " + tableAccess + ") find \"" + obj.FunctionName + "\") + 1))");
-                    }
-                    else
-                    {
-                        throw new Exception("Non-registered exception was raised, if you ever experience this then please create a bug. Compiler.WriteOutTree");
-                    }
-                }
-                else if (obj.HasNamespace)
-                {
-                    writer.Write(obj.NormalizedNamespaceName);
-                }
-                else
-                {
-                    writer.Write(obj.Name);
-                }
-            }
-            #endregion
-            #region OosVariableAssignment
-            else if (container is OosVariableAssignment)
-            {
-                var obj = (OosVariableAssignment)container;
-                writer.Write(tab);
-                var ident = (OosVariable)obj.Variable;
-                if (ident.HasObjectAccess && !obj.IsArrayAssignment)
-                {
-                    char tableAccess = obj.getFirstOf<OosClass>() != null ? '1' : '0';
-                    if (ident.HasThisKeyword)
-                        writer.Write("(_obj select 2) set [((_obj select " + tableAccess + ") find \"" + ident.FunctionName + "\") + 1, ");
-                    else if (ident.HasNamespace)
-                        writer.Write("(" + ident.NormalizedNamespaceName + " select 2) set [((" + ident.NormalizedNamespaceName + " select " + tableAccess + ") find \"" + ident.FunctionName + "\") + 1, ");
-                    else if (ident.IsLocal)
-                        writer.Write("(" + ident.NamespaceName + " select 2) set [((" + ident.NamespaceName + " select " + tableAccess + ") find \"" + ident.FunctionName + "\") + 1, ");
-                    else
-                        throw new Exception("Non-registered exception was raised, if you ever experience this then please create a bug. Compiler.WriteOutTree");
-                }
-                else
-                {
-                    WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                    if (obj.IsArrayAssignment)
-                        writer.Write(" set [" + obj.ArrayPosition + ",");
-                    else
-                        writer.Write(" = ");
-                }
-                switch (obj.AssignmentOperator)
-                {
-                    case AssignmentOperators.MultipliedEquals: // *=
-                        WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                        writer.Write(" * ");
-                        WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                        break;
-                    case AssignmentOperators.DividedEquals: // /=
-                        WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                        writer.Write(" / ");
-                        WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                        break;
-                    case AssignmentOperators.PlusEquals: // +=
-                        WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                        writer.Write(" + ");
-                        WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                        break;
-                    case AssignmentOperators.MinusEquals: // -=
-                        WriteOutTree(proj, obj.Variable, path, configObj, writer, tabCount);
-                        writer.Write(" - ");
-                        WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                        break;
-                    default: // =
-                        WriteOutTree(proj, obj.Value, path, configObj, writer, tabCount);
-                        break;
-                }
-                if (obj.IsArrayAssignment || ident.HasObjectAccess)
-                    writer.Write("]");
-            }
-            #endregion
-            #region OosWhileLoop
-            else if (container is OosWhileLoop)
-            {
-                var obj = (OosWhileLoop)container;
-                writer.Write(tab + "while {");
-                WriteOutTree(proj, obj.Expression, path, configObj, writer, tabCount);
-                writer.WriteLine("} do");
-                writer.WriteLine(tab + "{");
-                writer.WriteLine(tab + "\tscopeName \"breakable\";");
-                foreach (var blo in obj.Instructions)
-                {
-                    WriteOutTree(proj, blo, curPath, configObj, writer, tabCount + 1);
-                    if (blo is OosNative)
-                        writer.WriteLine();
-                    else
-                        writer.WriteLine(";");
-                }
-                writer.Write(tab + "}");
-            }
-            #endregion
-            else if (container == null)
+            if (container == null)
             {
                 //Just skip null objects and give a warning
                 Logger.Instance.log(Logger.LogLevel.WARNING, "Experienced NULL object during WriteOutTree. Output file: " + path);
             }
+            #region object Base
+            else if (container is Base)
+            {
+                var obj = (Base)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+            }
+            #endregion
+            #region object Namespace
+            else if (container is Namespace)
+            {
+                var obj = (Namespace)container;
+                var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_"));
+                configObj.addChild(objConfigClass);
+                path += obj.Name.OriginalValue;
+                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
+                Directory.CreateDirectory(path);
+                foreach (var it in obj.children)
+                {
+                    if (it is Namespace)
+                        WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    else
+                        WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                }
+            }
+            #endregion
+            #region object oosClass
+            else if (container is oosClass)
+            {
+                var obj = (oosClass)container;
+                var objConfigClass = new SqfConfigClass(obj.Name.OriginalValue);
+                configObj.addChild(objConfigClass);
+                path += obj.Name.OriginalValue;
+                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
+                Directory.CreateDirectory(path);
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                }
+            }
+            #endregion
+            #region object Function
+            else if (container is Function)
+            {
+                var obj = (Function)container;
+                int index = 0;
+                path += obj.Name.OriginalValue + ".sqf";
+                writer = new StreamWriter(path);
+                var objConfigClass = new SqfConfigClass(obj.Name.OriginalValue);
+                configObj.addChild(objConfigClass);
+                if (obj.encapsulation == Encapsulation.NA)
+                {
+                    throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
+                }
+                else if (obj.encapsulation == Encapsulation.Static)
+                {
+                    objConfigClass.addChild(new SqfConfigField("file", path));
+                    objConfigClass.addChild(new SqfConfigField("preInit", obj.Name.OriginalValue.StartsWith("preInit", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
+                    objConfigClass.addChild(new SqfConfigField("postInit", obj.Name.OriginalValue.StartsWith("postInit", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
+                    objConfigClass.addChild(new SqfConfigField("preStart", obj.Name.OriginalValue.StartsWith("preStart", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
+                    objConfigClass.addChild(new SqfConfigField("recompile", "0"));
+                    objConfigClass.addChild(new SqfConfigField("ext", "\".sqf\""));
+                    objConfigClass.addChild(new SqfConfigField("headerType", "0"));
+                }
+                else
+                {
+                    objConfigClass.addChild(new SqfConfigField("file", path));
+                    objConfigClass.addChild(new SqfConfigField("preInit", "0"));
+                    objConfigClass.addChild(new SqfConfigField("postInit", "0"));
+                    objConfigClass.addChild(new SqfConfigField("preStart", "0"));
+                    objConfigClass.addChild(new SqfConfigField("recompile", "0"));
+                    objConfigClass.addChild(new SqfConfigField("ext", "\".sqf\""));
+                    objConfigClass.addChild(new SqfConfigField("headerType", "0"));
+                }
+                writer.WriteLine("params [");
+                updateTabcount(ref tab, ref tabCount, 1);
+                index = 0;
+                foreach (var it in obj.ArgList)
+                {
+                    if(it is Variable)
+                    {
+                        if(index > 0)
+                            writer.WriteLine(",");
+                        var variable = (Variable)it;
+                        writer.Write(tab + "\"_" + variable.Name.OriginalValue + "\"");
+                        index++;
+                    }
+                    else
+                        throw new Exception("Function has non-Variable object in arglist, please report to developer");
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.WriteLine(endl + "];");
+                var pVarList = obj.getAllChildrenOf<Variable>(true);
+                pVarList.Intersect(obj.ArgList);
+
+                writer.WriteLine("private [");
+                updateTabcount(ref tab, ref tabCount, 1);
+                index = 0;
+                foreach (var it in obj.ArgList)
+                {
+                    if (it is Variable)
+                    {
+                        if (index > 0)
+                            writer.WriteLine(",");
+                        var variable = (Variable)it;
+                        writer.Write(tab + "\"_" + variable.Name.OriginalValue + "\"");
+                        index++;
+                    }
+                    else
+                        throw new Exception("Function has non-Variable object in arglist, please report to developer");
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.WriteLine(endl + "];");
+                writer.WriteLine("scopeName \"function\";");
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.CodeInstructions)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+            }
+            #endregion
+            #region object Break
+            else if (container is Break)
+            {
+                var obj = (Break)container;
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.WriteLine(tab + "breakOut \"loop\"");
+            }
+            #endregion
+            #region object Case
+            else if (container is Case)
+            {
+                var obj = (Case)container;
+                if (obj.expression == null)
+                {
+                    writer.WriteLine(tab + "default: {");
+                }
+                else
+                {
+                    writer.Write(tab + "case ");
+                    WriteOutTree(proj, obj.expression, path, configObj, writer, 0);
+                    writer.WriteLine(": {");
+                }
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.WriteLine(tab + "};");
+            }
+            #endregion
+            #region object Expression
+            else if (container is Expression)
+            {
+                var obj = (Expression)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object For
+            else if (container is For)
+            {
+                var obj = (For)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object FunctionCall
+            else if (container is FunctionCall)
+            {
+                var obj = (FunctionCall)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object Ident
+            else if (container is Ident)
+            {
+                if (container.Parent is Namespace ||
+                    container.Parent is oosClass ||
+                    container.Parent is VirtualFunction ||
+                    container.Parent is Variable ||
+                    container.Parent is Function ||
+                    container.Parent is oosInterface ||
+                    container.Parent is SqfCall)
+                {
+                    return;
+                }
+                var obj = (Ident)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object IfElse
+            else if (container is IfElse)
+            {
+                var obj = (IfElse)container;
+                writer.Write(tab + "if (");
+                WriteOutTree(proj, obj.expression, path, configObj, writer, 0);
+                writer.WriteLine(") then");
+                writer.Write(tab + "{");
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.IfInstructions)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                if(obj.HasElse)
+                {
+                    writer.WriteLine(tab + "}");
+                    writer.WriteLine(tab + "else");
+                    writer.WriteLine(tab + "{");
+                    updateTabcount(ref tab, ref tabCount, 1);
+                    foreach (var it in obj.ElseInstructions)
+                    {
+                        WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    }
+                    updateTabcount(ref tab, ref tabCount, -1);
+                }
+                writer.WriteLine(tab + "};");
+            }
+            #endregion
+            #region object NewArray
+            else if (container is NewArray)
+            {
+                var obj = (NewArray)container;
+                var index = 0;
+                writer.Write("[");
+                foreach (var it in obj.children)
+                {
+                    if (index > 0)
+                        writer.WriteLine(",");
+                    WriteOutTree(proj, it, path, configObj, writer, 0);
+                    index++;
+                }
+                writer.Write("];");
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object NewInstance
+            else if (container is NewInstance)
+            {
+                var obj = (NewInstance)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object Return
+            else if (container is Return)
+            {
+                var obj = (Return)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                writer.WriteLine("breakOut \"function\";");
+            }
+            #endregion
+            #region object SqfCall
+            else if (container is SqfCall)
+            {
+                var obj = (SqfCall)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object Switch
+            else if (container is Switch)
+            {
+                var obj = (Switch)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object Throw
+            else if (container is Throw)
+            {
+                var obj = (Throw)container;
+                writer.Write(tab + "throw ");
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                writer.WriteLine(";");
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object TryCatch
+            else if (container is TryCatch)
+            {
+                var obj = (TryCatch)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object Value
+            else if (container is Value)
+            {
+                var obj = (Value)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                writer.Write(obj.value);
+            }
+            #endregion
+            #region object Variable
+            else if (container is Variable)
+            {
+                var obj = (Variable)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object VariableAssignment
+            else if (container is VariableAssignment)
+            {
+                var obj = (VariableAssignment)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object While
+            else if (container is While)
+            {
+                var obj = (While)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
+            #region object oosInterface
+            else if (container is oosInterface)
+            {
+                //Interfaces are just logical structures in OOS, thus nothing gets created here
+            }
+            #endregion
+            #region object VirtualFunction
+            else if (container is VirtualFunction)
+            {
+                //VirtualFunctions are just logical structures in OOS, thus nothing gets created here
+            }
+            #endregion
+            #region object Cast
+            else if (container is Cast)
+            {
+                //Casts are just logical structures in OOS, thus nothing gets created here
+            }
+            #endregion
             else
             {
-                //throw new Exception("Non-Registered exception, if you ever experience this pls create a bug. Compiler.WriteOutTree");
+                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
             }
         }
-*/
         #endregion
         #region Compiling
         public void Compile(Project proj)
