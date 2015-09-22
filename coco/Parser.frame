@@ -71,6 +71,22 @@ public class Parser {
         scanner.ResetPeek();
 		return true;
 	}
+	bool peekString(int count, params string[] values)
+	{
+		Token t = la;
+        for(; count > 0; count --)
+            t = scanner.Peek();
+		foreach(var it in values)
+		{
+			if(t.val == it)
+			{
+				scanner.ResetPeek();
+				return true;
+			}
+		}
+        scanner.ResetPeek();
+		return false;
+	}
 	
 	
 	void SynErr (int n) {
