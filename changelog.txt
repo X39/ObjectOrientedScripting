@@ -1,46 +1,52 @@
-Version 0.4.1-ALPHA  
-    |- Wrapper: Fixed -gen is not working if file is not existing
-	|           (also if file was existing ... but expected error then)
+Version 0.5.0-ALPHA
+    |- Wrapper:   Fixed -gen is not working if file is not existing
+	|             (also if file was existing ... but expected error then)
+    |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"
+    |v- Compiler: GEN2 Implementation
+    ||-           New Syntax
+    ||-           Type Restriction
+    |\-           No overhead anymore
 Version 0.4.0-ALPHA                                                             
-    |- Wrapper: Now returns -1 if was not successfully                          
-    |- Wrapper: Added "setFlags(string[])" function to ICompiler interface      
-    |- Wrapper: Fixed compilerDLL search location                               
-    |           Working dir (applicationside) was checked                       
-    |           and not executable dir                                          
-    |- Compiler: Fixed naming of functions in output config file                
-    |            being incorrect                                                
-    |- Compiler: Added flag /CLFN with STRING value ("/CLFN=blabla.cfg")        
-    |            Sets how the output config will be named                       
-    |- Compiler: Added flag /NFNC                                               
-    \            Removes the CfgFunctions class from the config file            
+    |- Wrapper:   Now returns -1 if was not successfully                        
+    |- Wrapper:   Added "setFlags(string[])" function to ICompiler interface    
+    |- Wrapper:   Fixed compilerDLL search location                             
+    |             Working dir (applicationside) was checked                     
+    |             and not executable dir                                        
+    |- Compiler:  Fixed naming of functions in output config file               
+    |             being incorrect                                               
+    |- Compiler:  Added flag /CLFN with STRING value ("/CLFN=blabla.cfg")       
+    |             Sets how the output config will be named                      
+    |- Compiler:  Added flag /NFNC                                              
+    \             Removes the CfgFunctions class from the config file           
                                                                                 
 Version 0.3.0-ALPHA                                                             
-    |- Compiler: changed block native code from:                                
-    |                native <instructions> endnative                            
-    |            to:                                                            
-    |                startnative <instructions> endnative                       
-    |- Compiler: Added "native(<instructions>)" specially for expressions       
-    |            (will be merged at some point with the block native again)     
-    |- Compiler: Added SQF Call instruction:                                    
+    |- Compiler:  changed block native code from:                               
+    |                 native <instructions> endnative                           
+    |             to:                                                           
+    |                 startnative <instructions> endnative                      
+    |- Compiler:  Added "native(<instructions>)" specially for expressions      
+    |             (will be merged at some point with the block native again)    
+    |- Compiler:  Added SQF Call instruction:                                   
     |                SQF [ (>arg1>, <argN>) ] <instruction> [ (>arg1>, <argN>) ]
-    |- Compiler: Added missing detection for                                    
-    |            unsigned integer/double values in VALUE                        
-    |- Compiler: Added missing detection for                                    
-    |            >, >=, <, <= operations in EXPRESSION                          
-    |- Compiler: Added missing LOCALVARIABLE alternative for FORLOOP            
-    |- Compiler: Fixed FORLOOP                                                  
-    \- Compiler: PrettyPrint sqf output improved                                
+    |- Compiler:  Added missing detection for                                   
+    |             unsigned integer/double values in VALUE                       
+    |- Compiler:  Added missing detection for                                   
+    |             >, >=, <, <= operations in EXPRESSION                         
+    |- Compiler:  Added missing LOCALVARIABLE alternative for FORLOOP           
+    |- Compiler:  Fixed FORLOOP                                                 
+    \- Compiler:  PrettyPrint sqf output improved                               
                                                                                 
 Version 0.2.0-ALPHA                                                             
-    |v- New Parameters for Wrapper.exe                                          
-    ||- "sc=<FILE>"    Used to check the syntax of some document                
-    ||- "dll=<FILE>"   Forces given dll (ignores project settings)              
-    |\- "log[=<FILE>]" Enables LogToFile (with optional file parameter)         
-    |- Compiler: Fixed TryCatch                                                 
-    |- Compiler: Fixed Expressions                                              
-    |- Compiler: Implemented class inheritance                                  
-    |- Compiler: Implemented public/private encapsulation                       
-    |- Compiler: when parsing error was found the objectTree                    
-    |            wont get written out anymore                                   
-    |- Wrapper: Fixed ArgumentDetection (foo=bar was not detected)              
-    \- Logger: Disabled logToFile per default                                   
+    |v- Wrapper:  New Parameters                                      
+    ||-           "sc=<FILE>"    Used to check the syntax of some document      
+    ||-           "dll=<FILE>"   Forces given dll (ignores project settings)    
+    |\-           "log[=<FILE>]" Enables LogToFile
+    |                            (with optional file parameter)         
+    |- Compiler:  Fixed TryCatch                                                
+    |- Compiler:  Fixed Expressions                                             
+    |- Compiler:  Implemented class inheritance                                 
+    |- Compiler:  Implemented public/private encapsulation                      
+    |- Compiler:  when parsing error was found the objectTree                   
+    |             wont get written out anymore                                  
+    |- Wrapper:   Fixed ArgumentDetection (foo=bar was not detected)            
+    \- Logger:    Disabled logToFile per default                                
