@@ -121,7 +121,7 @@ namespace Wrapper
                 var obj = (Namespace)container;
                 var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_"));
                 configObj.addChild(objConfigClass);
-                path += obj.Name.OriginalValue;
+                path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
                 Directory.CreateDirectory(path);
                 foreach (var it in obj.children)
@@ -139,7 +139,7 @@ namespace Wrapper
                 var obj = (oosClass)container;
                 var objConfigClass = new SqfConfigClass(obj.Name.OriginalValue);
                 configObj.addChild(objConfigClass);
-                path += obj.Name.OriginalValue;
+                path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
                 Directory.CreateDirectory(path);
                 foreach (var it in obj.children)
@@ -153,7 +153,7 @@ namespace Wrapper
             {
                 var obj = (Function)container;
                 int index = 0;
-                path += obj.Name.OriginalValue + ".sqf";
+                path += '\\' + obj.Name.OriginalValue + ".sqf";
                 writer = new StreamWriter(path);
                 var objConfigClass = new SqfConfigClass(obj.Name.OriginalValue);
                 configObj.addChild(objConfigClass);
@@ -180,6 +180,10 @@ namespace Wrapper
                     objConfigClass.addChild(new SqfConfigField("recompile", "0"));
                     objConfigClass.addChild(new SqfConfigField("ext", "\".sqf\""));
                     objConfigClass.addChild(new SqfConfigField("headerType", "0"));
+                }
+                if(obj.IsConstructor)
+                {
+
                 }
                 writer.WriteLine("params [");
                 updateTabcount(ref tab, ref tabCount, 1);
@@ -269,33 +273,72 @@ namespace Wrapper
             else if (container is Expression)
             {
                 var obj = (Expression)container;
-                foreach (var it in obj.children)
+                writer.Write("(");
+                WriteOutTree(proj, obj.lExpression, path, configObj, writer, tabCount);
+                if (obj.rExpression != null)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.Write(") " + obj.expOperator + " (");
+                    WriteOutTree(proj, obj.rExpression, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                writer.Write(")");
             }
             #endregion
             #region object For
             else if (container is For)
             {
                 var obj = (For)container;
-                foreach (var it in obj.children)
+                WriteOutTree(proj, obj.forArg1, path, configObj, writer, tabCount);
+                writer.WriteLine(";");
+                writer.Write(tab + "while {");
+                WriteOutTree(proj, obj.forArg2, path, configObj, writer, tabCount);
+                writer.WriteLine("} do");
+                writer.WriteLine(tab + "{");
+                updateTabcount(ref tab, ref tabCount, 1);
+                WriteOutTree(proj, obj.forArg3, path, configObj, writer, tabCount);
+                foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                writer.Write(tab + "}");
             }
             #endregion
             #region object FunctionCall
             else if (container is FunctionCall)
             {
                 var obj = (FunctionCall)container;
-                foreach (var it in obj.children)
+                if(obj.Name.ReferencedObject is Function)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    var fnc = (Function)obj.Name.ReferencedObject;
+                    
+                    if(fnc.encapsulation == Encapsulation.NA)
+                    {
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                    else if(fnc.encapsulation == Encapsulation.Static)
+                    {
+                        string functionName = fnc.FullyQualifiedName;
+                        functionName = functionName.Insert(functionName.LastIndexOf("::"), "_fnc").Replace("::", "_");
+                        writer.Write(tab + "[");
+                        int index = 0;
+                        foreach(var it in obj.children)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                            index++;
+                        }
+                        writer.Write("] call " + functionName);
+                    }
+                    else
+                    {
+                        //TODO
+                    }
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                else
+                {
+                    throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                }
             }
             #endregion
             #region object Ident
@@ -307,16 +350,17 @@ namespace Wrapper
                     container.Parent is Variable ||
                     container.Parent is Function ||
                     container.Parent is oosInterface ||
-                    container.Parent is SqfCall)
+                    container.Parent is SqfCall ||
+                    container.Parent is Ident)
                 {
                     return;
                 }
                 var obj = (Ident)container;
+                WriteOutTree(proj, obj.ReferencedObject, path, configObj, writer, tabCount);
                 foreach (var it in obj.children)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object IfElse
@@ -342,10 +386,11 @@ namespace Wrapper
                     foreach (var it in obj.ElseInstructions)
                     {
                         WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                        writer.WriteLine(";");
                     }
                     updateTabcount(ref tab, ref tabCount, -1);
                 }
-                writer.WriteLine(tab + "};");
+                writer.Write(tab + "}");
             }
             #endregion
             #region object NewArray
@@ -361,8 +406,7 @@ namespace Wrapper
                     WriteOutTree(proj, it, path, configObj, writer, 0);
                     index++;
                 }
-                writer.Write("];");
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                writer.Write("]");
             }
             #endregion
             #region object NewInstance
@@ -373,7 +417,7 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object Return
@@ -384,7 +428,7 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                writer.WriteLine("breakOut \"function\";");
+                writer.Write("breakOut \"function\"");
             }
             #endregion
             #region object SqfCall
@@ -395,7 +439,7 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object Switch
@@ -406,7 +450,7 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object Throw
@@ -418,8 +462,6 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                writer.WriteLine(";");
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object TryCatch
@@ -430,7 +472,7 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object Value
@@ -448,11 +490,43 @@ namespace Wrapper
             else if (container is Variable)
             {
                 var obj = (Variable)container;
-                foreach (var it in obj.children)
+                if (obj.Parent is Function)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    foreach (var it in obj.children)
+                    {
+                        if (it is Ident)
+                        {
+                            var ident = (Ident)it;
+                            writer.Write("_" + ident.OriginalValue);
+                        }
+                        else
+                        {
+                            WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                        }
+                    }
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                else
+                {
+                    if (obj.Parent is oosClass || obj.Parent is Namespace)
+                    {
+                        foreach (var it in obj.children)
+                        {
+                            if (it is Ident)
+                            {
+                                var ident = (Ident)it;
+                                writer.Write("_" + ident.OriginalValue);
+                            }
+                            else
+                            {
+                                WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                }
             }
             #endregion
             #region object VariableAssignment
@@ -463,18 +537,24 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object While
             else if (container is While)
             {
                 var obj = (While)container;
-                foreach (var it in obj.children)
+                writer.Write(tab + "while {");
+                WriteOutTree(proj, obj.expression, path, configObj, writer, tabCount);
+                writer.WriteLine("} do");
+                writer.WriteLine(tab + "{");
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                writer.Write(tab + "}");
             }
             #endregion
             #region object oosInterface
@@ -497,7 +577,7 @@ namespace Wrapper
             #endregion
             else
             {
-                throw new Exception("ShouldNeverEverHappen Exception, developer missed an object for writeOutTree -.-' BLAME HIM!!!!!");
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
         }
         #endregion
