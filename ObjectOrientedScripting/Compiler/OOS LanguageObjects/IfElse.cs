@@ -9,12 +9,12 @@ namespace Compiler.OOS_LanguageObjects
     public class IfElse : pBaseLangObject
     {
         public VarType functionVarType;
-        private int ifEnd;
+        private int endMarker;
 
         public pBaseLangObject expression { get { return this.children[0]; } set { this.children[0] = value; } }
         public bool HasElse { get { return this.ElseInstructions.Count > 0; } }
-        public List<pBaseLangObject> IfInstructions { get { return this.children.GetRange(1, ifEnd); } }
-        public List<pBaseLangObject> ElseInstructions { get { return this.children.GetRange(ifEnd, this.children.Count - ifEnd); } }
+        public List<pBaseLangObject> IfInstructions { get { return this.children.GetRange(1, endMarker); } }
+        public List<pBaseLangObject> ElseInstructions { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
 
         public IfElse(pBaseLangObject parent) : base(parent)
         {
@@ -23,7 +23,7 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize() { return 0; }
         public void markIfEnd()
         {
-            ifEnd = this.children.Count;
+            endMarker = this.children.Count - 1;
         }
     }
 }

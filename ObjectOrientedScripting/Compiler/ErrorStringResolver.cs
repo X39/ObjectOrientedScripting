@@ -27,7 +27,15 @@ namespace Compiler
             C0013,
             C0014,
             C0015,
-            C0016
+            C0016,
+            C0017,
+            C0018,
+            C0019,
+            C0020,
+            C0021,
+            C0022,
+            C0023,
+            C0024
         }
         public static string resolve(ErrorCodeEnum errCode, int line = -1, int pos = -1)
         {
@@ -44,7 +52,7 @@ namespace Compiler
                 case ErrorCodeEnum.C0002:
                     return "Could not locate CLASS for THIS reference";
                 case ErrorCodeEnum.C0003: case ErrorCodeEnum.C0008:
-                    return "Could not locate VARIABLE for instance access";
+                    return "Could not locate declaration";
                 case ErrorCodeEnum.C0004: case ErrorCodeEnum.C0005: case ErrorCodeEnum.C0006: case ErrorCodeEnum.C0007:
                     return "Could not locate function object for IDENT";
                 case ErrorCodeEnum.C0009:
@@ -63,6 +71,22 @@ namespace Compiler
                     return "Cannot cast non-object to object";
                 case ErrorCodeEnum.C0016:
                     return "Cannot cast object to non-object but string";
+                case ErrorCodeEnum.C0017:
+                    return "Too many arguments for function";
+                case ErrorCodeEnum.C0018:
+                    return "Not enough arguments for function";
+                case ErrorCodeEnum.C0019:
+                    return "Argument type missmatch for function";
+                case ErrorCodeEnum.C0020:
+                    return "SQF Command is missing LArgs";
+                case ErrorCodeEnum.C0021:
+                    return "SQF Command should have LArgs";
+                case ErrorCodeEnum.C0022:
+                    return "SQF Command is missing RArgs";
+                case ErrorCodeEnum.C0023:
+                    return "SQF Command should have RArgs";
+                case ErrorCodeEnum.C0024:
+                    return "SQF Command is not registered in SupportInfo list";
                 default:
                     return "Unknown Error";
             }

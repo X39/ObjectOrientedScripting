@@ -1,6 +1,7 @@
 #include "test.def"
 #define SOMEDEF //testmore
 #define somethingWithArgs(TEST) //test TEST TEST6
+#define mergeTest(TEST) //testing TEST##merge with ##
 
 SOMEDEF
 TEST6
@@ -8,6 +9,8 @@ somethingWithArgs(approved)
 somethingWithArgs(", approved")
 somethingWithArgs((, approved))
 somethingWithArgs({a,p,r,o,v,e,d})
+mergeTest(its something with )
+mergeTest(itsMergedDude!)
 namespace testNamespace
 {
 	#include "cFoo.oos"

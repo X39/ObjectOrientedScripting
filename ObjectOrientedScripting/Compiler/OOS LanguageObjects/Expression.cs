@@ -39,7 +39,7 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else if (lExpression is SqfCall)
                 {
-                    throw new NotImplementedException();
+                    lType = ((SqfCall)lExpression).ReferencedType;
                 }
                 else if (lExpression is Value)
                 {
@@ -65,7 +65,7 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     else if (rExpression is Cast)
                     {
-                        rType = ((Cast)lExpression).ReferencedType;
+                        rType = ((Cast)rExpression).ReferencedType;
                     }
                     else if (rExpression is NewInstance)
                     {
@@ -73,11 +73,11 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     else if (rExpression is SqfCall)
                     {
-                        throw new NotImplementedException();
+                        rType = ((SqfCall)rExpression).ReferencedType;
                     }
                     else if (rExpression is Value)
                     {
-                        rType = new VarTypeObject(((Value)lExpression).varType);
+                        rType = new VarTypeObject(((Value)rExpression).varType);
                     }
                     else
                     {

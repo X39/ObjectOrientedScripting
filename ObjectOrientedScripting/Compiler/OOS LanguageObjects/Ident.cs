@@ -55,15 +55,15 @@ namespace Compiler.OOS_LanguageObjects
         public override int finalize()
         {
             int errCount = 0;
-            foreach (pBaseLangObject blo in children)
-                if (blo != null && !(blo is Ident))
-                    errCount += blo.finalize();
             errCount += this.doFinalize();
             isFirstFinalize = false;
             foreach (pBaseLangObject blo in children)
                 if (blo != null && blo is Ident)
                     errCount += blo.finalize();
             errCount += this.doFinalize();
+            foreach (pBaseLangObject blo in children)
+                if (blo != null && !(blo is Ident))
+                    errCount += blo.finalize();
             return errCount;
         }
         public override int doFinalize()

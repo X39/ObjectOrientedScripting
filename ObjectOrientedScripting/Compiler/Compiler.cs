@@ -22,6 +22,7 @@ namespace Wrapper
             configFileName = "config.cpp";
             addFunctionsClass = true;
             flagDefines = new List<PPDefine>();
+            SqfCall.readSupportInfoList();
         }
         public void setFlags(string[] strArr)
         {
@@ -94,7 +95,7 @@ namespace Wrapper
         private void updateTabcount(ref string s, ref int tabCount, int change)
         {
             tabCount += change;
-            string tab = new string('\t', tabCount);
+            s = new string('\t', tabCount);
         }
         public void WriteOutTree(Project proj, pBaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
         {
@@ -183,54 +184,77 @@ namespace Wrapper
                 }
                 if(obj.IsConstructor)
                 {
-
+                    //ToDo: Generate object
                 }
-                writer.WriteLine("params [");
-                updateTabcount(ref tab, ref tabCount, 1);
-                index = 0;
+                var argList = obj.ArgList;
+                if (obj.IsClassFunction && !obj.IsConstructor)
+                {
+                    var tmpList = new List<pBaseLangObject>();
+                    var variable = new Variable(obj, -1, -1);
+                    var ident = new Ident(variable, "___obj___", -1, -1);
+                    variable.Name = ident;
+                    variable.encapsulation = Encapsulation.NA;
+                    variable.varType = new VarTypeObject(obj.Name);
+                    tmpList.Add(variable);
+                    tmpList.AddRange(argList);
+                    argList = tmpList;
+                }
+                if (argList.Count > 0)
+                {
+                    writer.WriteLine("params [");
+                    updateTabcount(ref tab, ref tabCount, 1);
+                    index = 0;
+                    foreach (var it in argList)
+                    {
+                        if (it is Variable)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            var variable = (Variable)it;
+                            writer.Write(tab + "\"_" + variable.Name.OriginalValue + "\"");
+                            index++;
+                        }
+                        else
+                            throw new Exception("Function has non-Variable object in arglist, please report to developer");
+                    }
+                    updateTabcount(ref tab, ref tabCount, -1);
+                    writer.WriteLine(endl + "];");
+                }
+                var pVarList = obj.getAllChildrenOf<Variable>(true);
                 foreach (var it in obj.ArgList)
                 {
                     if(it is Variable)
-                    {
-                        if(index > 0)
-                            writer.WriteLine(",");
-                        var variable = (Variable)it;
-                        writer.Write(tab + "\"_" + variable.Name.OriginalValue + "\"");
-                        index++;
-                    }
-                    else
-                        throw new Exception("Function has non-Variable object in arglist, please report to developer");
+                        pVarList.Remove((Variable)it);
                 }
-                updateTabcount(ref tab, ref tabCount, -1);
-                writer.WriteLine(endl + "];");
-                var pVarList = obj.getAllChildrenOf<Variable>(true);
-                pVarList.Intersect(obj.ArgList);
 
-                writer.WriteLine("private [");
-                updateTabcount(ref tab, ref tabCount, 1);
-                index = 0;
-                foreach (var it in obj.ArgList)
+                if (pVarList.Count > 0)
                 {
-                    if (it is Variable)
+                    writer.WriteLine("private [");
+                    updateTabcount(ref tab, ref tabCount, 1);
+                    index = 0;
+                    foreach (var it in pVarList)
                     {
-                        if (index > 0)
-                            writer.WriteLine(",");
-                        var variable = (Variable)it;
-                        writer.Write(tab + "\"_" + variable.Name.OriginalValue + "\"");
-                        index++;
+                        if (it is Variable)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            var variable = (Variable)it;
+                            writer.Write(tab + "\"_" + variable.Name.OriginalValue + "\"");
+                            index++;
+                        }
+                        else
+                            throw new Exception("Function has non-Variable object in arglist, please report to developer");
                     }
-                    else
-                        throw new Exception("Function has non-Variable object in arglist, please report to developer");
+                    updateTabcount(ref tab, ref tabCount, -1);
+                    writer.WriteLine(endl + "];");
                 }
-                updateTabcount(ref tab, ref tabCount, -1);
-                writer.WriteLine(endl + "];");
                 writer.WriteLine("scopeName \"function\";");
-                updateTabcount(ref tab, ref tabCount, 1);
                 foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                updateTabcount(ref tab, ref tabCount, -1);
+                writer.Flush();
+                writer.Close();
             }
             #endregion
             #region object Break
@@ -341,6 +365,17 @@ namespace Wrapper
                 }
             }
             #endregion
+            #region object Cast
+            else if (container is Cast)
+            {
+                var obj = (VariableAssignment)container;
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+            }
+            #endregion
             #region object Ident
             else if (container is Ident)
             {
@@ -435,11 +470,51 @@ namespace Wrapper
             else if (container is SqfCall)
             {
                 var obj = (SqfCall)container;
-                foreach (var it in obj.children)
+                var lArgs = obj.LArgs;
+                var rArgs = obj.RArgs;
+                if (lArgs.Count > 0)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    if (lArgs.Count == 1)
+                    {
+                        WriteOutTree(proj, lArgs[0], path, configObj, writer, tabCount);
+                    }
+                    else
+                    {
+                        writer.WriteLine(tab + "[");
+                        updateTabcount(ref tab, ref tabCount, 1);
+                        int index = 0;
+                        foreach (var it in lArgs)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            index++;
+                            WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                        }
+                        updateTabcount(ref tab, ref tabCount, -1);
+                        writer.WriteLine(endl + tab + "]");
+                    }
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                writer.Write(" " + obj.Name.OriginalValue + " ");
+                if (rArgs.Count > 0)
+                {
+                    if (rArgs.Count == 1)
+                    {
+                        WriteOutTree(proj, rArgs[0], path, configObj, writer, tabCount);
+                    }
+                    else
+                    {
+                        writer.WriteLine(tab + "[");
+                        int index = 0;
+                        foreach (var it in rArgs)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            index++;
+                            WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                        }
+                        writer.Write(endl + tab + "]");
+                    }
+                }
             }
             #endregion
             #region object Switch
@@ -497,7 +572,7 @@ namespace Wrapper
                         if (it is Ident)
                         {
                             var ident = (Ident)it;
-                            writer.Write("_" + ident.OriginalValue);
+                            writer.Write(tab + "_" + ident.OriginalValue);
                         }
                         else
                         {
@@ -569,12 +644,6 @@ namespace Wrapper
                 //VirtualFunctions are just logical structures in OOS, thus nothing gets created here
             }
             #endregion
-            #region object Cast
-            else if (container is Cast)
-            {
-                //Casts are just logical structures in OOS, thus nothing gets created here
-            }
-            #endregion
             else
             {
                 throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
@@ -585,7 +654,7 @@ namespace Wrapper
         public void Compile(Project proj)
         {
             Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version, thus its just a plain \"CheckSyntax\" ... im sorry :(");
-            Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
+            Scanner scanner = new Scanner(proj.Buildfolder + "_preprocess_.obj");
             Parser parser = new Parser(scanner);
             parser.Parse();
             //OosContainer container;
@@ -668,7 +737,9 @@ namespace Wrapper
                 if (string.IsNullOrWhiteSpace(s))
                     continue;
                 //Remove left & right whitespaces and tabs from current string
-                s = s.Trim();
+                string sTrimmed = s.Trim();
+                string leading = s.Substring(0, s.Length - sTrimmed.Length);
+                s = sTrimmed;
                 if (s[0] != '#')
                 {//Current line is no define, thus handle it normally (find & replace)
                     //Make sure we are not inside of an ifdef/ifndef that disallows further processing of following lines
@@ -689,7 +760,7 @@ namespace Wrapper
                         reader.Close();
                         return false;
                     }
-                    writer.WriteLine(s);
+                    writer.WriteLine(leading + s);
                     continue;
                 }
                 //We DO have a define here
