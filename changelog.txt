@@ -2,8 +2,15 @@ Version 0.5.0-ALPHA
     |- Wrapper:   Fixed -gen is not working if file is not existing
 	|             (also if file was existing ... but expected error then)
     |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"
+    |- Compiler:  PreProcessor replaced non-keywords when they just contained a
+    |             part of the keyword (EG. keyword was FOO, FOOBAR would have
+    |             been replaced with <CONTENT>BAR)
+    |- Compiler:  PreProcessor now supports "merge" operator ##
+    |             #define FOO(BAR) BAR##FOOBAR
+    |             FOO(test) => testFOOBAR
     |v- Compiler: GEN2 Implementation
     ||-           New Syntax
+    ||-           New SQF ObjectStructure
     ||-           Type Restriction (with that all stuff that is connected to it)
     ||-           Interfaces (and with them virtual functions)
     ||-           "Linker" issues with proper issue IDs
