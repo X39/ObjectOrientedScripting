@@ -4,7 +4,10 @@ Version 0.5.0-ALPHA
     |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"
     |v- Compiler: GEN2 Implementation
     ||-           New Syntax
-    ||-           Type Restriction
+    ||-           Type Restriction (with that all stuff that is connected to it)
+    ||-           Interfaces (and with them virtual functions)
+    ||-           "Linker" issues with proper issue IDs
+    ||            (currently room for 4 digits (so 0001 - 9999))
     |\-           No overhead anymore
 Version 0.4.0-ALPHA                                                             
     |- Wrapper:   Now returns -1 if was not successfully                        
