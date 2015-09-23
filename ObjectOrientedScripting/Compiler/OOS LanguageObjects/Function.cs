@@ -15,6 +15,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public List<pBaseLangObject> ArgList { get { return this.children.GetRange(1, argListEnd); } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(argListEnd, this.children.Count - argListEnd); } }
+        public bool IsConstructor { get { return this.Name.OriginalValue == ((Interfaces.iName)this.Parent).Name.OriginalValue; } }
 
         public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
         public Function(pBaseLangObject parent) : base(parent)
