@@ -19,7 +19,7 @@ namespace Compiler.OOS_LanguageObjects.Ex
         public int Pos { get { return this.pos; } }
         public string On { get { return this.on; } }
         public TypeMissmatch(VarTypeObject t1, VarTypeObject t2, int line = -1, int pos = -1, string on = "")
-            : base("Type Missmatch" + (on == "" ? on : " on '" + on + "'") + ", LType = " + (t1.varType != VarType.Object ? Enum.GetName(typeof(VarType), t1.varType) : t1.ident.FullyQualifiedName) + " RType = " + (t2.varType != VarType.Object ? Enum.GetName(typeof(VarType), t2.varType) : t2.ident.FullyQualifiedName))
+            : base("Type Missmatch" + (on == "" ? on : " on '" + on + "'") + ", LType = " + (t1.varType != VarType.Object && t1.varType != VarType.ObjectStrict  ? Enum.GetName(typeof(VarType), t1.varType) : t1.ident.FullyQualifiedName) + " RType = " + (t2.varType != VarType.Object && t2.varType != VarType.ObjectStrict ? Enum.GetName(typeof(VarType), t2.varType) : t2.ident.FullyQualifiedName))
         {
             this.lType = t1;
             this.rType = t2;

@@ -11,7 +11,7 @@
                 "FunctionOrVar2",
                 "FunctionOrVarN"
             ],
-            [//Function/Variable List
+            [//Function/Variable List ((all functions/variables are inside of arrays so they can be refered to other classes/interfaces))
                 ...
             ],
             [//META-Informations
@@ -45,6 +45,7 @@
             ]
         ]
     ],
+    <CurrentActiveClass(RefrencedFromClassList,ChangesWhenPassingToOtherFunctionInCastedWay)>,
     [//PreSettled field for future META-Informations
         
     ]

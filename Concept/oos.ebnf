@@ -23,7 +23,8 @@ COMPILER OOS
 		T_CODEBRACKETCLOSE = '}'.
 		T_INSTANCEACCESS = '.'.
 		T_COMMA = ','.
-		T_CASTOPERATOR = '§'.
+		T_STATICCASTOPERATOR = '§'.
+		T_DYNAMICCASTOPERATOR = '$'.
 		
 	COMMENTS FROM "/*" TO "*/" NESTED
 	COMMENTS FROM "//" TO '\n'
@@ -59,6 +60,28 @@ COMPILER OOS
                 T_INSTANCEACCESS
                 IDENTACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
             ]
+        .
+        CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarType vt; pBaseLangObject ident; .)
+        =
+            (
+                T_STATICCASTOPERATOR (. obj.isStaticCast = true; .)
+                (
+                    VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
+                    |
+                    IDENT<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
+                )
+                T_STATICCASTOPERATOR
+            )
+            |
+            (
+                T_DYNAMICCASTOPERATOR (. obj.isStaticCast = false; .)
+                (
+                    VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
+                    |
+                    IDENT<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
+                )
+                T_DYNAMICCASTOPERATOR
+            )
         .
 		ENCAPSULATION<out Encapsulation e> (. e = Encapsulation.NA; .)
 		=
@@ -120,16 +143,6 @@ COMPILER OOS
 			|
 			BOOLEAN<out flag> (. obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); .)
 		.
-        CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarType vt; pBaseLangObject ident; .)
-        =
-            T_CASTOPERATOR
-            (
-                VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
-                |
-                IDENT<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
-            )
-            T_CASTOPERATOR
-        .
 		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Expression(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .)
 		=
 			[
@@ -142,7 +155,12 @@ COMPILER OOS
 				|
 				VALUE<out blo, obj> (. obj.lExpression = blo; .)
 				|
-                IDENTACCESS<out blo, obj> (. obj.lExpression = blo; .)
+                (
+                    IDENTACCESS<out blo, obj> (. obj.lExpression = blo; .)
+                    [
+                        OP_INSTANCEOF<out blo, obj, blo> (. obj.lExpression = blo; .)
+                    ]
+                )
 				|
                 OP_SQFCALL<out blo, obj> (. obj.lExpression = blo; .)
 			)
@@ -217,12 +235,13 @@ COMPILER OOS
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			[
 				':'
-				IDENT<out blo, obj> (. obj.addParentClass(blo); .)
+				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				{
 					','
-					IDENT<out blo, obj> (. obj.addParentClass(blo); .)
+					IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				}
 			]
+            (. obj.markEnd(); .)
 			T_CODEBRACKETOPEN
 			{
 				[
@@ -293,7 +312,7 @@ COMPILER OOS
 			T_CODEBRACKETCLOSE
 			
 		.
-		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
+		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name, true); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
 		=
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			T_ROUNDBRACKETOPEN
@@ -344,9 +363,14 @@ COMPILER OOS
 		NEWVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; .)
 		=
 			(
-				VARTYPE<out v> (. obj.varType = new VarTypeObject(v);; .)
+				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
-				IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo); .)
+                ( (. bool isStrict = false; .)
+                    [
+                        "strict" (. isStrict = true; .)
+                    ]
+                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)   
+                )
 			)
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 		.
@@ -482,7 +506,7 @@ COMPILER OOS
 		OP_NEWINSTANCE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewInstance(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .)
 		=
 			"new"
-			IDENT<out blo, obj> (. obj.addChild(blo); .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			BODY_FUNCTIONCALL<out blo2, blo> (. blo.addChild(blo2); .)
 		.
 		OP_NEWARRAY<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewArray(parent); outObj = obj; pBaseLangObject blo; .)
@@ -551,6 +575,11 @@ COMPILER OOS
 		=
 			"break"
 		.
+		OP_INSTANCEOF<out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess> (. var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; .)
+		=
+            "is"
+            IDENT<out blo, obj> (. obj.RIdent = (Ident)blo; .)
+		.
 		OP_THROW<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Throw(parent); outObj = obj; pBaseLangObject blo; .)
 		=
 			"throw"
@@ -567,7 +596,7 @@ COMPILER OOS
 		=
 			"switch"
 			T_ROUNDBRACKETOPEN
-			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
+			EXPRESSION<out blo, obj> (. obj.expression = blo; .)
 			T_ROUNDBRACKETCLOSE
 			T_CODEBRACKETOPEN
 			{

@@ -43,12 +43,15 @@
     <Compile Include="ErrorStringResolver.cs" />
     <Compile Include="Exceptions\TypeMissmatch.cs" />
     <Compile Include="Exceptions\InvalidIdentType.cs" />
+    <Compile Include="OOS LanguageObjects\InstanceOf.cs" />
     <Compile Include="OOS LanguageObjects\Case.cs" />
     <Compile Include="OOS LanguageObjects\Expression.cs" />
     <Compile Include="OOS LanguageObjects\Cast.cs" />
     <Compile Include="OOS LanguageObjects\ArrayAccess.cs" />
+    <Compile Include="OOS LanguageObjects\Interfaces\iGetFunctionIndex.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iHasObject.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iHasType.cs" />
+    <Compile Include="OOS LanguageObjects\Interfaces\iGetVariableIndex.cs" />
     <Compile Include="OOS LanguageObjects\NewArray.cs" />
     <Compile Include="OOS LanguageObjects\SqfCall.cs" />
     <Compile Include="OOS LanguageObjects\Switch.cs" />

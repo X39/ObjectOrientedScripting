@@ -22,6 +22,7 @@ namespace Compiler.OOS_LanguageObjects
         Auto,
         Void,
         Object,
+        ObjectStrict,
         Other,
         ScalarArray,
         BoolArray,
@@ -29,15 +30,18 @@ namespace Compiler.OOS_LanguageObjects
     }
     public class VarTypeObject
     {
-        public VarTypeObject(Ident i)
+        public VarTypeObject(Ident i, bool isStrict = false)
         {
             this.ident = i;
-            this.varType = VarType.Object;
+            this.varType = isStrict ? VarType.ObjectStrict : VarType.Object;
         } 
         public VarTypeObject(VarType v)
         {
             this.ident = null;
             this.varType = v;
+            if (v == VarType.ObjectStrict || v == VarType.Object)
+                throw new Exception("TODO: Allow anonymous objects");
+            //TODO: Allow anonymous objects
         }
         public Ident ident;
         public VarType varType;
@@ -47,7 +51,7 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             if (((VarTypeObject)obj).varType != this.varType)
                 return false;
-            if (this.varType != VarType.Object)
+            if (this.varType != VarType.Object && this.varType != VarType.ObjectStrict)
                 return true;
             return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
         }

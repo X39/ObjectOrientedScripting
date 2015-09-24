@@ -21,33 +21,35 @@ namespace Compiler.OOS_LanguageObjects
         public VarTypeObject varType;
         public VarTypeObject ReferencedType { get { return this.varType; } }
         public Encapsulation encapsulation;
-        public string FullyQualifiedName
+        public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
+        public string SqfVariableName
         {
             get
             {
                 if (this.encapsulation == Encapsulation.NA)
-                    return this.Name.OriginalValue;
-                string s = "";
-                List<Interfaces.iName> parentList = new List<Interfaces.iName>();
-                pBaseLangObject curParent = Parent;
-                while (curParent != null)
                 {
-                    if(curParent is Interfaces.iName)
-                        parentList.Add((Interfaces.iName)curParent);
-                    curParent = curParent.Parent;
+                    if (this.Name.OriginalValue == Wrapper.Compiler.thisVariableName)
+                        return Wrapper.Compiler.thisVariableName;
+                    else
+                        return "_" + this.Name.OriginalValue;
                 }
-                parentList.Reverse();
-                foreach (Interfaces.iName it in parentList)
-                    s += it.Name.OriginalValue;
-                s += this.Name.OriginalValue;
-                return s;
+                else if (this.encapsulation == Encapsulation.Static)
+                {
+                    return "GLOBAL" + this.Name.FullyQualifiedName.Replace("::", "_");
+                }
+                else
+                {
+                    var casted = (Interfaces.iGetVariableIndex)this.Parent;
+                    var res = casted.getVariableIndex(this.Name);
+                    return " select 1 select " + res.Item1 + " select " + res.Item2;
+                }
             }
         }
 
         private int line;
         private int pos;
 
-        public Variable(pBaseLangObject parent, int line, int pos) : base(parent)
+        public Variable(pBaseLangObject parent, int pos, int line) : base(parent)
         {
             this.addChild(null);
             varType = null;
@@ -55,6 +57,8 @@ namespace Compiler.OOS_LanguageObjects
             this.pos = pos;
         }
         public override int doFinalize() {
+            if(this.varType.varType == VarType.Object || this.varType.varType == VarType.ObjectStrict)
+                this.varType.ident.finalize();
             var assign = this.getAllChildrenOf<VariableAssignment>();
             if(assign.Count > 0)
             {

@@ -17,6 +17,7 @@ namespace Wrapper
         bool addFunctionsClass;
         List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
+        public static readonly string thisVariableName = "___obj___";
         public Compiler()
         {
             configFileName = "config.cpp";
@@ -97,7 +98,7 @@ namespace Wrapper
             tabCount += change;
             s = new string('\t', tabCount);
         }
-        public void WriteOutTree(Project proj, pBaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0)
+        public void WriteOutTree(Project proj, pBaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0, object extraParam = null)
         {
             string curPath = path;
             string tab = new string('\t', tabCount);
@@ -106,6 +107,17 @@ namespace Wrapper
                 //Just skip null objects and give a warning
                 Logger.Instance.log(Logger.LogLevel.WARNING, "Experienced NULL object during WriteOutTree. Output file: " + path);
             }
+            #region object ArrayAccess
+            else if (container is ArrayAccess)
+            {
+                var obj = (ArrayAccess)container;
+                writer.Write(" select ");
+                foreach (var it in obj.children)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                }
+            }
+            #endregion
             #region object Base
             else if (container is Base)
             {
@@ -129,6 +141,10 @@ namespace Wrapper
                 {
                     if (it is Namespace)
                         WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    else if (it is Variable)
+                    {
+                        //Skip
+                    }
                     else
                         WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
                 }
@@ -143,9 +159,14 @@ namespace Wrapper
                 path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
                 Directory.CreateDirectory(path);
-                foreach (var it in obj.children)
+                foreach (var it in obj.ClassContent)
                 {
-                    WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                    if (it is Variable)
+                    {
+                        //Skip
+                    }
+                    else
+                        WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
                 }
             }
             #endregion
@@ -182,7 +203,7 @@ namespace Wrapper
                     objConfigClass.addChild(new SqfConfigField("ext", "\".sqf\""));
                     objConfigClass.addChild(new SqfConfigField("headerType", "0"));
                 }
-                if(obj.IsConstructor)
+                if (obj.IsConstructor)
                 {
                     //ToDo: Generate object
                 }
@@ -191,7 +212,7 @@ namespace Wrapper
                 {
                     var tmpList = new List<pBaseLangObject>();
                     var variable = new Variable(obj, -1, -1);
-                    var ident = new Ident(variable, "___obj___", -1, -1);
+                    var ident = new Ident(variable, thisVariableName, -1, -1);
                     variable.Name = ident;
                     variable.encapsulation = Encapsulation.NA;
                     variable.varType = new VarTypeObject(obj.Name);
@@ -223,7 +244,7 @@ namespace Wrapper
                 var pVarList = obj.getAllChildrenOf<Variable>(true);
                 foreach (var it in obj.ArgList)
                 {
-                    if(it is Variable)
+                    if (it is Variable)
                         pVarList.Remove((Variable)it);
                 }
 
@@ -252,6 +273,7 @@ namespace Wrapper
                 foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
                 }
                 writer.Flush();
                 writer.Close();
@@ -297,14 +319,16 @@ namespace Wrapper
             else if (container is Expression)
             {
                 var obj = (Expression)container;
-                writer.Write("(");
+                if (!(obj.Parent is Function))
+                    writer.Write("(");
                 WriteOutTree(proj, obj.lExpression, path, configObj, writer, tabCount);
                 if (obj.rExpression != null)
                 {
                     writer.Write(") " + obj.expOperator + " (");
                     WriteOutTree(proj, obj.rExpression, path, configObj, writer, tabCount);
                 }
-                writer.Write(")");
+                if (!(obj.Parent is Function))
+                    writer.Write(")");
             }
             #endregion
             #region object For
@@ -331,32 +355,48 @@ namespace Wrapper
             else if (container is FunctionCall)
             {
                 var obj = (FunctionCall)container;
-                if(obj.Name.ReferencedObject is Function)
+                if (obj.Name.ReferencedObject is Function)
                 {
                     var fnc = (Function)obj.Name.ReferencedObject;
-                    
-                    if(fnc.encapsulation == Encapsulation.NA)
+                    if (extraParam is Ident)
+                    {
+                        if (obj.children.Count > 0)
+                        {
+                            writer.WriteLine(tab + "[");
+                            updateTabcount(ref tab, ref tabCount, 1);
+                            int index = 0;
+                            foreach (var it in obj.children)
+                            {
+                                if (index > 0)
+                                    writer.WriteLine(",");
+                                writer.Write(tab);
+                                WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                                index++;
+                            }
+                            updateTabcount(ref tab, ref tabCount, -1);
+                            writer.Write(endl + tab + "] call ");
+                        }
+                        else
+                        {
+                            writer.Write("[] call ");
+                        }
+                    }
+                    if (fnc.encapsulation == Encapsulation.NA)
                     {
                         throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
                     }
-                    else if(fnc.encapsulation == Encapsulation.Static)
+                    else if(fnc.encapsulation == Encapsulation.Static || fnc.IsConstructor)
                     {
-                        string functionName = fnc.FullyQualifiedName;
-                        functionName = functionName.Insert(functionName.LastIndexOf("::"), "_fnc").Replace("::", "_");
-                        writer.Write(tab + "[");
-                        int index = 0;
-                        foreach(var it in obj.children)
-                        {
-                            if (index > 0)
-                                writer.WriteLine(",");
-                            WriteOutTree(proj, it, path, configObj, writer, tabCount);
-                            index++;
-                        }
-                        writer.Write("] call " + functionName);
+                        if (extraParam is Ident)
+                            WriteOutTree(proj, (pBaseLangObject)extraParam, path, configObj, writer, tabCount, obj);
+                        else
+                            writer.Write(fnc.SqfVariableName);
                     }
                     else
                     {
-                        //TODO
+                        if (extraParam is Ident)
+                            WriteOutTree(proj, (pBaseLangObject)extraParam, path, configObj, writer, tabCount, obj);
+                        writer.Write(fnc.SqfVariableName);
                     }
                 }
                 else
@@ -368,12 +408,11 @@ namespace Wrapper
             #region object Cast
             else if (container is Cast)
             {
-                var obj = (VariableAssignment)container;
+                var obj = (Cast)container;
                 foreach (var it in obj.children)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object Ident
@@ -383,18 +422,125 @@ namespace Wrapper
                     container.Parent is oosClass ||
                     container.Parent is VirtualFunction ||
                     container.Parent is Variable ||
-                    container.Parent is Function ||
                     container.Parent is oosInterface ||
-                    container.Parent is SqfCall ||
-                    container.Parent is Ident)
+                    container.Parent is SqfCall)
                 {
                     return;
                 }
                 var obj = (Ident)container;
-                WriteOutTree(proj, obj.ReferencedObject, path, configObj, writer, tabCount);
-                foreach (var it in obj.children)
+                var instruction = obj.Instruction;
+                var nextIdent = obj.NextIdent;
+                var refObject = obj.ThisReferencedObject;
+                bool flag = false;
+                if (!(obj.Parent is Ident) && extraParam == null)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    var fncCall = obj.NextFunctionCall;
+                    if (fncCall != null)
+                    {
+                        var refObj = fncCall.ReferencedObject;
+                        if (refObj is Function)
+                        {
+                            var fnc = (Function)refObj;
+                            //if (fnc.IsClassFunction && !fnc.IsConstructor)
+                            //{
+                                flag = true;
+                                WriteOutTree(proj, fncCall, path, configObj, writer, tabCount, obj);
+                            //}
+                        }
+                        else
+                        {
+                            throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                        }
+                    }
+                }
+                if (flag)
+                {
+                    //Do nothing
+                }
+                else if (refObject is Variable)
+                {
+                    var variable = (Variable)refObject;
+                    if (instruction == null || instruction is Ident)
+                    {
+                        if (nextIdent != null)
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
+                        WriteOutTree(proj, variable, path, configObj, writer, tabCount, obj);
+                        if (instruction is Ident)
+                            WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                    }
+                    else if (instruction is VariableAssignment)
+                    {
+                        WriteOutTree(proj, variable, path, configObj, writer, tabCount);
+                        if (nextIdent == null)
+                        {
+                            if (variable.encapsulation == Encapsulation.NA || variable.encapsulation == Encapsulation.Static)
+                            {
+                                writer.Write(" = ");
+                                WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                            }
+                            else
+                            {
+                                writer.Write(" set [0, ");
+                                WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                                writer.Write("]");
+                            }
+                        }
+                        else
+                        {
+                            writer.Write(" select 0 ");
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
+                        }
+                    }
+                    else if (instruction is FunctionCall)
+                    {
+                        WriteOutTree(proj, variable, path, configObj, writer, tabCount, false);
+                        if (nextIdent != null)
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
+                    }
+                    else if (instruction is ArrayAccess)
+                    {
+                        WriteOutTree(proj, variable, path, configObj, writer, tabCount, false);
+                        WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                        if (nextIdent != null)
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
+                    }
+                    else
+                    {
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                }
+                else if (refObject is Function)
+                {
+                    Function fnc = (Function)refObject;
+                    if (instruction == null || instruction is Ident)
+                    {
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                    else if (instruction is FunctionCall && (!fnc.IsClassFunction || fnc.IsConstructor))
+                    {
+                        WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                        if (nextIdent != null)
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount, obj);
+                    }
+                    else if (instruction is FunctionCall && fnc.IsClassFunction && extraParam != null)
+                    {
+                        WriteOutTree(proj, instruction, path, configObj, writer, tabCount, obj);
+                        if (nextIdent != null)
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
+                    }
+                    else
+                    {
+                        //MAGIC WORKING SHIT, nothing to do here anymore (debuging is kinda funny btw.)
+                    }
+                }
+                else if (refObject is oosClass)
+                {
+                    writer.Write(thisVariableName + " ");
+                    WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
+                }
+                else
+                {
+                    throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
                 }
             }
             #endregion
@@ -412,7 +558,7 @@ namespace Wrapper
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
                 updateTabcount(ref tab, ref tabCount, -1);
-                if(obj.HasElse)
+                if (obj.HasElse)
                 {
                     writer.WriteLine(tab + "}");
                     writer.WriteLine(tab + "else");
@@ -428,6 +574,17 @@ namespace Wrapper
                 writer.Write(tab + "}");
             }
             #endregion
+            #region object InstanceOf
+            else if (container is InstanceOf)
+            {
+                var obj = (InstanceOf)container;
+                writer.Write("((");
+                WriteOutTree(proj, obj.LIdent, path, configObj, writer, tabCount);
+                writer.Write(" select 0) find (");
+                writer.Write('"' + obj.RIdent.FullyQualifiedName + '"');
+                writer.Write(") != -1)");
+            }
+            #endregion
             #region object NewArray
             else if (container is NewArray)
             {
@@ -437,7 +594,7 @@ namespace Wrapper
                 foreach (var it in obj.children)
                 {
                     if (index > 0)
-                        writer.WriteLine(",");
+                        writer.Write(", ");
                     WriteOutTree(proj, it, path, configObj, writer, 0);
                     index++;
                 }
@@ -452,7 +609,6 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object Return
@@ -463,7 +619,7 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                writer.Write("breakOut \"function\"");
+                writer.Write(" breakOut \"function\"");
             }
             #endregion
             #region object SqfCall
@@ -477,6 +633,7 @@ namespace Wrapper
                     if (lArgs.Count == 1)
                     {
                         WriteOutTree(proj, lArgs[0], path, configObj, writer, tabCount);
+                        writer.Write(" ");
                     }
                     else
                     {
@@ -491,19 +648,20 @@ namespace Wrapper
                             WriteOutTree(proj, it, path, configObj, writer, tabCount);
                         }
                         updateTabcount(ref tab, ref tabCount, -1);
-                        writer.WriteLine(endl + tab + "]");
+                        writer.WriteLine(endl + tab + "] ");
                     }
                 }
-                writer.Write(" " + obj.Name.OriginalValue + " ");
+                writer.Write(obj.Name.OriginalValue);
                 if (rArgs.Count > 0)
                 {
                     if (rArgs.Count == 1)
                     {
+                        writer.Write(" ");
                         WriteOutTree(proj, rArgs[0], path, configObj, writer, tabCount);
                     }
                     else
                     {
-                        writer.WriteLine(tab + "[");
+                        writer.WriteLine(tab + " [");
                         int index = 0;
                         foreach (var it in rArgs)
                         {
@@ -546,6 +704,7 @@ namespace Wrapper
                 foreach (var it in obj.children)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
                 }
                 throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
@@ -565,14 +724,44 @@ namespace Wrapper
             else if (container is Variable)
             {
                 var obj = (Variable)container;
-                if (obj.Parent is Function)
+                if (obj.Parent is oosClass || obj.Parent is Namespace || obj.Parent is Ident || extraParam != null)
+                {
+                    foreach (var it in obj.children)
+                    {
+                        if (it is Ident)
+                        {
+                            writer.Write(obj.SqfVariableName);
+                        }
+                        else
+                        {
+                            if (!(extraParam is bool))
+                                WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                        }
+                    }
+                }
+                else if (obj.Parent is Function || obj.Parent is For)
                 {
                     foreach (var it in obj.children)
                     {
                         if (it is Ident)
                         {
                             var ident = (Ident)it;
-                            writer.Write(tab + "_" + ident.OriginalValue);
+                            writer.Write(tab + "_" + ident.OriginalValue + " = ");
+                        }
+                        else
+                        {
+                            WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                        }
+                    }
+                }
+                else if (obj.Parent is TryCatch)
+                {
+                    foreach (var it in obj.children)
+                    {
+                        if (it is Ident)
+                        {
+                            var ident = (Ident)it;
+                            writer.Write(tab + "_" + ident.OriginalValue + " = _exception");
                         }
                         else
                         {
@@ -582,25 +771,7 @@ namespace Wrapper
                 }
                 else
                 {
-                    if (obj.Parent is oosClass || obj.Parent is Namespace)
-                    {
-                        foreach (var it in obj.children)
-                        {
-                            if (it is Ident)
-                            {
-                                var ident = (Ident)it;
-                                writer.Write("_" + ident.OriginalValue);
-                            }
-                            else
-                            {
-                                WriteOutTree(proj, it, path, configObj, writer, tabCount);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
-                    }
+                    throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
                 }
             }
             #endregion
@@ -612,7 +783,6 @@ namespace Wrapper
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object While
@@ -706,7 +876,7 @@ namespace Wrapper
                 }
             }
             Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
-            foreach(var it in flagDefines)
+            foreach (var it in flagDefines)
                 defines.Add(it.Name, it);
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
             //Start actual preprocessing

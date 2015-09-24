@@ -22,8 +22,14 @@ interface testInterface
 }
 class testObj
 {
+    public ::testObj testobject;
 	public testObj()
 	{
+        auto _obj = new testObj();
+        _obj.testFncPublic("preInitArg1", "preInitArg2");
+        this.testobject = new testObj();
+        this.testobject.testVarPublic = "";
+        this.testobject.testobject = new testObj();
 		this.testVarPublic = "";
 		testVarStatic = "";
 		this.testFncPublic("arg1", "arg2");
@@ -40,6 +46,18 @@ class testObj
 		SQF diag_log(SQF str(_arg2));
 		return "";
 	}
+}
+static void castDynamicTest(::testNamespace::cBar testVar)
+{
+    auto casted = $cFoo$ testVar;
+}
+static void castStaticTest(strict ::testNamespace::cBar testVar)
+{
+    auto casted = §cFoo§ testVar;
+}
+static bool instanceOfTest(::testNamespace::cFoo testVar)
+{
+    return testVar is ::testNamespace::cBar;
 }
 static bool returnTrue()
 {
@@ -78,7 +96,7 @@ static void preInit()
 			{
 				throw "foobar";
 			}
-			catch(object test)
+			catch(string test)
 			{
 				SQF diag_log(test);
 			}
