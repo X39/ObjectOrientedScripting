@@ -1,6 +1,6 @@
 class cBar : cFoo
 {
-	public void foobar(string _someRandomArg)
+	public void override foobar(string _someRandomArg)
 	{
 		SQF diag_log("class bar " + _someRandomArg);
 	}

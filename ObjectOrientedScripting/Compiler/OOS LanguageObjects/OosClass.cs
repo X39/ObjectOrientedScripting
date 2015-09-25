@@ -12,6 +12,38 @@ namespace Compiler.OOS_LanguageObjects
         int endMarker;
         public List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> ClassContent { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
+        public List<Function> AllFunctions
+        {
+            get
+            {
+                List<Function> fncList = new List<Function>();
+                foreach (var it in parentClasses)
+                {
+                    fncList.AddRange(it.AllFunctions);
+                }
+                var thisFncList = this.getAllChildrenOf<Function>();
+                foreach (var it in thisFncList)
+                {
+                    if (it.encapsulation == Encapsulation.Public || it.encapsulation == Encapsulation.Protected || it.encapsulation == Encapsulation.Private)
+                    {
+                        fncList.Add(it);
+                    }
+                }
+                return fncList;
+            }
+        }
+        public List<Function> InheritanceFunctions
+        {
+            get
+            {
+                List<Function> fncList = new List<Function>();
+                foreach (var it in parentClasses)
+                {
+                    fncList.AddRange(it.AllFunctions);
+                }
+                return fncList;
+            }
+        }
         private List<oosClass> parentClasses;
         private List<oosInterface> parentInterfaces;
         
@@ -72,6 +104,66 @@ namespace Compiler.OOS_LanguageObjects
                     errCount++;
                 }
             }
+            var functionNameList = new List<string>();
+            var inheritanceFunctions = this.InheritanceFunctions;
+            foreach (var it in this.AllFunctions)
+            {
+                var origVal = it.Name.OriginalValue;
+                if (functionNameList.FirstOrDefault(checkString => checkString.Contains(origVal)) != null)
+                {
+                    var parentFnc = inheritanceFunctions.FirstOrDefault(checkValue => checkValue.Name.OriginalValue == origVal);
+                    if (parentFnc == null)
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0033, it.Name.Line, it.Name.Pos));
+                        errCount++;
+                    }
+                    else
+                    {
+                        if(!it.Override)
+                        {
+                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0034, it.Name.Line, it.Name.Pos));
+                            errCount++;
+                        }
+                        else
+                        {
+                            var argList = parentFnc.ArgList;
+                            var itArgList = it.ArgList;
+                            if (argList.Count != itArgList.Count)
+                            {
+                                if (argList.Count > itArgList.Count)
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0035, it.Name.Line, it.Name.Pos));
+                                    errCount++;
+                                }
+                                else
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0036, it.Name.Line, it.Name.Pos));
+                                    errCount++;
+                                }
+                            }
+                            for (var i = 0; i < argList.Count; i++)
+                            {
+                                if (i > argList.Count || i > itArgList.Count)
+                                    break;
+                                Variable v = (Variable)argList[i];
+                                Variable e = (Variable)itArgList[i];
+                                if (!v.varType.Equals(e.ReferencedType))
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0037, e.Line, e.Pos));
+                                    errCount++;
+                                }
+                            }
+                            if(!it.varType.Equals(parentFnc.varType))
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0038, it.Name.Line, it.Name.Pos));
+                                errCount++;
+                            }
+                        }
+                    }
+                }
+                functionNameList.Add(it.Name.OriginalValue);
+            }
+            //ToDo: Check interface functions are implemented
             return errCount;
         }
 

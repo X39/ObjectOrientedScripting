@@ -47,7 +47,9 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         private int line;
+        public int Line { get { return this.line; } }
         private int pos;
+        public int Pos { get { return this.pos; } }
 
         public Variable(pBaseLangObject parent, int pos, int line) : base(parent)
         {

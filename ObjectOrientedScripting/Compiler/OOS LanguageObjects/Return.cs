@@ -8,7 +8,15 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Return : pBaseLangObject
     {
-        public Return(pBaseLangObject parent) : base(parent) { }
+        private int line;
+        public int Line { get { return this.line; } }
+        private int pos;
+        public int Pos { get { return this.pos; } }
+        public Return(pBaseLangObject parent, int line, int pos) : base(parent)
+        {
+            this.line = line;
+            this.pos = pos;
+        }
         public override int doFinalize() { return 0; }
     }
 }

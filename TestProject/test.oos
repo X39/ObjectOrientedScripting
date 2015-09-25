@@ -20,7 +20,7 @@ interface testInterface
 {
 	void interfaceFnc(string, scalar, scalar);
 }
-class testObj
+class testObj : testInterface
 {
     public ::testObj testobject;
 	public testObj()
@@ -46,6 +46,10 @@ class testObj
 		SQF diag_log(SQF str(_arg2));
 		return "";
 	}
+	void interfaceFnc(string s, scalar i, scalar j)
+    {
+		return;
+    }
 }
 static void castDynamicTest(::testNamespace::cBar testVar)
 {
@@ -85,7 +89,7 @@ static void preInit()
     string castedString = §string§ scalarValue;
     
 	
-	for(auto _test = 0; _test < 10; _test++)
+	for(auto _test = 0; _test < 10; _test = _test + 1)
 	{
 		SQF diag_log("test");
 	}

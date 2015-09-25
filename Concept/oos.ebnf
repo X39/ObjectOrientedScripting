@@ -244,6 +244,7 @@ COMPILER OOS
             (. obj.markEnd(); .)
 			T_CODEBRACKETOPEN
 			{
+                (. e = Encapsulation.Private; .)
 				[
 					ENCAPSULATION<out e>
 					|
@@ -295,6 +296,9 @@ COMPILER OOS
 				|
 				IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo); .)
 			)
+            [
+                "override" (. obj.Override = true; .)
+            ]
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			T_ROUNDBRACKETOPEN
 			[
@@ -585,7 +589,7 @@ COMPILER OOS
 			"throw"
 			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 		.
-		OP_RETURN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Return(parent); outObj = obj; pBaseLangObject blo; .)
+		OP_RETURN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Return(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .)
 		=
 			"return"
 			[

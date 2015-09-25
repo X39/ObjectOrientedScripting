@@ -26,6 +26,8 @@ namespace Compiler.SqfConfigObjects
         }
         public void write(StreamWriter writer, int tabCount = 0)
         {
+            if (this.children.Count == 0)
+                return;
             string tab = new string('\t', tabCount);
             writer.WriteLine(tab + "class " + name);
             writer.WriteLine(tab + "{");

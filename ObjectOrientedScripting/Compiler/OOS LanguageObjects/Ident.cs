@@ -95,13 +95,24 @@ namespace Compiler.OOS_LanguageObjects
                 if (this.IsGlobalIdentifier)
                     return this.originalValue;
                 else
+                {
                     if (obj == null)
+                    {
                         return "::" + this.originalValue;
+                    }
                     else
+                    {
                         if (this.Parent is oosClass || this.Parent is oosInterface)
-                            return obj.FullyQualifiedName;
+                        {
+                            obj = this.getFirstOf<Namespace>();
+                            return (obj == null ? "" : obj.FullyQualifiedName) + "::" + this.originalValue;
+                        }
                         else
+                        {
                             return obj.FullyQualifiedName + "::" + this.originalValue;
+                        }
+                    }
+                }
             }
         }
         public string CurrentNamespace

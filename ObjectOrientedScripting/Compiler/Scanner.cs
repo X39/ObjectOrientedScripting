@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 56;
-	const int noSym = 56;
+	const int maxT = 57;
+	const int noSym = 57;
 
 
 	public Buffer buffer; // scanner buffer
@@ -426,23 +426,24 @@ public class Scanner {
 			case "class": t.kind = 34; break;
 			case "interface": t.kind = 36; break;
 			case "void": t.kind = 37; break;
-			case "strict": t.kind = 38; break;
-			case "auto": t.kind = 39; break;
-			case "for": t.kind = 40; break;
-			case "while": t.kind = 41; break;
-			case "new": t.kind = 42; break;
-			case "if": t.kind = 43; break;
-			case "else": t.kind = 44; break;
-			case "try": t.kind = 45; break;
-			case "catch": t.kind = 46; break;
-			case "break": t.kind = 47; break;
-			case "is": t.kind = 48; break;
-			case "throw": t.kind = 49; break;
-			case "return": t.kind = 50; break;
-			case "switch": t.kind = 51; break;
-			case "case": t.kind = 52; break;
-			case "default": t.kind = 53; break;
-			case "SQF": t.kind = 55; break;
+			case "override": t.kind = 38; break;
+			case "strict": t.kind = 39; break;
+			case "auto": t.kind = 40; break;
+			case "for": t.kind = 41; break;
+			case "while": t.kind = 42; break;
+			case "new": t.kind = 43; break;
+			case "if": t.kind = 44; break;
+			case "else": t.kind = 45; break;
+			case "try": t.kind = 46; break;
+			case "catch": t.kind = 47; break;
+			case "break": t.kind = 48; break;
+			case "is": t.kind = 49; break;
+			case "throw": t.kind = 50; break;
+			case "return": t.kind = 51; break;
+			case "switch": t.kind = 52; break;
+			case "case": t.kind = 53; break;
+			case "default": t.kind = 54; break;
+			case "SQF": t.kind = 56; break;
 			default: break;
 		}
 	}
@@ -620,9 +621,9 @@ public class Scanner {
 				else if (ch == ':') {AddCh(); goto case 42;}
 				else {t.kind = 3; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
 			case 42:
-				recEnd = pos; recKind = 54;
+				recEnd = pos; recKind = 55;
 				if (ch == ':') {AddCh(); goto case 7;}
-				else {t.kind = 54; break;}
+				else {t.kind = 55; break;}
 
 		}
 		t.val = new String(tval, 0, tlen);

@@ -122,9 +122,14 @@ namespace Wrapper
             else if (container is Base)
             {
                 var obj = (Base)container;
+                var objConfigClass = new SqfConfigClass("Generic");
+                configObj.addChild(objConfigClass);
                 foreach (var it in obj.children)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    if (it is Function)
+                        WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                    else
+                        WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
             }
             #endregion
@@ -132,21 +137,22 @@ namespace Wrapper
             else if (container is Namespace)
             {
                 var obj = (Namespace)container;
-                var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_"));
+                var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_").Substring(1));
                 configObj.addChild(objConfigClass);
                 path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
                 Directory.CreateDirectory(path);
                 foreach (var it in obj.children)
                 {
-                    if (it is Namespace)
-                        WriteOutTree(proj, it, path, configObj, writer, tabCount);
-                    else if (it is Variable)
+                    if (it is Variable)
                     {
                         //Skip
                     }
-                    else
+                    else if(it is Function)
                         WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                    else
+                        WriteOutTree(proj, it, path, configObj, writer, tabCount);
+
                 }
             }
             #endregion
@@ -154,7 +160,7 @@ namespace Wrapper
             else if (container is oosClass)
             {
                 var obj = (oosClass)container;
-                var objConfigClass = new SqfConfigClass(obj.Name.OriginalValue);
+                var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_").Substring(1));
                 configObj.addChild(objConfigClass);
                 path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
@@ -166,7 +172,9 @@ namespace Wrapper
                         //Skip
                     }
                     else
+                    {
                         WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                    }
                 }
             }
             #endregion
@@ -183,9 +191,9 @@ namespace Wrapper
                 {
                     throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
                 }
-                else if (obj.encapsulation == Encapsulation.Static)
+                else if (obj.encapsulation == Encapsulation.Static || obj.IsConstructor)
                 {
-                    objConfigClass.addChild(new SqfConfigField("file", path));
+                    objConfigClass.addChild(new SqfConfigField("file", '"' + path.Substring(proj.OutputFolder.Length) + '"'));
                     objConfigClass.addChild(new SqfConfigField("preInit", obj.Name.OriginalValue.StartsWith("preInit", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
                     objConfigClass.addChild(new SqfConfigField("postInit", obj.Name.OriginalValue.StartsWith("postInit", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
                     objConfigClass.addChild(new SqfConfigField("preStart", obj.Name.OriginalValue.StartsWith("preStart", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
@@ -193,19 +201,60 @@ namespace Wrapper
                     objConfigClass.addChild(new SqfConfigField("ext", "\".sqf\""));
                     objConfigClass.addChild(new SqfConfigField("headerType", "0"));
                 }
-                else
-                {
-                    objConfigClass.addChild(new SqfConfigField("file", path));
-                    objConfigClass.addChild(new SqfConfigField("preInit", "0"));
-                    objConfigClass.addChild(new SqfConfigField("postInit", "0"));
-                    objConfigClass.addChild(new SqfConfigField("preStart", "0"));
-                    objConfigClass.addChild(new SqfConfigField("recompile", "0"));
-                    objConfigClass.addChild(new SqfConfigField("ext", "\".sqf\""));
-                    objConfigClass.addChild(new SqfConfigField("headerType", "0"));
-                }
-                if (obj.IsConstructor)
-                {
-                    //ToDo: Generate object
+                if(obj.IsConstructor)
+                {//Print object structure
+                    //ToDo: generate reference arrays for the class functions/variables
+                    //ToDo: print classes with the references
+                    var classObject = obj.getFirstOf<oosClass>();
+                    writer.WriteLine(tab + thisVariableName + " = [");
+                    updateTabcount(ref tab, ref tabCount, 1);
+
+                    //Write out parents info
+                    var parentIdents = classObject.ParentClassesIdents;
+                    writer.WriteLine(tab + "[");
+                    updateTabcount(ref tab, ref tabCount, 1);
+                    index = 0;
+                    foreach (var it in parentIdents)
+                    {
+                        if (index > 0)
+                            writer.WriteLine(",");
+                        if (it is Ident)
+                        {
+
+                            writer.Write('"' + ((Ident)it).FullyQualifiedName + '"');
+                        }
+                        else
+                        {
+                            throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
+                        }
+                    }
+                    updateTabcount(ref tab, ref tabCount, -1);
+                    writer.WriteLine(endl + tab + "],");
+
+                    //Write out the different classes
+                    writer.WriteLine(tab + "[");
+                    updateTabcount(ref tab, ref tabCount, 1);
+                    index = 0;
+                    foreach (var it in parentIdents)
+                    {
+                        if (index > 0)
+                            writer.WriteLine(",");
+                        if (it is Ident)
+                        {
+
+                            writer.Write('"' + ((Ident)it).FullyQualifiedName + '"');
+                        }
+                        else
+                        {
+                            throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
+                        }
+                    }
+                    updateTabcount(ref tab, ref tabCount, -1);
+                    writer.WriteLine(endl + tab + "],");
+                    
+
+                    updateTabcount(ref tab, ref tabCount, -1);
+                    writer.WriteLine(tab + "]");
                 }
                 var argList = obj.ArgList;
                 if (obj.IsClassFunction && !obj.IsConstructor)
@@ -289,37 +338,14 @@ namespace Wrapper
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
                 updateTabcount(ref tab, ref tabCount, -1);
-                writer.WriteLine(tab + "breakOut \"loop\"");
-            }
-            #endregion
-            #region object Case
-            else if (container is Case)
-            {
-                var obj = (Case)container;
-                if (obj.expression == null)
-                {
-                    writer.WriteLine(tab + "default: {");
-                }
-                else
-                {
-                    writer.Write(tab + "case ");
-                    WriteOutTree(proj, obj.expression, path, configObj, writer, 0);
-                    writer.WriteLine(": {");
-                }
-                updateTabcount(ref tab, ref tabCount, 1);
-                foreach (var it in obj.children)
-                {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
-                }
-                updateTabcount(ref tab, ref tabCount, -1);
-                writer.WriteLine(tab + "};");
+                writer.Write(tab + "breakOut \"loop\"");
             }
             #endregion
             #region object Expression
             else if (container is Expression)
             {
                 var obj = (Expression)container;
-                if (!(obj.Parent is Function))
+                if (!(obj.Parent is Function) && !(obj.Parent is IfElse) && !(obj.Parent is Case) && !(obj.Parent is While) && !(obj.Parent is Switch) && !(obj.Parent is For) && !(obj.Parent is TryCatch))
                     writer.Write("(");
                 WriteOutTree(proj, obj.lExpression, path, configObj, writer, tabCount);
                 if (obj.rExpression != null)
@@ -327,7 +353,7 @@ namespace Wrapper
                     writer.Write(") " + obj.expOperator + " (");
                     WriteOutTree(proj, obj.rExpression, path, configObj, writer, tabCount);
                 }
-                if (!(obj.Parent is Function))
+                if (!(obj.Parent is Function) && !(obj.Parent is IfElse) && !(obj.Parent is Case) && !(obj.Parent is While) && !(obj.Parent is Switch) && !(obj.Parent is For) && !(obj.Parent is TryCatch))
                     writer.Write(")");
             }
             #endregion
@@ -343,12 +369,13 @@ namespace Wrapper
                 writer.WriteLine(tab + "{");
                 updateTabcount(ref tab, ref tabCount, 1);
                 WriteOutTree(proj, obj.forArg3, path, configObj, writer, tabCount);
+                writer.WriteLine(";");
                 foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                     writer.WriteLine(";");
                 }
-                writer.Write(tab + "}");
+                writer.Write("}");
             }
             #endregion
             #region object FunctionCall
@@ -551,11 +578,12 @@ namespace Wrapper
                 writer.Write(tab + "if (");
                 WriteOutTree(proj, obj.expression, path, configObj, writer, 0);
                 writer.WriteLine(") then");
-                writer.Write(tab + "{");
+                writer.WriteLine(tab + "{");
                 updateTabcount(ref tab, ref tabCount, 1);
                 foreach (var it in obj.IfInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
                 }
                 updateTabcount(ref tab, ref tabCount, -1);
                 if (obj.HasElse)
@@ -615,6 +643,7 @@ namespace Wrapper
             else if (container is Return)
             {
                 var obj = (Return)container;
+                writer.Write(tab);
                 foreach (var it in obj.children)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
@@ -651,6 +680,10 @@ namespace Wrapper
                         writer.WriteLine(endl + tab + "] ");
                     }
                 }
+                else
+                {
+                    writer.Write(tab);
+                }
                 writer.Write(obj.Name.OriginalValue);
                 if (rArgs.Count > 0)
                 {
@@ -679,11 +712,41 @@ namespace Wrapper
             else if (container is Switch)
             {
                 var obj = (Switch)container;
-                foreach (var it in obj.children)
+                writer.Write(tab + "switch(");
+                WriteOutTree(proj, obj.expression, path, configObj, writer, tabCount);
+                writer.WriteLine(") do");
+                writer.WriteLine(tab + "{");
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.Write(tab + "}");
+            }
+            #endregion
+            #region object Case
+            else if (container is Case)
+            {
+                var obj = (Case)container;
+                if (obj.expression == null)
+                {
+                    writer.WriteLine(tab + "default: {");
+                }
+                else
+                {
+                    writer.Write(tab + "case ");
+                    WriteOutTree(proj, obj.expression, path, configObj, writer, 0);
+                    writer.WriteLine(": {");
+                }
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.CodeInstructions)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.WriteLine(tab + "};");
             }
             #endregion
             #region object Throw
@@ -701,12 +764,28 @@ namespace Wrapper
             else if (container is TryCatch)
             {
                 var obj = (TryCatch)container;
-                foreach (var it in obj.children)
+                writer.WriteLine(tab + "try");
+                writer.WriteLine(tab + "{");
+                updateTabcount(ref tab, ref tabCount, 1);
+                foreach (var it in obj.TryInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                     writer.WriteLine(";");
                 }
-                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.WriteLine(tab + "}");
+                writer.WriteLine(tab + "catch");
+                writer.WriteLine(tab + "{");
+                updateTabcount(ref tab, ref tabCount, 1);
+                WriteOutTree(proj, obj.variable, path, configObj, writer, tabCount);
+                writer.WriteLine(";");
+                foreach (var it in obj.CatchInstructions)
+                {
+                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.WriteLine(";");
+                }
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.Write(tab + "}");
             }
             #endregion
             #region object Value
@@ -799,7 +878,8 @@ namespace Wrapper
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                     writer.WriteLine(";");
                 }
-                writer.Write(tab + "}");
+                updateTabcount(ref tab, ref tabCount, -1);
+                writer.Write("}");
             }
             #endregion
             #region object oosInterface

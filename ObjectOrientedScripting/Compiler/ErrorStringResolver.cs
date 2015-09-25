@@ -17,7 +17,8 @@ namespace Compiler
             C0015, C0016, C0017, C0018, C0019,
             C0020, C0021, C0022, C0023, C0024,
             C0025, C0026, C0027, C0028, C0029,
-            C0030, C0031
+            C0030, C0031, C0032, C0033, C0034,
+            C0035, C0036, C0037, C0038
         }
         public static string resolve(ErrorCodeEnum errCode, int line = -1, int pos = -1)
         {
@@ -59,6 +60,13 @@ namespace Compiler
                 case ErrorCodeEnum.C0027: return "RArg has to refer to a class or an interface";
                 case ErrorCodeEnum.C0028: return "LArg is not allowed to be casted";
                 case ErrorCodeEnum.C0030: return "Missing 'this' reference in front of class variable";
+                case ErrorCodeEnum.C0032: return "Constructors are not allowed to return anything but void";
+                case ErrorCodeEnum.C0033: return "Function overrides existing function";
+                case ErrorCodeEnum.C0034: return "Missing override keyword on overriding function";
+                case ErrorCodeEnum.C0035: return "Function override has too many arguments";
+                case ErrorCodeEnum.C0036: return "Function override lacks arguments";
+                case ErrorCodeEnum.C0037: return "Function override type missmatch on argument";
+                case ErrorCodeEnum.C0038: return "Function override return type missmatch";
                 default: return "Unknown Error";
             }
         }
