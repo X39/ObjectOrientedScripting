@@ -17,6 +17,10 @@ namespace Compiler.OOS_LanguageObjects
             this.line = line;
             this.pos = pos;
         }
-        public override int doFinalize() { return 0; }
+        public override int doFinalize()
+        {
+            //ToDo: check that the return type is matching its functions return type
+            return 0;
+        }
     }
 }

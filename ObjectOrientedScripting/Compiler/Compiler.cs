@@ -100,6 +100,7 @@ namespace Wrapper
         }
         public void WriteOutTree(Project proj, pBaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0, object extraParam = null)
         {
+            //ToDo: change "private" array so that it just privates on current scope level
             string curPath = path;
             string tab = new string('\t', tabCount);
             if (container == null)
@@ -360,6 +361,7 @@ namespace Wrapper
             #region object For
             else if (container is For)
             {
+                //ToDo: find out why the hell the variables are freaking around
                 var obj = (For)container;
                 WriteOutTree(proj, obj.forArg1, path, configObj, writer, tabCount);
                 writer.WriteLine(";");
@@ -435,6 +437,7 @@ namespace Wrapper
             #region object Cast
             else if (container is Cast)
             {
+                //ToDo: do the actual casting stuff
                 var obj = (Cast)container;
                 foreach (var it in obj.children)
                 {

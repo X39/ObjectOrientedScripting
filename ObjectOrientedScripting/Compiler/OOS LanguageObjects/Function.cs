@@ -68,6 +68,7 @@ namespace Compiler.OOS_LanguageObjects
                     }
                 }
             }
+            //ToDo: make sure this function always returns a value (will get complicated with ifElse shit -.-')
             return errCount;
         }
         public void markArgListEnd()

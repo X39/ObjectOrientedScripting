@@ -59,6 +59,7 @@ namespace Compiler.OOS_LanguageObjects
             this.pos = pos;
         }
         public override int doFinalize() {
+            //ToDo: make sure we got no doubleDefine in here
             if(this.varType.varType == VarType.Object || this.varType.varType == VarType.ObjectStrict)
                 this.varType.ident.finalize();
             var assign = this.getAllChildrenOf<VariableAssignment>();
