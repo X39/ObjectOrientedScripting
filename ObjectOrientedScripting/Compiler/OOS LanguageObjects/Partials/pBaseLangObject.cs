@@ -11,6 +11,14 @@ namespace Compiler.OOS_LanguageObjects
         public List<pBaseLangObject> children;
         private pBaseLangObject parent;
         public pBaseLangObject Parent { get { return this.parent; } set { this.parent = value; } }
+        public bool HasScope { get { return false; } }
+        public int ScopeCount { get { return 0; } }
+        public List<pBaseLangObject> getScopeItems(int scopeIndex)
+        {
+            if (scopeIndex < 0)
+                return this.children;
+            return new List<pBaseLangObject>();
+        }
 
         public pBaseLangObject(pBaseLangObject parent)
         {
@@ -55,15 +63,15 @@ namespace Compiler.OOS_LanguageObjects
                 return (T)this;
             return null;
         }
-        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null) where T : pBaseLangObject
+        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int scopeIndex = -1) where T : pBaseLangObject
         {
             List<T> l = new List<T>();
-            private_getAllChildrenOf<T>(l, fullSearch, stopObject);
+            private_getAllChildrenOf<T>(l, fullSearch, stopObject, scopeIndex);
             return l;
         }
-        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject) where T : pBaseLangObject
+        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int scopeIndex) where T : pBaseLangObject
         {
-            foreach (var obj in this.children)
+            foreach (var obj in this.getScopeItems(scopeIndex))
             {
                 if (obj == null)
                     continue;
@@ -72,7 +80,7 @@ namespace Compiler.OOS_LanguageObjects
                 if (obj is T)
                     l.Add((T)obj);
                 if (fullSearch)
-                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject))
+                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, scopeIndex))
                         return true;
             }
             return false;
