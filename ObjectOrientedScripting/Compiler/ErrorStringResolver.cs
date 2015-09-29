@@ -18,7 +18,8 @@ namespace Compiler
             C0020, C0021, C0022, C0023, C0024,
             C0025, C0026, C0027, C0028, C0029,
             C0030, C0031, C0032, C0033, C0034,
-            C0035, C0036, C0037, C0038
+            C0035, C0036, C0037, C0038, C0039,
+            C0040
         }
         public static string resolve(ErrorCodeEnum errCode, int line = -1, int pos = -1)
         {
@@ -67,6 +68,8 @@ namespace Compiler
                 case ErrorCodeEnum.C0036: return "Function override lacks arguments";
                 case ErrorCodeEnum.C0037: return "Function override type missmatch on argument";
                 case ErrorCodeEnum.C0038: return "Function override return type missmatch";
+                case ErrorCodeEnum.C0039: return "Return type is void but return instruction tries to return a value";
+                case ErrorCodeEnum.C0040: return "Return type differs from function return type";
                 default: return "Unknown Error";
             }
         }

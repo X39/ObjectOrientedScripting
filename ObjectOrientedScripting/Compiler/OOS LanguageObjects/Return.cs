@@ -19,8 +19,23 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override int doFinalize()
         {
-            //ToDo: check that the return type is matching its functions return type
-            return 0;
+            int errCount = 0;
+            var fnc = this.getFirstOf<Function>();
+            if(this.children.Count > 0)
+            {
+                var returnExpression = (Expression)this.children[0];
+                if(!returnExpression.ReferencedType.Equals(fnc.varType))
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0040, this.line, this.pos));
+                    errCount++;
+                }
+            }
+            else if(fnc.varType.varType != VarType.Void)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0039, this.line, this.pos));
+                errCount++;
+            }
+            return errCount;
         }
     }
 }
