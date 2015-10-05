@@ -506,6 +506,7 @@ public class Parser {
 		obj.markEnd(); 
 		Expect(11);
 		while (StartOf(7)) {
+			e = Encapsulation.Private; 
 			if (StartOf(8)) {
 				if (la.kind == 17 || la.kind == 18 || la.kind == 19) {
 					ENCAPSULATION(out e);
@@ -854,7 +855,7 @@ public class Parser {
 		while (la.kind == 53 || la.kind == 54 || la.kind == 55) {
 			if (la.kind == 53) {
 				Get();
-				caseObj = new Case(obj); obj.addChild(caseObj); 
+				caseObj = new Case(obj, la.col, la.pos); obj.addChild(caseObj); 
 				EXPRESSION(out blo, obj);
 				caseObj.expression = blo; 
 				Expect(35);
@@ -884,11 +885,11 @@ public class Parser {
 			} else {
 				if (la.kind == 54) {
 					Get();
-					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = null; 
+					caseObj = new Case(obj, la.col, la.pos); obj.addChild(caseObj); caseObj.expression = null; 
 					Expect(35);
 				} else {
 					Get();
-					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = null; 
+					caseObj = new Case(obj, la.col, la.pos); obj.addChild(caseObj); caseObj.expression = null; 
 				}
 				while (StartOf(10)) {
 					CODEINSTRUCTION(out blo, obj);

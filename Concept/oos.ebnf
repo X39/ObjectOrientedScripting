@@ -605,7 +605,7 @@ COMPILER OOS
 			T_CODEBRACKETOPEN
 			{
 				(
-					"case" (. caseObj = new Case(obj); obj.addChild(caseObj); .)
+					"case" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
 					EXPRESSION<out blo, obj> (. caseObj.expression = blo; .)
 					':'
 					{
@@ -631,11 +631,11 @@ COMPILER OOS
 				(
 					(
 						(
-							"default" (. caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = null; .)
+							"default" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); caseObj.expression = null; .)
 							':'
 						)
 						|
-						"default:" (. caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = null; .)
+						"default:" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); caseObj.expression = null; .)
 					)
 					{
 						CODEINSTRUCTION<out blo, obj> (. caseObj.addChild(blo); .)

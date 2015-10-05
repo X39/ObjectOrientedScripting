@@ -59,7 +59,16 @@ namespace Compiler.OOS_LanguageObjects
             this.pos = pos;
         }
         public override int doFinalize() {
-            //ToDo: make sure we got no doubleDefine in here
+            int errCount = 0;
+            var varList = this.Parent.getAllChildrenOf<Variable>(false, this, 0);
+            foreach(var it in varList)
+            {
+                if(it.Name.FullyQualifiedName == this.Name.FullyQualifiedName)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0041, this.line, this.pos));
+                    errCount++;
+                }
+            }
             if(this.varType.varType == VarType.Object || this.varType.varType == VarType.ObjectStrict)
                 this.varType.ident.finalize();
             var assign = this.getAllChildrenOf<VariableAssignment>();
@@ -70,7 +79,7 @@ namespace Compiler.OOS_LanguageObjects
                 if (expList.Count <= 0 && newArrayList.Count <= 0)
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0000, this.line, this.pos));
-                    return 1;
+                    errCount++;
                 }
                 if (newArrayList.Count <= 0)
                 {
@@ -83,7 +92,7 @@ namespace Compiler.OOS_LanguageObjects
                     if (!this.varType.Equals(type))
                     {
                         Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0001, this.line, this.pos));
-                        return 1;
+                        errCount++;
                     }
                 }
                 else
@@ -97,11 +106,11 @@ namespace Compiler.OOS_LanguageObjects
                     if (!this.varType.Equals(type))
                     {
                         Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0001, this.line, this.pos));
-                        return 1;
+                        errCount++;
                     }
                 }
             }
-            return 0;
+            return errCount;
         }
         public override string ToString()
         {

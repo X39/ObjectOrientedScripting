@@ -22,16 +22,13 @@ interface testInterface
 }
 class testObj : testInterface
 {
-    public ::testObj testobject;
 	public testObj()
 	{
         auto _obj = new testObj();
         _obj.testFncPublic("preInitArg1", "preInitArg2");
-        this.testobject = new testObj();
-        this.testobject.testVarPublic = "";
-        this.testobject.testobject = new testObj();
 		this.testVarPublic = "";
 		testVarStatic = "";
+		this.testFncPublic("arg1", "arg2");
 		this.testFncPublic("arg1", "arg2");
 		::testObj::testFncStatic("arg1", "arg2");
 	}
@@ -41,7 +38,7 @@ class testObj : testInterface
 	{
 		SQF diag_log(SQF str(_arg1));
 	}
-	static void testFncStatic(string _arg1, string _arg2)
+	static string testFncStatic(string _arg1, string _arg2)
 	{
 		SQF diag_log(SQF str(_arg2));
 		return "";

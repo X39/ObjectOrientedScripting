@@ -45,6 +45,10 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     lType = new VarTypeObject(((Value)lExpression).varType);
                 }
+                else if (lExpression is InstanceOf)
+                {
+                    lType = ((InstanceOf)lExpression).ReferencedType;
+                }
                 else
                 {
                     throw new NotImplementedException();
@@ -78,6 +82,10 @@ namespace Compiler.OOS_LanguageObjects
                     else if (rExpression is Value)
                     {
                         rType = new VarTypeObject(((Value)rExpression).varType);
+                    }
+                    else if (rExpression is InstanceOf)
+                    {
+                        rType = ((InstanceOf)rExpression).ReferencedType;
                     }
                     else
                     {

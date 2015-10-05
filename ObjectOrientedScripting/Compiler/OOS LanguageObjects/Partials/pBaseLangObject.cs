@@ -53,6 +53,20 @@ namespace Compiler.OOS_LanguageObjects
                     return null;
             }
         }
+        public int countTo<T>() where T : pBaseLangObject
+        {
+            if (this is T)
+            {
+                return 1;
+            }
+            else
+            {
+                if (this.parent != null)
+                    return 1 + this.parent.countTo<T>();
+                else
+                    return 1;
+            }
+        }
         public T getLastOf<T>() where T : pBaseLangObject
         {
             if (this.parent == null)
@@ -63,14 +77,16 @@ namespace Compiler.OOS_LanguageObjects
                 return (T)this;
             return null;
         }
-        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int scopeIndex = -1) where T : pBaseLangObject
+        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int deepness = -1, int scopeIndex = -1) where T : pBaseLangObject
         {
             List<T> l = new List<T>();
-            private_getAllChildrenOf<T>(l, fullSearch, stopObject, scopeIndex);
+            private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness, scopeIndex);
             return l;
         }
-        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int scopeIndex) where T : pBaseLangObject
+        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int deepness, int scopeIndex) where T : pBaseLangObject
         {
+            if (deepness == 0)
+                return false;
             foreach (var obj in this.getScopeItems(scopeIndex))
             {
                 if (obj == null)
@@ -80,7 +96,7 @@ namespace Compiler.OOS_LanguageObjects
                 if (obj is T)
                     l.Add((T)obj);
                 if (fullSearch)
-                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, scopeIndex))
+                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness - 1, scopeIndex))
                         return true;
             }
             return false;

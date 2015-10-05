@@ -346,16 +346,22 @@ namespace Wrapper
             else if (container is Expression)
             {
                 var obj = (Expression)container;
-                if (!(obj.Parent is Function) && !(obj.Parent is IfElse) && !(obj.Parent is Case) && !(obj.Parent is While) && !(obj.Parent is Switch) && !(obj.Parent is For) && !(obj.Parent is TryCatch))
-                    writer.Write("(");
+                if (obj.rExpression != null || !(obj.Parent is Function || obj.Parent is IfElse || obj.Parent is Case || obj.Parent is While || obj.Parent is Switch || obj.Parent is For || obj.Parent is TryCatch || obj.Parent is NewArray))
+                {
+                    if (!(obj.Parent is Expression) || ((Expression)obj.Parent).rExpression != obj)
+                        writer.Write("(");
+                }
                 WriteOutTree(proj, obj.lExpression, path, configObj, writer, tabCount);
                 if (obj.rExpression != null)
                 {
                     writer.Write(") " + obj.expOperator + " (");
                     WriteOutTree(proj, obj.rExpression, path, configObj, writer, tabCount);
                 }
-                if (!(obj.Parent is Function) && !(obj.Parent is IfElse) && !(obj.Parent is Case) && !(obj.Parent is While) && !(obj.Parent is Switch) && !(obj.Parent is For) && !(obj.Parent is TryCatch))
-                    writer.Write(")");
+                if (obj.rExpression != null || !(obj.Parent is Function || obj.Parent is IfElse || obj.Parent is Case || obj.Parent is While || obj.Parent is Switch || obj.Parent is For || obj.Parent is TryCatch || obj.Parent is NewArray))
+                {
+                    if (!(obj.Parent is Expression) || ((Expression)obj.Parent).rExpression != obj)
+                        writer.Write(")");
+                }
             }
             #endregion
             #region object For
@@ -370,6 +376,7 @@ namespace Wrapper
                 writer.WriteLine("} do");
                 writer.WriteLine(tab + "{");
                 updateTabcount(ref tab, ref tabCount, 1);
+                writer.Write(tab);
                 WriteOutTree(proj, obj.forArg3, path, configObj, writer, tabCount);
                 writer.WriteLine(";");
                 foreach (var it in obj.CodeInstructions)
@@ -494,13 +501,13 @@ namespace Wrapper
                     {
                         if (nextIdent != null)
                             WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
-                        WriteOutTree(proj, variable, path, configObj, writer, tabCount, obj);
+                        WriteOutTree(proj, variable, path, configObj, writer, tabCount, true);
                         if (instruction is Ident)
                             WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
                     }
                     else if (instruction is VariableAssignment)
                     {
-                        WriteOutTree(proj, variable, path, configObj, writer, tabCount);
+                        WriteOutTree(proj, variable, path, configObj, writer, tabCount, true);
                         if (nextIdent == null)
                         {
                             if (variable.encapsulation == Encapsulation.NA || variable.encapsulation == Encapsulation.Static)

@@ -19,7 +19,8 @@ namespace Compiler
             C0025, C0026, C0027, C0028, C0029,
             C0030, C0031, C0032, C0033, C0034,
             C0035, C0036, C0037, C0038, C0039,
-            C0040
+            C0040, C0041, C0042, C0043, C0044,
+            C0045
         }
         public static string resolve(ErrorCodeEnum errCode, int line = -1, int pos = -1)
         {
@@ -70,6 +71,11 @@ namespace Compiler
                 case ErrorCodeEnum.C0038: return "Function override return type missmatch";
                 case ErrorCodeEnum.C0039: return "Return type is void but return instruction tries to return a value";
                 case ErrorCodeEnum.C0040: return "Return type differs from function return type";
+                case ErrorCodeEnum.C0041: return "Variable ReDeclaration found";
+                case ErrorCodeEnum.C0042: return "Catch variable has to be string";
+                case ErrorCodeEnum.C0043: return "Throw expression has to resolve to string";
+                case ErrorCodeEnum.C0044: return "Case type not matching Switch type";
+                case ErrorCodeEnum.C0045: return "Second 'default' case located";
                 default: return "Unknown Error";
             }
         }

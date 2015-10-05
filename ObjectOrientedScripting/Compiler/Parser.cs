@@ -855,7 +855,7 @@ public class Parser {
 		while (la.kind == 53 || la.kind == 54 || la.kind == 55) {
 			if (la.kind == 53) {
 				Get();
-				caseObj = new Case(obj); obj.addChild(caseObj); 
+				caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); 
 				EXPRESSION(out blo, obj);
 				caseObj.expression = blo; 
 				Expect(35);
@@ -885,11 +885,11 @@ public class Parser {
 			} else {
 				if (la.kind == 54) {
 					Get();
-					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = null; 
+					caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); caseObj.expression = null; 
 					Expect(35);
 				} else {
 					Get();
-					caseObj = new Case(obj); obj.addChild(caseObj); caseObj.expression = null; 
+					caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); caseObj.expression = null; 
 				}
 				while (StartOf(10)) {
 					CODEINSTRUCTION(out blo, obj);

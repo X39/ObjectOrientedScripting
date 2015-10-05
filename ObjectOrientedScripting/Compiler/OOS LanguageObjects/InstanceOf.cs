@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class InstanceOf : pBaseLangObject
+    public class InstanceOf : pBaseLangObject, Interfaces.iHasType
     {
         public pBaseLangObject LIdent { get { return (pBaseLangObject)this.children[0]; } set { this.children[0] = value; } }
         public Ident RIdent { get { return (Ident)this.children[1]; } set { this.children[1] = value; } }
@@ -15,6 +15,7 @@ namespace Compiler.OOS_LanguageObjects
             this.addChild(null);
             this.addChild(null);
         }
+        public VarTypeObject ReferencedType { get { return new VarTypeObject(VarType.Bool); } }
         public override int doFinalize()
         {
             int errCount = 0;
