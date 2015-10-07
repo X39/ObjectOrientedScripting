@@ -227,6 +227,8 @@ namespace Wrapper
                         }
                         foreach (var it in fncList)
                         {
+                            if (((Function)it).IsConstructor)
+                                continue;
                             if (index > 0)
                                 writer.WriteLine(",");
                             writer.Write(tab + "\"" + thisVariableName + "fnc" + it.Name.OriginalValue.Replace("::", "_") + "\"");
@@ -249,6 +251,8 @@ namespace Wrapper
                     writer.WriteLine(tab + "//Object '" + obj.Name + "' functions");
                     foreach (var it in fncList)
                     {
+                        if (((Function)it).IsConstructor)
+                            continue;
                         writer.WriteLine(tab + thisVariableName + "fnc" + it.Name.OriginalValue.Replace("::", "_") + " = {");
                         WriteOutTree(proj, it, path, configObj, writer, 1, obj);
                         writer.WriteLine("};");
@@ -307,7 +311,7 @@ namespace Wrapper
                                         writer.WriteLine(",");
                                     if (child is Function)
                                     {
-                                        if (((Function)child).IsClassFunction)
+                                        if (((Function)child).IsClassFunction && !((Function)child).IsConstructor)
                                             writer.Write(tab + '"' + ((Function)child).FullyQualifiedName + '"');
                                         else
                                             writer.Write(tab + "nil");
@@ -342,7 +346,7 @@ namespace Wrapper
                                         writer.WriteLine(",");
                                     if (child is Function)
                                     {
-                                        if (((Function)child).IsClassFunction)
+                                        if (((Function)child).IsClassFunction && !((Function)child).IsConstructor)
                                             writer.Write(tab + thisVariableName + "fnc" + ((Function)child).Name.OriginalValue.Replace("::", "_"));
                                         else
                                             writer.Write(tab + "nil");
@@ -398,10 +402,11 @@ namespace Wrapper
                     writer.WriteLine(tab + "nil,");
                     //Reserved for future meta informations
                     writer.WriteLine(tab + "[]");
-                    
+
 
                     updateTabcount(ref tab, ref tabCount, -1);
                     writer.WriteLine(tab + "];");
+                    writer.WriteLine(tab + "//Actual class starts here, we just printed the object till here :)");
                 }
                 var argList = obj.ArgList;
                 if (obj.IsClassFunction && !obj.IsConstructor)
