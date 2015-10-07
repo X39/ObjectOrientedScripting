@@ -22,6 +22,8 @@ namespace Compiler.OOS_LanguageObjects
         public VarTypeObject ReferencedType { get { return this.varType; } }
         public Encapsulation encapsulation;
         public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
+        public pBaseLangObject Value { get { var valAssign = this.getAllChildrenOf<VariableAssignment>(); if (valAssign.Count > 0) return valAssign[0]; return null; } }
+        public bool IsClassVariable { get { return this.encapsulation != Encapsulation.Static && this.encapsulation != Encapsulation.NA; } }
         public string SqfVariableName
         {
             get
@@ -41,7 +43,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     var casted = (Interfaces.iGetVariableIndex)this.Parent;
                     var res = casted.getVariableIndex(this.Name);
-                    return " select 1 select " + res.Item1 + " select " + res.Item2;
+                    return " select 1 select " + res.Item1 + " select 1 select " + res.Item2;
                 }
             }
         }
@@ -69,8 +71,15 @@ namespace Compiler.OOS_LanguageObjects
                     errCount++;
                 }
             }
-            if(this.varType.varType == VarType.Object || this.varType.varType == VarType.ObjectStrict)
+            if (this.varType.varType == VarType.Object || this.varType.varType == VarType.ObjectStrict)
+            {
                 this.varType.ident.finalize();
+                if(this.varType.ident.ReferencedObject is oosInterface && this.varType.varType == VarType.ObjectStrict)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0046, this.line, this.pos));
+                    errCount++;
+                }
+            }
             var assign = this.getAllChildrenOf<VariableAssignment>();
             if(assign.Count > 0)
             {

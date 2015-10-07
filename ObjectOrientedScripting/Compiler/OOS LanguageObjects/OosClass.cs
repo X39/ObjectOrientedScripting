@@ -12,15 +12,11 @@ namespace Compiler.OOS_LanguageObjects
         int endMarker;
         public List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> ClassContent { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
-        public List<Function> AllFunctions
+        public List<Function> ThisFunctions
         {
             get
             {
                 List<Function> fncList = new List<Function>();
-                foreach (var it in parentClasses)
-                {
-                    fncList.AddRange(it.AllFunctions);
-                }
                 var thisFncList = this.getAllChildrenOf<Function>();
                 foreach (var it in thisFncList)
                 {
@@ -29,6 +25,16 @@ namespace Compiler.OOS_LanguageObjects
                         fncList.Add(it);
                     }
                 }
+                return fncList;
+            }
+        }
+        public List<Function> AllFunctions
+        {
+            get
+            {
+                List<Function> fncList = new List<Function>();
+                fncList.AddRange(this.InheritanceFunctions);
+                fncList.AddRange(this.ThisFunctions);
                 return fncList;
             }
         }
@@ -41,9 +47,62 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     fncList.AddRange(it.AllFunctions);
                 }
+                for (int i = 0; i < fncList.Count; i++)
+                {
+                    var it = fncList[i];
+                    foreach (var it2 in this.ThisFunctions)
+                    {
+                        if (it.Name.OriginalValue.Equals(it2.Name.OriginalValue))
+                        {
+                            if (it2.Override)
+                            {
+                                fncList.RemoveAt(i);
+                            }
+                        }
+                    }
+                }
                 return fncList;
             }
         }
+        public List<Variable> ThisVariables
+        {
+            get
+            {
+                List<Variable> varList = new List<Variable>();
+                var thisVarList = this.getAllChildrenOf<Variable>();
+                foreach (var it in thisVarList)
+                {
+                    if (it.encapsulation == Encapsulation.Public || it.encapsulation == Encapsulation.Protected || it.encapsulation == Encapsulation.Private)
+                    {
+                        varList.Add(it);
+                    }
+                }
+                return varList;
+            }
+        }
+        public List<Variable> InheritanceVariables
+        {
+            get
+            {
+                List<Variable> varList = new List<Variable>();
+                foreach (var it in parentClasses)
+                {
+                    varList.AddRange(it.AllVariables);
+                }
+                return varList;
+            }
+        }
+        public List<Variable> AllVariables
+        {
+            get
+            {
+                List<Variable> varList = new List<Variable>();
+                varList.AddRange(this.ThisVariables);
+                varList.AddRange(this.InheritanceVariables);
+                return varList;
+            }
+        }
+
         private List<oosClass> parentClasses;
         private List<oosInterface> parentInterfaces;
         
@@ -199,7 +258,7 @@ namespace Compiler.OOS_LanguageObjects
                 for (int i = 0; i < this.parentClasses.Count; i++)
                 {
                     var it = this.parentClasses[i];
-                    tuple = it.getFunctionIndex(ident, false);
+                    tuple = it.getFunctionIndex(ident);
                     if (tuple.Item1 != -1)
                     {
                         tuple = new Tuple<int, int>(i, tuple.Item2);

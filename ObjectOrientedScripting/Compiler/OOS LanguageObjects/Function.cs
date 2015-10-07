@@ -44,7 +44,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     var casted = (Interfaces.iGetFunctionIndex)this.Parent;
                     var res = casted.getFunctionIndex(this.Name);
-                    return " select 1 select " + res.Item1 + " select " + res.Item2;
+                    return " select 1 select " + res.Item1 + " select 1 select " + res.Item2;
                 }
             }
         }

@@ -103,6 +103,7 @@ namespace Wrapper
             //ToDo: change "private" array so that it just privates on current scope level
             string curPath = path;
             string tab = new string('\t', tabCount);
+            bool writerWasNull = writer == null;
             if (container == null)
             {
                 //Just skip null objects and give a warning
@@ -183,9 +184,12 @@ namespace Wrapper
             else if (container is Function)
             {
                 var obj = (Function)container;
+                if (extraParam is Function && obj.IsConstructor)
+                    return;
                 int index = 0;
                 path += '\\' + obj.Name.OriginalValue + ".sqf";
-                writer = new StreamWriter(path);
+                if (writerWasNull)
+                    writer = new StreamWriter(path);
                 var objConfigClass = new SqfConfigClass(obj.Name.OriginalValue);
                 configObj.addChild(objConfigClass);
                 if (obj.encapsulation == Encapsulation.NA)
@@ -207,26 +211,70 @@ namespace Wrapper
                     //ToDo: generate reference arrays for the class functions/variables
                     //ToDo: print classes with the references
                     var classObject = obj.getFirstOf<oosClass>();
+                    var varList = classObject.AllVariables;
+                    var fncList = classObject.AllFunctions;
+                    if (varList.Count > 0 || fncList.Count > 0)
+                    {
+                        writer.WriteLine(tab + "private [");
+                        updateTabcount(ref tab, ref tabCount, 1);
+                        index = 0;
+                        foreach (var it in varList)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            writer.Write(tab + "\"" + thisVariableName + "var" + it.Name.OriginalValue.Replace("::", "_") + "\"");
+                            index++;
+                        }
+                        foreach (var it in fncList)
+                        {
+                            if (index > 0)
+                                writer.WriteLine(",");
+                            writer.Write(tab + "\"" + thisVariableName + "fnc" + it.Name.OriginalValue.Replace("::", "_") + "\"");
+                            index++;
+                        }
+                        updateTabcount(ref tab, ref tabCount, -1);
+                        writer.WriteLine(endl + tab + "];");
+                    }
+                    writer.WriteLine(tab + "//Object '" + obj.Name + "' variables");
+                    foreach (var it in varList)
+                    {
+                        writer.Write(tab + thisVariableName + "var" + it.Name.OriginalValue.Replace("::", "_") + " = [");
+                        var val = it.Value;
+                        if (val == null)
+                            writer.Write("nil");
+                        else
+                            WriteOutTree(proj, val, path, configObj, writer, 1);
+                        writer.WriteLine("];");
+                    }
+                    writer.WriteLine(tab + "//Object '" + obj.Name + "' functions");
+                    foreach (var it in fncList)
+                    {
+                        writer.WriteLine(tab + thisVariableName + "fnc" + it.Name.OriginalValue.Replace("::", "_") + " = {");
+                        WriteOutTree(proj, it, path, configObj, writer, 1, obj);
+                        writer.WriteLine("};");
+                    }
                     writer.WriteLine(tab + thisVariableName + " = [");
                     updateTabcount(ref tab, ref tabCount, 1);
 
                     //Write out parents info
-                    var parentIdents = classObject.ParentClassesIdents;
+                    var classIdents = classObject.ParentClassesIdents;
+                    classIdents.Add(classObject.Name);
+
                     writer.WriteLine(tab + "[");
                     updateTabcount(ref tab, ref tabCount, 1);
                     index = 0;
-                    foreach (var it in parentIdents)
+                    foreach (var it in classIdents)
                     {
                         if (index > 0)
                             writer.WriteLine(",");
                         if (it is Ident)
                         {
-
-                            writer.Write('"' + ((Ident)it).FullyQualifiedName + '"');
+                            index++;
+                            writer.Write(tab + '"' + ((Ident)it).FullyQualifiedName + '"');
                         }
                         else
                         {
-                            throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
+                            throw new Exception("please report to developer, unknown exception happened in function object creation");
                         }
                     }
                     updateTabcount(ref tab, ref tabCount, -1);
@@ -236,14 +284,108 @@ namespace Wrapper
                     writer.WriteLine(tab + "[");
                     updateTabcount(ref tab, ref tabCount, 1);
                     index = 0;
-                    foreach (var it in parentIdents)
+                    foreach (var it in classIdents)
                     {
                         if (index > 0)
                             writer.WriteLine(",");
                         if (it is Ident)
                         {
+                            var refObj = ((Ident)it).ReferencedObject;
+                            if(refObj is oosClass)
+                            {
+                                index++;
+                                var cObj = (oosClass)refObj;
+                                int index2 = 0;
+                                //LookupRegister
+                                writer.WriteLine(tab + "[");
+                                updateTabcount(ref tab, ref tabCount, 1);
+                                writer.WriteLine(tab + "[");
+                                updateTabcount(ref tab, ref tabCount, 1);
+                                foreach (var child in cObj.children)
+                                {
+                                    if (index2 > 0)
+                                        writer.WriteLine(",");
+                                    if (child is Function)
+                                    {
+                                        if (((Function)child).IsClassFunction)
+                                            writer.Write(tab + '"' + ((Function)child).FullyQualifiedName + '"');
+                                        else
+                                            writer.Write(tab + "nil");
+                                    }
+                                    else if (child is VirtualFunction)
+                                    {
+                                        writer.Write(tab + '"' + ((VirtualFunction)child).FullyQualifiedName + '"');
+                                    }
+                                    else if (child is Variable)
+                                    {
 
-                            writer.Write('"' + ((Ident)it).FullyQualifiedName + '"');
+                                        if (((Variable)child).IsClassVariable)
+                                            writer.Write(tab + '"' + ((Variable)child).FullyQualifiedName + '"');
+                                        else
+                                            writer.Write(tab + "nil");
+                                    }
+                                    else
+                                    {
+                                        writer.Write(tab + "nil");
+                                    }
+                                    index2++;
+                                }
+                                updateTabcount(ref tab, ref tabCount, -1);
+                                writer.WriteLine(endl + tab + "],");
+                                //Content list
+                                index2 = 0;
+                                writer.WriteLine(tab + "[");
+                                updateTabcount(ref tab, ref tabCount, 1);
+                                foreach (var child in cObj.children)
+                                {
+                                    if (index2 > 0)
+                                        writer.WriteLine(",");
+                                    if (child is Function)
+                                    {
+                                        if (((Function)child).IsClassFunction)
+                                            writer.Write(tab + thisVariableName + "fnc" + ((Function)child).Name.OriginalValue.Replace("::", "_"));
+                                        else
+                                            writer.Write(tab + "nil");
+                                    }
+                                    else if (child is VirtualFunction)
+                                    {
+                                        writer.Write(tab + thisVariableName + "var" + ((VirtualFunction)child).Name.OriginalValue.Replace("::", "_"));
+                                    }
+                                    else if (child is Variable)
+                                    {
+
+                                        if (((Variable)child).IsClassVariable)
+                                            writer.Write(tab + thisVariableName + "var" + ((Variable)child).Name.OriginalValue.Replace("::", "_"));
+                                        else
+                                            writer.Write(tab + "nil");
+                                    }
+                                    else
+                                    {
+                                        writer.Write(tab + "nil");
+                                    }
+                                    index2++;
+                                }
+                                updateTabcount(ref tab, ref tabCount, -1);
+                                writer.WriteLine(endl + tab + "],");
+                                //Meta-Informations
+                                index2 = 0;
+                                writer.WriteLine(tab + "[");
+                                updateTabcount(ref tab, ref tabCount, 1);
+                                writer.Write(tab + '"' + ((Ident)it).FullyQualifiedName + '"');
+                                updateTabcount(ref tab, ref tabCount, -1);
+                                writer.WriteLine(endl + tab + "]");
+                                updateTabcount(ref tab, ref tabCount, -1);
+                                writer.Write(tab + "]");
+                            }
+                            else if(refObj is oosInterface)
+                            {
+                                index++;
+                                writer.Write(tab + "nil");
+                            }
+                            else
+                            {
+                                throw new Exception("please report to developer, unknown exception happened in function object creation cast refObj");
+                            }
                         }
                         else
                         {
@@ -252,10 +394,14 @@ namespace Wrapper
                     }
                     updateTabcount(ref tab, ref tabCount, -1);
                     writer.WriteLine(endl + tab + "],");
+                    //Current active class
+                    writer.WriteLine(tab + "nil,");
+                    //Reserved for future meta informations
+                    writer.WriteLine(tab + "[]");
                     
 
                     updateTabcount(ref tab, ref tabCount, -1);
-                    writer.WriteLine(tab + "]");
+                    writer.WriteLine(tab + "];");
                 }
                 var argList = obj.ArgList;
                 if (obj.IsClassFunction && !obj.IsConstructor)
@@ -272,7 +418,7 @@ namespace Wrapper
                 }
                 if (argList.Count > 0)
                 {
-                    writer.WriteLine("params [");
+                    writer.WriteLine(tab + "params [");
                     updateTabcount(ref tab, ref tabCount, 1);
                     index = 0;
                     foreach (var it in argList)
@@ -289,7 +435,7 @@ namespace Wrapper
                             throw new Exception("Function has non-Variable object in arglist, please report to developer");
                     }
                     updateTabcount(ref tab, ref tabCount, -1);
-                    writer.WriteLine(endl + "];");
+                    writer.WriteLine(endl + tab + "];");
                 }
                 var pVarList = obj.getAllChildrenOf<Variable>(true);
                 foreach (var it in obj.ArgList)
@@ -300,7 +446,7 @@ namespace Wrapper
 
                 if (pVarList.Count > 0)
                 {
-                    writer.WriteLine("private [");
+                    writer.WriteLine(tab + "private [");
                     updateTabcount(ref tab, ref tabCount, 1);
                     index = 0;
                     foreach (var it in pVarList)
@@ -317,16 +463,23 @@ namespace Wrapper
                             throw new Exception("Function has non-Variable object in arglist, please report to developer");
                     }
                     updateTabcount(ref tab, ref tabCount, -1);
-                    writer.WriteLine(endl + "];");
+                    writer.WriteLine(endl + tab + "];");
                 }
-                writer.WriteLine("scopeName \"function\";");
+                writer.WriteLine(tab + "scopeName \"function\";");
                 foreach (var it in obj.CodeInstructions)
                 {
                     WriteOutTree(proj, it, path, configObj, writer, tabCount);
                     writer.WriteLine(";");
                 }
-                writer.Flush();
-                writer.Close();
+                if(obj.IsConstructor)
+                {
+                    writer.WriteLine(tab + thisVariableName);
+                }
+                if (writerWasNull)
+                {
+                    writer.Flush();
+                    writer.Close();
+                }
             }
             #endregion
             #region object Break
