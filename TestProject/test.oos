@@ -11,110 +11,113 @@ somethingWithArgs((, approved))
 somethingWithArgs({a,p,r,o,v,e,d})
 mergeTest(its something with )
 mergeTest(itsMergedDude!)
-namespace testNamespace
+namespace X39
 {
-	#include "cFoo.oos"
-	#include "cBar.oos"
-}
-interface testInterface
-{
-	void interfaceFnc(string, scalar, scalar);
-}
-class testObj : testInterface
-{
-	public testObj()
-	{
-        auto _obj = new testObj();
-        _obj.testFncPublic("preInitArg1", "preInitArg2");
-		this.testVarPublic = "";
-		testVarStatic = "";
-		this.testFncPublic("arg1", "arg2");
-		this.testFncPublic("arg1", "arg2");
-		::testObj::testFncStatic("arg1", "arg2");
-	}
-	public string testVarPublic;
-	static string testVarStatic;
-	public void testFncPublic(string _arg1, string _arg2)
-	{
-		SQF diag_log(SQF str(_arg1));
-	}
-	static string testFncStatic(string _arg1, string _arg2)
-	{
-		SQF diag_log(SQF str(_arg2));
-		return "";
-	}
-	void interfaceFnc(string s, scalar i, scalar j)
+    namespace testNamespace
     {
-		return;
+        #include "cFoo.oos"
+        #include "cBar.oos"
     }
-}
-static void castDynamicTest(::testNamespace::cBar testVar)
-{
-    auto casted = $cFoo$ testVar;
-}
-static void castStaticTest(strict ::testNamespace::cBar testVar)
-{
-    auto casted = §cFoo§ testVar;
-}
-static bool instanceOfTest(::testNamespace::cFoo testVar)
-{
-    return testVar is ::testNamespace::cBar;
-}
-static bool returnTrue()
-{
-	return true;
-}
-static void preInit()
-{
-	SQF diag_log("preInit");
-    auto _obj = new ::testObj();
-	_obj.testFncPublic("preInitArg1", "preInitArg2");
-	::testObj::testFncStatic("preInitArg1", "preInitArg2");
-	auto _foo = new testNamespace::cFoo();
-	_foo.foobar("normal foo");
+    interface testInterface
+    {
+        void interfaceFnc(string, scalar, scalar);
+    }
+    class testObj : testInterface
+    {
+        public testObj()
+        {
+            auto _obj = new testObj();
+            _obj.testFncPublic("preInitArg1", "preInitArg2");
+            this.testVarPublic = "";
+            testVarStatic = "";
+            this.testFncPublic("arg1", "arg2");
+            this.testFncPublic("arg1", "arg2");
+            ::X39::testObj::testFncStatic("arg1", "arg2");
+        }
+        public string testVarPublic;
+        static string testVarStatic;
+        public void testFncPublic(string _arg1, string _arg2)
+        {
+            SQF diag_log(SQF str(_arg1));
+        }
+        static string testFncStatic(string _arg1, string _arg2)
+        {
+            SQF diag_log(SQF str(_arg2));
+            return "";
+        }
+        void interfaceFnc(string s, scalar i, scalar j)
+        {
+            return;
+        }
+    }
+    static void castDynamicTest(::X39::testNamespace::cBar testVar)
+    {
+        auto casted = $cFoo$ testVar;
+    }
+    static void castStaticTest(strict ::X39::testNamespace::cBar testVar)
+    {
+        auto casted = §cFoo§ testVar;
+    }
+    static bool instanceOfTest(::X39::testNamespace::cFoo testVar)
+    {
+        return testVar is ::X39::testNamespace::cBar;
+    }
+    static bool returnTrue()
+    {
+        return true;
+    }
+    static void preInit()
+    {
+        SQF diag_log("preInit");
+        auto _obj = new ::X39::testObj();
+        _obj.testFncPublic("preInitArg1", "preInitArg2");
+        ::X39::testObj::testFncStatic("preInitArg1", "preInitArg2");
+        auto _foo = new ::X39::testNamespace::cFoo();
+        _foo.foobar("normal foo");
 
-	auto _bar = new testNamespace::cBar();
-	_foo.foobar("normal bar");
+        auto _bar = new ::X39::testNamespace::cBar();
+        _foo.foobar("normal bar");
 
-	auto _testing = 0;
-    auto scalarArray = {1, 2, 3, 4, 5, 6};
-    auto stringArray = {"test1", "test2", "test3"};
-    auto boolArray = {false, true, false};
-    auto scalarValue = scalarArray[0];
-    auto stringValue = stringArray[0];
-    auto boolValue = boolArray[0];
-    string castedString = §string§ scalarValue;
-    
-	
-	for(auto _test = 0; _test < 10; _test = _test + 1)
-	{
-		SQF diag_log("test");
-	}
-	switch(SQF alive (SQF player))
-	{
-		case true:
-			try
-			{
-				throw "foobar";
-			}
-			catch(string test)
-			{
-				SQF diag_log(test);
-			}
-			break;
-		default:
-			if(::returnTrue())
-			{
-				SQF systemChat("aprooved");
-			}
-			else
-			{
-				SQF systemChat("nop");
-			}
-			break;
-	}
-	while(true)
-	{
-		break;
-	}
+        auto _testing = 0;
+        auto scalarArray = {1, 2, 3, 4, 5, 6};
+        auto stringArray = {"test1", "test2", "test3"};
+        auto boolArray = {false, true, false};
+        auto scalarValue = scalarArray[0];
+        auto stringValue = stringArray[0];
+        auto boolValue = boolArray[0];
+        string castedString = §string§ scalarValue;
+        
+        
+        for(auto _test = 0; _test < 10; _test = _test + 1)
+        {
+            SQF diag_log("test");
+        }
+        switch(SQF alive (SQF player))
+        {
+            case true:
+                try
+                {
+                    throw "foobar";
+                }
+                catch(string test)
+                {
+                    SQF diag_log(test);
+                }
+                break;
+            default:
+                if(::X39::returnTrue())
+                {
+                    SQF systemChat("aprooved");
+                }
+                else
+                {
+                    SQF systemChat("nop");
+                }
+                break;
+        }
+        while(true)
+        {
+            break;
+        }
+    }
 }
