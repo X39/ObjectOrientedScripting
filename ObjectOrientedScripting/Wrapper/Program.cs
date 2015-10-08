@@ -121,7 +121,9 @@ namespace Wrapper
                         Logger.Instance.log(Logger.LogLevel.INFO, "Creating directory");
                         Directory.CreateDirectory(path);
                     }
-                    Logger.Instance.log(Logger.LogLevel.INFO, "Creating project file");
+                    if (!path.EndsWith("\\"))
+                        path += '\\';
+                    Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating project file at '" + path + "poject.oosproj" + "'");
                     StreamWriter writer = new StreamWriter(path + "poject.oosproj");
                     writer.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
                     writer.WriteLine("<root>");
@@ -132,25 +134,25 @@ namespace Wrapper
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.4.0-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.5.0-ALPHA\" />");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!File.Exists(path + "Main.oos"))
                     {
-                        Logger.Instance.log(Logger.LogLevel.INFO, "Creating main file");
+                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating main file at '" + path + "Main.oos" + "'");
                         File.Create(path + "Main.oos").Close();
                     }
                     if (!Directory.Exists(path + "output"))
                     {
-                        Logger.Instance.log(Logger.LogLevel.INFO, "Creating output directory");
+                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating output directory at '" + path + "output" + "'");
                         Directory.CreateDirectory(path + "output");
                     }
                     if (!Directory.Exists(path + "build"))
                     {
-                        Logger.Instance.log(Logger.LogLevel.INFO, "Creating build directory");
+                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating build directory at '" + path + "build" + "'");
                         Directory.CreateDirectory(path + "build");
                     }
-                    Logger.Instance.log(Logger.LogLevel.INFO, "Created empty project for 0.1.0-ALPHA compiler");
+                    Logger.Instance.log(Logger.LogLevel.INFO, "Created empty project for 0.5.0-ALPHA compiler");
                 }
                 catch (Exception ex)
                 {
