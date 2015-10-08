@@ -2,6 +2,7 @@ Version 0.5.0-ALPHA
     |- Wrapper:   Fixed -gen is not working if file is not existing
 	|             (also if file was existing ... but expected error then)
     |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"
+    |- Compiler:  Flag /THISVAR="_thisvarname_"
     |- Compiler:  PreProcessor replaced non-keywords when they just contained a
     |             part of the keyword (EG. keyword was FOO, FOOBAR would have
     |             been replaced with <CONTENT>BAR)
