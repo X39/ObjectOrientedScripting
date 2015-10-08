@@ -17,7 +17,7 @@ namespace Wrapper
         bool addFunctionsClass;
         List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
-        public static readonly string thisVariableName = "___obj___";
+        public static string thisVariableName = "___obj___";
         public Compiler()
         {
             configFileName = "config.cpp";
@@ -48,8 +48,10 @@ namespace Wrapper
                         addFunctionsClass = false;
                         break;
                     case "DEFINE":
-                        addFunctionsClass = false;
                         flagDefines.Add(new PPDefine('#' + s.Substring(count + 1)));
+                        break;
+                    case "THISVAR":
+                        thisVariableName = s.Substring(count + 1);
                         break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
@@ -59,7 +61,7 @@ namespace Wrapper
         }
         public Version getVersion()
         {
-            return new Version("0.4.0-ALPHA");
+            return new Version("0.5.0-ALPHA");
         }
         public void CheckSyntax(string filepath)
         {
@@ -140,7 +142,9 @@ namespace Wrapper
             {
                 var obj = (Namespace)container;
                 var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_").Substring(1));
+                var objConfigClass2 = new SqfConfigClass("foobar");
                 configObj.addChild(objConfigClass);
+                objConfigClass.addChild(objConfigClass2);
                 path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
                 Directory.CreateDirectory(path);
@@ -151,7 +155,7 @@ namespace Wrapper
                         //Skip
                     }
                     else if(it is Function)
-                        WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                        WriteOutTree(proj, it, path, objConfigClass2, writer, tabCount);
                     else
                         WriteOutTree(proj, it, path, configObj, writer, tabCount);
 
@@ -198,7 +202,7 @@ namespace Wrapper
                 }
                 else if (obj.encapsulation == Encapsulation.Static || obj.IsConstructor)
                 {
-                    objConfigClass.addChild(new SqfConfigField("file", '"' + path.Substring(proj.OutputFolder.Length) + '"'));
+                    objConfigClass.addChild(new SqfConfigField("file", '"' + path.Substring(proj.OutputFolder.Length + 1) + '"'));
                     objConfigClass.addChild(new SqfConfigField("preInit", obj.Name.OriginalValue.StartsWith("preInit", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
                     objConfigClass.addChild(new SqfConfigField("postInit", obj.Name.OriginalValue.StartsWith("postInit", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
                     objConfigClass.addChild(new SqfConfigField("preStart", obj.Name.OriginalValue.StartsWith("preStart", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
@@ -207,9 +211,10 @@ namespace Wrapper
                     objConfigClass.addChild(new SqfConfigField("headerType", "0"));
                 }
                 if(obj.IsConstructor)
-                {//Print object structure
-                    //ToDo: generate reference arrays for the class functions/variables
-                    //ToDo: print classes with the references
+                {
+                    /////////////////////////////////
+                    // OBJECT CONSTRUCTOR PRINTING //
+                    /////////////////////////////////
                     var classObject = obj.getFirstOf<oosClass>();
                     var varList = classObject.AllVariables;
                     var fncList = classObject.AllFunctions;
@@ -604,9 +609,113 @@ namespace Wrapper
             {
                 //ToDo: do the actual casting stuff
                 var obj = (Cast)container;
-                foreach (var it in obj.children)
+                if(obj.isStaticCast)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    writer.Write(tab + "[] call {");
+                    if (obj.children.Count != 1 || !(obj.children[0] is Ident))
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    Ident ident = (Ident)obj.children[0];
+                    switch(ident.ReferencedType.varType)
+                    {
+                        case VarType.ObjectStrict:
+                            {
+                                writer.Write("(");
+                                WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                writer.Write(") set [2, ");
+                                var tupel = ident.getClassReferenceOfFQN(ident.ReferencedType.ident.FullyQualifiedName);
+                                if (tupel.Item1 != null)
+                                {
+                                    var index = tupel.Item1.getClassIndex(obj.varType.ident);
+                                    if (index == -1)
+                                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                                    WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                    writer.Write(" select 1 select " + index + "]; ");
+                                    WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                }
+                                else
+                                {
+                                    throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                                }
+                            } break;
+                        case VarType.Bool: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.BoolArray: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.Scalar: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.ScalarArray: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.String:
+                            writer.Write("str ");
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.StringArray: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        default:
+                            throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                    writer.Write("}");
+                }
+                else
+                {
+                    writer.Write(tab + "[] call {");
+                    if (obj.children.Count != 1 || !(obj.children[0] is Ident))
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    Ident ident = (Ident)obj.children[0];
+                    switch(ident.ReferencedType.varType)
+                    {
+                        case VarType.Object:
+                            {
+                                updateTabcount(ref tab, ref tabCount, 1);
+                                writer.WriteLine(endl + tab + "private \"_index\"; ");
+                                writer.Write(tab + "_index = (");
+                                WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                writer.WriteLine(") select 0 find \"" + obj.varType.ident.FullyQualifiedName + "\"; ");
+                                writer.WriteLine(tab + "if (_index == -1) then { throw \"InvalidCastException\"; }; ");
+                                writer.Write(tab + '(');
+                                WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                writer.Write(") set [2, ");
+                                var tupel = ident.getClassReferenceOfFQN(ident.ReferencedType.ident.FullyQualifiedName);
+                                if (tupel.Item1 == null)
+                                    throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                                
+                                var index = tupel.Item1.getClassIndex(obj.varType.ident);
+                                if (index == -1)
+                                    throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                                WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                writer.Write(" select 1 select _index];" + endl + tab);
+                                WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                                updateTabcount(ref tab, ref tabCount, -1);
+                                writer.Write(endl + tab);
+                            } break;
+                        case VarType.Bool: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.BoolArray: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.Scalar: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.ScalarArray: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.String:
+                            writer.Write("str ");
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        case VarType.StringArray: //ToDo: make an actual cast instead of just rewriting the output type during compile time
+                            WriteOutTree(proj, ident, path, configObj, writer, tabCount);
+                            break;
+                        default:
+                            throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                    writer.Write("}");
                 }
             }
             #endregion
@@ -899,7 +1008,7 @@ namespace Wrapper
                 var obj = (Case)container;
                 if (obj.expression == null)
                 {
-                    writer.WriteLine(tab + "default: {");
+                    writer.WriteLine(tab + "default {");
                 }
                 else
                 {

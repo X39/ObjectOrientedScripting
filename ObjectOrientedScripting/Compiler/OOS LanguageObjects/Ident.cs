@@ -411,7 +411,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             return errCount;
         }
-        private Tuple<Function, VirtualFunction> getFunctionReferenceOfFQN(string fqn)
+        public Tuple<Function, VirtualFunction> getFunctionReferenceOfFQN(string fqn)
         {
             var varList = this.getFirstOf<Base>().getAllChildrenOf<Function>(true);
             foreach (var it in varList)
@@ -432,7 +432,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             return null;
         }
-        private Tuple<oosClass, oosInterface> getClassReferenceOfFQN(string fqn)
+        public Tuple<oosClass, oosInterface> getClassReferenceOfFQN(string fqn)
         {
             var varList = this.getFirstOf<Base>().getAllChildrenOf<oosClass>(true);
             foreach (var it in varList)

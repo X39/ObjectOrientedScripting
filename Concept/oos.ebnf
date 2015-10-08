@@ -294,7 +294,12 @@ COMPILER OOS
 				|
 				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
 				|
-				IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo); .)
+                (   (. bool isStrict = false; .)                    
+                    [
+                        "strict" (. isStrict = true; .)
+                    ]
+                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                )
 			)
             [
                 "override" (. obj.Override = true; .)
@@ -342,7 +347,12 @@ COMPILER OOS
 				|
 				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
 				|
-				IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo); .)
+                (   (. bool isStrict = false; .)                    
+                    [
+                        "strict" (. isStrict = true; .)
+                    ]
+                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                )
 			)
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			T_ROUNDBRACKETOPEN

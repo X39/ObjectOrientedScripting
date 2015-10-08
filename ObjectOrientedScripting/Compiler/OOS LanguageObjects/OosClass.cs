@@ -238,6 +238,17 @@ namespace Compiler.OOS_LanguageObjects
         {
             return this.getFunctionIndex(ident, true);
         }
+        public int getClassIndex(Ident otherClassIdent)
+        {
+            var classIdents = this.ParentClassesIdents;
+            classIdents.Add(this.Name);
+            for(int i = 0; i < classIdents.Count; i++)
+            {
+                if (((Ident)classIdents[i]).FullyQualifiedName.Equals(otherClassIdent.FullyQualifiedName))
+                    return i;
+            }
+            return -1;
+        }
         public Tuple<int, int> getFunctionIndex(Ident ident, bool allowDeepSearch)
         {
             Tuple<int, int> tuple = null;

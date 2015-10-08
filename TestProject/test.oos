@@ -26,8 +26,6 @@ namespace X39
     {
         public testObj()
         {
-            auto _obj = new testObj();
-            _obj.testFncPublic("preInitArg1", "preInitArg2");
             this.testVarPublic = "";
             testVarStatic = "";
             this.testFncPublic("arg1", "arg2");
@@ -52,11 +50,11 @@ namespace X39
     }
     static void castDynamicTest(::X39::testNamespace::cBar testVar)
     {
-        auto casted = $cFoo$ testVar;
+        auto casted = $testNamespace::cFoo$ testVar;
     }
     static void castStaticTest(strict ::X39::testNamespace::cBar testVar)
     {
-        auto casted = §cFoo§ testVar;
+        auto casted = §testNamespace::cFoo§ testVar;
     }
     static bool instanceOfTest(::X39::testNamespace::cFoo testVar)
     {

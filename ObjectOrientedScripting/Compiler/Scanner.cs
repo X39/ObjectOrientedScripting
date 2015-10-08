@@ -426,8 +426,8 @@ public class Scanner {
 			case "class": t.kind = 34; break;
 			case "interface": t.kind = 36; break;
 			case "void": t.kind = 37; break;
-			case "override": t.kind = 38; break;
-			case "strict": t.kind = 39; break;
+			case "strict": t.kind = 38; break;
+			case "override": t.kind = 39; break;
 			case "auto": t.kind = 40; break;
 			case "for": t.kind = 41; break;
 			case "while": t.kind = 42; break;
