@@ -41,21 +41,54 @@ public class Parser {
 	public Token t;    // last recognized token
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
-	OosContainer oosTreeBase;
 
 -->declarations
 
+	private Base baseObject;
+	public Base BaseObject { get { return baseObject; } }
+	
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
-		oosTreeBase = null;
+		baseObject = null;
 	}
 	
-    public void getBaseContainer(out OosContainer blo)
-    {
-        blo =  oosTreeBase;
-    }
-
+	bool peekCompare(params int[] values)
+	{
+		Token t = la;
+		foreach(int i in values)
+		{
+			if(i != -1 && t.kind != i)
+			{
+				scanner.ResetPeek();
+				return false;
+			}
+            if (t.next == null)
+                t = scanner.Peek();
+            else
+                t = t.next;
+		}
+        scanner.ResetPeek();
+		return true;
+	}
+	bool peekString(int count, params string[] values)
+	{
+		Token t = la;
+        for(; count > 0; count --)
+            t = scanner.Peek();
+		foreach(var it in values)
+		{
+			if(t.val == it)
+			{
+				scanner.ResetPeek();
+				return true;
+			}
+		}
+        scanner.ResetPeek();
+		return false;
+	}
+	
+	
 	void SynErr (int n) {
 		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
 		errDist = 0;

@@ -6,40 +6,61 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public enum ClassEncapsulation
+    public enum Encapsulation
     {
-        PRIVATE,
-        PUBLIC
-    }
-    public enum AssignmentOperators
-    {
-        PlusEquals,
-        MinusEquals,
-        MultipliedEquals,
-        DividedEquals,
-        Equals
-    }
-    public enum ExpressionOperator
-    {
-        AndAnd,
-        And,
-        OrOr,
-        Or,
-        ExplicitEquals,
-        Equals,
-        Plus,
-        Minus,
-        Multiplication,
-        Division,
-        Larger,
-        LargerEquals,
-        Smaller,
-        SmallerEquals,
+        Private,
+        Protected,
+        Public,
+        Static,
         NA
     }
-    public enum QuickAssignmentTypes
+    public enum VarType
     {
-        PlusPlus,
-        MinusMinus
+        Scalar,
+        Bool,
+        String,
+        Auto,
+        Void,
+        Object,
+        ObjectStrict,
+        Other,
+        ScalarArray,
+        BoolArray,
+        StringArray
+    }
+    public class VarTypeObject
+    {
+        public VarTypeObject(Ident i, bool isStrict = false)
+        {
+            this.ident = i;
+            this.varType = isStrict ? VarType.ObjectStrict : VarType.Object;
+        } 
+        public VarTypeObject(VarType v)
+        {
+            this.ident = null;
+            this.varType = v;
+            if (v == VarType.ObjectStrict || v == VarType.Object)
+                throw new Exception("TODO: Allow anonymous objects");
+            //TODO: Allow anonymous objects
+        }
+        public Ident ident;
+        public VarType varType;
+        public override bool Equals(object obj)
+        {
+            if (!(obj is VarTypeObject))
+                return false;
+            if (((VarTypeObject)obj).varType != this.varType)
+                return false;
+            if (this.varType != VarType.Object && this.varType != VarType.ObjectStrict)
+                return true;
+            return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
+        }
+    }
+    public enum IdentType
+    {
+        Name,
+        GlobalAccess,
+        RelativeAccess,
+        NA
     }
 }

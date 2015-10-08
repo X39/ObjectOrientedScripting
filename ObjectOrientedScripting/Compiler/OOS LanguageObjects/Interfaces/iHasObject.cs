@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iName
+    public interface iHasObject
     {
-        Ident Name {get; set;}
-        string FullyQualifiedName { get; }
+        pBaseLangObject ReferencedObject {get;}
     }
 }

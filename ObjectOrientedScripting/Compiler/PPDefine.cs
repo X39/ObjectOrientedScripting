@@ -11,6 +11,9 @@ namespace Compiler
         private string _name;
         private string[] _arguments;
         private string _value;
+        public string Name { get { return this._name; } }
+        public string[] Arguments { get { return this._arguments; } }
+        public string Value { get { return this._value; } }
 
         public PPDefine(string s)
         {
@@ -53,6 +56,56 @@ namespace Compiler
             {
                 _arguments[i] = _arguments[i].Trim();
             }
+        }
+        private string defineContentReplace(string argText, string value, string input)
+        {
+            string output = "";
+            string word = "";
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+                if (!char.IsLetterOrDigit(c) && c != '_')
+                {
+                    //reset current word as we did not had the current define here and encountered a word terminator
+                    output += word + c;
+                    word = "";
+                    continue;
+                }
+                word += c;
+
+                if (word.Equals(argText, StringComparison.Ordinal))
+                {
+                    if (i + 1 < input.Length)
+                    {
+                        char cLH = input[i + 1];
+                        if (cLH == '\t' || cLH == ' ' || cLH == '\r' || cLH == '\n')
+                        {
+
+                        }
+                        else if (cLH == '#')
+                        {
+                            if (i + 2 < input.Length)
+                            {
+                                if (input[i + 2] != '#')
+                                    continue;
+                                else
+                                    i += 2;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    output += value;
+                    word = "";
+                }
+            }
+            return output + word;
         }
 
         public string replace(string input)
@@ -110,7 +163,7 @@ namespace Compiler
                             //throw an expection if we have too many arguments for this define
                             if (curArg >= _arguments.Length)
                                 throw new Exception("encountered unexpected extra argument in define while preprocessing, allowed count is " + _arguments.Length);
-                            curValue = curValue.Replace(_arguments[curArg], word);
+                            curValue = this.defineContentReplace(_arguments[curArg], word, curValue);//curValue.Replace(_arguments[curArg], word);
                             word = "";
                             curArg++;
                             continue;
@@ -121,7 +174,7 @@ namespace Compiler
                             //throw an expection if we have too many arguments for this define
                             if (curArg >= _arguments.Length)
                                 throw new Exception("encountered unexpected extra argument in define while preprocessing, allowed count is " + _arguments.Length);
-                            curValue = curValue.Replace(_arguments[curArg], word);
+                            curValue = this.defineContentReplace(_arguments[curArg], word, curValue);//curValue.Replace(_arguments[curArg], word);
                             word = "";
                             counter--;
                             break;
@@ -168,7 +221,7 @@ namespace Compiler
                     }
                     //we exited the define with an invalid number of capsulations ... seems like something moved wrong here!
                     if (counter != 0)
-                        throw new Exception("Missing defines arguemnts end character in current line");
+                        throw new Exception("Missing macro arguments end character in current line");
                     output += curValue;
                 }
             }

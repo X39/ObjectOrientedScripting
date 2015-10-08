@@ -269,8 +269,11 @@ namespace Wrapper
             }
             else
             {
+#if DEBUG
+#else
                 try
                 {
+#endif
                     compiler.setFlags(compilerFlags.ToArray());
                     Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
                     compiler.Preprocess(proj);
@@ -282,12 +285,15 @@ namespace Wrapper
                     compiler.Translate(proj);
                     Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
                     exitCode = 0;
+#if DEBUG
+#else
                 }
                 catch (Exception ex)
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, "Failed to generate project:");
                     Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message);
                 }
+#endif
             }
 
             Logger.Instance.close();
