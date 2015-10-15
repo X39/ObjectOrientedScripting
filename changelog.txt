@@ -1,3 +1,9 @@
+Version 0.5.1-ALPHA
+    |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of
+    |             project.oosproj)
+    |- Wrapper:   Fixed "URI-Format not supported" message when not forcing
+    |             a DLL (dll lookup now works as expected -.-*)
+    |- Compiler:  Fixed functions getting invalidly recognized as duplicate
 Version 0.5.0-ALPHA
     |- Wrapper:   Fixed -gen is not working if file is not existing
     |             (also if file was existing ... but expected error then)

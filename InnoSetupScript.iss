@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ObjectOrientedScripting Compiler"
-#define MyAppVersion "0.2.0-ALPHA"
+#define MyAppVersion "0.5.1-ALPHA"
 #define MyAppPublisher "X39"
-#define MyAppURL "http://x39.unitedtacticalforces.de"
+#define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "Wrapper.exe"
 
 [Setup]
@@ -46,7 +46,13 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
-    'Version 0.5.0-ALPHA                                                             ' + AnsiChar(#10) +
+'Version 0.5.1-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of         ' + AnsiChar(#10) +
+'    |             project.oosproj)                                              ' + AnsiChar(#10) +
+'    |- Wrapper:   Fixed "URI-Format not supported" message when not forcing     ' + AnsiChar(#10) +
+'    |             a DLL (dll lookup now works as expected -.-*)                 ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed functions getting invalidly recognized as duplicate     ' + AnsiChar(#10) +
+'Version 0.5.0-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Wrapper:   Fixed -gen is not working if file is not existing             ' + AnsiChar(#10) +
 '    |             (also if file was existing ... but expected error then)       ' + AnsiChar(#10) +
 '    |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"            ' + AnsiChar(#10) +
