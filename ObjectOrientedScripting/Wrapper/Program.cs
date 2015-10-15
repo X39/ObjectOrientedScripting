@@ -124,7 +124,7 @@ namespace Wrapper
                     if (!path.EndsWith("\\"))
                         path += '\\';
                     Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating project file at '" + path + "poject.oosproj" + "'");
-                    StreamWriter writer = new StreamWriter(path + "poject.oosproj");
+                    StreamWriter writer = new StreamWriter(path + "ppoject.oosproj");
                     writer.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
                     writer.WriteLine("<root>");
                     writer.WriteLine("	<project>");
@@ -224,7 +224,9 @@ namespace Wrapper
                 }
                 if (dllPath == "")
                 {
-                    foreach (var f in Directory.EnumerateFiles(System.Reflection.Assembly.GetExecutingAssembly().CodeBase))
+                    var executablePath = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath;
+                    executablePath = executablePath.Substring(0, executablePath.LastIndexOf('\\'));
+                    foreach (var f in Directory.EnumerateFiles(executablePath))
                     {
                         if (f.Contains(compilerVersion))
                         {
