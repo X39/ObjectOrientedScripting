@@ -168,7 +168,7 @@ namespace Compiler.OOS_LanguageObjects
             foreach (var it in this.AllFunctions)
             {
                 var origVal = it.Name.OriginalValue;
-                if (functionNameList.FirstOrDefault(checkString => checkString.Contains(origVal)) != null)
+                if (functionNameList.FirstOrDefault(checkString => checkString.Equals(origVal)) != null)
                 {
                     var parentFnc = inheritanceFunctions.FirstOrDefault(checkValue => checkValue.Name.OriginalValue == origVal);
                     if (parentFnc == null)
