@@ -32,6 +32,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Wrapper.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.5.0-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.5.1-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Logger.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
