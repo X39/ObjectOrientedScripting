@@ -479,6 +479,7 @@ public class Parser {
 				if (peekCompare(-1, -1, _T_TERMINATOR) ) {
 					NEWVARIABLE(out blo, obj, Encapsulation.Static);
 					obj.addChild(blo); 
+					TERMINATOR();
 				} else if (StartOf(6)) {
 					FUNCTION(out blo, obj, Encapsulation.Static);
 					obj.addChild(blo); 

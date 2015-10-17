@@ -48,6 +48,7 @@ namespace X39
             return;
         }
     }
+    static string testVarStatic2;
     static void castDynamicTest(::X39::testNamespace::cBar testVar)
     {
         auto casted = $testNamespace::cFoo$ testVar;

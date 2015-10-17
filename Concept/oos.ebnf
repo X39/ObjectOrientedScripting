@@ -221,7 +221,10 @@ COMPILER OOS
 					"static"
 					(
 						IF( peekCompare(-1, -1, _T_TERMINATOR) )
-						NEWVARIABLE<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
+						(
+                            NEWVARIABLE<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
+                            TERMINATOR
+                        )
 						|
 						FUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
 					)
