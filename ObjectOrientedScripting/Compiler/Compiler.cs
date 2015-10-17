@@ -146,7 +146,7 @@ namespace Wrapper
             {
                 var obj = (Namespace)container;
                 var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_").Substring(1));
-                var objConfigClass2 = new SqfConfigClass("foobar");
+                var objConfigClass2 = new SqfConfigClass("generic");
                 configObj.addChild(objConfigClass);
                 objConfigClass.addChild(objConfigClass2);
                 path += '\\' + obj.Name.OriginalValue;
@@ -171,7 +171,9 @@ namespace Wrapper
             {
                 var obj = (oosClass)container;
                 var objConfigClass = new SqfConfigClass(obj.FullyQualifiedName.Replace("::", "_").Substring(1));
+                var objConfigClass2 = new SqfConfigClass("ThisClass");
                 configObj.addChild(objConfigClass);
+                objConfigClass.addChild(objConfigClass2);
                 path += '\\' + obj.Name.OriginalValue;
                 Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating directory '" + path + "'");
                 Directory.CreateDirectory(path);
@@ -183,7 +185,7 @@ namespace Wrapper
                     }
                     else
                     {
-                        WriteOutTree(proj, it, path, objConfigClass, writer, tabCount);
+                        WriteOutTree(proj, it, path, objConfigClass2, writer, tabCount);
                     }
                 }
             }

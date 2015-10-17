@@ -24,9 +24,23 @@ namespace Compiler.SqfConfigObjects
                 throw new Exception("Not Added Exception, if you ever experience this create a bug. SqfConfigClass");
             this.children.Add(obj);
         }
+        public int countChildren()
+        {
+            int count = 0;
+            foreach (var it in this.children)
+            {
+                if (it is SqfConfigClass)
+                {
+                    count += ((SqfConfigClass)it).countChildren();
+                }
+                else
+                    count++;
+            }
+            return count;
+        }
         public void write(StreamWriter writer, int tabCount = 0)
         {
-            if (this.children.Count == 0)
+            if (this.countChildren() == 0)
                 return;
             string tab = new string('\t', tabCount);
             writer.WriteLine(tab + "class " + name);
