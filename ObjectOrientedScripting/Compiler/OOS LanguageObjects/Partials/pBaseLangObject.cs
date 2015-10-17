@@ -36,6 +36,8 @@ namespace Compiler.OOS_LanguageObjects
             foreach (pBaseLangObject blo in children)
                 if(blo != null)
                     errCount += blo.finalize();
+            if (this is Interfaces.iTemplate && ((Interfaces.iTemplate)this).template != null)
+                errCount += ((Interfaces.iTemplate)this).template.doFinalize();
             errCount += this.doFinalize();
             return errCount;
         }

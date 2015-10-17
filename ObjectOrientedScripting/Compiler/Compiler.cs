@@ -19,9 +19,12 @@ namespace Wrapper
         List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
+        public string stdLibPath;
         public Compiler()
         {
             configFileName = "config.cpp";
+            stdLibPath = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath;
+            stdLibPath = stdLibPath.Substring(0, stdLibPath.LastIndexOf('\\')) + "\\stdLibrary\\";
             addFunctionsClass = true;
             outputFolderCleanup = true;
             flagDefines = new List<PPDefine>();
@@ -57,6 +60,11 @@ namespace Wrapper
                         break;
                     case "THISVAR":
                         thisVariableName = s.Substring(count + 1);
+                        break;
+                    case "STDLIBPATH":
+                        stdLibPath = s.Substring(count + 1).Replace('/', '\\');
+                        if (!stdLibPath.EndsWith("\\"))
+                            stdLibPath += '\\';
                         break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
@@ -1342,10 +1350,7 @@ namespace Wrapper
                         string newFile;
                         if (afterDefine.StartsWith("<") && afterDefine.EndsWith(">"))
                         {
-                            newFile = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath;
-                            newFile = newFile.Substring(0, newFile.LastIndexOf('\\'));
-
-                            newFile += "\\stdLibrary\\" + afterDefine.Trim(new char[] { '<', '>' });
+                            newFile = stdLibPath + afterDefine.Trim(new char[] { '<', '>' });
                         }
                         else
                         {

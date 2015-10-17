@@ -13,7 +13,7 @@ COMPILER OOS
 		T_STRING = '"' { STRINGCHARS | "\\\""} '"'.
 		T_IDENT = ["::"] ( CHARACTER | '_' ) { "::" | CHARACTER | '_' | DIGIT }.
 		T_TERMINATOR = ';'.
-		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | '>' | ">=" | '<' | "<=".
+		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | ">=" | "<=".
 		T_ASSIGNMENTCHAR = '='.
 		T_ROUNDBRACKETOPEN = '('.
 		T_ROUNDBRACKETCLOSE = ')'.
@@ -25,6 +25,8 @@ COMPILER OOS
 		T_COMMA = ','.
 		T_STATICCASTOPERATOR = '§'.
 		T_DYNAMICCASTOPERATOR = '$'.
+		T_TEMPLATEOPEN = '<'.
+		T_TEMPLATECLOSE = '>'.
 		
 	COMMENTS FROM "/*" TO "*/" NESTED
 	COMMENTS FROM "//" TO '\n'
@@ -39,6 +41,24 @@ COMPILER OOS
 				T_TERMINATOR
 			}
 		.
+        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col); pBaseLangObject blo; VarType e; .)
+        =
+            T_TEMPLATEOPEN
+            (
+                IDENT<out blo, obj> (. obj.vtoList.Add(new VarTypeObject((Ident)blo)); .)
+                |
+                VARTYPE<out e> (. obj.vtoList.Add(new VarTypeObject(e)); .)
+            )
+            {
+                T_COMMA
+                (
+                    IDENT<out blo, obj> (. obj.vtoList.Add(new VarTypeObject((Ident)blo)); .)
+                    |
+                    VARTYPE<out e> (. obj.vtoList.Add(new VarTypeObject(e)); .)
+                )
+            }
+            T_TEMPLATECLOSE
+        .
 		IDENT<out pBaseLangObject outObj, pBaseLangObject parent>
 		=
             T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col); .)
@@ -103,6 +123,8 @@ COMPILER OOS
                 "float" (. e = VarType.Scalar; .)
                 |
                 "bool" (. e = VarType.Bool; .)
+                |
+                "boolean" (. e = VarType.Bool; .)
                 |
                 "string" (. e = VarType.String; .)
                 |
@@ -170,7 +192,13 @@ COMPILER OOS
 				"--" (. obj.expOperator = t.val; .)
 				|
 				(
-					T_EXPOP (. obj.expOperator = t.val; .)
+					(
+                        T_EXPOP (. obj.expOperator = t.val; .)
+                        |
+                        T_TEMPLATEOPEN (. obj.expOperator = t.val; .)
+                        |
+                        T_TEMPLATECLOSE (. obj.expOperator = t.val; .)
+                    )
 					EXPRESSION<out blo, obj> (. obj.rExpression = blo; .)
 				)
 			}
@@ -191,6 +219,8 @@ COMPILER OOS
 				NAMESPACE<out blo, obj> (. obj.addChild(blo); .)
 				|
 				CLASS<out blo, obj> (. obj.addChild(blo); .)
+				|
+				NATIVECLASS<out blo, obj> (. obj.addChild(blo); .)
 				|
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
@@ -215,6 +245,8 @@ COMPILER OOS
 				|
 				CLASS<out blo, obj> (. obj.addChild(blo); .)
 				|
+				NATIVECLASS<out blo, obj> (. obj.addChild(blo); .)
+				|
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
 				(
@@ -232,6 +264,121 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
+        NATIVECLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Native(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; Template te; .)
+        =
+            "native"
+            IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+            [
+                TEMPLATE<out te, obj> (. obj.template = te; .)
+            ]
+			T_CODEBRACKETOPEN
+            NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
+			{
+				NATIVEFUNCTION<out blo, obj> (. obj.addChild(blo); .)
+                |
+                NATIVEOPERATOR<out blo, obj> (. obj.addChild(blo); .)
+			}
+			T_CODEBRACKETCLOSE
+        .
+        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeInstruction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .)
+        =
+            "assign"
+            [
+                "simple" (. obj.IsSimple = true; .)
+            ]
+			T_ROUNDBRACKETOPEN
+			[
+				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
+				{
+					','
+					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
+				}
+			]
+			T_ROUNDBRACKETCLOSE
+			{
+				ANY (. obj.Code += t.val; .)
+			}
+			"endAssign"
+        .
+        NATIVEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeFunction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; VarType v; .)
+        =
+            "fnc"
+            [
+                "simple" (. obj.IsSimple = true; .)
+            ]
+            (
+				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
+				|
+				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
+				|
+                (   (. bool isStrict = false; .)                    
+                    [
+                        "strict" (. isStrict = true; .)
+                    ]
+                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                )
+            )
+            IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			T_ROUNDBRACKETOPEN
+			[
+				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
+				{
+					','
+					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
+				}
+			]
+			T_ROUNDBRACKETCLOSE
+			{
+				ANY (. obj.Code += t.val; .)
+			}
+			"endFnc"
+        .
+        NATIVEOPERATOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeOperator(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; VarType v; .)
+        =
+            "operator"
+            [
+                "simple"
+            ]
+            (
+				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
+				|
+				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
+				|
+                (   (. bool isStrict = false; .)                    
+                    [
+                        "strict" (. isStrict = true; .)
+                    ]
+                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                )
+            )
+            (
+                (
+                    T_SQUAREBRACKETOPEN
+                    T_SQUAREBRACKETCLOSE (. obj.Operator = "[]"; .)
+                )
+                |
+				(
+                    T_EXPOP (. obj.Operator = t.val; .)
+                    |
+                    T_TEMPLATEOPEN (. obj.Operator = t.val; .)
+                    |
+                    T_TEMPLATECLOSE (. obj.Operator = t.val; .)
+                )
+            )
+			T_ROUNDBRACKETOPEN
+			[
+				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
+				{
+					','
+					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
+				}
+			]
+			T_ROUNDBRACKETCLOSE
+			{
+				ANY (. obj.Code += t.val; .)
+			}
+			"endOperator"
+        .
 		CLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosClass(parent); outObj = obj; pBaseLangObject blo; Encapsulation e = Encapsulation.Private; bool hasConstructor = false; .)
 		=
 			"class"
@@ -389,6 +536,9 @@ COMPILER OOS
                     IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)   
                 )
 			)
+            [ (. Template te; .)
+                TEMPLATE<out te, obj> (. obj.template = te; .)
+            ]
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 		.
 		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
@@ -524,6 +674,9 @@ COMPILER OOS
 		=
 			"new"
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
+            [ (. Template te; .)
+                TEMPLATE<out te, obj> (. obj.template = te; .)
+            ]
 			BODY_FUNCTIONCALL<out blo2, blo> (. blo.addChild(blo2); .)
 		.
 		OP_NEWARRAY<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewArray(parent); outObj = obj; pBaseLangObject blo; .)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class Variable : pBaseLangObject, Interfaces.iName, Interfaces.iHasType
+    public class Variable : pBaseLangObject, Interfaces.iName, Interfaces.iHasType, Interfaces.iTemplate
     {
         public Ident Name
         {
@@ -24,6 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
         public pBaseLangObject Value { get { var valAssign = this.getAllChildrenOf<VariableAssignment>(); if (valAssign.Count > 0) return valAssign[0]; return null; } }
         public bool IsClassVariable { get { return this.encapsulation != Encapsulation.Static && this.encapsulation != Encapsulation.NA; } }
+        public Template template { get; set; }
         public string SqfVariableName
         {
             get
