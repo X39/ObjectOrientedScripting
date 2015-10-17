@@ -6,6 +6,7 @@ Version 0.5.2-ALPHA
     |- Compiler:  Added output folder cleanup
     |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup
     |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)
+    |- Compiler:  Added additional keyword "boolean" for bool types
 Version 0.5.1-ALPHA
     |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of
     |             project.oosproj)
