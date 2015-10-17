@@ -1,0 +1,37 @@
+namespace std
+{
+    native array<T>
+    {
+        assign simple ()
+            []
+        endAssign
+        
+        fnc simple scalar pushBack (T _val)
+            _this pushBack _val
+        endFnc
+        
+        fnc simple scalar find (T _val)
+            _this find _val
+        endFnc
+        
+        fnc simple scalar resize (scalar _i)
+            _this resize _i
+        endFnc
+        
+        fnc simple scalar deleteAt (scalar _i)
+            _this deleteAt _i
+        endFnc
+        
+        fnc simple scalar deleteRange (scalar _i, scalar _j)
+            _this deleteRange [_i, _j]
+        endFnc
+        
+        operator simple T [] (scalar _i)
+            _this select _i
+        endOperator
+        
+        operator simple bool === (array<T> _arr)
+            _this isEqualTo _arr
+        endOperator
+    }
+}
