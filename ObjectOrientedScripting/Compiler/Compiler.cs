@@ -15,6 +15,7 @@ namespace Wrapper
     {
         string configFileName;
         bool addFunctionsClass;
+        bool outputFolderCleanup;
         List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
@@ -22,6 +23,7 @@ namespace Wrapper
         {
             configFileName = "config.cpp";
             addFunctionsClass = true;
+            outputFolderCleanup = true;
             flagDefines = new List<PPDefine>();
             SqfCall.readSupportInfoList();
         }
@@ -50,6 +52,9 @@ namespace Wrapper
                     case "DEFINE":
                         flagDefines.Add(new PPDefine('#' + s.Substring(count + 1)));
                         break;
+                    case "NOCLEANUP":
+                        outputFolderCleanup = false;
+                        break;
                     case "THISVAR":
                         thisVariableName = s.Substring(count + 1);
                         break;
@@ -70,8 +75,26 @@ namespace Wrapper
             parser.Parse();
         }
         #region Translating
+        private void cleanupRecursive(string path)
+        {
+            foreach (var it in Directory.EnumerateDirectories(path))
+            {
+                cleanupRecursive(it);
+                Directory.Delete(it);
+            }
+            foreach (var it in Directory.EnumerateFiles(path))
+            {
+                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Deleting '" + it + "'");
+                File.Delete(it);
+            }
+        }
         public void Translate(Project proj)
         {
+            if(outputFolderCleanup)
+            {
+                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Cleaning up output dir");
+                cleanupRecursive(proj.OutputFolder);
+            }
             //Read compiled file
             Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
             Parser parser = new Parser(scanner);
