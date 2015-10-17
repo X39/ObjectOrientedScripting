@@ -519,7 +519,7 @@ public class Parser {
 				NEWVARIABLE(out blo, obj, e);
 				obj.addChild(blo); 
 				TERMINATOR();
-			} else if (peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) ) {
+			} else if (peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) ) {
 				CONSTRUCTOR(out blo, obj, e);
 				obj.addChild(blo); hasConstructor = true; 
 			} else if (StartOf(6)) {

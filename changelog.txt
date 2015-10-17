@@ -1,5 +1,6 @@
 Version 0.5.2-ALPHA
     |- Compiler:  Fixed output folder is not getting generated if not existing
+    |- Compiler:  Fixed typeless functions are all recognized as constructor
 Version 0.5.1-ALPHA
     |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of
     |             project.oosproj)

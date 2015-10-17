@@ -256,7 +256,7 @@ COMPILER OOS
 						NEWVARIABLE<out blo, obj, e> (. obj.addChild(blo); .)
 						TERMINATOR
 					)
-					|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) )
+					|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) )
 					CONSTRUCTOR<out blo, obj, e> (. obj.addChild(blo); hasConstructor = true; .)
 					|
 					FUNCTION<out blo, obj, e> (. obj.addChild(blo); .)
