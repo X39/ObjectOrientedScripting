@@ -91,6 +91,10 @@ namespace Wrapper
                 cfgClass = new SqfConfigClass("cfgFunctions");
                 file.addChild(cfgClass);
             }
+            if (!Directory.Exists(proj.OutputFolder))
+            {
+                Directory.CreateDirectory(proj.OutputFolder);
+            }
             WriteOutTree(proj, parser.BaseObject, proj.OutputFolder, cfgClass, null);
             //Create config.cpp file
             file.writeOut(proj.OutputFolder);

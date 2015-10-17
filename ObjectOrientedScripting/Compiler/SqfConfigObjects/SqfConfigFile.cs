@@ -26,6 +26,10 @@ namespace Compiler.SqfConfigObjects
         }
         public void writeOut(string path)
         {
+            if(!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
             if (path.EndsWith("\\"))
                 path += this.Name;
             else
