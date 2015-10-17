@@ -5,6 +5,7 @@ Version 0.5.2-ALPHA
     |- Compiler:  Fixed namespace static variables lacked semicolon in EBNF
     |- Compiler:  Added output folder cleanup
     |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup
+    |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)
 Version 0.5.1-ALPHA
     |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of
     |             project.oosproj)

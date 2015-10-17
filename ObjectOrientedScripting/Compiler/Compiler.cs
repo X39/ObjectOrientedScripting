@@ -1338,8 +1338,19 @@ namespace Wrapper
                     case "#include":
                         //We are supposed to include a new file at this spot so lets do it
                         //Beautify the filepath so we can work with it
-                        string newFile = proj.ProjectPath + afterDefine.Trim(new char[] { '"', '\'', ' ' });
+                        afterDefine.Trim();
+                        string newFile;
+                        if (afterDefine.StartsWith("<") && afterDefine.EndsWith(">"))
+                        {
+                            newFile = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath;
+                            newFile = newFile.Substring(0, newFile.LastIndexOf('\\'));
 
+                            newFile += "\\stdLibrary\\" + afterDefine.Trim(new char[] { '<', '>' });
+                        }
+                        else
+                        {
+                            newFile = proj.ProjectPath + afterDefine.Trim(new char[] { '"', '\'', ' ' });
+                        }
                         //make sure we have no self reference here
                         if (newFile.Equals(filePath, StringComparison.OrdinalIgnoreCase))
                         {
