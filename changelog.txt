@@ -1,3 +1,6 @@
+Version 0.5.3-ALPHA                                                             
+    |- Compiler:  Added "scalar length()" function to ::std::array              
+                                                                                
 Version 0.5.2-ALPHA                                                             
     |- Compiler:  Fixed output folder is not getting generated if not existing  
     |- Compiler:  Fixed typeless functions are all recognized as constructor    
