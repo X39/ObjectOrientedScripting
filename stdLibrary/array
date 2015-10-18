@@ -26,6 +26,10 @@ namespace std
             _this deleteRange [_i, _j]
         endFnc
         
+        fnc simple scalar length ()
+            count _this
+        endFnc
+        
         operator simple T [] (scalar _i)
             _this select _i
         endOperator
