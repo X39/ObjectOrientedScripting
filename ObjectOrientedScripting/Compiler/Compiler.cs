@@ -13,6 +13,19 @@ namespace Wrapper
 {
     public class Compiler : ICompiler
     {
+        private class ContainerClass
+        {
+            public ContainerClass(object value, int purpose, pBaseLangObject sender)
+            {
+                this.Value = value;
+                this.Purpose = purpose;
+                this.Sender = sender;
+            }
+            public object Value { get; set; }
+            public int Purpose { get; set; }
+            public pBaseLangObject Sender { get; set; }
+        }
+
         string configFileName;
         bool addFunctionsClass;
         bool outputFolderCleanup;
@@ -150,10 +163,80 @@ namespace Wrapper
             else if (container is ArrayAccess)
             {
                 var obj = (ArrayAccess)container;
-                writer.Write(" select ");
-                foreach (var it in obj.children)
+                if (extraParam is ContainerClass)
                 {
-                    WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    ContainerClass cc = (ContainerClass)extraParam;
+                    if(cc.Sender is Ident)
+                    {
+                        switch(cc.Purpose)
+                        {
+                            case 0:
+                                {
+                                    cc.Value = null;
+                                    if (obj.Parent is Ident &&
+                                        ((Ident)obj.Parent).ReferencedObject is Variable &&
+                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.IsObject &&
+                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject is Native)
+                                    {
+                                        cc.Value = (Native)((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject;
+                                    }
+                                }
+                                break;
+                            case 1:
+                                {
+                                    if (obj.Parent is Ident &&
+                                        ((Ident)obj.Parent).ReferencedObject is Variable &&
+                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.IsObject &&
+                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject is Native)
+                                    {
+                                        Native n = (Native)((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject;
+                                        var opList = n.getAllChildrenOf<NativeOperator>();
+                                        foreach (var it in opList)
+                                        {
+                                            if (it.Operator == "[]")
+                                            {
+                                                List<string> argList = new List<string>();
+                                                {
+                                                    MemoryStream stream = new MemoryStream();
+                                                    var sw = new StreamWriter(stream);
+                                                    WriteOutTree(proj, cc.Sender, path, configObj, sw, tabCount, obj);
+                                                    sw.Flush();
+                                                    stream.Seek(0, SeekOrigin.Begin);
+                                                    argList.Add(new StreamReader(stream).ReadToEnd());
+                                                    stream.Close();
+                                                }
+                                                foreach (var it2 in obj.children)
+                                                {
+                                                    MemoryStream stream = new MemoryStream();
+                                                    var sw = new StreamWriter(stream);
+                                                    WriteOutTree(proj, it2, path, configObj, sw, tabCount);
+                                                    sw.Flush();
+                                                    stream.Seek(0, SeekOrigin.Begin);
+                                                    argList.Add(new StreamReader(stream).ReadToEnd());
+                                                    stream.Close();
+                                                }
+                                                writer.Write(it.getCode(argList.ToArray()));
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            default:
+                                throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                }
+                else
+                {
+                    writer.Write(" select ");
+                    foreach (var it in obj.children)
+                    {
+                        WriteOutTree(proj, it, path, configObj, writer, tabCount);
+                    }
                 }
             }
             #endregion
@@ -601,6 +684,15 @@ namespace Wrapper
                             writer.WriteLine(tab + "[");
                             updateTabcount(ref tab, ref tabCount, 1);
                             int index = 0;
+                            if (fnc.encapsulation != Encapsulation.NA && fnc.encapsulation != Encapsulation.Static)
+                            {
+                                if (extraParam is Ident)
+                                {
+                                    writer.Write(tab);
+                                    WriteOutTree(proj, (pBaseLangObject)extraParam, path, configObj, writer, tabCount, obj);
+                                    index++;
+                                }
+                            }
                             foreach (var it in obj.children)
                             {
                                 if (index > 0)
@@ -633,6 +725,35 @@ namespace Wrapper
                         if (extraParam is Ident)
                             WriteOutTree(proj, (pBaseLangObject)extraParam, path, configObj, writer, tabCount, obj);
                         writer.Write(fnc.SqfVariableName);
+                    }
+                }
+                else if (obj.Name.ReferencedObject is NativeInstruction)
+                {
+                    if (extraParam != null)
+                    {
+                        var instruction = (NativeInstruction)obj.Name.ReferencedObject;
+                        List<string> argList = new List<string>();
+                        if (extraParam is Ident && !(obj.Name.ReferencedObject is NativeAssign))
+                        {
+                            MemoryStream stream = new MemoryStream();
+                            var sw = new StreamWriter(stream);
+                            WriteOutTree(proj, (pBaseLangObject)extraParam, path, configObj, sw, tabCount, obj);
+                            sw.Flush();
+                            stream.Seek(0, SeekOrigin.Begin);
+                            argList.Add(new StreamReader(stream).ReadToEnd());
+                            stream.Close();
+                        }
+                        foreach (var it in obj.children)
+                        {
+                            MemoryStream stream = new MemoryStream();
+                            var sw = new StreamWriter(stream);
+                            WriteOutTree(proj, it, path, configObj, sw, tabCount);
+                            sw.Flush();
+                            stream.Seek(0, SeekOrigin.Begin);
+                            argList.Add(new StreamReader(stream).ReadToEnd());
+                            stream.Close();
+                        }
+                        writer.Write(instruction.getCode(argList.ToArray()));
                     }
                 }
                 else
@@ -781,16 +902,38 @@ namespace Wrapper
                         var refObj = fncCall.ReferencedObject;
                         if (refObj is Function)
                         {
-                            var fnc = (Function)refObj;
+                            //var fnc = (Function)refObj;
                             //if (fnc.IsClassFunction && !fnc.IsConstructor)
                             //{
                                 flag = true;
                                 WriteOutTree(proj, fncCall, path, configObj, writer, tabCount, obj);
                             //}
                         }
+                        else if (refObj is NativeInstruction)
+                        {
+                            //var instr = (NativeInstruction)refObj;
+                            flag = true;
+                            WriteOutTree(proj, fncCall, path, configObj, writer, tabCount, obj);
+                        }
                         else
                         {
                             throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                        }
+                    }
+                    else
+                    {
+                        var list = obj.getAllChildrenOf<ArrayAccess>(true);
+                        if(list.Count > 0)
+                        {
+                            ArrayAccess aa = list[0];
+                            ContainerClass cc = new ContainerClass(null, 0, obj);
+                            WriteOutTree(proj, aa, path, configObj, writer, tabCount, cc);
+                            if(cc.Value != null)
+                            {
+                                cc.Purpose = 1;
+                                WriteOutTree(proj, aa, path, configObj, writer, tabCount, cc);
+                                flag = true;
+                            }
                         }
                     }
                 }
@@ -841,7 +984,8 @@ namespace Wrapper
                     else if (instruction is ArrayAccess)
                     {
                         WriteOutTree(proj, variable, path, configObj, writer, tabCount, false);
-                        WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                        if (extraParam == null)
+                            WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
                         if (nextIdent != null)
                             WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount);
                     }
@@ -871,6 +1015,25 @@ namespace Wrapper
                     }
                     else
                     {
+                        //MAGIC WORKING SHIT, nothing to do here anymore (debuging is kinda funny btw.)
+                    }
+                }
+                else if (refObject is NativeInstruction)
+                {
+                    NativeInstruction ins = (NativeInstruction)refObject;
+                    if (instruction == null || instruction is Ident)
+                    {
+                        throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
+                    }
+                    else if (instruction is FunctionCall)
+                    {
+                        WriteOutTree(proj, instruction, path, configObj, writer, tabCount);
+                        if (nextIdent != null)
+                            WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount, obj);
+                    }
+                    else
+                    {
+                        throw new Exception("Foobar?");
                         //MAGIC WORKING SHIT, nothing to do here anymore (debuging is kinda funny btw.)
                     }
                 }
@@ -1218,19 +1381,19 @@ namespace Wrapper
             #region object NativeAssign
             else if (container is NativeAssign)
             {
-                var obj = (NativeAssign)container;
+                var obj = (NativeAssign)container; throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object NativeFunction
             else if (container is NativeFunction)
             {
-                var obj = (NativeFunction)container;
+                var obj = (NativeFunction)container; throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #region object NativeOperator
             else if (container is NativeOperator)
             {
-                var obj = (NativeOperator)container;
+                var obj = (NativeOperator)container; throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");
             }
             #endregion
             #endregion

@@ -296,9 +296,9 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 			{
-				ANY (. obj.Code += t.val; .)
+				ANY (. obj.Code += t.val + ' '; .)
 			}
-			"endAssign"
+			"endAssign" (. obj.Code = obj.Code.Trim(); .)
         .
         NATIVEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeFunction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; VarType v; .)
         =
@@ -329,15 +329,15 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 			{
-				ANY (. obj.Code += t.val; .)
+				ANY (. obj.Code += t.val + ' '; .)
 			}
-			"endFnc"
+			"endFnc" (. obj.Code = obj.Code.Trim(); .)
         .
         NATIVEOPERATOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeOperator(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; VarType v; .)
         =
             "operator"
             [
-                "simple"
+                "simple" (. obj.IsSimple = true; .)
             ]
             (
 				VARTYPE<out v> (. obj.VTO = new VarTypeObject(v); .)
@@ -356,14 +356,14 @@ COMPILER OOS
                     T_SQUAREBRACKETOPEN
                     T_SQUAREBRACKETCLOSE (. obj.Operator = "[]"; .)
                 )
-                |
-				(
-                    T_EXPOP (. obj.Operator = t.val; .)
-                    |
-                    T_TEMPLATEOPEN (. obj.Operator = t.val; .)
-                    |
-                    T_TEMPLATECLOSE (. obj.Operator = t.val; .)
-                )
+//                |
+//                (
+//                    T_EXPOP (. obj.Operator = t.val; .)
+//                    |
+//                    T_TEMPLATEOPEN (. obj.Operator = t.val; .)
+//                    |
+//                    T_TEMPLATECLOSE (. obj.Operator = t.val; .)
+//                )
             )
 			T_ROUNDBRACKETOPEN
 			[
@@ -375,9 +375,9 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 			{
-				ANY (. obj.Code += t.val; .)
+				ANY (. obj.Code += t.val + ' '; .)
 			}
-			"endOperator"
+			"endOperator" (. obj.Code = obj.Code.Trim(); .)
         .
 		CLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosClass(parent); outObj = obj; pBaseLangObject blo; Encapsulation e = Encapsulation.Private; bool hasConstructor = false; .)
 		=

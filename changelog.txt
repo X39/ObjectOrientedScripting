@@ -3,6 +3,7 @@ Version 0.5.2-ALPHA
     |- Compiler:  Fixed typeless functions are all recognized as constructor    
     |- Compiler:  Fixed classes are lacking a cfgConfig layer                   
     |- Compiler:  Fixed namespace static variables lacked semicolon in EBNF     
+    |- Compiler:  Fixed object functions not getting object parameter passed    
     |- Compiler:  Added output folder cleanup                                   
     |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup          
     |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)     

@@ -698,7 +698,7 @@ public class Parser {
 	}
 
 	void NATIVEASSIGN(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new NativeInstruction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; 
+		var obj = new NativeAssign(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; 
 		Expect(38);
 		if (la.kind == 39) {
 			Get();
@@ -717,9 +717,10 @@ public class Parser {
 		Expect(8);
 		while (StartOf(12)) {
 			Get();
-			obj.Code += t.val; 
+			obj.Code += t.val + ' '; 
 		}
 		Expect(40);
+		obj.Code = obj.Code.Trim(); 
 	}
 
 	void NATIVEFUNCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -731,10 +732,10 @@ public class Parser {
 		}
 		if (StartOf(1)) {
 			VARTYPE(out v);
-			obj.varType = new VarTypeObject(v); 
+			obj.VTO = new VarTypeObject(v); 
 		} else if (la.kind == 42) {
 			Get();
-			obj.varType = new VarTypeObject(VarType.Void); 
+			obj.VTO = new VarTypeObject(VarType.Void); 
 		} else if (la.kind == 3 || la.kind == 43) {
 			bool isStrict = false; 
 			if (la.kind == 43) {
@@ -742,7 +743,7 @@ public class Parser {
 				isStrict = true; 
 			}
 			IDENT(out blo, obj);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
+			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
 		} else SynErr(86);
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
@@ -759,9 +760,10 @@ public class Parser {
 		Expect(8);
 		while (StartOf(13)) {
 			Get();
-			obj.Code += t.val; 
+			obj.Code += t.val + ' '; 
 		}
 		Expect(44);
+		obj.Code = obj.Code.Trim(); 
 	}
 
 	void NATIVEOPERATOR(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -769,13 +771,14 @@ public class Parser {
 		Expect(45);
 		if (la.kind == 39) {
 			Get();
+			obj.IsSimple = true; 
 		}
 		if (StartOf(1)) {
 			VARTYPE(out v);
-			obj.varType = new VarTypeObject(v); 
+			obj.VTO = new VarTypeObject(v); 
 		} else if (la.kind == 42) {
 			Get();
-			obj.varType = new VarTypeObject(VarType.Void); 
+			obj.VTO = new VarTypeObject(VarType.Void); 
 		} else if (la.kind == 3 || la.kind == 43) {
 			bool isStrict = false; 
 			if (la.kind == 43) {
@@ -783,23 +786,13 @@ public class Parser {
 				isStrict = true; 
 			}
 			IDENT(out blo, obj);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
+			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
 		} else SynErr(87);
 		if (la.kind == 9) {
 			Get();
 			Expect(10);
 			obj.Operator = "[]"; 
-		} else if (la.kind == 5 || la.kind == 17 || la.kind == 18) {
-			if (la.kind == 5) {
-				Get();
-				obj.Operator = t.val; 
-			} else if (la.kind == 17) {
-				Get();
-				obj.Operator = t.val; 
-			} else {
-				Get();
-				obj.Operator = t.val; 
-			}
+		} else if (la.kind == 7) {
 		} else SynErr(88);
 		Expect(7);
 		if (StartOf(10)) {
@@ -814,9 +807,10 @@ public class Parser {
 		Expect(8);
 		while (StartOf(14)) {
 			Get();
-			obj.Code += t.val; 
+			obj.Code += t.val + ' '; 
 		}
 		Expect(46);
+		obj.Code = obj.Code.Trim(); 
 	}
 
 	void CONSTRUCTOR(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e) {

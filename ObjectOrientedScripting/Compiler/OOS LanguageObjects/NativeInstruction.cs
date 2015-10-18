@@ -24,7 +24,9 @@ namespace Compiler.OOS_LanguageObjects
         }
         public string getCode(string[] argList)
         {
-            if(argList.Length != this.children.Count + 1)
+            if (this.children.Count == 0 && argList.Length == 0)
+                return Code;
+            if(argList.Length < this.children.Count)
             {
                 throw new Exception("Should never happen exception got raised. Please report to developer!");
             }
@@ -32,10 +34,10 @@ namespace Compiler.OOS_LanguageObjects
             if (this.IsSimple)
             {
                 outString = Code;
-                outString.Replace("_this", argList[0]);
+                outString = outString.Replace("_this", argList[0]);
                 for(int i = 1; i < argList.Length; i++)
                 {
-                    outString.Replace(((Variable)this.children[i - 1]).Name.OriginalValue, argList[i]);
+                    outString = outString.Replace(((Variable)this.children[i - 1]).Name.OriginalValue, argList[i]);
                 }
             }
             else
@@ -49,12 +51,12 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 outString += "] call {";
                 string tmp = Code;
-                tmp.Replace("_this", "(_this select 0)");
+                tmp = tmp.Replace("_this", "(_this select 0)");
                 for (int i = 0; i < this.children.Count; i++)
                 {
-                    tmp.Replace(((Variable)this.children[i]).Name.OriginalValue, "(_this select " + (i + 1) + ")");
+                    tmp = tmp.Replace(((Variable)this.children[i]).Name.OriginalValue, "(_this select " + (i + 1) + ")");
                 }
-                outString += "}";
+                outString += tmp + "}";
             }
             return outString;
         }

@@ -30,6 +30,7 @@ namespace Compiler.OOS_LanguageObjects
     }
     public class VarTypeObject
     {
+        public bool IsObject { get { return this.varType == VarType.Object || this.varType == VarType.ObjectStrict; } }
         public VarTypeObject(Ident i, bool isStrict = false)
         {
             this.ident = i;

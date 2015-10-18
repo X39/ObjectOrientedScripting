@@ -29,9 +29,5 @@ namespace std
         operator simple T [] (scalar _i)
             _this select _i
         endOperator
-        
-        operator simple bool === (array<T> _arr)
-            _this isEqualTo _arr
-        endOperator
     }
 }

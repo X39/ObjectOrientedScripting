@@ -717,9 +717,10 @@ public class Parser {
 		Expect(8);
 		while (StartOf(12)) {
 			Get();
-			obj.Code += t.val; 
+			obj.Code += t.val + ' '; 
 		}
 		Expect(40);
+		obj.Code = obj.Code.Trim(); 
 	}
 
 	void NATIVEFUNCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -759,9 +760,10 @@ public class Parser {
 		Expect(8);
 		while (StartOf(13)) {
 			Get();
-			obj.Code += t.val; 
+			obj.Code += t.val + ' '; 
 		}
 		Expect(44);
+		obj.Code = obj.Code.Trim(); 
 	}
 
 	void NATIVEOPERATOR(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -769,6 +771,7 @@ public class Parser {
 		Expect(45);
 		if (la.kind == 39) {
 			Get();
+			obj.IsSimple = true; 
 		}
 		if (StartOf(1)) {
 			VARTYPE(out v);
@@ -785,22 +788,9 @@ public class Parser {
 			IDENT(out blo, obj);
 			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
 		} else SynErr(87);
-		if (la.kind == 9) {
-			Get();
-			Expect(10);
-			obj.Operator = "[]"; 
-		} else if (la.kind == 5 || la.kind == 17 || la.kind == 18) {
-			if (la.kind == 5) {
-				Get();
-				obj.Operator = t.val; 
-			} else if (la.kind == 17) {
-				Get();
-				obj.Operator = t.val; 
-			} else {
-				Get();
-				obj.Operator = t.val; 
-			}
-		} else SynErr(88);
+		Expect(9);
+		Expect(10);
+		obj.Operator = "[]"; 
 		Expect(7);
 		if (StartOf(10)) {
 			NEWVARIABLE(out blo, obj);
@@ -814,9 +804,10 @@ public class Parser {
 		Expect(8);
 		while (StartOf(14)) {
 			Get();
-			obj.Code += t.val; 
+			obj.Code += t.val + ' '; 
 		}
 		Expect(46);
+		obj.Code = obj.Code.Trim(); 
 	}
 
 	void CONSTRUCTOR(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e) {
@@ -859,7 +850,7 @@ public class Parser {
 			}
 			IDENT(out blo, obj);
 			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
-		} else SynErr(89);
+		} else SynErr(88);
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 		Expect(7);
@@ -879,7 +870,7 @@ public class Parser {
 				} else if (la.kind == 3) {
 					IDENT(out blo, obj);
 					obj.argTypes.Add(new VarTypeObject((Ident)blo)); 
-				} else SynErr(90);
+				} else SynErr(89);
 			}
 		}
 		Expect(8);
@@ -893,7 +884,7 @@ public class Parser {
 			TERMINATOR();
 		} else if (StartOf(17)) {
 			CODEINSTRUCTION_NSC(out outObj, parent);
-		} else SynErr(91);
+		} else SynErr(90);
 	}
 
 	void AUTOVARIABLE(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA) {
@@ -922,7 +913,7 @@ public class Parser {
 			outObj.addChild(blo); 
 		} else if (StartOf(2)) {
 			EXPRESSION(out outObj, parent);
-		} else SynErr(92);
+		} else SynErr(91);
 	}
 
 	void OP_THROW(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -953,7 +944,7 @@ public class Parser {
 			OP_SWITCH(out outObj, parent);
 		} else if (la.kind == 57) {
 			OP_TRYCATCH(out outObj, parent);
-		} else SynErr(93);
+		} else SynErr(92);
 	}
 
 	void OP_FOR(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -991,7 +982,7 @@ public class Parser {
 		} else if (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(94);
+		} else SynErr(93);
 	}
 
 	void OP_WHILE(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -1017,7 +1008,7 @@ public class Parser {
 		} else if (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(95);
+		} else SynErr(94);
 	}
 
 	void OP_IFELSE(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -1037,7 +1028,7 @@ public class Parser {
 		} else if (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(96);
+		} else SynErr(95);
 		if (la.kind == 56) {
 			Get();
 			obj.markIfEnd(); 
@@ -1051,7 +1042,7 @@ public class Parser {
 			} else if (StartOf(11)) {
 				CODEINSTRUCTION(out blo, obj);
 				obj.addChild(blo); 
-			} else SynErr(97);
+			} else SynErr(96);
 		}
 	}
 
@@ -1092,7 +1083,7 @@ public class Parser {
 					OP_RETURN(out blo, obj);
 					caseObj.endOfCase = blo; 
 					TERMINATOR();
-				} else SynErr(98);
+				} else SynErr(97);
 			} else {
 				if (la.kind == 65) {
 					Get();
@@ -1118,7 +1109,7 @@ public class Parser {
 					OP_RETURN(out blo, obj);
 					caseObj.endOfCase = blo; 
 					TERMINATOR();
-				} else SynErr(99);
+				} else SynErr(98);
 			}
 		}
 		Expect(12);
@@ -1299,18 +1290,17 @@ public class Errors {
 			case 85: s = "invalid FUNCTION"; break;
 			case 86: s = "invalid NATIVEFUNCTION"; break;
 			case 87: s = "invalid NATIVEOPERATOR"; break;
-			case 88: s = "invalid NATIVEOPERATOR"; break;
+			case 88: s = "invalid VFUNCTION"; break;
 			case 89: s = "invalid VFUNCTION"; break;
-			case 90: s = "invalid VFUNCTION"; break;
-			case 91: s = "invalid CODEINSTRUCTION"; break;
-			case 92: s = "invalid CODEINSTRUCTION_SC"; break;
-			case 93: s = "invalid CODEINSTRUCTION_NSC"; break;
-			case 94: s = "invalid OP_FOR"; break;
-			case 95: s = "invalid OP_WHILE"; break;
+			case 90: s = "invalid CODEINSTRUCTION"; break;
+			case 91: s = "invalid CODEINSTRUCTION_SC"; break;
+			case 92: s = "invalid CODEINSTRUCTION_NSC"; break;
+			case 93: s = "invalid OP_FOR"; break;
+			case 94: s = "invalid OP_WHILE"; break;
+			case 95: s = "invalid OP_IFELSE"; break;
 			case 96: s = "invalid OP_IFELSE"; break;
-			case 97: s = "invalid OP_IFELSE"; break;
+			case 97: s = "invalid OP_SWITCH"; break;
 			case 98: s = "invalid OP_SWITCH"; break;
-			case 99: s = "invalid OP_SWITCH"; break;
 
 			default: s = "error " + n; break;
 		}

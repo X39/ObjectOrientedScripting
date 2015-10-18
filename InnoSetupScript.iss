@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ObjectOrientedScripting Compiler"
-#define MyAppVersion "0.5.1-ALPHA"
+#define MyAppVersion "0.5.2-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "Wrapper.exe"
@@ -31,9 +31,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Wrapper.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.5.0-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\Compiler-0.5.1-ALPHA.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Logger.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\GitHub\ObjectOrientedScripting\stdLibrary\*"; DestDir: "{app}\stdLibrary\"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -47,12 +47,27 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
+'Version 0.5.2-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed output folder is not getting generated if not existing  ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed typeless functions are all recognized as constructor    ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed classes are lacking a cfgConfig layer                   ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed namespace static variables lacked semicolon in EBNF     ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed object functions not getting object parameter passed    ' + AnsiChar(#10) +
+'    |- Compiler:  Added output folder cleanup                                   ' + AnsiChar(#10) +
+'    |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup          ' + AnsiChar(#10) +
+'    |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)     ' + AnsiChar(#10) +
+'    |- Compiler:  Added additional keyword "boolean" for bool types             ' + AnsiChar(#10) +
+'    |- Compiler:  New CompileErrors: C0049                                      ' + AnsiChar(#10) +
+'    |- Compiler:  Added NativeClasses                                           ' + AnsiChar(#10) +
+'    \- Compiler:  Added array object to stdLib                                  ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.5.1-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of         ' + AnsiChar(#10) +
 '    |             project.oosproj)                                              ' + AnsiChar(#10) +
 '    |- Wrapper:   Fixed "URI-Format not supported" message when not forcing     ' + AnsiChar(#10) +
 '    |             a DLL (dll lookup now works as expected -.-*)                 ' + AnsiChar(#10) +
-'    |- Compiler:  Fixed functions getting invalidly recognized as duplicate     ' + AnsiChar(#10) +
+'    \- Compiler:  Fixed functions getting invalidly recognized as duplicate     ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.5.0-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Wrapper:   Fixed -gen is not working if file is not existing             ' + AnsiChar(#10) +
 '    |             (also if file was existing ... but expected error then)       ' + AnsiChar(#10) +
@@ -64,14 +79,15 @@ begin
 '    |- Compiler:  PreProcessor now supports "merge" operator ##                 ' + AnsiChar(#10) +
 '    |             #define FOO(BAR) BAR##FOOBAR                                  ' + AnsiChar(#10) +
 '    |             FOO(test) => testFOOBAR                                       ' + AnsiChar(#10) +
-'    |v- Compiler: GEN2 Implementation                                           ' + AnsiChar(#10) +
-'    ||-           New Syntax                                                    ' + AnsiChar(#10) +
-'    ||-           New SQF ObjectStructure                                       ' + AnsiChar(#10) +
-'    ||-           Type Restriction (with that all stuff that is connected to it)' + AnsiChar(#10) +
-'    ||-           Interfaces (and with them virtual functions)                  ' + AnsiChar(#10) +
-'    ||-           "Linker" issues with proper issue IDs                         ' + AnsiChar(#10) +
-'    ||            (currently room for 4 digits (so 0001 - 9999))                ' + AnsiChar(#10) +
-'    |\-           No overhead anymore                                           ' + AnsiChar(#10) +
+'    \v- Compiler: GEN2 Implementation                                           ' + AnsiChar(#10) +
+'     |-           New Syntax                                                    ' + AnsiChar(#10) +
+'     |-           New SQF ObjectStructure                                       ' + AnsiChar(#10) +
+'     |-           Type Restriction (with that all stuff that is connected to it)' + AnsiChar(#10) +
+'     |-           Interfaces (and with them virtual functions)                  ' + AnsiChar(#10) +
+'     |-           "Linker" issues with proper issue IDs                         ' + AnsiChar(#10) +
+'     |            (currently room for 4 digits (so 0001 - 9999))                ' + AnsiChar(#10) +
+'     \-           No unneeded overhead anymore                                  ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.4.0-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Wrapper:   Now returns -1 if was not successfully                        ' + AnsiChar(#10) +
 '    |- Wrapper:   Added "setFlags(string[])" function to ICompiler interface    ' + AnsiChar(#10) +
