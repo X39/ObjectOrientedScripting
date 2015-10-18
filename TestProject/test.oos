@@ -12,6 +12,7 @@ somethingWithArgs({a,p,r,o,v,e,d})
 mergeTest(its something with )
 mergeTest(itsMergedDude!)
 #include <array>
+#include <config>
 namespace X39
 {
     namespace testNamespace
@@ -84,6 +85,15 @@ namespace X39
         arrayObjectTest.pushBack(1);
         arrayObjectTest.pushBack(2);
         SQF diag_log(arrayObjectTest[0]);
+        
+        auto configObj = new ::std::config();
+        configObj = configObj.extend("CfgVehicles");
+        configObj = configObj.extend("FooBar");
+        configObj = configObj.parent();
+        auto hierarchy = configObj.hierarchy();
+        SQF diag_log(hierarchy[0].name());
+        SQF diag_log(configObj[0].name());
+        
         auto scalarArray = {1, 2, 3, 4, 5, 6};
         auto stringArray = {"test1", "test2", "test3"};
         auto boolArray = {false, true, false};

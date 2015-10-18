@@ -1,0 +1,40 @@
+#include <array>
+
+namespace std
+{
+    native config
+    {
+        assign simple ()
+            configFile
+        endAssign
+        
+        fnc simple config extend (string _s)
+            _this >> _s
+        endFnc
+        
+        fnc simple scalar count (string _s)
+            count _this
+        endFnc
+        
+        operator simple T [] (scalar _i)
+            _this select _i
+        endOperator
+        
+        
+        fnc string parent ()
+            private "_var";
+            _var = configHierarchy _this;
+            (_var select ((_var pushBack 1) - 1))
+        endFnc
+        
+        fnc simple ::std::array<config> hierarchy () configHierarchy _this endFnc
+        
+        fnc simple bool isClass ()      isClass _this       endFnc
+        fnc simple bool isText ()       isText _this        endFnc
+        fnc simple bool isNumber ()     isNumber _this      endFnc
+        
+        fnc simple scalar getNumber ()  getNumber _this     endFnc
+        fnc simple string getText ()    getText _this       endFnc
+        fnc simple string name ()       configName _this    endFnc
+    }
+}
