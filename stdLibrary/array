@@ -14,15 +14,15 @@ namespace std
             _this find _val
         endFnc
         
-        fnc simple scalar resize (scalar _i)
+        fnc simple void resize (scalar _i)
             _this resize _i
         endFnc
         
-        fnc simple scalar deleteAt (scalar _i)
+        fnc simple void deleteAt (scalar _i)
             _this deleteAt _i
         endFnc
         
-        fnc simple scalar deleteRange (scalar _i, scalar _j)
+        fnc simple void deleteRange (scalar _i, scalar _j)
             _this deleteRange [_i, _j]
         endFnc
         
