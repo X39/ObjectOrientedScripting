@@ -123,8 +123,8 @@ namespace Wrapper
                     }
                     if (!path.EndsWith("\\"))
                         path += '\\';
-                    Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating project file at '" + path + "poject.oosproj" + "'");
-                    StreamWriter writer = new StreamWriter(path + "ppoject.oosproj");
+                    Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating project file at '" + path + "project.oosproj" + "'");
+                    StreamWriter writer = new StreamWriter(path + "project.oosproj");
                     writer.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
                     writer.WriteLine("<root>");
                     writer.WriteLine("	<project>");
@@ -134,7 +134,7 @@ namespace Wrapper
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.5.1-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.5.2-ALPHA\" />");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!File.Exists(path + "Main.oos"))

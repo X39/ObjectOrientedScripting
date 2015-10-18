@@ -1,36 +1,44 @@
-Version 0.5.2-ALPHA
-    |- Compiler:  Fixed output folder is not getting generated if not existing
-    |- Compiler:  Fixed typeless functions are all recognized as constructor
-    |- Compiler:  Fixed classes are lacking a cfgConfig layer
-    |- Compiler:  Fixed namespace static variables lacked semicolon in EBNF
-    |- Compiler:  Added output folder cleanup
-    |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup
-    |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)
-Version 0.5.1-ALPHA
-    |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of
-    |             project.oosproj)
-    |- Wrapper:   Fixed "URI-Format not supported" message when not forcing
-    |             a DLL (dll lookup now works as expected -.-*)
-    \- Compiler:  Fixed functions getting invalidly recognized as duplicate
-Version 0.5.0-ALPHA
-    |- Wrapper:   Fixed -gen is not working if file is not existing
-    |             (also if file was existing ... but expected error then)
-    |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"
-    |- Compiler:  Flag /THISVAR="_thisvarname_"
-    |- Compiler:  PreProcessor replaced non-keywords when they just contained a
-    |             part of the keyword (EG. keyword was FOO, FOOBAR would have
-    |             been replaced with <CONTENT>BAR)
-    |- Compiler:  PreProcessor now supports "merge" operator ##
-    |             #define FOO(BAR) BAR##FOOBAR
-    |             FOO(test) => testFOOBAR
-    \v- Compiler: GEN2 Implementation
-     |-           New Syntax
-     |-           New SQF ObjectStructure
+Version 0.5.2-ALPHA                                                             
+    |- Compiler:  Fixed output folder is not getting generated if not existing  
+    |- Compiler:  Fixed typeless functions are all recognized as constructor    
+    |- Compiler:  Fixed classes are lacking a cfgConfig layer                   
+    |- Compiler:  Fixed namespace static variables lacked semicolon in EBNF     
+    |- Compiler:  Fixed object functions not getting object parameter passed    
+    |- Compiler:  Added output folder cleanup                                   
+    |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup          
+    |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)     
+    |- Compiler:  Added additional keyword "boolean" for bool types             
+    |- Compiler:  New CompileErrors: C0049                                      
+    |- Compiler:  Added NativeClasses                                           
+    \- Compiler:  Added array object to stdLib                                  
+                                                                                
+Version 0.5.1-ALPHA                                                             
+    |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of         
+    |             project.oosproj)                                              
+    |- Wrapper:   Fixed "URI-Format not supported" message when not forcing     
+    |             a DLL (dll lookup now works as expected -.-*)                 
+    \- Compiler:  Fixed functions getting invalidly recognized as duplicate     
+                                                                                
+Version 0.5.0-ALPHA                                                             
+    |- Wrapper:   Fixed -gen is not working if file is not existing             
+    |             (also if file was existing ... but expected error then)       
+    |- Compiler:  Flag /DEFINE="#whatever(arg) dosomething with arg"            
+    |- Compiler:  Flag /THISVAR="_thisvarname_"                                 
+    |- Compiler:  PreProcessor replaced non-keywords when they just contained a 
+    |             part of the keyword (EG. keyword was FOO, FOOBAR would have   
+    |             been replaced with <CONTENT>BAR)                              
+    |- Compiler:  PreProcessor now supports "merge" operator ##                 
+    |             #define FOO(BAR) BAR##FOOBAR                                  
+    |             FOO(test) => testFOOBAR                                       
+    \v- Compiler: GEN2 Implementation                                           
+     |-           New Syntax                                                    
+     |-           New SQF ObjectStructure                                       
      |-           Type Restriction (with that all stuff that is connected to it)
-     |-           Interfaces (and with them virtual functions)
-     |-           "Linker" issues with proper issue IDs
-     |            (currently room for 4 digits (so 0001 - 9999))
-     \-           No unneeded overhead anymore
+     |-           Interfaces (and with them virtual functions)                  
+     |-           "Linker" issues with proper issue IDs                         
+     |            (currently room for 4 digits (so 0001 - 9999))                
+     \-           No unneeded overhead anymore                                  
+                                                                                
 Version 0.4.0-ALPHA                                                             
     |- Wrapper:   Now returns -1 if was not successfully                        
     |- Wrapper:   Added "setFlags(string[])" function to ICompiler interface    

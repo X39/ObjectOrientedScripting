@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 57;
-	const int noSym = 57;
+	const int maxT = 68;
+	const int noSym = 68;
 
 
 	public Buffer buffer; // scanner buffer
@@ -409,41 +409,50 @@ public class Scanner {
 
 	void CheckLiteral() {
 		switch (t.val) {
-			case "public": t.kind = 17; break;
-			case "private": t.kind = 18; break;
-			case "protected": t.kind = 19; break;
-			case "scalar": t.kind = 20; break;
-			case "int": t.kind = 21; break;
-			case "double": t.kind = 22; break;
-			case "float": t.kind = 23; break;
-			case "bool": t.kind = 24; break;
-			case "string": t.kind = 25; break;
-			case "object": t.kind = 26; break;
-			case "true": t.kind = 27; break;
-			case "false": t.kind = 28; break;
-			case "static": t.kind = 32; break;
-			case "namespace": t.kind = 33; break;
-			case "class": t.kind = 34; break;
-			case "interface": t.kind = 36; break;
-			case "void": t.kind = 37; break;
-			case "override": t.kind = 38; break;
-			case "strict": t.kind = 39; break;
-			case "auto": t.kind = 40; break;
-			case "for": t.kind = 41; break;
-			case "while": t.kind = 42; break;
-			case "new": t.kind = 43; break;
-			case "if": t.kind = 44; break;
-			case "else": t.kind = 45; break;
-			case "try": t.kind = 46; break;
-			case "catch": t.kind = 47; break;
-			case "break": t.kind = 48; break;
-			case "is": t.kind = 49; break;
-			case "throw": t.kind = 50; break;
-			case "return": t.kind = 51; break;
-			case "switch": t.kind = 52; break;
-			case "case": t.kind = 53; break;
-			case "default": t.kind = 54; break;
-			case "SQF": t.kind = 56; break;
+			case "public": t.kind = 19; break;
+			case "private": t.kind = 20; break;
+			case "protected": t.kind = 21; break;
+			case "scalar": t.kind = 22; break;
+			case "int": t.kind = 23; break;
+			case "double": t.kind = 24; break;
+			case "float": t.kind = 25; break;
+			case "bool": t.kind = 26; break;
+			case "boolean": t.kind = 27; break;
+			case "string": t.kind = 28; break;
+			case "object": t.kind = 29; break;
+			case "true": t.kind = 30; break;
+			case "false": t.kind = 31; break;
+			case "static": t.kind = 35; break;
+			case "namespace": t.kind = 36; break;
+			case "native": t.kind = 37; break;
+			case "assign": t.kind = 38; break;
+			case "simple": t.kind = 39; break;
+			case "endAssign": t.kind = 40; break;
+			case "fnc": t.kind = 41; break;
+			case "void": t.kind = 42; break;
+			case "strict": t.kind = 43; break;
+			case "endFnc": t.kind = 44; break;
+			case "operator": t.kind = 45; break;
+			case "endOperator": t.kind = 46; break;
+			case "class": t.kind = 47; break;
+			case "interface": t.kind = 49; break;
+			case "override": t.kind = 50; break;
+			case "auto": t.kind = 51; break;
+			case "for": t.kind = 52; break;
+			case "while": t.kind = 53; break;
+			case "new": t.kind = 54; break;
+			case "if": t.kind = 55; break;
+			case "else": t.kind = 56; break;
+			case "try": t.kind = 57; break;
+			case "catch": t.kind = 58; break;
+			case "break": t.kind = 59; break;
+			case "is": t.kind = 60; break;
+			case "throw": t.kind = 61; break;
+			case "return": t.kind = 62; break;
+			case "switch": t.kind = 63; break;
+			case "case": t.kind = 64; break;
+			case "default": t.kind = 65; break;
+			case "SQF": t.kind = 67; break;
 			default: break;
 		}
 	}
@@ -538,13 +547,13 @@ public class Scanner {
 				if (ch == '=') {AddCh(); goto case 27;}
 				else {t.kind = 6; break;}
 			case 24:
-				recEnd = pos; recKind = 5;
+				recEnd = pos; recKind = 18;
 				if (ch == '=') {AddCh(); goto case 10;}
-				else {t.kind = 5; break;}
+				else {t.kind = 18; break;}
 			case 25:
-				recEnd = pos; recKind = 5;
+				recEnd = pos; recKind = 17;
 				if (ch == '=') {AddCh(); goto case 10;}
-				else {t.kind = 5; break;}
+				else {t.kind = 17; break;}
 			case 26:
 				if (ch <= 9 || ch >= 11 && ch <= 12 || ch >= 14 && ch <= '!' || ch >= '#' && ch <= '[' || ch >= ']' && ch <= 65535) {AddCh(); goto case 4;}
 				else if (ch == '"') {AddCh(); goto case 28;}
@@ -561,20 +570,20 @@ public class Scanner {
 				else if (ch == 92) {AddCh(); goto case 26;}
 				else {t.kind = 2; break;}
 			case 29:
-				{t.kind = 29; break;}
+				{t.kind = 32; break;}
 			case 30:
-				{t.kind = 30; break;}
+				{t.kind = 33; break;}
 			case 31:
-				{t.kind = 31; break;}
+				{t.kind = 34; break;}
 			case 32:
 				recEnd = pos; recKind = 5;
 				if (ch >= '0' && ch <= '9') {AddCh(); goto case 1;}
 				else if (ch == '-') {AddCh(); goto case 31;}
 				else {t.kind = 5; break;}
 			case 33:
-				recEnd = pos; recKind = 35;
+				recEnd = pos; recKind = 48;
 				if (ch == ':') {AddCh(); goto case 6;}
-				else {t.kind = 35; break;}
+				else {t.kind = 48; break;}
 			case 34:
 				recEnd = pos; recKind = 5;
 				if (ch == '+') {AddCh(); goto case 30;}
@@ -621,9 +630,9 @@ public class Scanner {
 				else if (ch == ':') {AddCh(); goto case 42;}
 				else {t.kind = 3; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
 			case 42:
-				recEnd = pos; recKind = 55;
+				recEnd = pos; recKind = 66;
 				if (ch == ':') {AddCh(); goto case 7;}
-				else {t.kind = 55; break;}
+				else {t.kind = 66; break;}
 
 		}
 		t.val = new String(tval, 0, tlen);

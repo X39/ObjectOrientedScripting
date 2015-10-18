@@ -21,8 +21,21 @@ namespace Compiler.OOS_LanguageObjects
             Ident ident = (Ident)this.Parent;
             if (ident.ReferencedObject == null)
                 return 0;
-            Function fnc = (Function)ident.ReferencedObject;
-            var argList = fnc.ArgList;
+            List<pBaseLangObject> argList;
+            if (ident.ReferencedObject is Function)
+            {
+                Function fnc = (Function)ident.ReferencedObject;
+                argList = fnc.ArgList;
+            }
+            else if(ident.ReferencedObject is NativeInstruction)
+            {
+                NativeInstruction ni = (NativeInstruction)ident.ReferencedObject;
+                argList = ni.children;
+            }
+            else
+            {
+                throw new Exception("NOPE! Should not happen exception happened ... please report to dev...");
+            }
             if(argList.Count != this.children.Count)
             {
                 if (argList.Count > this.children.Count)
@@ -36,17 +49,61 @@ namespace Compiler.OOS_LanguageObjects
                     errCount++;
                 }
             }
+            var template = ident.ReferencedObject.getFirstOf<Interfaces.iTemplate>();
             for(var i = 0; i < argList.Count; i++)
             {
                 if (i > argList.Count || i > this.children.Count)
                     break;
                 Variable v = (Variable)argList[i];
                 Expression e = (Expression)this.children[i];
-                if(!v.varType.Equals(e.ReferencedType))
+                if ((v.varType.varType == VarType.Object || v.varType.varType == VarType.ObjectStrict) && template != null)
                 {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0019, e.Line, e.Pos));
-                    errCount++;
+                    bool flag = false;
+                    for (int j = 0; j < template.template.vtoList.Count; j++ )
+                    {
+                        var it = template.template.vtoList[j];
+                        if (v.varType.ident.OriginalValue.Equals(it.ident.OriginalValue))
+                        {
+                            var varIdent = this.getLastOf<Ident>();
+                            var template2 = ((Interfaces.iTemplate)varIdent.ReferencedObject).template;
+                            if (!(varIdent.ReferencedObject is Interfaces.iTemplate))
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.UNKNOWN, e.Line, e.Pos));
+                                errCount++;
+                            }
+                            else if (template2 != null && template2.vtoList.Count > j)
+                            {
+                                var it2 = template2.vtoList[j];
+                                if (!e.ReferencedType.Equals(it2))
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0049, e.Line, e.Pos));
+                                    errCount++;
+                                }
+                                else
+                                {
+                                    flag = true;
+                                }
+                            }
+                        }
+                    }
+                    if(!flag)
+                    {
+                        if (!v.varType.Equals(e.ReferencedType))
+                        {
+                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0019, e.Line, e.Pos));
+                            errCount++;
+                        }
+                    }
                 }
+                else
+                {
+                    if (!v.varType.Equals(e.ReferencedType))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0019, e.Line, e.Pos));
+                        errCount++;
+                    }
+                }
+
             }
             return errCount;
         }
