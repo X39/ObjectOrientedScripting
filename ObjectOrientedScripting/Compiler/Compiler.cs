@@ -1208,6 +1208,32 @@ namespace Wrapper
                 //VirtualFunctions are just logical structures in OOS, thus nothing gets created here
             }
             #endregion
+            #region Native Class Section
+            #region object Native
+            else if (container is Native)
+            {
+                var obj = (Native)container;
+            }
+            #endregion
+            #region object NativeAssign
+            else if (container is NativeAssign)
+            {
+                var obj = (NativeAssign)container;
+            }
+            #endregion
+            #region object NativeFunction
+            else if (container is NativeFunction)
+            {
+                var obj = (NativeFunction)container;
+            }
+            #endregion
+            #region object NativeOperator
+            else if (container is NativeOperator)
+            {
+                var obj = (NativeOperator)container;
+            }
+            #endregion
+            #endregion
             else
             {
                 throw new Exception("ShouldNeverEverHappen Exception, developer fucked up writeOutTree -.-' BLAME HIM!!!!!");

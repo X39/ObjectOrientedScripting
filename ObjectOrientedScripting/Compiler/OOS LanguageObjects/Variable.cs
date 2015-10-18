@@ -82,6 +82,11 @@ namespace Compiler.OOS_LanguageObjects
                 }
             }
             var assign = this.getAllChildrenOf<VariableAssignment>();
+            var newInstance = this.getAllChildrenOf<NewInstance>(true);
+            if (newInstance.Count > 0)
+            {
+                this.template = newInstance[0].template;
+            }
             if(assign.Count > 0)
             {
                 var expList = assign[0].getAllChildrenOf<Expression>();

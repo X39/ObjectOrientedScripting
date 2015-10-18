@@ -698,7 +698,7 @@ public class Parser {
 	}
 
 	void NATIVEASSIGN(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new NativeInstruction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; 
+		var obj = new NativeAssign(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; 
 		Expect(38);
 		if (la.kind == 39) {
 			Get();
@@ -731,10 +731,10 @@ public class Parser {
 		}
 		if (StartOf(1)) {
 			VARTYPE(out v);
-			obj.varType = new VarTypeObject(v); 
+			obj.VTO = new VarTypeObject(v); 
 		} else if (la.kind == 42) {
 			Get();
-			obj.varType = new VarTypeObject(VarType.Void); 
+			obj.VTO = new VarTypeObject(VarType.Void); 
 		} else if (la.kind == 3 || la.kind == 43) {
 			bool isStrict = false; 
 			if (la.kind == 43) {
@@ -742,7 +742,7 @@ public class Parser {
 				isStrict = true; 
 			}
 			IDENT(out blo, obj);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
+			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
 		} else SynErr(86);
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
@@ -772,10 +772,10 @@ public class Parser {
 		}
 		if (StartOf(1)) {
 			VARTYPE(out v);
-			obj.varType = new VarTypeObject(v); 
+			obj.VTO = new VarTypeObject(v); 
 		} else if (la.kind == 42) {
 			Get();
-			obj.varType = new VarTypeObject(VarType.Void); 
+			obj.VTO = new VarTypeObject(VarType.Void); 
 		} else if (la.kind == 3 || la.kind == 43) {
 			bool isStrict = false; 
 			if (la.kind == 43) {
@@ -783,7 +783,7 @@ public class Parser {
 				isStrict = true; 
 			}
 			IDENT(out blo, obj);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
+			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
 		} else SynErr(87);
 		if (la.kind == 9) {
 			Get();

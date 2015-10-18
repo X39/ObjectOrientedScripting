@@ -44,6 +44,7 @@
     <Compile Include="Exceptions\TypeMissmatch.cs" />
     <Compile Include="Exceptions\InvalidIdentType.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iTemplate.cs" />
+    <Compile Include="OOS LanguageObjects\NativeAssign.cs" />
     <Compile Include="OOS LanguageObjects\NativeOperator.cs" />
     <Compile Include="OOS LanguageObjects\NativeFunction.cs" />
     <Compile Include="OOS LanguageObjects\NativeInstruction.cs" />

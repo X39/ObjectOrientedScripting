@@ -280,7 +280,7 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
         .
-        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeInstruction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .)
+        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeAssign(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .)
         =
             "assign"
             [
@@ -307,15 +307,15 @@ COMPILER OOS
                 "simple" (. obj.IsSimple = true; .)
             ]
             (
-				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
+				VARTYPE<out v> (. obj.VTO = new VarTypeObject(v); .)
 				|
-				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
+				"void" (. obj.VTO = new VarTypeObject(VarType.Void); .)
 				|
                 (   (. bool isStrict = false; .)                    
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
                 )
             )
             IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
@@ -340,15 +340,15 @@ COMPILER OOS
                 "simple"
             ]
             (
-				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
+				VARTYPE<out v> (. obj.VTO = new VarTypeObject(v); .)
 				|
-				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
+				"void" (. obj.VTO = new VarTypeObject(VarType.Void); .)
 				|
                 (   (. bool isStrict = false; .)                    
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
                 )
             )
             (

@@ -7,6 +7,9 @@ Version 0.5.2-ALPHA
     |- Compiler:  Flag /NOCLEANUP which prevents output folder cleanup
     |- Compiler:  PreProcessor now supports stdLibrary #include (using < >)
     |- Compiler:  Added additional keyword "boolean" for bool types
+    |- Compiler:  New CompileErrors: C0049
+    |- Compiler:  Added NativeClasses
+    |- Compiler:  Added array object to stdLib
 Version 0.5.1-ALPHA
     |- Wrapper:   Fixed naming of -gen param (poject.oosproj instead of
     |             project.oosproj)

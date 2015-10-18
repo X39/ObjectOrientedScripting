@@ -20,7 +20,7 @@ namespace Compiler
             C0030, C0031, C0032, C0033, C0034,
             C0035, C0036, C0037, C0038, C0039,
             C0040, C0041, C0042, C0043, C0044,
-            C0045, C0046, C0047, C0048
+            C0045, C0046, C0047, C0048, C0049
         }
         public static string resolve(ErrorCodeEnum errCode, int line = -1, int pos = -1)
         {
@@ -79,6 +79,7 @@ namespace Compiler
                 case ErrorCodeEnum.C0046: return "Interfaces are not allowed to be 'strict' type";
                 case ErrorCodeEnum.C0047: return "Cannot cast staticly to interfaces";
                 case ErrorCodeEnum.C0048: return "Dynamic cast is not allowed for primitive types";
+                case ErrorCodeEnum.C0049: return "Type missmatch on template";
                 default: return "Unknown Error";
             }
         }

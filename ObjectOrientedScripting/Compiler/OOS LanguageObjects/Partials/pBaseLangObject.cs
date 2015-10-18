@@ -41,18 +41,18 @@ namespace Compiler.OOS_LanguageObjects
             errCount += this.doFinalize();
             return errCount;
         }
-        public T getFirstOf<T>() where T : pBaseLangObject
+        public T getFirstOf<T>()
         {
             if (this is T)
             {
-                return (T)this;
+                return (T)(object)this;
             }
             else
             {
                 if (this.parent != null)
                     return this.parent.getFirstOf<T>();
                 else
-                    return null;
+                    return default(T);
             }
         }
         public int countTo<T>() where T : pBaseLangObject
@@ -69,15 +69,15 @@ namespace Compiler.OOS_LanguageObjects
                     return 1;
             }
         }
-        public T getLastOf<T>() where T : pBaseLangObject
+        public T getLastOf<T>()
         {
             if (this.parent == null)
-                return null;
+                return default(T);
             if(this.parent is T)
                 return this.parent.getLastOf<T>();
             if (this is T)
-                return (T)this;
-            return null;
+                return (T)(object)this;
+            return default(T);
         }
         public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int deepness = -1, int scopeIndex = -1) where T : pBaseLangObject
         {

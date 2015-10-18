@@ -79,7 +79,7 @@ namespace X39
         _foo.foobar("normal bar");
 
         auto _testing = 0;
-        auto arrayObjectTest = new std::array<scalar>();
+        auto arrayObjectTest = new ::std::array<scalar>();
         arrayObjectTest.pushBack(0);
         arrayObjectTest.pushBack(1);
         arrayObjectTest.pushBack(2);

@@ -107,6 +107,11 @@ namespace Compiler.OOS_LanguageObjects
                             obj = this.getFirstOf<Namespace>();
                             return (obj == null ? "" : obj.FullyQualifiedName) + "::" + this.originalValue;
                         }
+                        if (this.Parent is NativeInstruction)
+                        {
+                            obj = this.getFirstOf<Native>();
+                            return (obj == null ? "" : obj.FullyQualifiedName) + "::" + this.originalValue;
+                        }
                         else
                         {
                             return obj.FullyQualifiedName + "::" + this.originalValue;
@@ -164,6 +169,8 @@ namespace Compiler.OOS_LanguageObjects
             foreach (pBaseLangObject blo in children)
                 if (blo != null && blo is Ident)
                     errCount += blo.finalize();
+            if (this is Interfaces.iTemplate && ((Interfaces.iTemplate)this).template != null)
+                errCount += ((Interfaces.iTemplate)this).template.doFinalize();
             errCount += this.doFinalize();
             foreach (pBaseLangObject blo in children)
                 if (blo != null && !(blo is Ident))
@@ -221,7 +228,7 @@ namespace Compiler.OOS_LanguageObjects
                         return errCount;
                     }
                 }
-                else if (this.Parent is Namespace || this.Parent is VirtualFunction || this.Parent is Variable || this.Parent is Function || this.Parent is oosInterface)
+                else if (this.Parent is Namespace || this.Parent is VirtualFunction || this.Parent is Template || this.Parent is Variable || this.Parent is Function || this.Parent is Native || this.Parent is NativeInstruction || this.Parent is oosInterface)
                 {
                     this.referencedObject = this.Parent;
                     this.referencedType = new VarTypeObject(this);
@@ -285,6 +292,13 @@ namespace Compiler.OOS_LanguageObjects
                                     this.thisReferencedObject = tuple.Item2;
                                     this.thisReferencedType = tuple.Item2.varType;
                                 }
+                                else if (tuple.Item3 != null)
+                                {
+                                    this.referencedObject = tuple.Item3;
+                                    this.referencedType = tuple.Item3.VTO;
+                                    this.thisReferencedObject = tuple.Item3;
+                                    this.thisReferencedType = tuple.Item3.VTO;
+                                }
                                 else
                                 {
                                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0005, this.line, this.pos));
@@ -341,6 +355,13 @@ namespace Compiler.OOS_LanguageObjects
                                 this.referencedType = tuple.Item2.varType;
                                 this.thisReferencedObject = tuple.Item2;
                                 this.thisReferencedType = tuple.Item2.varType;
+                            }
+                            else if (tuple.Item3 != null)
+                            {
+                                this.referencedObject = tuple.Item3;
+                                this.referencedType = tuple.Item3.VTO;
+                                this.thisReferencedObject = tuple.Item3;
+                                this.thisReferencedType = tuple.Item3.VTO;
                             }
                             else
                             {
@@ -411,23 +432,33 @@ namespace Compiler.OOS_LanguageObjects
             }
             return errCount;
         }
-        public Tuple<Function, VirtualFunction> getFunctionReferenceOfFQN(string fqn)
+        public Tuple<Function, VirtualFunction, NativeInstruction> getFunctionReferenceOfFQN(string fqn)
         {
             var varList = this.getFirstOf<Base>().getAllChildrenOf<Function>(true);
             foreach (var it in varList)
             {
                 var fqn2 = it.Name.FullyQualifiedName;
                 if (fqn2 == fqn)
-                    return new Tuple<Function, VirtualFunction>(it, null);
+                    return new Tuple<Function, VirtualFunction, NativeInstruction>(it, null, null);
                 if (fqn2.StartsWith(fqn) && fqn.EndsWith(fqn2.Remove(0, fqn.Length)))
-                    return new Tuple<Function, VirtualFunction>(it, null);
+                    return new Tuple<Function, VirtualFunction, NativeInstruction>(it, null, null);
             }
             var varList2 = this.getFirstOf<Base>().getAllChildrenOf<VirtualFunction>(true);
             foreach (var it in varList2)
             {
                 if (it.Name.FullyQualifiedName == fqn)
                 {
-                    return new Tuple<Function, VirtualFunction>(null, it);
+                    return new Tuple<Function, VirtualFunction, NativeInstruction>(null, it, null);
+                }
+            }
+            var varList3 = this.getFirstOf<Base>().getAllChildrenOf<NativeInstruction>(true);
+            foreach (var it in varList3)
+            {
+                if (!(it is Interfaces.iName))
+                    continue;
+                if (((Interfaces.iName)it).Name.FullyQualifiedName == fqn)
+                {
+                    return new Tuple<Function, VirtualFunction, NativeInstruction>(null, null, it);
                 }
             }
             return null;

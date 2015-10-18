@@ -426,9 +426,9 @@ public class Parser {
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		if (la.kind == 17) {
-			Template t; 
-			TEMPLATE(out t, obj);
-			obj.template = t; 
+			Template te; 
+			TEMPLATE(out te, obj);
+			obj.template = te; 
 		}
 		BODY_FUNCTIONCALL(out blo2, blo);
 		blo.addChild(blo2); 
@@ -645,6 +645,11 @@ public class Parser {
 			IDENT(out blo, obj);
 			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
 		} else SynErr(84);
+		if (la.kind == 17) {
+			Template te; 
+			TEMPLATE(out te, obj);
+			obj.template = te; 
+		}
 		IDENT(out blo, obj);
 		try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } 
 	}
