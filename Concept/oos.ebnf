@@ -14,6 +14,7 @@ COMPILER OOS
 		T_IDENT = ["::"] ( CHARACTER | '_' ) { "::" | CHARACTER | '_' | DIGIT }.
 		T_TERMINATOR = ';'.
 		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | ">=" | "<=".
+        T_OTHEROP = ">>" | "<<".
 		T_ASSIGNMENTCHAR = '='.
 		T_ROUNDBRACKETOPEN = '('.
 		T_ROUNDBRACKETCLOSE = ')'.
@@ -296,7 +297,7 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 			{
-				ANY (. obj.Code += t.val + ' '; .)
+				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
 			}
 			"endAssign" (. obj.Code = obj.Code.Trim(); .)
         .
@@ -316,6 +317,9 @@ COMPILER OOS
                         "strict" (. isStrict = true; .)
                     ]
                     IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
+                    [ (. Template te; .)
+                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                    ]
                 )
             )
             IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
@@ -329,7 +333,7 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 			{
-				ANY (. obj.Code += t.val + ' '; .)
+				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
 			}
 			"endFnc" (. obj.Code = obj.Code.Trim(); .)
         .
@@ -349,6 +353,9 @@ COMPILER OOS
                         "strict" (. isStrict = true; .)
                     ]
                     IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
+                    [ (. Template te; .)
+                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                    ]
                 )
             )
             (
@@ -356,14 +363,14 @@ COMPILER OOS
                     T_SQUAREBRACKETOPEN
                     T_SQUAREBRACKETCLOSE (. obj.Operator = "[]"; .)
                 )
-//                |
-//                (
-//                    T_EXPOP (. obj.Operator = t.val; .)
-//                    |
-//                    T_TEMPLATEOPEN (. obj.Operator = t.val; .)
-//                    |
-//                    T_TEMPLATECLOSE (. obj.Operator = t.val; .)
-//                )
+                |
+                (
+                    T_EXPOP (. obj.Operator = t.val; .)
+                    |
+                    T_TEMPLATEOPEN (. obj.Operator = t.val; .)
+                    |
+                    T_TEMPLATECLOSE (. obj.Operator = t.val; .)
+                )
             )
 			T_ROUNDBRACKETOPEN
 			[
@@ -375,7 +382,7 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 			{
-				ANY (. obj.Code += t.val + ' '; .)
+				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
 			}
 			"endOperator" (. obj.Code = obj.Code.Trim(); .)
         .
@@ -449,6 +456,9 @@ COMPILER OOS
                         "strict" (. isStrict = true; .)
                     ]
                     IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    [ (. Template te; .)
+                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                    ]
                 )
 			)
             [
@@ -502,6 +512,9 @@ COMPILER OOS
                         "strict" (. isStrict = true; .)
                     ]
                     IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    [ (. Template te; .)
+                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                    ]
                 )
 			)
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
@@ -533,12 +546,12 @@ COMPILER OOS
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)   
+                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    [ (. Template te; .)
+                        TEMPLATE<out te, obj> (. obj.template = te; .)
+                    ]
                 )
 			)
-            [ (. Template te; .)
-                TEMPLATE<out te, obj> (. obj.template = te; .)
-            ]
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 		.
 		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
