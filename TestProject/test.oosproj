@@ -7,5 +7,5 @@
 		<outputfolder>./output/</outputfolder>
 		<buildfolder>./build/</buildfolder>
 	</project>
-	<compiler version="0.1.0-ALPHA" />
+	<compiler version="0.5.2-ALPHA" />
 </root>
