@@ -1332,6 +1332,7 @@ u:nil:exportjipmessages STRING
 u:nil:deletelocation LOCATION
 u:nil:soldiermagazines OBJECT
 u:string:format ARRAY
+u:nil:disableRemoteSensors BOOL
 u:nil:finite SCALAR,NaN
 u:nil:waypointhouseposition ARRAY
 u:nil:geteditorcamera CONTROL
@@ -2102,6 +2103,7 @@ n:nil:clearitempool
 n:nil:dialog
 n:nil:profilenamesteam
 n:string:player
+n:bool:getRemoteSensorsDisabled
 n:nil:shownartillerycomputer
 n:nil:showncompass
 n:nil:visiblecompass
