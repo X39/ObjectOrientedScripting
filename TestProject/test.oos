@@ -14,7 +14,7 @@ mergeTest(itsMergedDude!)
 #include <array>
 #include <config>
 #include <vehicle>
-#include <namespace>
+#include <context>
 namespace X39
 {
     namespace testNamespace
@@ -103,7 +103,7 @@ namespace X39
         }
         veh.setPosition(0, 0, 0);
         
-        auto vehContext = veh.getNamespace();
+        auto vehContext = veh.getContext();
         vehContext.setString("foo", "foobar", true);
         
         auto scalarArray = {1, 2, 3, 4, 5, 6};

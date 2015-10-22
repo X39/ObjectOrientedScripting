@@ -1,6 +1,6 @@
 namespace std
 {
-    native namespace
+    native context
     {
         assign simple ()
             missionNamespace
@@ -15,11 +15,11 @@ namespace std
         fnc simple bool getBool (string ident, bool default)                _this getVariable [ident, default]      endFnc
         fnc simple void setBool (string ident, bool val, bool publish)      _this setVariable [ident, val, publish] endFnc
         
-        fnc simple void setContext (namespace n)                            n                                       endFnc
-        fnc simple namespace toMissionContext ()                            missionNamespace                        endFnc
-        fnc simple namespace toUiContext ()                                 uiNamespace                             endFnc
-        fnc simple namespace toParsingContext ()                            parsingNamespace                        endFnc
-        fnc simple namespace toProfileContext ()                            profileNamespace                        endFnc
+        fnc simple void setContext (context n)                              n                                       endFnc
+        fnc simple context toMissionContext ()                              missionNamespace                        endFnc
+        fnc simple context toUiContext ()                                   uiNamespace                             endFnc
+        fnc simple context toParsingContext ()                              parsingNamespace                        endFnc
+        fnc simple context toProfileContext ()                              profileNamespace                        endFnc
         
         fnc simple void saveProfileContext ()                               saveProfileNamespace                    endFnc
     }

@@ -1,6 +1,6 @@
 #include <array>
 #include <config>
-#include <namespace>
+#include <context>
 
 namespace std
 {
@@ -24,7 +24,7 @@ namespace std
         fnc simple scalar           getSpeed        ()                              speed _this                                 endFnc
         fnc simple string           getType         ()                              typeOf _this                                endFnc
         fnc simple config           getConfigEntry  ()                              configBin >> "CfgVehicles" >> typeOf _this  endFnc
-        fnc simple namespace        getNamespace    ()                              _this                                       endFnc
+        fnc simple context          getContext      ()                              _this                                       endFnc
         
         fnc simple bool             isKindOf        (string type)                   _this isKindOf type                         endFnc
         fnc simple bool             isAlive         ()                              alive _this                                 endFnc
