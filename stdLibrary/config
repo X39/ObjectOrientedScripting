@@ -16,7 +16,7 @@ namespace std
             count _this
         endFnc
         
-        operator simple T [] (scalar _i)
+        operator simple config [] (scalar _i)
             _this select _i
         endOperator
         

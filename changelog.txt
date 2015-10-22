@@ -4,6 +4,9 @@ Version 0.5.3-ALPHA
     |             line had whitespace characters after its last valid character 
     |- Compiler:  SQF command arguments where not separated by commas           
     |- Compiler:  Added "scalar length()" function to ::std::array              
+    |- Compiler:  Added 'config' object to stdLibrary
+    |- Compiler:  Added 'namespace' object to stdLibrary
+    |- Compiler:  Added 'vehicle' object to stdLibrary
     |- Compiler:  PreProcessor allowed multiple includes of the same file ref.  
     |- Compiler:  Parent classes/interfaces now need to be adressed with        
     |             extends (for classes) or implements (for interfaces)          

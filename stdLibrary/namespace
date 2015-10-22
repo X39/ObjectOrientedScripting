@@ -1,0 +1,26 @@
+namespace std
+{
+    native namespace
+    {
+        assign simple ()
+            missionNamespace
+        endAssign
+        
+        fnc simple string getString (string ident, string default)          _this getVariable [ident, default]      endFnc
+        fnc simple void setString (string ident, string val, bool publish)  _this setVariable [ident, val, publish] endFnc
+        
+        fnc simple scalar getScalar (string ident, scalar default)          _this getVariable [ident, default]      endFnc
+        fnc simple void setScalar (string ident, scalar val, bool publish)  _this setVariable [ident, val, publish] endFnc
+        
+        fnc simple bool getBool (string ident, bool default)                _this getVariable [ident, default]      endFnc
+        fnc simple void setBool (string ident, bool val, bool publish)      _this setVariable [ident, val, publish] endFnc
+        
+        fnc simple void setContext (namespace n)                            n                                       endFnc
+        fnc simple namespace toMissionContext ()                            missionNamespace                        endFnc
+        fnc simple namespace toUiContext ()                                 uiNamespace                             endFnc
+        fnc simple namespace toParsingContext ()                            parsingNamespace                        endFnc
+        fnc simple namespace toProfileContext ()                            profileNamespace                        endFnc
+        
+        fnc simple void saveProfileContext ()                               saveProfileNamespace                    endFnc
+    }
+}

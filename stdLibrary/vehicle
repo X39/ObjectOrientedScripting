@@ -1,0 +1,45 @@
+#include <array>
+#include <config>
+#include <namespace>
+
+namespace std
+{
+    native vehicle
+    {
+        assign simple (string name, int i, int j, int k)
+            name createVehicle [i, j, k]
+        endAssign
+        
+        fnc simple array<scalar> getPosition ()
+            position _this
+        endFnc
+        
+        fnc simple scalar setPosition (int i, int j, int k)
+            _this setPos [i, j, k]
+        endFnc
+        
+        fnc simple array<scalar> getPositionASL ()
+            getPosASL _this
+        endFnc
+        
+        fnc simple scalar setPositionASL (int i, int j, int k)
+            _this setPosASL [i, j, k]
+        endFnc
+        
+        fnc simple bool isKindOf (string type)
+            _this isKindOf type
+        endFnc
+        
+        fnc simple string getType ()
+            typeOf _this
+        endFnc
+        
+        fnc simple config getConfigEntry ()
+            configBin >> "CfgVehicles" >> typeOf _this
+        endFnc
+        
+        fnc simple namespace getNamespace ()
+            _this
+        endFnc
+    }
+}
