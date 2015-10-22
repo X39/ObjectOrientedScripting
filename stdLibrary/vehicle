@@ -6,40 +6,28 @@ namespace std
 {
     native vehicle
     {
-        assign simple (string name, int i, int j, int k)
-            name createVehicle [i, j, k]
-        endAssign
+        assign simple (string name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
         
-        fnc simple array<scalar> getPosition ()
-            position _this
-        endFnc
+        fnc simple void             setDirection    (scalar i)                      _this setDir i                              endFnc
+        fnc simple void             setPosition     (scalar i, scalar j, scalar k)  _this setPos [i, j, k]                      endFnc
+        fnc simple void             setPositionASL  (scalar i, scalar j, scalar k)  _this setPosASL [i, j, k]                   endFnc
+        fnc simple void             setVelocity     (scalar i, scalar j, scalar k)  _this setVelocity [i, j, k]                 endFnc
+        fnc simple void             setDamage       (scalar i)                      _this setDamage include                     endFnc
         
-        fnc simple scalar setPosition (int i, int j, int k)
-            _this setPos [i, j, k]
-        endFnc
+        fnc simple scalar           getDamage       ()                              damage _this                                endFnc
+        fnc simple scalar           getDirection    ()                              direction _this                             endFnc
+        fnc simple array<scalar>    getPosition     ()                              position _this                              endFnc
+        fnc simple array<scalar>    getPositionASL  ()                              getPosASL _this                             endFnc
+        fnc simple array<scalar>    getVectorDir    ()                              vectorDir _this                             endFnc
+        fnc simple array<scalar>    getVectorUp     ()                              vectorUp _this                              endFnc
+        fnc simple array<scalar>    getVelocity     ()                              velocity _this                              endFnc
+        fnc simple scalar           getSpeed        ()                              speed _this                                 endFnc
+        fnc simple string           getType         ()                              typeOf _this                                endFnc
+        fnc simple config           getConfigEntry  ()                              configBin >> "CfgVehicles" >> typeOf _this  endFnc
+        fnc simple namespace        getNamespace    ()                              _this                                       endFnc
         
-        fnc simple array<scalar> getPositionASL ()
-            getPosASL _this
-        endFnc
+        fnc simple bool             isKindOf        (string type)                   _this isKindOf type                         endFnc
+        fnc simple bool             isAlive         ()                              alive _this                                 endFnc
         
-        fnc simple scalar setPositionASL (int i, int j, int k)
-            _this setPosASL [i, j, k]
-        endFnc
-        
-        fnc simple bool isKindOf (string type)
-            _this isKindOf type
-        endFnc
-        
-        fnc simple string getType ()
-            typeOf _this
-        endFnc
-        
-        fnc simple config getConfigEntry ()
-            configBin >> "CfgVehicles" >> typeOf _this
-        endFnc
-        
-        fnc simple namespace getNamespace ()
-            _this
-        endFnc
     }
 }
