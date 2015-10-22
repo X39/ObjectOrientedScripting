@@ -139,7 +139,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public void markExtendsEnd()
         {
-            this.endMarkerParents = this.children.Count;
+            this.endMarkerParents = this.children.Count - 1;
         }
         public override int doFinalize()
         {

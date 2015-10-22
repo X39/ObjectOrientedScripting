@@ -402,8 +402,8 @@ COMPILER OOS
 					','
 					IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				}
-			]
-			[(. obj.markExtendsEnd(); .)
+			](. obj.markExtendsEnd(); .)
+			[
 				"implements"
 				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				{

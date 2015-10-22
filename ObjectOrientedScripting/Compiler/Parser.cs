@@ -564,8 +564,8 @@ public class Parser {
 				obj.addParentClass((Ident)blo); 
 			}
 		}
+		obj.markExtendsEnd(); 
 		if (la.kind == 50) {
-			obj.markExtendsEnd(); 
 			Get();
 			IDENT(out blo, obj);
 			obj.addParentClass((Ident)blo); 
