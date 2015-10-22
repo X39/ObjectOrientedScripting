@@ -12,8 +12,12 @@ namespace Compiler.OOS_LanguageObjects
         public int Line { get { return this.line; } }
         private int pos;
         public int Pos { get { return this.pos; } }
-
-        public VarTypeObject VTO { get; set; }
+        VarTypeObject vto;
+        public VarTypeObject VTO
+        {
+            get { return vto; }
+            set { vto = value; }
+        }
         public string Code { get; set; }
         public bool IsSimple { get; set; }
 

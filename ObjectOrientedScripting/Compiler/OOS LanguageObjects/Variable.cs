@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
         public pBaseLangObject Value { get { var valAssign = this.getAllChildrenOf<VariableAssignment>(); if (valAssign.Count > 0) return valAssign[0]; return null; } }
         public bool IsClassVariable { get { return this.encapsulation != Encapsulation.Static && this.encapsulation != Encapsulation.NA; } }
-        public Template template { get; set; }
+        public Template template { get { return this.varType.template; } set { this.varType.template = value; } }
         public string SqfVariableName
         {
             get
@@ -102,7 +102,9 @@ namespace Compiler.OOS_LanguageObjects
                     var type = expression.ReferencedType;
                     if (this.varType.varType == VarType.Auto)
                     {
+                        Template te = this.varType.template;
                         this.varType = type;
+                        this.varType.template = te;
                     }
                     if (!this.varType.Equals(type))
                     {
@@ -116,7 +118,9 @@ namespace Compiler.OOS_LanguageObjects
                     var type = arr.ReferencedType;
                     if (this.varType.varType == VarType.Auto)
                     {
+                        Template te = this.varType.template;
                         this.varType = type;
+                        this.varType.template = te;
                     }
                     if (!this.varType.Equals(type))
                     {

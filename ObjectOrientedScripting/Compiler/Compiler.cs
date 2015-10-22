@@ -33,6 +33,7 @@ namespace Wrapper
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
         public string stdLibPath;
+        private List<string> includedFiles;
         public Compiler()
         {
             configFileName = "config.cpp";
@@ -42,6 +43,7 @@ namespace Wrapper
             outputFolderCleanup = true;
             flagDefines = new List<PPDefine>();
             SqfCall.readSupportInfoList();
+            includedFiles = new List<string>();
         }
         public void setFlags(string[] strArr)
         {
@@ -173,23 +175,24 @@ namespace Wrapper
                             case 0:
                                 {
                                     cc.Value = null;
-                                    if (obj.Parent is Ident &&
-                                        ((Ident)obj.Parent).ReferencedObject is Variable &&
-                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.IsObject &&
-                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject is Native)
+                                    if (obj.Parent is Ident && ((Ident)obj.Parent).ReferencedObject is Variable && ((Variable)((Ident)obj.Parent).ReferencedObject).varType.IsObject)
                                     {
-                                        cc.Value = (Native)((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject;
+                                        if (((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject is Native)
+                                        {
+                                            cc.Value = (Native)((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject;
+                                        }
+                                        else if (((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject is NativeInstruction)
+                                        {
+                                            cc.Value = (Native)((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject.Parent;
+                                        }
                                     }
                                 }
                                 break;
                             case 1:
                                 {
-                                    if (obj.Parent is Ident &&
-                                        ((Ident)obj.Parent).ReferencedObject is Variable &&
-                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.IsObject &&
-                                        ((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject is Native)
+                                    if (cc.Value is Native)
                                     {
-                                        Native n = (Native)((Variable)((Ident)obj.Parent).ReferencedObject).varType.ident.ReferencedObject;
+                                        Native n = (Native)cc.Value;
                                         var opList = n.getAllChildrenOf<NativeOperator>();
                                         foreach (var it in opList)
                                         {
@@ -932,6 +935,8 @@ namespace Wrapper
                             {
                                 cc.Purpose = 1;
                                 WriteOutTree(proj, aa, path, configObj, writer, tabCount, cc);
+                                if (nextIdent != null)
+                                    WriteOutTree(proj, nextIdent, path, configObj, writer, tabCount, cc);
                                 flag = true;
                             }
                         }
@@ -1490,7 +1495,7 @@ namespace Wrapper
                 if (string.IsNullOrWhiteSpace(s))
                     continue;
                 //Remove left & right whitespaces and tabs from current string
-                string sTrimmed = s.Trim();
+                string sTrimmed = s.TrimStart();
                 string leading = s.Substring(0, s.Length - sTrimmed.Length);
                 s = sTrimmed;
                 if (s[0] != '#')
@@ -1552,6 +1557,9 @@ namespace Wrapper
                             reader.Close();
                             throw new Exception("Include contains self reference. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
+                        //Check if file was already included
+                        if (includedFiles.Contains(newFile))
+                            break;
                         //process the file before continuing with this
                         try
                         {
@@ -1561,6 +1569,7 @@ namespace Wrapper
                                 reader.Close();
                                 return false;
                             }
+                            includedFiles.Add(newFile);
                         }
                         catch (Exception e)
                         {

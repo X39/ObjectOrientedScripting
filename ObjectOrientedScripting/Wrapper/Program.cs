@@ -134,7 +134,7 @@ namespace Wrapper
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.5.2-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.5.3-ALPHA\" />");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!File.Exists(path + "Main.oos"))
@@ -152,7 +152,7 @@ namespace Wrapper
                         Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating build directory at '" + path + "build" + "'");
                         Directory.CreateDirectory(path + "build");
                     }
-                    Logger.Instance.log(Logger.LogLevel.INFO, "Created empty project for 0.5.0-ALPHA compiler");
+                    Logger.Instance.log(Logger.LogLevel.INFO, "Created empty project for 0.5.3-ALPHA compiler");
                 }
                 catch (Exception ex)
                 {

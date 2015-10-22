@@ -28,20 +28,33 @@ namespace Compiler.OOS_LanguageObjects
         BoolArray,
         StringArray
     }
-    public class VarTypeObject
+    public class VarTypeObject : Interfaces.iTemplate
     {
+        Template te;
+        public Template template
+        {
+            get { return this.te; }
+            set { if(value != null) this.te = value; }
+        }
         public bool IsObject { get { return this.varType == VarType.Object || this.varType == VarType.ObjectStrict; } }
-        public VarTypeObject(Ident i, bool isStrict = false)
+        public VarTypeObject(Ident i, bool isStrict = false, Template template = null)
         {
             this.ident = i;
             this.varType = isStrict ? VarType.ObjectStrict : VarType.Object;
-        } 
+            this.template = template;
+
+            if(this.template == null && (this.ident.ThisReferencedObject is Interfaces.iTemplate))
+            {
+                this.template = ((Interfaces.iTemplate)this.ident.ReferencedObject).template;
+            }
+        }
         public VarTypeObject(VarType v)
         {
             this.ident = null;
             this.varType = v;
             if (v == VarType.ObjectStrict || v == VarType.Object)
                 throw new Exception("TODO: Allow anonymous objects");
+            template = null;
             //TODO: Allow anonymous objects
         }
         public Ident ident;

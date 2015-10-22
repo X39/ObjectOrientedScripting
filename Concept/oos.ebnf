@@ -166,7 +166,7 @@ COMPILER OOS
 			|
 			BOOLEAN<out flag> (. obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); .)
 		.
-		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Expression(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .)
+		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent, bool flag> (. var obj = new Expression(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; obj.negate = flag; .)
 		=
 			[
 				'!' (. obj.negate = true; .)
@@ -204,15 +204,20 @@ COMPILER OOS
 				)
 			}
 		.
-		EXPRESSION<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; .)
+		EXPRESSION<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; bool negate = false; .)
 		=
-			(
-				T_ROUNDBRACKETOPEN
-				EXPRESSION_HELPER<out outObj, parent>
-				T_ROUNDBRACKETCLOSE
-			)
-            |
-			EXPRESSION_HELPER<out outObj, parent>
+            [
+                '!' (. negate = true; .)
+            ]
+            (
+                (
+                    T_ROUNDBRACKETOPEN
+                    EXPRESSION_HELPER<out outObj, parent, negate>
+                    T_ROUNDBRACKETCLOSE
+                )
+                |
+                EXPRESSION_HELPER<out outObj, parent, false>
+            )
 		.
 		OOS (. var obj = new Base(); baseObject = obj; pBaseLangObject blo; .)
 		=
@@ -318,7 +323,7 @@ COMPILER OOS
                     ]
                     IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                        TEMPLATE<out te, outObj> (. obj.VTO.template = te; .)
                     ]
                 )
             )
@@ -354,7 +359,7 @@ COMPILER OOS
                     ]
                     IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                        TEMPLATE<out te, outObj> (. obj.VTO.template = te; .)
                     ]
                 )
             )
@@ -391,7 +396,15 @@ COMPILER OOS
 			"class"
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			[
-				':'
+				"extends"
+				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
+				{
+					','
+					IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
+				}
+			]
+			[(. obj.markExtendsEnd(); .)
+				"implements"
 				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				{
 					','
@@ -457,7 +470,7 @@ COMPILER OOS
                     ]
                     IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                        TEMPLATE<out te, outObj> (. obj.varType.template = te; .)
                     ]
                 )
 			)
@@ -513,7 +526,7 @@ COMPILER OOS
                     ]
                     IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. blo.addChild(te); .)
+                        TEMPLATE<out te, outObj> (. obj.varType.template = te; .)
                     ]
                 )
 			)
@@ -548,7 +561,7 @@ COMPILER OOS
                     ]
                     IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, obj> (. obj.template = te; .)
+                        TEMPLATE<out te, outObj> (. obj.varType.template = te; .)
                     ]
                 )
 			)
@@ -838,7 +851,9 @@ COMPILER OOS
 			"SQF"
 			[
 				T_ROUNDBRACKETOPEN
+				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				{
+                    T_COMMA
 					EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				}
 				T_ROUNDBRACKETCLOSE
@@ -846,7 +861,9 @@ COMPILER OOS
 			IDENT<out blo, outObj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			[
 				T_ROUNDBRACKETOPEN (. obj.markEnd(); .)
+				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				{
+                    T_COMMA
 					EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				}
 				T_ROUNDBRACKETCLOSE

@@ -10,6 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     {
         public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
         int endMarker;
+        int endMarkerParents;
         public List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> ClassContent { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
         public List<Function> ThisFunctions
@@ -136,11 +137,16 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.endMarker = this.children.Count - 1;
         }
+        public void markExtendsEnd()
+        {
+            this.endMarkerParents = this.children.Count;
+        }
         public override int doFinalize()
         {
             int errCount = 0;
-            foreach (var it in ParentClassesIdents)
+            for (int i = 0; i < ParentClassesIdents.Count; i++)
             {
+                var it = ParentClassesIdents[i];
                 if (!(it is Ident))
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.UNKNOWN, Name.Line, Name.Pos));
@@ -149,12 +155,22 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 if (((Ident)it).ReferencedObject is oosClass)
                 {
+                    if(i >= this.endMarkerParents)
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0050, Name.Line, Name.Pos));
+                        errCount++;
+                    }
                     var parentClass = (oosClass)((Ident)it).ReferencedObject;
                     this.parentClasses.Add(parentClass);
                     this.parentClasses.AddRange(parentClass.parentClasses);
                 }
                 else if (((Ident)it).ReferencedObject is oosInterface)
                 {
+                    if (i < this.endMarkerParents)
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0051, Name.Line, Name.Pos));
+                        errCount++;
+                    }
                     this.parentInterfaces.Add((oosInterface)((Ident)it).ReferencedObject);
                 }
                 else

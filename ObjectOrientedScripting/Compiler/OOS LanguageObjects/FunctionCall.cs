@@ -61,11 +61,13 @@ namespace Compiler.OOS_LanguageObjects
                     bool flag = false;
                     for (int j = 0; j < template.template.vtoList.Count; j++ )
                     {
+                        //Anonymous template in class
                         var it = template.template.vtoList[j];
                         if (v.varType.ident.OriginalValue.Equals(it.ident.OriginalValue))
                         {
                             var varIdent = this.getLastOf<Ident>();
-                            var template2 = ((Interfaces.iTemplate)varIdent.ReferencedObject).template;
+                            //Typed template in class
+                            var template2 = ((Variable)varIdent.ReferencedObject).varType.template;
                             if (!(varIdent.ReferencedObject is Interfaces.iTemplate))
                             {
                                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.UNKNOWN, e.Line, e.Pos));

@@ -272,6 +272,10 @@ namespace Compiler.OOS_LanguageObjects
                             var obj = refType.ident.ReferencedObject;
                             if (firstChild is FunctionCall)
                             {
+                                if(obj is NativeFunction || obj is Function)
+                                {
+                                    obj = obj.Parent;
+                                }
                                 var tuple = getFunctionReferenceOfFQN(((Interfaces.iName)obj).Name.FullyQualifiedName + "::" + this.originalValue);
                                 if (tuple == null)
                                 {
