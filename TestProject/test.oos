@@ -26,7 +26,7 @@ namespace X39
     {
         void interfaceFnc(string, scalar, scalar);
     }
-    class testObj : testInterface
+    class testObj implements testInterface
     {
         public testObj()
         {

@@ -1,4 +1,4 @@
-class cBar : cFoo
+class cBar extends cFoo
 {
 	public void override foobar(string _someRandomArg)
 	{
