@@ -65,6 +65,7 @@ namespace Compiler.OOS_LanguageObjects
                         command = splitString[2].Split(' ')[1];
                     else
                         command = splitString[2];
+                    command = command.ToLower();
                     switch (splitString[1].ToLower())
                     {
                         default:
