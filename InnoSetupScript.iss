@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ObjectOrientedScripting Compiler"
-#define MyAppVersion "0.5.2-ALPHA"
+#define MyAppVersion "0.5.3-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "Wrapper.exe"
@@ -46,7 +46,24 @@ var
 
 procedure InitializeWizard;
 begin
-  ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
+  ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',         
+'This version (like the last too) has a shitty fucking issue causing the linker  ' + AnsiChar(#10) +
+'to fail ... thus ... do not raise issues in regards of bad linking please ...   ' + AnsiChar(#10) +        
+'It is already being worked on (litterally ... i rewrite the entire linker :P)   ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
+'Version 0.5.3-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed invalid type cast with template objects                 ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed bug in PreProcessor which caused invalid output if a    ' + AnsiChar(#10) +
+'    |             line had whitespace characters after its last valid character ' + AnsiChar(#10) +
+'    |- Compiler:  SQF command arguments where not separated by commas           ' + AnsiChar(#10) +
+'    |- Compiler:  Added "scalar length()" function to ::std::array              ' + AnsiChar(#10) +
+'    |- Compiler:  Added "config" object to stdLibrary                           ' + AnsiChar(#10) +
+'    |- Compiler:  Added "namespace" object to stdLibrary                        ' + AnsiChar(#10) +
+'    |- Compiler:  Added "vehicle" object to stdLibrary                          ' + AnsiChar(#10) +
+'    |- Compiler:  PreProcessor allowed multiple includes of the same file ref.  ' + AnsiChar(#10) +
+'    |- Compiler:  Parent classes/interfaces now need to be adressed with        ' + AnsiChar(#10) +
+'    |             extends (for classes) or implements (for interfaces)          ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.5.2-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  Fixed output folder is not getting generated if not existing  ' + AnsiChar(#10) +
 '    |- Compiler:  Fixed typeless functions are all recognized as constructor    ' + AnsiChar(#10) +

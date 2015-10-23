@@ -447,7 +447,10 @@ public class Parser {
 		Expect(70);
 		if (la.kind == 8) {
 			Get();
-			while (StartOf(2)) {
+			EXPRESSION(out blo, obj);
+			obj.addChild(blo); 
+			while (la.kind == 15) {
+				Get();
 				EXPRESSION(out blo, obj);
 				obj.addChild(blo); 
 			}
@@ -458,7 +461,10 @@ public class Parser {
 		if (la.kind == 8) {
 			Get();
 			obj.markEnd(); 
-			while (StartOf(2)) {
+			EXPRESSION(out blo, obj);
+			obj.addChild(blo); 
+			while (la.kind == 15) {
+				Get();
 				EXPRESSION(out blo, obj);
 				obj.addChild(blo); 
 			}
@@ -558,8 +564,8 @@ public class Parser {
 				obj.addParentClass((Ident)blo); 
 			}
 		}
+		obj.markExtendsEnd(); 
 		if (la.kind == 50) {
-			//obj.markExtendsEnd(); 
 			Get();
 			IDENT(out blo, obj);
 			obj.addParentClass((Ident)blo); 

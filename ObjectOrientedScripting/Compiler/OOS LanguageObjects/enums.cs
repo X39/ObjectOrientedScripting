@@ -70,11 +70,4 @@ namespace Compiler.OOS_LanguageObjects
             return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
         }
     }
-    public enum IdentType
-    {
-        Name,
-        GlobalAccess,
-        RelativeAccess,
-        NA
-    }
 }

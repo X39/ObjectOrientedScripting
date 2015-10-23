@@ -20,6 +20,8 @@ namespace Compiler.OOS_LanguageObjects
         public bool Override { get { return this.isOverride; } set { this.isOverride = value; } }
         public bool IsClassFunction { get { return this.encapsulation != Encapsulation.Static && this.encapsulation != Encapsulation.NA; } }
 
+        public bool IsAsync { get; set; }
+
         public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
         public string SqfVariableName
         {
@@ -52,6 +54,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.children.Add(null);
             varType = null;
+            this.IsAsync = false;
         }
         public override int doFinalize()
         {

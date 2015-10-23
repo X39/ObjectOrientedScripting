@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iName
+    public interface iClass : iName
     {
-        Ident Name {get; set;}
+        List<Ident> ExtendedClasses { get; }
     }
 }

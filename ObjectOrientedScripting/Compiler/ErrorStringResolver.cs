@@ -8,6 +8,32 @@ namespace Compiler
 {
     public static class ErrorStringResolver
     {
+
+
+        public enum LinkerErrorCode
+        {
+            UNKNOWN,
+            LNK0000, LNK0001, LNK0002, LNK0003, LNK0004
+        }
+
+        public static string resolve(LinkerErrorCode errCode, int line = -1, int pos = -1)
+        {
+            return Enum.GetName(typeof(LinkerErrorCode), errCode) + ": " + doResolve(errCode) + ". " + (line == -1 ? "" : "line " + line.ToString() + (pos == -1 ? "" : " col " + pos.ToString()));
+        }
+        private static string doResolve(LinkerErrorCode errCode)
+        {
+            switch (errCode)
+            {
+                case LinkerErrorCode.LNK0000: return "Ident using acces operator '::' at non-allowed room";
+                case LinkerErrorCode.LNK0001: return "Could not locate function reference for Ident";
+                case LinkerErrorCode.LNK0002: return "Type Missmatch, function with given ArgList could not be located";
+                case LinkerErrorCode.LNK0003: return "Invalid Encapsulation, accessing private scope outside of class context";
+                case LinkerErrorCode.LNK0004: return "Invalid Encapsulation, accessing protected scope outside of parented context";
+                default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
+            }
+        }
+
+
         public enum ErrorCodeEnum
         {
             UNKNOWN,
@@ -83,7 +109,7 @@ namespace Compiler
                 case ErrorCodeEnum.C0049: return "Type missmatch on template";
                 case ErrorCodeEnum.C0050: return "It is not possible to implement classes";
                 case ErrorCodeEnum.C0051: return "It is not possible to extend interfaces";
-                default: return "Unknown Error";
+                default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
             }
         }
     }

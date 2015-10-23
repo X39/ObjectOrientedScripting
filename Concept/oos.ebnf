@@ -16,6 +16,8 @@ COMPILER OOS
 		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | ">=" | "<=".
         T_OTHEROP = ">>" | "<<".
 		T_ASSIGNMENTCHAR = '='.
+		T_EXTENDEDASSIGNMENTCHARS = "+=" | "-=" | "*=" | "/=".
+		T_FASTASSIGNMENTCHARS = "++" | "--".
 		T_ROUNDBRACKETOPEN = '('.
 		T_ROUNDBRACKETCLOSE = ')'.
 		T_SQUAREBRACKETOPEN = '['.
@@ -74,8 +76,6 @@ COMPILER OOS
                 BODY_FUNCTIONCALL<out blo, ident> (. ((Ident)ident).addChild(blo); .)
                 |
                 BODY_ARRAYACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
-                |
-                BODY_ASSIGNMENT<out blo, ident> (. ((Ident)ident).addChild(blo); .)
             ]
             [
                 T_INSTANCEACCESS
@@ -188,20 +188,14 @@ COMPILER OOS
                 OP_SQFCALL<out blo, obj> (. obj.lExpression = blo; .)
 			)
 			{
-				"++" (. obj.expOperator = t.val; .)
-				|
-				"--" (. obj.expOperator = t.val; .)
-				|
 				(
-					(
-                        T_EXPOP (. obj.expOperator = t.val; .)
-                        |
-                        T_TEMPLATEOPEN (. obj.expOperator = t.val; .)
-                        |
-                        T_TEMPLATECLOSE (. obj.expOperator = t.val; .)
-                    )
-					EXPRESSION<out blo, obj> (. obj.rExpression = blo; .)
-				)
+                    T_EXPOP (. obj.expOperator = t.val; .)
+                    |
+                    T_TEMPLATEOPEN (. obj.expOperator = t.val; .)
+                    |
+                    T_TEMPLATECLOSE (. obj.expOperator = t.val; .)
+                )
+				EXPRESSION<out blo, obj> (. obj.rExpression = blo; .)
 			}
 		.
 		EXPRESSION<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; bool negate = false; .)
@@ -280,6 +274,8 @@ COMPILER OOS
 			T_CODEBRACKETOPEN
             NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
 			{
+                NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
+                |
 				NATIVEFUNCTION<out blo, obj> (. obj.addChild(blo); .)
                 |
                 NATIVEOPERATOR<out blo, obj> (. obj.addChild(blo); .)
@@ -459,6 +455,12 @@ COMPILER OOS
 		.
 		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; .)
 		=
+            [
+                "async" (. obj.IsAsync = true; .)
+            ]
+            [
+                "override" (. obj.Override = true; .)
+            ]
 			(
 				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
@@ -474,9 +476,6 @@ COMPILER OOS
                     ]
                 )
 			)
-            [
-                "override" (. obj.Override = true; .)
-            ]
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
 			T_ROUNDBRACKETOPEN
 			[
@@ -566,11 +565,20 @@ COMPILER OOS
                 )
 			)
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+            [
+                BODY_ASSIGNMENT<out blo, ident> (. obj.addChild(blo); .)
+            ]
 		.
+        VARIABLEASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new AssignContainer(parent); outObj = obj; pBaseLangObject blo; .)
+        =
+            IDENT<out blo, obj> (. obj.addChild(blo); .)
+            BODY_ASSIGNMENT<out blo, obj, true> (. obj.addChild(blo); .)
+        .
 		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
 		=
 			"auto"(. obj.varType = new VarTypeObject(VarType.Auto); .)
 			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+            BODY_ASSIGNMENT<out blo, ident> (. obj.addChild(blo); .)
 		.
 		CODEINSTRUCTION_SC<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; pBaseLangObject blo; .)
 		=
@@ -589,8 +597,7 @@ COMPILER OOS
 				AUTOVARIABLE<out outObj, parent>
 				BODY_ASSIGNMENT<out blo, outObj> (. outObj.addChild(blo); .)
 			)
-			|
-			EXPRESSION<out outObj, parent>
+            VARIABLEASSIGNMENT<out outObj, parent>
 		.
 		CODEINSTRUCTION_NSC<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; .)
 		=
@@ -613,13 +620,30 @@ COMPILER OOS
 			|
 			CODEINSTRUCTION_NSC<out outObj, parent>
 		.
-		BODY_ASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new VariableAssignment(parent); outObj = obj; pBaseLangObject blo; .)
+		BODY_ASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject parent, bool allowAlt = false> (. var obj = new VariableAssignment(parent); outObj = obj; pBaseLangObject blo; .)
 		=
-			T_ASSIGNMENTCHAR (. obj.operation = t.val; .)
             (
-                EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
+                T_ASSIGNMENTCHAR (. obj.operation = t.val; .)
+                (
+                    EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
+                    |
+                    OP_NEWARRAY<out blo, obj> (. obj.addChild(blo); .)
+                )
+            )
+            |IF( allowAlt )
+            (
+                (
+                    T_FASTASSIGNMENTCHARS (. obj.operation = t.val; .)
+                )
                 |
-                OP_NEWARRAY<out blo, obj> (. obj.addChild(blo); .)
+                (
+                    T_EXTENDEDASSIGNMENTCHARS (. obj.operation = t.val; .)
+                    (
+                        EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
+                        |
+                        OP_NEWARRAY<out blo, obj> (. obj.addChild(blo); .)
+                    )
+                )
             )
 		.
 		BODY_ARRAYACCESS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new ArrayAccess(parent); outObj = obj; pBaseLangObject blo; .)

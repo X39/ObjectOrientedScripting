@@ -1,15 +1,22 @@
+Version 0.6.0-ALPHA                                                             
+    |- Compiler:  Rewrote entire Linker & Writer
+    |- Compiler:  Reorganized how overwrite should be used (see next INFO)
+    |- Compiler:  Added "async" keyword for functions (see next INFO)
+    |             async functions have to have the return type void!
+    |- INFO:      Functions look like so now:
+    |             <encapsulation> [async] [override] <type> <name> ( <argList> )
 Version 0.5.3-ALPHA                                                             
     |- Compiler:  Fixed invalid type cast with template objects                 
     |- Compiler:  Fixed bug in PreProcessor which caused invalid output if a    
     |             line had whitespace characters after its last valid character 
     |- Compiler:  SQF command arguments where not separated by commas           
     |- Compiler:  Added "scalar length()" function to ::std::array              
-    |- Compiler:  Added 'config' object to stdLibrary
-    |- Compiler:  Added 'namespace' object to stdLibrary
-    |- Compiler:  Added 'vehicle' object to stdLibrary
+    |- Compiler:  Added "config" object to stdLibrary
+    |- Compiler:  Added "namespace" object to stdLibrary
+    |- Compiler:  Added "vehicle" object to stdLibrary
     |- Compiler:  PreProcessor allowed multiple includes of the same file ref.  
     |- Compiler:  Parent classes/interfaces now need to be adressed with        
-    |             extends (for classes) or implements (for interfaces)          
+    \             extends (for classes) or implements (for interfaces)          
                                                                                 
 Version 0.5.2-ALPHA                                                             
     |- Compiler:  Fixed output folder is not getting generated if not existing  
