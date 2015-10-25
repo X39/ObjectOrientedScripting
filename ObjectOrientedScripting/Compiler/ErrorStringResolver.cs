@@ -13,7 +13,8 @@ namespace Compiler
         public enum LinkerErrorCode
         {
             UNKNOWN,
-            LNK0000, LNK0001, LNK0002, LNK0003, LNK0004
+            LNK0000, LNK0001, LNK0002, LNK0003, LNK0004,
+            LNK0005, LNK0006
         }
 
         public static string resolve(LinkerErrorCode errCode, int line = -1, int pos = -1)
@@ -29,6 +30,8 @@ namespace Compiler
                 case LinkerErrorCode.LNK0002: return "Type Missmatch, function with given ArgList could not be located";
                 case LinkerErrorCode.LNK0003: return "Invalid Encapsulation, accessing private scope outside of class context";
                 case LinkerErrorCode.LNK0004: return "Invalid Encapsulation, accessing protected scope outside of parented context";
+                case LinkerErrorCode.LNK0005: return "Invalid Operator, object is not implementing ArrayAccess operator";
+                case LinkerErrorCode.LNK0006: return "Invalid Operator, vartype is not supporting ArrayAccess operator";
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
             }
         }

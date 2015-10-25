@@ -42,11 +42,13 @@
     <Compile Include="Compiler.cs" />
     <Compile Include="ErrorStringResolver.cs" />
     <Compile Include="Exceptions\TypeMissmatch.cs" />
-    <Compile Include="Exceptions\InvalidIdentType.cs" />
     <Compile Include="OOS LanguageObjects\HelperClasses\NamespaceResolver.cs" />
-    <Compile Include="OOS LanguageObjects\HelperClasses\StaticFunctions.cs" />
+    <Compile Include="OOS LanguageObjects\HelperClasses\ArgList.cs" />
+    <Compile Include="OOS LanguageObjects\Interfaces\iArgList.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iClass.cs" />
+    <Compile Include="OOS LanguageObjects\Interfaces\iCodeBlock.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iFunction.cs" />
+    <Compile Include="OOS LanguageObjects\Interfaces\iOperatorFunction.cs" />
     <Compile Include="OOS LanguageObjects\Interfaces\iTemplate.cs" />
     <Compile Include="OOS LanguageObjects\NativeAssign.cs" />
     <Compile Include="OOS LanguageObjects\NativeOperator.cs" />

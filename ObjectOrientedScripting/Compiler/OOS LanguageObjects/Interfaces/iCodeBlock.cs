@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iClass : iName
+    public interface iCodeBlock
     {
-        List<Ident> ExtendedClasses { get; }
-        VarTypeObject VTO { get; }
-        iOperatorFunction getOperatorFunction(OperatorFunctions op);
+        List<Return> ReturnCommands { get; }
     }
 }

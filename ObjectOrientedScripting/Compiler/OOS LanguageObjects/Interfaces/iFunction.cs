@@ -6,11 +6,21 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iFunction : iName
+    public interface iFunction : iName, iArgList
     {
+        /// <summary>
+        /// Return type of this iFunction
+        /// </summary>
         VarTypeObject ReturnType { get; }
+        /// <summary>
+        /// Returns a Template object which then can deref some unknown class conflicts in
+        /// ArgList field
+        /// </summary>
         Template TemplateArguments { get; }
+        /// <summary>
+        /// Returns functions encapsulation
+        /// </summary>
         Encapsulation FunctionEncapsulation { get; }
-        List<pBaseLangObject> ArgList { get; }
+        bool IsAsync { get; }
     }
 }

@@ -9,6 +9,8 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
     class NamespaceResolver
     {
         public int LayerCount { get { throw new NotImplementedException(); } }
+        public pBaseLangObject Reference { get { throw new NotImplementedException(); } }
+        public static Base BaseClass { get; set; }
         public static implicit operator NamespaceResolver(string input)
         {
             return new NamespaceResolver(input);
@@ -33,15 +35,15 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
 
 
 
-        public static List<Interfaces.iFunction> getFunctionReferenceOfFQN(pBaseLangObject blo, HelperClasses.NamespaceResolver nsr)
+        public static List<Interfaces.iFunction> getFunctionReferenceOfFQN(HelperClasses.NamespaceResolver nsr)
         {
             throw new NotImplementedException();
         }
-        public static Interfaces.iClass getClassReferenceOfFQN(pBaseLangObject blo, HelperClasses.NamespaceResolver nsr)
+        public static Interfaces.iClass getClassReferenceOfFQN(HelperClasses.NamespaceResolver nsr)
         {
             throw new NotImplementedException();
         }
-        private Variable getVariableReferenceOfFQN(pBaseLangObject blo, HelperClasses.NamespaceResolver nsr, bool localVariables = true)
+        public static Variable getVariableReferenceOfFQN(HelperClasses.NamespaceResolver nsr, bool localVariables = true, pBaseLangObject blo = null)
         {
             throw new NotImplementedException();
         }

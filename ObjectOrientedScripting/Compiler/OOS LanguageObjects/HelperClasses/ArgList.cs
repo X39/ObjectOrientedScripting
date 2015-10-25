@@ -8,7 +8,7 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
 {
     class ArgList
     {
-        public static bool matchesArglist(List<pBaseLangObject> lArgs, List<pBaseLangObject> rArgs)
+        public static bool matchesArglist(List<VarTypeObject> lArgs, List<VarTypeObject> rArgs)
         {
             throw new NotImplementedException();
         }

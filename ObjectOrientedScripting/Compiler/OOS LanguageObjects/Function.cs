@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class Function : pBaseLangObject, Interfaces.iName
+    public class Function : pBaseLangObject, Interfaces.iName, Interfaces.iFunction
     {
-        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
         public VarTypeObject varType;
         private int endMarker;
         public Encapsulation encapsulation;
 
-        public List<pBaseLangObject> ArgList { get { return this.children.GetRange(1, endMarker); } }
+        private List<pBaseLangObject> ArgListObjects { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
         public bool IsConstructor { get { if (this.Parent is Base) return false; return this.Name.OriginalValue == ((Interfaces.iName)this.Parent).Name.OriginalValue; } }
         private bool isOverride;
@@ -22,7 +22,6 @@ namespace Compiler.OOS_LanguageObjects
 
         public bool IsAsync { get; set; }
 
-        public string FullyQualifiedName { get { return this.Parent + "::" + this.Name.OriginalValue; } }
         public string SqfVariableName
         {
             get
@@ -50,6 +49,43 @@ namespace Compiler.OOS_LanguageObjects
                 }
             }
         }
+
+        /// <summary>
+        /// Return type of this iFunction
+        /// </summary>
+        public VarTypeObject ReturnType { get { return this.varType; } }
+        /// <summary>
+        /// Returns a Template object which then can deref some unknown class conflicts in
+        /// ArgList field
+        /// </summary>
+        public Template TemplateArguments { get { return null; } }
+        /// <summary>
+        /// Returns functions encapsulation
+        /// </summary>
+        public Encapsulation FunctionEncapsulation { get { return this.encapsulation; } }
+        /// <summary>
+        /// Returns the Arglist required for this iFunction
+        /// </summary>
+        public List<VarTypeObject> ArgList
+        {
+            get
+            {
+                List<VarTypeObject> retList = new List<VarTypeObject>();
+                foreach (var it in this.ArgListObjects)
+                {
+                    if (it is Variable)
+                    {
+                        retList.Add(((Variable)it).varType);
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                return retList;
+            }
+        }
+
         public Function(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
@@ -59,19 +95,6 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            if(this.IsConstructor)
-            {
-                var returnCommandList = this.getAllChildrenOf<Return>(true);
-                foreach(var it in returnCommandList)
-                {
-                    if(it.children.Count > 0)
-                    {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0032, it.Line, it.Pos));
-                        errCount++;
-                    }
-                }
-            }
-            //ToDo: make sure this function always returns a value (will get complicated with ifElse shit -.-')
             return errCount;
         }
         public void markArgListEnd()
@@ -80,7 +103,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override string ToString()
         {
-            return this.FullyQualifiedName;
+            return "fnc->" + this.Name.FullyQualifiedName;
         }
     }
 }

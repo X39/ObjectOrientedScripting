@@ -6,33 +6,30 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class VirtualFunction : pBaseLangObject, Interfaces.iName
+    public class VirtualFunction : pBaseLangObject, Interfaces.iName, Interfaces.iFunction
     {
-        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
         public VarTypeObject varType;
         public List<VarTypeObject> argTypes;
 
-
-        public string FullyQualifiedName
-        {
-            get
-            {
-                string s = "";
-                List<Interfaces.iName> parentList = new List<Interfaces.iName>();
-                pBaseLangObject curParent = Parent;
-                while (curParent != null)
-                {
-                    if (curParent is Interfaces.iName)
-                        parentList.Add((Interfaces.iName)curParent);
-                    curParent = curParent.Parent;
-                }
-                parentList.Reverse();
-                foreach (Interfaces.iName it in parentList)
-                    s += it.Name;
-                s += "_fnc_" + this.Name.OriginalValue;
-                return s;
-            }
-        }
+        /// <summary>
+        /// Return type of this iFunction
+        /// </summary>
+        public VarTypeObject ReturnType { get { return this.varType; } }
+        /// <summary>
+        /// Returns a Template object which then can deref some unknown class conflicts in
+        /// ArgList field
+        /// </summary>
+        public Template TemplateArguments { get { return null; } }
+        /// <summary>
+        /// Returns functions encapsulation
+        /// </summary>
+        public Encapsulation FunctionEncapsulation { get { return Encapsulation.Public; } }
+        /// <summary>
+        /// Returns the Arglist required for this iFunction
+        /// </summary>
+        public List<VarTypeObject> ArgList { get { return this.argTypes; } }
+        public bool IsAsync { get; set; }
         public VirtualFunction(pBaseLangObject parent) : base(parent) 
         {
             argTypes = new List<VarTypeObject>();
@@ -40,5 +37,9 @@ namespace Compiler.OOS_LanguageObjects
             varType = null;
         }
         public override int doFinalize() { return 0; }
+        public override string ToString()
+        {
+            return "vFnc->" + this.Name.FullyQualifiedName;
+        }
     }
 }

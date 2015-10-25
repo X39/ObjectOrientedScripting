@@ -13,8 +13,7 @@ namespace Compiler.OOS_LanguageObjects
         public Template template { get; set; }
         private int pos;
         public int Pos { get { return this.pos; } }
-        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
-        public string FullyQualifiedName { get { return this.Name.FullyQualifiedName; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
         public Native(pBaseLangObject parent, int line, int pos) : base(parent)
         {
             this.addChild(null);

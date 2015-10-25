@@ -99,8 +99,7 @@ namespace Compiler.OOS_LanguageObjects
             }
         }
 
-        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
-        public string FullyQualifiedName { get { return this.Name.OriginalValue; } }
+        public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
 
         public List<pBaseLangObject> LArgs { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> RArgs { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }

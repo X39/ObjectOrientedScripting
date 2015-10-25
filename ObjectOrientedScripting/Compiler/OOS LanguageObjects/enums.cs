@@ -28,6 +28,10 @@ namespace Compiler.OOS_LanguageObjects
         BoolArray,
         StringArray
     }
+    public enum OperatorFunctions
+    {
+        ArrayAccess
+    }
     public class VarTypeObject : Interfaces.iTemplate
     {
         Template te;
@@ -43,7 +47,7 @@ namespace Compiler.OOS_LanguageObjects
             this.varType = isStrict ? VarType.ObjectStrict : VarType.Object;
             this.template = template;
 
-            if(this.template == null && (this.ident.ThisReferencedObject is Interfaces.iTemplate))
+            if(this.template == null && (this.ident.ReferencedObject is Interfaces.iTemplate))
             {
                 this.template = ((Interfaces.iTemplate)this.ident.ReferencedObject).template;
             }

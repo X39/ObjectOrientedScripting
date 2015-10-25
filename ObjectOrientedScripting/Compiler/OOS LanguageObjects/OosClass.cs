@@ -6,12 +6,34 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class oosClass : pBaseLangObject, Interfaces.iName, Interfaces.iGetFunctionIndex, Interfaces.iGetVariableIndex
+    public class oosClass : pBaseLangObject, Interfaces.iGetFunctionIndex, Interfaces.iGetVariableIndex, Interfaces.iClass
     {
-        public Ident Name { get { return ((Ident)this.children[0]); } set { if (!value.IsSimpleIdentifier) throw new Ex.InvalidIdentType(value.getIdentType(), IdentType.Name); this.children[0] = value; } }
-        int endMarker;
-        int endMarkerParents;
-        public List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
+        private int endMarker;
+        private int endMarkerParents;
+        private VarTypeObject vto;
+        private List<oosClass> parentClasses;
+        private List<oosInterface> parentInterfaces;
+
+
+        public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; vto = new VarTypeObject(value, true, null); } }
+        public List<Ident> ExtendedClasses
+        {
+            get
+            {
+                List<Ident> retList = new List<Ident>();
+                foreach (var it in this.ParentClassesIdents)
+                {
+                    if (it is Ident)
+                        retList.Add((Ident)it);
+                    else
+                        throw new Exception();
+                }
+                return retList;
+            }
+        }
+
+        public VarTypeObject VTO { get { return this.vto; } }
+        private List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> ClassContent { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
         public List<Function> ThisFunctions
         {
@@ -104,29 +126,7 @@ namespace Compiler.OOS_LanguageObjects
             }
         }
 
-        private List<oosClass> parentClasses;
-        private List<oosInterface> parentInterfaces;
         
-        public string FullyQualifiedName
-        {
-            get
-            {
-                string s = "::";
-                List<Interfaces.iName> parentList = new List<Interfaces.iName>();
-                pBaseLangObject curParent = Parent;
-                while (curParent != null)
-                {
-                    if (curParent is Interfaces.iName)
-                        parentList.Add((Interfaces.iName)curParent);
-                    curParent = curParent.Parent;
-                }
-                parentList.Reverse();
-                foreach (Interfaces.iName it in parentList)
-                    s += it.Name.OriginalValue + "::";
-                s += this.Name.OriginalValue;
-                return s;
-            }
-        }
         public oosClass(pBaseLangObject parent) : base(parent)
         {
             this.parentClasses = new List<oosClass>();
@@ -144,101 +144,6 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            for (int i = 0; i < ParentClassesIdents.Count; i++)
-            {
-                var it = ParentClassesIdents[i];
-                if (!(it is Ident))
-                {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.UNKNOWN, Name.Line, Name.Pos));
-                    errCount++;
-                    continue;
-                }
-                if (((Ident)it).ReferencedObject is oosClass)
-                {
-                    if(i >= this.endMarkerParents)
-                    {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0050, Name.Line, Name.Pos));
-                        errCount++;
-                    }
-                    var parentClass = (oosClass)((Ident)it).ReferencedObject;
-                    this.parentClasses.Add(parentClass);
-                    this.parentClasses.AddRange(parentClass.parentClasses);
-                }
-                else if (((Ident)it).ReferencedObject is oosInterface)
-                {
-                    if (i < this.endMarkerParents)
-                    {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0051, Name.Line, Name.Pos));
-                        errCount++;
-                    }
-                    this.parentInterfaces.Add((oosInterface)((Ident)it).ReferencedObject);
-                }
-                else
-                {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.UNKNOWN, Name.Line, Name.Pos));
-                    errCount++;
-                }
-            }
-            var functionNameList = new List<string>();
-            var inheritanceFunctions = this.InheritanceFunctions;
-            foreach (var it in this.AllFunctions)
-            {
-                var origVal = it.Name.OriginalValue;
-                if (functionNameList.FirstOrDefault(checkString => checkString.Equals(origVal)) != null)
-                {
-                    var parentFnc = inheritanceFunctions.FirstOrDefault(checkValue => checkValue.Name.OriginalValue == origVal);
-                    if (parentFnc == null)
-                    {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0033, it.Name.Line, it.Name.Pos));
-                        errCount++;
-                    }
-                    else
-                    {
-                        if(!it.Override)
-                        {
-                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0034, it.Name.Line, it.Name.Pos));
-                            errCount++;
-                        }
-                        else
-                        {
-                            var argList = parentFnc.ArgList;
-                            var itArgList = it.ArgList;
-                            if (argList.Count != itArgList.Count)
-                            {
-                                if (argList.Count > itArgList.Count)
-                                {
-                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0035, it.Name.Line, it.Name.Pos));
-                                    errCount++;
-                                }
-                                else
-                                {
-                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0036, it.Name.Line, it.Name.Pos));
-                                    errCount++;
-                                }
-                            }
-                            for (var i = 0; i < argList.Count; i++)
-                            {
-                                if (i > argList.Count || i > itArgList.Count)
-                                    break;
-                                Variable v = (Variable)argList[i];
-                                Variable e = (Variable)itArgList[i];
-                                if (!v.varType.Equals(e.ReferencedType))
-                                {
-                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0037, e.Line, e.Pos));
-                                    errCount++;
-                                }
-                            }
-                            if(!it.varType.Equals(parentFnc.varType))
-                            {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0038, it.Name.Line, it.Name.Pos));
-                                errCount++;
-                            }
-                        }
-                    }
-                }
-                functionNameList.Add(it.Name.OriginalValue);
-            }
-            //ToDo: Check interface functions are implemented
             return errCount;
         }
 
@@ -248,7 +153,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override string ToString()
         {
-            return this.FullyQualifiedName;
+            return "class->" + this.Name.FullyQualifiedName;
         }
         public Tuple<int, int> getFunctionIndex(Ident ident)
         {
@@ -364,6 +269,12 @@ namespace Compiler.OOS_LanguageObjects
                 }
             }
             return tuple == null ? new Tuple<int, int>(-1, -1) : tuple;
+        }
+
+
+        public Interfaces.iOperatorFunction getOperatorFunction(OperatorFunctions op)
+        {
+            return null;
         }
     }
 }

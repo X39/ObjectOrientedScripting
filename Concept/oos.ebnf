@@ -11,7 +11,7 @@ COMPILER OOS
 	TOKENS
 		T_SCALAR = [ '-' ] DIGIT { DIGIT } [ '.' DIGIT { DIGIT } ].
 		T_STRING = '"' { STRINGCHARS | "\\\""} '"'.
-		T_IDENT = ["::"] ( CHARACTER | '_' ) { "::" | CHARACTER | '_' | DIGIT }.
+		T_IDENT = ( CHARACTER | '_' ) { CHARACTER | '_' | DIGIT }.
 		T_TERMINATOR = ';'.
 		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | ">=" | "<=".
         T_OTHEROP = ">>" | "<<".
@@ -25,6 +25,7 @@ COMPILER OOS
 		T_CODEBRACKETOPEN = '{'.
 		T_CODEBRACKETCLOSE = '}'.
 		T_INSTANCEACCESS = '.'.
+		T_NAMESPACEACCESS = "::".
 		T_COMMA = ','.
 		T_STATICCASTOPERATOR = '§'.
 		T_DYNAMICCASTOPERATOR = '$'.
@@ -66,19 +67,26 @@ COMPILER OOS
 		=
             T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col); .)
 		.
-		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; .)
+		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; .)
 		=
+            [
+                T_NAMESPACEACCESS (. isGlobalIdent = true; .)
+            ]
             [
                 CAST<out outObj, parent>
             ]
-            IDENT<out ident, parent> (. if(outObj == null) outObj = ident; else outObj.addChild(ident); .)
+            IDENT<out ident, parent> (. try{ ((Ident)ident).IsGlobalIdentifier = isGlobalIdent; } catch (Exception ex) { SemErr(ex.Message); } if(outObj == null) outObj = ident; else outObj.addChild(ident); .)
             [
                 BODY_FUNCTIONCALL<out blo, ident> (. ((Ident)ident).addChild(blo); .)
                 |
                 BODY_ARRAYACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
             ]
             [
-                T_INSTANCEACCESS
+                (
+                    T_INSTANCEACCESS (. ((Ident)ident).Access = Ident.AccessType.Instance; .)
+                    |
+                    T_NAMESPACEACCESS (. ((Ident)ident).Access = Ident.AccessType.Namespace; .)
+                )
                 IDENTACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
             ]
         .
@@ -213,7 +221,7 @@ COMPILER OOS
                 EXPRESSION_HELPER<out outObj, parent, false>
             )
 		.
-		OOS (. var obj = new Base(); baseObject = obj; pBaseLangObject blo; .)
+		OOS (. if(this.BaseObject == null) throw new Exception("BaseObject was never set"); var obj = this.BaseObject; pBaseLangObject blo; .)
 		=
 			{
 				NAMESPACE<out blo, obj> (. obj.addChild(blo); .)
@@ -238,7 +246,7 @@ COMPILER OOS
 		NAMESPACE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Namespace(parent); outObj = obj; pBaseLangObject blo; .)
 		=
 			"namespace"
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_CODEBRACKETOPEN
 			{
 				NAMESPACE<out blo, obj> (. obj.addChild(blo); .)
@@ -267,7 +275,7 @@ COMPILER OOS
         NATIVECLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Native(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; Template te; .)
         =
             "native"
-            IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+            IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
             [
                 TEMPLATE<out te, obj> (. obj.template = te; .)
             ]
@@ -323,7 +331,7 @@ COMPILER OOS
                     ]
                 )
             )
-            IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+            IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_ROUNDBRACKETOPEN
 			[
 				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
@@ -390,7 +398,7 @@ COMPILER OOS
 		CLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosClass(parent); outObj = obj; pBaseLangObject blo; Encapsulation e = Encapsulation.Private; bool hasConstructor = false; .)
 		=
 			"class"
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			[
 				"extends"
 				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
@@ -476,7 +484,7 @@ COMPILER OOS
                     ]
                 )
 			)
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_ROUNDBRACKETOPEN
 			[
 				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
@@ -495,7 +503,7 @@ COMPILER OOS
 		.
 		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name, true); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
 		=
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_ROUNDBRACKETOPEN
 			[
 				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
@@ -514,6 +522,9 @@ COMPILER OOS
 		.
 		VFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new VirtualFunction(parent); outObj = obj; pBaseLangObject blo; VarType v; .)
 		=
+            [
+                "async" (. obj.IsAsync = true; .)
+            ]
 			(
 				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
@@ -529,7 +540,7 @@ COMPILER OOS
                     ]
                 )
 			)
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_ROUNDBRACKETOPEN
 			[
 				(
@@ -564,21 +575,21 @@ COMPILER OOS
                     ]
                 )
 			)
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
+			IDENT<out blo, outObj> (. obj.Name = (Ident)blo; .)
             [
-                BODY_ASSIGNMENT<out blo, ident> (. obj.addChild(blo); .)
+                BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
             ]
 		.
         VARIABLEASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new AssignContainer(parent); outObj = obj; pBaseLangObject blo; .)
         =
-            IDENT<out blo, obj> (. obj.addChild(blo); .)
-            BODY_ASSIGNMENT<out blo, obj, true> (. obj.addChild(blo); .)
+            IDENT<out blo, outObj> (. obj.addChild(blo); .)
+            BODY_ASSIGNMENT<out blo, outObj, true> (. obj.addChild(blo); .)
         .
 		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
 		=
 			"auto"(. obj.varType = new VarTypeObject(VarType.Auto); .)
-			IDENT<out blo, obj> (. try{ obj.Name = (Ident)blo;} catch (Exception ex) { SemErr(ex.Message); } .)
-            BODY_ASSIGNMENT<out blo, ident> (. obj.addChild(blo); .)
+			IDENT<out blo, outObj> (. obj.Name = (Ident)blo; .)
+            BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
 		.
 		CODEINSTRUCTION_SC<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; pBaseLangObject blo; .)
 		=

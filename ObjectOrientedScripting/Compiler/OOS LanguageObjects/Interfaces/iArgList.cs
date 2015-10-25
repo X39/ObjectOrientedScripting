@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iClass : iName
+    public interface iArgList
     {
-        List<Ident> ExtendedClasses { get; }
-        VarTypeObject VTO { get; }
-        iOperatorFunction getOperatorFunction(OperatorFunctions op);
+        /// <summary>
+        /// Returns the Arglist required for this iFunction
+        /// </summary>
+        List<VarTypeObject> ArgList { get; }
     }
 }

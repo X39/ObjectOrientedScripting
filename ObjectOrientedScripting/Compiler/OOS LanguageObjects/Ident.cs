@@ -15,44 +15,73 @@ namespace Compiler.OOS_LanguageObjects
             FunctionCall,
             NamespaceAccess
         }
+        public enum AccessType
+        {
+            Instance,
+            Namespace,
+            NA
+        }
 
-        public bool IsSimpleIdentifier { get { return !this.originalValue.Contains("::"); } }
-        public bool IsGlobalIdentifier { get { return this.originalValue.StartsWith("::"); } }
-        public bool IsRelativeIdentifier { get { return this.originalValue.Contains("::"); } }
+        public bool IsSimpleIdentifier { get { return !(this.Parent is Ident) && this.Access == AccessType.NA; } }
+        private bool isGlobalIdentifier;
+        public bool IsGlobalIdentifier { get { return this.isGlobalIdentifier; } set { if (this.Parent is Ident) throw new Exception("Double Namespace Access experienced"); this.isGlobalIdentifier = value; } }
+        public bool IsRelativeIdentifier { get { return this.Access == AccessType.Namespace; } }
         public bool IsSelfReference { get { return this.FullyQualifiedName.Contains("::this"); } }
         public string FullyQualifiedName
         {
             get
             {
-                Interfaces.iName obj = this.getFirstOf<oosClass>();
-                if (obj == null)
-                    obj = this.getFirstOf<Namespace>();
-                if (this.IsGlobalIdentifier)
-                    return this.originalValue;
+                string res = "";
+                var lastIdent = this.getLastOf<Ident>();
+                if (lastIdent.isGlobalIdentifier)
+                {
+                    res = "::";
+                }
                 else
                 {
-                    if (obj == null)
+                    if(lastIdent.Parent is Interfaces.iName)
                     {
-                        return "::" + this.originalValue;
-                    }
-                    else
-                    {
-                        if (this.Parent is oosClass || this.Parent is oosInterface)
-                        {
-                            obj = this.getFirstOf<Namespace>();
-                            return (obj == null ? "" : obj.Name.FullyQualifiedName) + "::" + this.originalValue;
-                        }
-                        if (this.Parent is NativeInstruction)
-                        {
-                            obj = this.getFirstOf<Native>();
-                            return (obj == null ? "" : obj.Name.FullyQualifiedName) + "::" + this.originalValue;
-                        }
-                        else
-                        {
-                            return obj.Name.FullyQualifiedName + "::" + this.originalValue;
-                        }
+                        var refIdent = ((Interfaces.iName)lastIdent.Parent).Name;
+                        res = refIdent.FullyQualifiedName;
                     }
                 }
+                var curIdent = this;
+                List<Ident> identList = new List<Ident>();
+                while (curIdent != null)
+                {
+                    identList.Add(curIdent);
+                    curIdent = curIdent.getFirstOf<Ident>();
+                }
+                for (int i = identList.Count - 1; i >= 0; i--)
+                {
+                    var it = identList[i];
+                    Ident parentIdent = (it.Parent is Ident ? (Ident)it.Parent : null);
+                    res += it.originalValue;
+                    switch (it.Access)
+                    {
+                        case AccessType.Instance:
+                            if (parentIdent == null)
+                            {
+                                throw new Exception();
+                            }
+                            else
+                            {
+                                if(parentIdent.ReferencedType.IsObject)
+                                {
+                                    res = parentIdent.ReferencedType.ident.FullyQualifiedName + "::" + this.originalValue;
+                                }
+                                else
+                                {
+                                    throw new Exception();
+                                }
+                            }
+                            break;
+                        case AccessType.Namespace:
+                            res += "::";
+                            break;
+                    }
+                }
+                return res;
             }
         }
 
@@ -69,15 +98,18 @@ namespace Compiler.OOS_LanguageObjects
         public string OriginalValue { get { return this.originalValue; } }
         public int Line { get { return this.line; } }
         public int Pos { get { return this.pos; } }
+        public AccessType Access { get; set; }
 
 
-        public Ident(pBaseLangObject parent, string origVal, int line, int pos) : base(parent) 
+        public Ident(pBaseLangObject parent, string origVal, int line, int pos) : base(parent)
         {
             this.originalValue = origVal;
             referencedObject = null;
             referencedType = new VarTypeObject(VarType.Void);
             this.line = line;
             this.pos = pos;
+            this.Access = AccessType.NA;
+            this.isGlobalIdentifier = false;
         }
         public override int doFinalize()
         {
@@ -101,9 +133,17 @@ namespace Compiler.OOS_LanguageObjects
             {
                 type = IdenType.ArrayAccess;
             }
-            else if (this.IsSimpleIdentifier)
+            else if (parentIdent == null && this.Access == AccessType.NA)
             {
                 type = IdenType.VariableAccess;
+            }
+            else if (parentIdent.Access == AccessType.Namespace && this.Access == AccessType.NA || this.Access == AccessType.Instance)
+            {
+                var ntr = new HelperClasses.NamespaceResolver(this.FullyQualifiedName);
+                if (ntr.Reference is Interfaces.iClass)
+                    type = IdenType.NamespaceAccess;
+                else
+                    type = IdenType.VariableAccess;
             }
             else if (parentIdent == null)
             {
@@ -113,17 +153,60 @@ namespace Compiler.OOS_LanguageObjects
             //And process it then
             switch(type)
             {
-                #region VariableAccess
+                #region VariableAccess & ArrayAccess
                 case IdenType.VariableAccess:
-                    {
-
-                    }
-                    break;
-                #endregion
-                #region ArrayAccess
                 case IdenType.ArrayAccess:
                     {
+                        var variable = HelperClasses.NamespaceResolver.getVariableReferenceOfFQN(this.FullyQualifiedName, true, this);
+                        if (variable == null)
+                        {
+                            variable = HelperClasses.NamespaceResolver.getVariableReferenceOfFQN(this.FullyQualifiedName, false, this);
+                        }
+                        this.referencedObject = variable;
+                        //Set type to variable type
+                        this.referencedType = variable.varType;
 
+                        if(type == IdenType.ArrayAccess)
+                        {
+                            if (this.referencedType.IsObject)
+                            {
+                                //Check if given object is implementing the ArrayAccess operator
+                                if (this.referencedType.ident.referencedObject is Interfaces.iClass)
+                                {
+                                    Interfaces.iClass classRef = (Interfaces.iClass)this.referencedType.ident.referencedObject;
+                                    Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OperatorFunctions.ArrayAccess);
+                                    if (opFnc == null)
+                                    {
+                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0005, this.Line, this.Pos));
+                                        errCount++;
+                                    }
+                                    else
+                                    {
+                                        this.referencedType = opFnc.ReturnType;
+                                    }
+                                }
+                                else
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos));
+                                    errCount++;
+                                }
+                            }
+                            else
+                            {
+                                //just check if this is an array type
+                                switch(this.referencedType.varType)
+                                {
+                                    case VarType.BoolArray:
+                                    case VarType.ScalarArray:
+                                    case VarType.StringArray:
+                                        break;
+                                    default:
+                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos));
+                                        errCount++;
+                                        break;
+                                }
+                            }
+                        }
                     }
                     break;
                 #endregion
@@ -134,11 +217,11 @@ namespace Compiler.OOS_LanguageObjects
                         var fncCall = fncCalls[0];
                         if(parentIdent == null)
                         {
-                            fncList = HelperClasses.NamespaceResolver.getFunctionReferenceOfFQN(this, this.FullyQualifiedName);
+                            fncList = HelperClasses.NamespaceResolver.getFunctionReferenceOfFQN(this.FullyQualifiedName);
                         }
                         else
                         {
-                            fncList = HelperClasses.NamespaceResolver.getFunctionReferenceOfFQN(this, new HelperClasses.NamespaceResolver(parentIdent.ReferencedType.ident.FullyQualifiedName, this.originalValue));
+                            fncList = HelperClasses.NamespaceResolver.getFunctionReferenceOfFQN(new HelperClasses.NamespaceResolver(parentIdent.ReferencedType.ident.FullyQualifiedName, this.originalValue));
                         }
                         if (fncList.Count == 0)
                         {
@@ -151,7 +234,7 @@ namespace Compiler.OOS_LanguageObjects
                             Interfaces.iFunction fnc = null;
                             foreach (var it in fncList)
                             {
-                                if(HelperClasses.ArgList.matchesArglist(it.ArgList, fncCall.children))
+                                if(HelperClasses.ArgList.matchesArglist(it.ArgList, fncCall.ArgList))
                                 {
                                     fnc = it;
                                     break;
@@ -213,7 +296,13 @@ namespace Compiler.OOS_LanguageObjects
                 #region NamespaceAccess
                 case IdenType.NamespaceAccess:
                     {
-
+                        var nsr = new HelperClasses.NamespaceResolver(this.FullyQualifiedName);
+                        var reference = nsr.Reference;
+                        this.referencedObject = reference;
+                        if (reference is Interfaces.iClass)
+                            this.referencedType = ((Interfaces.iClass)reference).VTO;
+                        else
+                            this.referencedType = null;
                     }
                     break;
                 #endregion
