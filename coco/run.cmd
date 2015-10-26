@@ -1,3 +1,3 @@
 @ECHO OFF
-Coco.exe -o ..\ObjectOrientedScripting\Compiler\ -frames .\ ..\Concept\oos.ebnf
+Coco.exe -o ..\ObjectOrientedScripting\Compiler\OOS\ -frames .\ ..\Concept\oos.ebnf
 pause

@@ -7,13 +7,11 @@ using System.IO;
 
 namespace Wrapper
 {
-    public interface ICompiler
+    public interface ICompiler_1
     {
         Version getVersion();
         void setFlags(string[] strArr);
         void CheckSyntax(string filepath);
-        void Translate(Project proj);
         void Compile(Project proj);
-        void Preprocess(Project proj);
     }
 }

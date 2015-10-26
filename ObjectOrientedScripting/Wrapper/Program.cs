@@ -189,7 +189,7 @@ namespace Wrapper
                 return exitCode;
             }
             Project proj;
-            ICompiler compiler;
+            ICompiler_1 compiler;
             try
             {
                 proj = Project.openProject(path);
@@ -252,7 +252,7 @@ namespace Wrapper
                 }
                 Assembly assembly = Assembly.LoadFrom(compilerPath);
                 Type type = assembly.GetType("Wrapper.Compiler", true);
-                compiler = (ICompiler)Activator.CreateInstance(type);
+                compiler = (ICompiler_1)Activator.CreateInstance(type);
 
             }
             catch (Exception ex)
@@ -279,15 +279,7 @@ namespace Wrapper
                 {
 #endif
                     compiler.setFlags(compilerFlags.ToArray());
-                    Logger.Instance.log(Logger.LogLevel.INFO, "-----Starting preprocessing-----");
-                    compiler.Preprocess(proj);
-                    Logger.Instance.log(Logger.LogLevel.INFO, "-----Preprocessing is  done-----");
-                    Logger.Instance.log(Logger.LogLevel.INFO, "-----  Starting compiling  -----");
                     compiler.Compile(proj);
-                    Logger.Instance.log(Logger.LogLevel.INFO, "-----  Compiling is  done  -----");
-                    Logger.Instance.log(Logger.LogLevel.INFO, "----- Starting translating -----");
-                    compiler.Translate(proj);
-                    Logger.Instance.log(Logger.LogLevel.INFO, "----- Translating is  done -----");
                     exitCode = 0;
 #if DEBUG
 #else

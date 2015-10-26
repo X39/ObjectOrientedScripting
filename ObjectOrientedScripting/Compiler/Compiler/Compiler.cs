@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +11,7 @@ using System.IO;
 
 namespace Wrapper
 {
-    public class Compiler : ICompiler
+    public class Compiler : ICompiler_1
     {
         private class ContainerClass
         {
@@ -29,6 +29,7 @@ namespace Wrapper
         string configFileName;
         bool addFunctionsClass;
         bool outputFolderCleanup;
+        bool noPrintOut;
         List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
@@ -41,6 +42,7 @@ namespace Wrapper
             stdLibPath = stdLibPath.Substring(0, stdLibPath.LastIndexOf('\\')) + "\\stdLibrary\\";
             addFunctionsClass = true;
             outputFolderCleanup = true;
+            noPrintOut = false;
             flagDefines = new List<PPDefine>();
             SqfCall.readSupportInfoList();
             includedFiles = new List<string>();
@@ -80,6 +82,9 @@ namespace Wrapper
                         stdLibPath = s.Substring(count + 1).Replace('/', '\\');
                         if (!stdLibPath.EndsWith("\\"))
                             stdLibPath += '\\';
+                        break;
+                    case "NOPRINTOUT":
+                        noPrintOut = true;
                         break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
@@ -143,7 +148,6 @@ namespace Wrapper
             {
                 Directory.CreateDirectory(proj.OutputFolder);
             }
-            WriteOutTree(proj, parser.BaseObject, proj.OutputFolder, cfgClass, null);
             //Create config.cpp file
             file.writeOut(proj.OutputFolder);
         }
@@ -152,75 +156,52 @@ namespace Wrapper
             tabCount += change;
             s = new string('\t', tabCount);
         }
-        public void WriteOutTree(Project proj, pBaseLangObject container, string path, iSqfConfig configObj, StreamWriter writer, int tabCount = 0, object extraParam = null)
-        {
-        }
-        #endregion
-        #region Compiling
         public void Compile(Project proj)
-        {
-            Logger.Instance.log(Logger.LogLevel.WARNING, "Compile is not supported by this compiler version, thus its just a plain \"CheckSyntax\" ... im sorry :(");
-            Scanner scanner = new Scanner(proj.Buildfolder + "_preprocess_.obj");
-            Parser parser = new Parser(scanner);
-            parser.Parse();
-            //OosContainer container;
-            //parser.getBaseContainer(out container);
-            int errCount = parser.errors.count;
-            if (errCount > 0)
-                throw new Exception("Errors found (" + errCount + "), cannot continue with Compile!");
-            var filePath = proj.Buildfolder + "_preprocess_.obj";
-            var newPath = proj.Buildfolder + "_compile_.obj";
-            for (int i = 0; i < 3; i++)
-            {
-                try
-                {
-                    File.Copy(filePath, newPath, true);
-                    break;
-                }
-                catch (IOException e)
-                {
-                    System.Threading.Thread.Sleep(500);
-                    if (i == 2)
-                        throw e;
-                    continue;
-                }
-            }
-        }
-        #endregion
-        #region PreProcessing
-        public void Preprocess(Project proj)
         {
             //Make sure the build directory exists and create it if needed
             if (!Directory.Exists(proj.Buildfolder))
                 Directory.CreateDirectory(proj.Buildfolder);
+
             //Prepare some stuff needed for preprocessing
-            StreamWriter writer = null;
-            for (int i = 0; i < 3; i++)
-            {
-                try
-                {
-                    writer = new StreamWriter(proj.Buildfolder + "_preprocess_.obj", false, Encoding.UTF8, 1024);
-                    break;
-                }
-                catch (IOException e)
-                {
-                    Logger.Instance.log(Logger.LogLevel.WARNING, e.Message + " Trying again (" + (i + 1) + "/3)");
-                    System.Threading.Thread.Sleep(500);
-                    if (i == 2)
-                        throw e;
-                    continue;
-                }
-            }
             Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
             foreach (var it in flagDefines)
                 defines.Add(it.Name, it);
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
-            //Start actual preprocessing
-            preprocessFile(ifdefs, defines, proj, proj.Mainfile, writer);
+            List<PostProcessFile> ppFiles = new List<PostProcessFile>();
+            //do the preprocessing
+            MultiStreamWriter msw = new MultiStreamWriter();
+            preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), msw, ppFiles);
 
-            //Close the file writer
-            writer.Flush();
-            writer.Close();
+            //Check the syntax of all files in ppFiles
+            foreach(var it in ppFiles)
+            {
+                //if (!noPrintOut)
+                //{
+                //    var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
+                //    it.resetPosition();
+                //    it.FileStream.WriteTo(stream);
+                //    stream.Flush();
+                //    stream.Close();
+                //}
+                Scanner scanner = new Scanner(it.FileStream);
+                Base baseObject = new Base();
+                Parser parser = new Parser(scanner);
+                parser.BaseObject = baseObject;
+                parser.Parse();
+                if (parser.errors.count > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.INFO, "In file '" + it.Name + "'");
+                }
+                if(!noPrintOut)
+                {
+                    var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
+                    it.resetPosition();
+                    it.FullFilestream.WriteTo(stream);
+                    stream.Flush();
+                    stream.Close();
+                }
+                it.resetPosition();
+            }
         }
         private enum preprocessFile_IfDefModes
         {
@@ -228,10 +209,16 @@ namespace Wrapper
             FALSE,
             IGNORE
         }
-        private bool preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, PPDefine> defines, Project proj, string filePath, StreamWriter writer)
+        private bool preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, PPDefine> defines, Project proj, string filePath, string name, MultiStreamWriter writer, List<PostProcessFile> ppFiles)
         {
             //Open given file
             StreamReader reader = new StreamReader(filePath);
+            PostProcessFile ppFile = new PostProcessFile(filePath, name);
+            ppFiles.Add(ppFile);
+            StreamWriter thisFileWriter = new StreamWriter(ppFile.FileStream);
+            StreamWriter FullFileWriter = new StreamWriter(ppFile.FullFilestream);
+            writer.Add(thisFileWriter);
+            writer.Add(FullFileWriter);
 
             //Prepare some variables needed for the entire processing periode in this function
             string s;
@@ -241,7 +228,10 @@ namespace Wrapper
                 filelinenumber++;
                 //skip empty lines
                 if (string.IsNullOrWhiteSpace(s))
+                {
+                    writer.WriteLine();
                     continue;
+                }
                 //Remove left & right whitespaces and tabs from current string
                 string sTrimmed = s.TrimStart();
                 string leading = s.Substring(0, s.Length - sTrimmed.Length);
@@ -264,6 +254,8 @@ namespace Wrapper
                         Logger.Instance.log(Logger.LogLevel.ERROR, "Experienced some error while parsing existing defines.");
                         Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message + ". file: " + filePath + ". linenumber: " + filelinenumber);
                         reader.Close();
+                        writer.Remove(thisFileWriter);
+                        writer.Remove(FullFileWriter);
                         return false;
                     }
                     writer.WriteLine(leading + s);
@@ -279,6 +271,8 @@ namespace Wrapper
                 int index2 = -1;
                 //get text AFTER the define
                 string afterDefine = s.Substring(spaceIndex).TrimStart();
+
+                writer.WriteLine();
 
                 //Check which define was used
                 switch (s.Substring(0, spaceIndex))
@@ -303,6 +297,7 @@ namespace Wrapper
                         {
                             //Ohhh no ... some problem in OSI layer 8
                             reader.Close();
+                            writer.KillAll();
                             throw new Exception("Include contains self reference. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //Check if file was already included
@@ -311,13 +306,17 @@ namespace Wrapper
                         //process the file before continuing with this
                         try
                         {
-                            if (!preprocessFile(ifdefs, defines, proj, newFile, writer))
+                            writer.Remove(thisFileWriter);
+                            if (!preprocessFile(ifdefs, defines, proj, newFile, afterDefine.Trim(new char[] { '<', '>', '"', '\'', ' ' }), writer, ppFiles))
                             {
                                 //A sub file encountered an error, so stop here to prevent useles waste of ressources
                                 reader.Close();
+                                writer.Remove(thisFileWriter);
+                                writer.Remove(FullFileWriter);
                                 return false;
                             }
                             includedFiles.Add(newFile);
+                            writer.Add(thisFileWriter);
                         }
                         catch (Exception e)
                         {
@@ -328,6 +327,7 @@ namespace Wrapper
                         //The user wants to define something here
                         while (s.EndsWith("\\"))
                         {
+                            thisFileWriter.WriteLine();
                             afterDefine += reader.ReadLine();
                             filelinenumber++;
                         }
@@ -344,6 +344,7 @@ namespace Wrapper
                         {
                             //Redefining something is not allowed, so throw an error here
                             reader.Close();
+                            writer.KillAll();
                             throw new Exception("Redefining a define is not allowed! Use #undefine to undef something. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //FINALLY add the define
@@ -373,6 +374,7 @@ namespace Wrapper
                         if (index < 0)
                         {
                             reader.Close();
+                            writer.KillAll();
                             throw new Exception("unexpected #else. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //swap the value of currents if scope to the correct value
@@ -384,6 +386,7 @@ namespace Wrapper
                         if (index < 0)
                         {
                             reader.Close();
+                            writer.KillAll();
                             throw new Exception("unexpected #endif. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //remove current if scope
@@ -392,6 +395,10 @@ namespace Wrapper
                 }
             }
             reader.Close();
+            writer.Flush();
+            writer.Remove(thisFileWriter);
+            writer.Remove(FullFileWriter);
+            ppFile.resetPosition();
             return true;
         }
         #endregion

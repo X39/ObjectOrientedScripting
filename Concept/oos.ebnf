@@ -27,7 +27,7 @@ COMPILER OOS
 		T_INSTANCEACCESS = '.'.
 		T_NAMESPACEACCESS = "::".
 		T_COMMA = ','.
-		T_STATICCASTOPERATOR = '§'.
+		T_STATICCASTOPERATOR = '%'.
 		T_DYNAMICCASTOPERATOR = '$'.
 		T_TEMPLATEOPEN = '<'.
 		T_TEMPLATECLOSE = '>'.
@@ -67,7 +67,7 @@ COMPILER OOS
 		=
             T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col); .)
 		.
-		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; .)
+		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; .)
 		=
             [
                 T_NAMESPACEACCESS (. isGlobalIdent = true; .)
@@ -76,18 +76,20 @@ COMPILER OOS
                 CAST<out outObj, parent>
             ]
             IDENT<out ident, parent> (. try{ ((Ident)ident).IsGlobalIdentifier = isGlobalIdent; } catch (Exception ex) { SemErr(ex.Message); } if(outObj == null) outObj = ident; else outObj.addChild(ident); .)
+			(. if(allowBody) { .)
             [
                 BODY_FUNCTIONCALL<out blo, ident> (. ((Ident)ident).addChild(blo); .)
                 |
                 BODY_ARRAYACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
             ]
+			(. } .)
             [
                 (
                     T_INSTANCEACCESS (. ((Ident)ident).Access = Ident.AccessType.Instance; .)
                     |
                     T_NAMESPACEACCESS (. ((Ident)ident).Access = Ident.AccessType.Namespace; .)
                 )
-                IDENTACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
+                IDENTACCESS<out blo, ident, allowBody> (. ((Ident)ident).addChild(blo); .)
             ]
         .
         CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarType vt; pBaseLangObject ident; .)
@@ -97,7 +99,7 @@ COMPILER OOS
                 (
                     VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
                     |
-                    IDENT<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
+                    IDENTACCESS<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
                 )
                 T_STATICCASTOPERATOR
             )
@@ -107,7 +109,7 @@ COMPILER OOS
                 (
                     VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
                     |
-                    IDENT<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
+                    IDENTACCESS<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
                 )
                 T_DYNAMICCASTOPERATOR
             )
@@ -325,7 +327,7 @@ COMPILER OOS
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENTACCESS<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.VTO.template = te; .)
                     ]
@@ -361,7 +363,7 @@ COMPILER OOS
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENTACCESS<out blo, obj, false> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.VTO.template = te; .)
                     ]
@@ -401,18 +403,18 @@ COMPILER OOS
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			[
 				"extends"
-				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
+				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
 				{
 					','
-					IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
+					IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
 				}
 			](. obj.markExtendsEnd(); .)
 			[
 				"implements"
-				IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
+				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
 				{
 					','
-					IDENT<out blo, obj> (. obj.addParentClass((Ident)blo); .)
+					IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
 				}
 			]
             (. obj.markEnd(); .)
@@ -478,7 +480,7 @@ COMPILER OOS
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.varType.template = te; .)
                     ]
@@ -534,7 +536,7 @@ COMPILER OOS
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.varType.template = te; .)
                     ]
@@ -546,14 +548,14 @@ COMPILER OOS
 				(
 					VARTYPE<out v> (. obj.argTypes.Add(new VarTypeObject(v)); .)
 					|
-					IDENT<out blo, obj> (.  obj.argTypes.Add(new VarTypeObject((Ident)blo)); .)
+					IDENTACCESS<out blo, obj, false> (.  obj.argTypes.Add(new VarTypeObject((Ident)blo)); .)
 				)
 				{
 					','
 					(
 						VARTYPE<out v> (. obj.argTypes.Add(new VarTypeObject(v)); .)
 						|
-						IDENT<out blo, obj> (. obj.argTypes.Add(new VarTypeObject((Ident)blo)); .)
+						IDENTACCESS<out blo, obj, false> (. obj.argTypes.Add(new VarTypeObject((Ident)blo)); .)
 					)
 				}
 			]
@@ -569,7 +571,7 @@ COMPILER OOS
                     [
                         "strict" (. isStrict = true; .)
                     ]
-                    IDENT<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                    IDENTACCESS<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.varType.template = te; .)
                     ]
@@ -580,9 +582,8 @@ COMPILER OOS
                 BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
             ]
 		.
-        VARIABLEASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new AssignContainer(parent); outObj = obj; pBaseLangObject blo; .)
+        VARIABLEASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject ident, pBaseLangObject parent> (. var obj = new AssignContainer(parent); outObj = obj; pBaseLangObject blo; .)
         =
-            IDENT<out blo, outObj> (. obj.addChild(blo); .)
             BODY_ASSIGNMENT<out blo, outObj, true> (. obj.addChild(blo); .)
         .
 		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .)
@@ -604,11 +605,17 @@ COMPILER OOS
 				]
 			)
 			|
+			AUTOVARIABLE<out outObj, parent>
+			|
 			(
-				AUTOVARIABLE<out outObj, parent>
-				BODY_ASSIGNMENT<out blo, outObj> (. outObj.addChild(blo); .)
+				IDENTACCESS<out blo, outObj>
+				[
+					VARIABLEASSIGNMENT<out outObj, blo, parent>
+				]
+				(. if(outObj == null) outObj = blo; else outObj.addChild(blo); .)
 			)
-            VARIABLEASSIGNMENT<out outObj, parent>
+			|
+			OP_SQFCALL<out outObj, parent>
 		.
 		CODEINSTRUCTION_NSC<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; .)
 		=
@@ -734,7 +741,7 @@ COMPILER OOS
 		OP_NEWINSTANCE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewInstance(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .)
 		=
 			"new"
-			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
+			IDENTACCESS<out blo, obj, false> (. obj.Name = (Ident)blo; .)
             [ (. Template te; .)
                 TEMPLATE<out te, obj> (. obj.template = te; .)
             ]
@@ -809,7 +816,7 @@ COMPILER OOS
 		OP_INSTANCEOF<out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess> (. var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; .)
 		=
             "is"
-            IDENT<out blo, obj> (. obj.RIdent = (Ident)blo; .)
+            IDENTACCESS<out blo, obj> (. obj.RIdent = (Ident)blo; .)
 		.
 		OP_THROW<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Throw(parent); outObj = obj; pBaseLangObject blo; .)
 		=

@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public bool IsSimpleIdentifier { get { return !(this.Parent is Ident) && this.Access == AccessType.NA; } }
         private bool isGlobalIdentifier;
-        public bool IsGlobalIdentifier { get { return this.isGlobalIdentifier; } set { if (this.Parent is Ident) throw new Exception("Double Namespace Access experienced"); this.isGlobalIdentifier = value; } }
+        public bool IsGlobalIdentifier { get { return this.isGlobalIdentifier; } set { if (value && this.Parent is Ident) throw new Exception("Double Namespace Access experienced"); this.isGlobalIdentifier = value; } }
         public bool IsRelativeIdentifier { get { return this.Access == AccessType.Namespace; } }
         public bool IsSelfReference { get { return this.FullyQualifiedName.Contains("::this"); } }
         public string FullyQualifiedName

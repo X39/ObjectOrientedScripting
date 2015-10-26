@@ -251,7 +251,7 @@ public class Scanner {
 		start[46] = 18; 
 		start[58] = 37; 
 		start[44] = 20; 
-		start[167] = 21; 
+		start[37] = 21; 
 		start[36] = 22; 
 		start[33] = 35; 
 		start[100] = 38; 
