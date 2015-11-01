@@ -515,7 +515,8 @@ public class Parser {
 		{
 			if(it.Name.OriginalValue == ((Ident)blo).OriginalValue)
 			{
-				obj = it;
+                obj = it;
+                outObj = obj;
 				break;
 			}
 		}
