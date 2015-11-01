@@ -27,11 +27,11 @@ namespace Wrapper
             public pBaseLangObject Sender { get; set; }
         }
 
-        string configFileName;
-        bool addFunctionsClass;
-        bool outputFolderCleanup;
-        bool noPrintOut;
-        List<PPDefine> flagDefines;
+        private string configFileName;
+        private bool addFunctionsClass;
+        private bool outputFolderCleanup;
+        private int printOutMode;
+        private List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
         public string stdLibPath;
@@ -43,7 +43,7 @@ namespace Wrapper
             stdLibPath = stdLibPath.Substring(0, stdLibPath.LastIndexOf('\\')) + "\\stdLibrary\\";
             addFunctionsClass = true;
             outputFolderCleanup = true;
-            noPrintOut = false;
+            printOutMode = 1;
             flagDefines = new List<PPDefine>();
             SqfCall.readSupportInfoList();
             includedFiles = new List<string>();
@@ -84,8 +84,24 @@ namespace Wrapper
                         if (!stdLibPath.EndsWith("\\"))
                             stdLibPath += '\\';
                         break;
-                    case "NOPRINTOUT":
-                        noPrintOut = true;
+                    case "PRINTMODE":
+                        switch(s.Substring(count + 1))
+                        {
+                            case "NONE": case "0":
+                                printOutMode = 0;
+                                break;
+                            case "NEEDED": case "1":
+                                printOutMode = 1;
+                                break;
+                            case "PARTIAL": case "2":
+                                printOutMode = 2;
+                                break;
+                            case "ALL": case "3":
+                                printOutMode = 3;
+                                break;
+                            default:
+                                throw new Exception("Unknown PRINTMODE, valid ones are: NONE|0  NEEDED|1  PARTIAL|2  ALL|3");
+                        }
                         break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
@@ -172,6 +188,9 @@ namespace Wrapper
             //do the preprocessing
             MultiStreamWriter msw = new MultiStreamWriter();
             preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), msw, ppFiles);
+            var ppMainFile = ppFiles[0];
+
+
             int errCount = 0;
             //Check the syntax of all files in ppFiles
             foreach(var it in ppFiles)
@@ -194,20 +213,40 @@ namespace Wrapper
                     errCount += p.errors.count;
                     Logger.Instance.log(Logger.LogLevel.INFO, "In file '" + it.Name + "'");
                 }
-                if(!noPrintOut)
+                if (printOutMode > 0)
                 {
-                    var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
-                    it.resetPosition();
-                    it.FileStream.WriteTo(stream);
-                    stream.Flush();
-                    stream.Close();
-
-
-                    var stream2 = File.Create(proj.Buildfolder + it.Name + ".objF");
-                    it.resetPosition();
-                    it.FullFileStream.WriteTo(stream2);
-                    stream2.Flush();
-                    stream2.Close();
+                    if (printOutMode == 1 && it == ppMainFile)
+                    {
+                        var stream = File.Create(proj.Buildfolder + it.Name + ".objF");
+                        it.resetPosition();
+                        it.FullFileStream.WriteTo(stream);
+                        stream.Flush();
+                        stream.Close();
+                    }
+                    if (printOutMode >= 2)
+                    {
+                        var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
+                        it.resetPosition();
+                        it.FileStream.WriteTo(stream);
+                        stream.Flush();
+                        stream.Close();
+                        if (printOutMode >= 3)
+                        {
+                            var stream2 = File.Create(proj.Buildfolder + it.Name + ".objF");
+                            it.resetPosition();
+                            it.FullFileStream.WriteTo(stream2);
+                            stream2.Flush();
+                            stream2.Close();
+                        }
+                        else if(it == ppMainFile)
+                        {
+                            var stream2 = File.Create(proj.Buildfolder + it.Name + ".objF");
+                            it.resetPosition();
+                            it.FullFileStream.WriteTo(stream2);
+                            stream2.Flush();
+                            stream2.Close();
+                        }
+                    }
                 }
                 it.resetPosition();
             }
@@ -219,7 +258,6 @@ namespace Wrapper
 
 
             //process the actual file
-            var ppMainFile = ppFiles[0];
 
 
             Base oosTreeBase = new Base();
@@ -230,9 +268,10 @@ namespace Wrapper
             errCount = parser.errors.count + parser.BaseObject.finalize();
             if (errCount > 0)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Comnpiling!");
                 return;
             }
+            oosTreeBase.writeOut(null);
         }
         private enum preprocessFile_IfDefModes
         {
