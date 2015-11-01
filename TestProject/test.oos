@@ -89,8 +89,7 @@ namespace X39
         SQF diag_log(arrayObjectTest[0]);
         
         auto configObj = new ::std::config();
-        configObj = configObj.extend("CfgVehicles");
-        configObj = configObj.extend("FooBar");
+        configObj = configObj.extend("CfgVehicles").extend("FooBar");
         configObj = configObj.parent();
         auto hierarchy = configObj.hierarchy();
         SQF diag_log(hierarchy[0].name());
