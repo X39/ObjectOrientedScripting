@@ -1,0 +1,76 @@
+#include <array>
+namespace std
+{
+    native String
+    {
+        assign simple ()
+            ""
+        endAssign
+		
+        assign simple (string s)
+            s
+        endAssign
+		
+        assign simple (String s)
+            s
+        endAssign
+        
+        fnc simple scalar length ()
+            count _this
+        endFnc
+        
+        fnc simple String subString (scalar off, scalar len)
+            _this select [off, len]
+        endFnc
+		
+        fnc simple String indexOf (string s)
+            _this find s
+        endFnc
+        fnc simple String indexOf (String s)
+            _this find s
+        endFnc
+		
+        fnc simple bool contains (string s)
+            (_this find s) >= 0
+        endFnc
+        fnc simple bool contains (String s)
+            (_this find s) >= 0
+        endFnc
+		
+		fnc simple string toString ()
+			_this
+		endFnc
+		
+		fnc simple ::std::array<scalar> toArray()
+			toArray _this
+		endFnc
+		
+		fnc simple String append(string s)
+			_this + s
+		endFnc
+		
+		fnc simple String append(String s)
+			_this + s
+		endFnc
+		
+		fnc simple ::std::array<::std::String> split(string delimiter)
+			_this splitString delimiter
+		endFnc
+		
+		fnc simple ::std::array<::std::String> split(String delimiter)
+			_this splitString delimiter
+		endFnc
+		
+		fnc simple bool equals(String s)
+			_this isEqualTo s
+		endFnc
+		
+		fnc simple String toUpper()
+			toUpper _this
+		endFnc
+		
+		fnc simple String toLower()
+			toLower _this
+		endFnc
+    }
+}
