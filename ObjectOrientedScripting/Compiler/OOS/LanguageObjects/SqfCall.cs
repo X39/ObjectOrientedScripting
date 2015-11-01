@@ -112,39 +112,58 @@ namespace Compiler.OOS_LanguageObjects
         public SqfCall(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
+            this.referencedType = new VarTypeObject(VarType.Void);
         }
+
+        public override int finalize()
+        {
+            if (this.IsFinalized)
+                return 0;
+            int errCount = 0;
+            foreach (pBaseLangObject blo in children)
+                if (blo != null)
+                    errCount += blo.finalize();
+            if (this is Interfaces.iTemplate && ((Interfaces.iTemplate)this).TemplateObject != null)
+                errCount += ((Interfaces.iTemplate)this).TemplateObject.finalize(); 
+            errCount += this.doFinalize();
+            if (this is Interfaces.iHasType && ((Interfaces.iHasType)this).ReferencedType.IsObject)
+                errCount += ((Interfaces.iHasType)this).ReferencedType.ident.finalize();
+            this.IsFinalized = true;
+            return errCount;
+        }
+
         public override int doFinalize()
         {
             int errCount = 0;
             var sio = supportInfoList.Find(SupportInfoObject.bySqfCommand(this.Name.OriginalValue.ToLower()));
             if(sio == null)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0024, this.Name.Line, this.Name.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0019, this.Name.Line, this.Name.Pos));
                 return 1;
             }
             var lArgs = LArgs;
             var rArgs = RArgs;
             if (lArgs.Count == 0 && sio.hasL)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0020, this.Name.Line, this.Name.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0015, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
             else if (lArgs.Count != 0 && !sio.hasL)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0021, this.Name.Line, this.Name.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0016, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
             if (rArgs.Count == 0 && sio.hasR)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0022, this.Name.Line, this.Name.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0017, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
             else if (rArgs.Count != 0 && !sio.hasR)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0023, this.Name.Line, this.Name.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0018, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
-            this.referencedType = new VarTypeObject(sio.outType);
+            this.referencedType.varType = sio.outType;
             return 0;
         }
         public void markEnd()

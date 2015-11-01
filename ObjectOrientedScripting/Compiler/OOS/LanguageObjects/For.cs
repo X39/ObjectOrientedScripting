@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class For : pBaseLangObject
+    public class For : pBaseLangObject, Interfaces.iCodeBlock
     {
         public pBaseLangObject forArg1 { get { return this.children[0]; } set { this.children[0] = value; } }
         public pBaseLangObject forArg2 { get { return this.children[1]; } set { this.children[1] = value; } }
@@ -20,5 +20,10 @@ namespace Compiler.OOS_LanguageObjects
             this.children.Add(null);
         }
         public override int doFinalize() { return 0; }
+
+        public List<Return> ReturnCommands
+        {
+            get { return this.getAllChildrenOf<Return>(); }
+        }
     }
 }

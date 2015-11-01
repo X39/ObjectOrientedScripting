@@ -14,7 +14,7 @@ namespace Compiler.OOS_LanguageObjects
         public Encapsulation encapsulation;
         public pBaseLangObject Value { get { var valAssign = this.getAllChildrenOf<VariableAssignment>(); if (valAssign.Count > 0) return valAssign[0]; return null; } }
         public bool IsClassVariable { get { return this.encapsulation != Encapsulation.Static && this.encapsulation != Encapsulation.NA; } }
-        public Template template { get { return this.varType.template; } set { this.varType.template = value; } }
+        public Template TemplateObject { get { return this.varType.TemplateObject; } set { this.varType.TemplateObject = value; } }
         public string SqfVariableName
         {
             get
@@ -39,20 +39,111 @@ namespace Compiler.OOS_LanguageObjects
             }
         }
 
-        private int line;
-        public int Line { get { return this.line; } }
-        private int pos;
-        public int Pos { get { return this.pos; } }
+        public int Line { get; internal set; }
+        public int Pos { get; internal set; }
 
         public Variable(pBaseLangObject parent, int pos, int line) : base(parent)
         {
             this.addChild(null);
             varType = null;
-            this.line = line;
-            this.pos = pos;
+            this.Line = line;
+            this.Pos = pos;
+        }
+        public override int finalize()
+        {
+            if (this.IsFinalized)
+                return 0;
+            int errCount = 0;
+            foreach (pBaseLangObject blo in children)
+                if (blo != null)
+                    errCount += blo.finalize();
+            errCount += this.doFinalize();
+            if (this is Interfaces.iTemplate && ((Interfaces.iTemplate)this).TemplateObject != null)
+                errCount += ((Interfaces.iTemplate)this).TemplateObject.doFinalize();
+            if (this is Interfaces.iHasType && ((Interfaces.iHasType)this).ReferencedType.IsObject)
+                errCount += ((Interfaces.iHasType)this).ReferencedType.ident.finalize();
+            this.IsFinalized = true;
+            return errCount;
         }
         public override int doFinalize() {
             int errCount = 0;
+            var assignList = this.getAllChildrenOf<VariableAssignment>();
+            //Make sure that we not got an auto without an assign here
+            if (this.varType.varType == VarType.Auto && assignList.Count == 0)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0007, this.Line, this.Pos));
+                errCount++;
+            }
+            //Check if we got an assign and validate the value after that
+            if (assignList.Count > 0)
+            {
+                var assign = assignList[0];
+                var assignType = assign.ReferencedType;
+                var thisType = this.varType;
+
+                if (thisType.varType == VarType.Auto)
+                {
+                    thisType.varType = assignType.varType;
+                    thisType.ident = assignType.ident;
+                    thisType.TemplateObject = assignType.TemplateObject;
+                }
+                else
+                {
+                    if (!assignType.Equals(thisType))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0008, this.Line, this.Pos));
+                        errCount++;
+                    }
+                }
+            }
+            //Check variable is not yet existing in above scopes
+            switch(this.encapsulation)
+            {
+                case Encapsulation.NA:
+                    {
+                        var fnc = this.getFirstOf<Interfaces.iFunction>();
+                        if (fnc != null)
+                        {
+                            bool flag = false;
+                            foreach(var it in ((pBaseLangObject)fnc).getAllChildrenOf<Variable>(true, this))
+                            {
+                                if(it.Name.FullyQualifiedName == this.Name.FullyQualifiedName)
+                                {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                            if (flag)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0009, this.Line, this.Pos));
+                                errCount++;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        var classRef = this.getFirstOf<Interfaces.iClass>();
+                        if (classRef != null)
+                        {
+                            if (!((pBaseLangObject)classRef).getAllChildrenOf<Variable>(true, this).TrueForAll(it => it.Name.FullyQualifiedName != this.Name.FullyQualifiedName))
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0010, this.Line, this.Pos));
+                                errCount++;
+                            }
+                        }
+                        else
+                        {
+                            var topObject = this.getFirstOf<Base>();
+                            if (!topObject.getAllChildrenOf<Variable>(true, this).TrueForAll(it => it.Name.FullyQualifiedName != this.Name.FullyQualifiedName))
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0011, this.Line, this.Pos));
+                                errCount++;
+                            }
+                        }
+                    }
+                    break;
+            }
             return errCount;
         }
         public override string ToString()

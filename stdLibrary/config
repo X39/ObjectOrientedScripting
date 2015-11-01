@@ -27,7 +27,7 @@ namespace std
             (_var select ((_var pushBack 1) - 1))
         endFnc
         
-        fnc simple ::std::array<config> hierarchy () configHierarchy _this endFnc
+        fnc simple ::std::array<::std::config> hierarchy () configHierarchy _this endFnc
         
         fnc simple bool isClass ()      isClass _this       endFnc
         fnc simple bool isText ()       isText _this        endFnc

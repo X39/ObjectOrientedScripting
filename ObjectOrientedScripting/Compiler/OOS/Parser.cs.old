@@ -150,19 +150,19 @@ public class Parser {
 	void TEMPLATE(out Template obj, pBaseLangObject parent) {
 		obj = new Template(parent, t.line, t.col); pBaseLangObject blo; VarType e; 
 		Expect(21);
-		if (la.kind == 3) {
-			IDENT(out blo, obj);
+		if (StartOf(1)) {
+			IDENTACCESS(out blo, obj);
 			obj.vtoList.Add(new VarTypeObject((Ident)blo)); 
-		} else if (StartOf(1)) {
+		} else if (StartOf(2)) {
 			VARTYPE(out e);
 			obj.vtoList.Add(new VarTypeObject(e)); 
 		} else SynErr(74);
 		while (la.kind == 18) {
 			Get();
-			if (la.kind == 3) {
-				IDENT(out blo, obj);
+			if (StartOf(1)) {
+				IDENTACCESS(out blo, obj);
 				obj.vtoList.Add(new VarTypeObject((Ident)blo)); 
-			} else if (StartOf(1)) {
+			} else if (StartOf(2)) {
 				VARTYPE(out e);
 				obj.vtoList.Add(new VarTypeObject(e)); 
 			} else SynErr(75);
@@ -170,9 +170,39 @@ public class Parser {
 		Expect(22);
 	}
 
-	void IDENT(out pBaseLangObject outObj, pBaseLangObject parent) {
-		Expect(3);
-		outObj = new Ident(parent, t.val, t.line, t.col); 
+	void IDENTACCESS(out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true) {
+		pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; 
+		if (la.kind == 17) {
+			Get();
+			isGlobalIdent = true; 
+		}
+		if (la.kind == 19 || la.kind == 20) {
+			CAST(out outObj, parent);
+		}
+		IDENT(out ident, (outObj == null ? parent : outObj));
+		try{ ((Ident)ident).IsGlobalIdentifier = isGlobalIdent; } catch (Exception ex) { SemErr(ex.Message); } if(outObj == null) outObj = ident; else outObj.addChild(ident); 
+		if(allowBody) { 
+		if (la.kind == 10 || la.kind == 12) {
+			if (la.kind == 10) {
+				BODY_FUNCTIONCALL(out blo, ident);
+				((Ident)ident).addChild(blo); 
+			} else {
+				BODY_ARRAYACCESS(out blo, ident);
+				((Ident)ident).addChild(blo); 
+			}
+		}
+		} 
+		if (la.kind == 16 || la.kind == 17) {
+			if (la.kind == 16) {
+				Get();
+				((Ident)ident).Access = Ident.AccessType.Instance; 
+			} else {
+				Get();
+				((Ident)ident).Access = Ident.AccessType.Namespace; 
+			}
+			IDENTACCESS(out blo, ident, allowBody);
+			((Ident)ident).addChild(blo); 
+		}
 	}
 
 	void VARTYPE(out VarType e) {
@@ -241,39 +271,9 @@ public class Parser {
 		}
 	}
 
-	void IDENTACCESS(out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true) {
-		pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; 
-		if (la.kind == 17) {
-			Get();
-			isGlobalIdent = true; 
-		}
-		if (la.kind == 19 || la.kind == 20) {
-			CAST(out outObj, parent);
-		}
-		IDENT(out ident, parent);
-		try{ ((Ident)ident).IsGlobalIdentifier = isGlobalIdent; } catch (Exception ex) { SemErr(ex.Message); } if(outObj == null) outObj = ident; else outObj.addChild(ident); 
-		if(allowBody) { 
-		if (la.kind == 10 || la.kind == 12) {
-			if (la.kind == 10) {
-				BODY_FUNCTIONCALL(out blo, ident);
-				((Ident)ident).addChild(blo); 
-			} else {
-				BODY_ARRAYACCESS(out blo, ident);
-				((Ident)ident).addChild(blo); 
-			}
-		}
-		} 
-		if (la.kind == 16 || la.kind == 17) {
-			if (la.kind == 16) {
-				Get();
-				((Ident)ident).Access = Ident.AccessType.Instance; 
-			} else {
-				Get();
-				((Ident)ident).Access = Ident.AccessType.Namespace; 
-			}
-			IDENTACCESS(out blo, ident, allowBody);
-			((Ident)ident).addChild(blo); 
-		}
+	void IDENT(out pBaseLangObject outObj, pBaseLangObject parent) {
+		Expect(3);
+		outObj = new Ident(parent, t.val, t.line, t.col); 
 	}
 
 	void CAST(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -281,10 +281,10 @@ public class Parser {
 		if (la.kind == 19) {
 			Get();
 			obj.isStaticCast = true; 
-			if (StartOf(1)) {
+			if (StartOf(2)) {
 				VARTYPE(out vt);
 				obj.varType = new VarTypeObject(vt); 
-			} else if (StartOf(2)) {
+			} else if (StartOf(1)) {
 				IDENTACCESS(out ident, obj);
 				obj.varType = new VarTypeObject((Ident)ident); 
 			} else SynErr(77);
@@ -292,10 +292,10 @@ public class Parser {
 		} else if (la.kind == 20) {
 			Get();
 			obj.isStaticCast = false; 
-			if (StartOf(1)) {
+			if (StartOf(2)) {
 				VARTYPE(out vt);
 				obj.varType = new VarTypeObject(vt); 
-			} else if (StartOf(2)) {
+			} else if (StartOf(1)) {
 				IDENTACCESS(out ident, obj);
 				obj.varType = new VarTypeObject((Ident)ident); 
 			} else SynErr(78);
@@ -383,7 +383,7 @@ public class Parser {
 		} else if (StartOf(4)) {
 			VALUE(out blo, obj);
 			obj.lExpression = blo; 
-		} else if (StartOf(2)) {
+		} else if (StartOf(1)) {
 			IDENTACCESS(out blo, obj);
 			obj.lExpression = blo; 
 			if (la.kind == 64) {
@@ -417,11 +417,11 @@ public class Parser {
 		obj.Name = (Ident)blo; 
 		if (la.kind == 21) {
 			Template te; 
-			TEMPLATE(out te, obj);
-			obj.template = te; 
+			TEMPLATE(out te, ((Ident)blo).LastIdent);
+			obj.TemplateObject = te; 
 		}
-		BODY_FUNCTIONCALL(out blo2, blo);
-		blo.addChild(blo2); 
+		BODY_FUNCTIONCALL(out blo2, ((Ident)blo).LastIdent);
+		((Ident)blo).LastIdent.addChild(blo2); 
 	}
 
 	void OP_INSTANCEOF(out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess) {
@@ -508,7 +508,18 @@ public class Parser {
 		var obj = new Namespace(parent); outObj = obj; pBaseLangObject blo; 
 		Expect(38);
 		IDENT(out blo, obj);
-		obj.Name = (Ident)blo; 
+		obj.Name = (Ident)blo;
+		
+		var nsList = parent.getAllChildrenOf<Namespace>();
+		foreach(var it in nsList)
+		{
+			if(it.Name.OriginalValue == ((Ident)blo).OriginalValue)
+			{
+				obj = it;
+				break;
+			}
+		}
+		
 		Expect(14);
 		while (StartOf(6)) {
 			if (la.kind == 38) {
@@ -591,9 +602,10 @@ public class Parser {
 		Expect(15);
 		if(!hasConstructor) {
 		            var constructor = new Function(obj);
+		constructor.encapsulation = Encapsulation.Public;
 		            try
 		            {
-		              constructor.Name = obj.Name;
+		              constructor.Name = new Ident(constructor, obj.Name.OriginalValue, obj.Name.Line, obj.Name.Pos);
 		            }
 		            catch (Exception ex)
 		            {
@@ -606,14 +618,15 @@ public class Parser {
 	}
 
 	void NATIVECLASS(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new Native(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; Template te; 
+		var obj = new Native(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; Template te; bool flag = false; 
 		Expect(39);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		if (la.kind == 21) {
 			TEMPLATE(out te, obj);
-			obj.template = te; 
+			obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name, true, te); 
 		}
+		if(!flag) obj.VTO = new VarTypeObject(obj.Name, true); 
 		Expect(14);
 		NATIVEASSIGN(out blo, obj);
 		obj.addChild(blo); 
@@ -636,7 +649,7 @@ public class Parser {
 		var obj = new oosInterface(parent); outObj = obj; pBaseLangObject blo; 
 		Expect(52);
 		IDENT(out blo, obj);
-		obj.Name = (Ident)blo; 
+		obj.Name = (Ident)blo; obj.VTO = new VarTypeObject((Ident)blo, true); 
 		Expect(14);
 		while (StartOf(10)) {
 			VFUNCTION(out blo, obj);
@@ -647,7 +660,7 @@ public class Parser {
 
 	void NEWVARIABLE(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA) {
 		var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
-		if (StartOf(1)) {
+		if (StartOf(2)) {
 			VARTYPE(out v);
 			obj.varType = new VarTypeObject(v); 
 		} else if (StartOf(11)) {
@@ -661,7 +674,7 @@ public class Parser {
 			if (la.kind == 21) {
 				Template te; 
 				TEMPLATE(out te, outObj);
-				obj.varType.template = te; 
+				obj.varType.TemplateObject = te; 
 			}
 		} else SynErr(88);
 		IDENT(out blo, outObj);
@@ -682,7 +695,7 @@ public class Parser {
 			Get();
 			obj.Override = true; 
 		}
-		if (StartOf(1)) {
+		if (StartOf(2)) {
 			VARTYPE(out v);
 			obj.varType = new VarTypeObject(v); 
 		} else if (la.kind == 44) {
@@ -699,7 +712,7 @@ public class Parser {
 			if (la.kind == 21) {
 				Template te; 
 				TEMPLATE(out te, outObj);
-				obj.varType.template = te; 
+				obj.varType.TemplateObject = te; 
 			}
 		} else SynErr(89);
 		IDENT(out blo, obj);
@@ -726,6 +739,7 @@ public class Parser {
 
 	void NATIVEASSIGN(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new NativeAssign(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; 
+		obj.Name = new Ident(obj, ((Native)parent).Name.OriginalValue, ((Native)parent).Name.Line, ((Native)parent).Name.Pos); 
 		Expect(40);
 		if (la.kind == 41) {
 			Get();
@@ -757,7 +771,7 @@ public class Parser {
 			Get();
 			obj.IsSimple = true; 
 		}
-		if (StartOf(1)) {
+		if (StartOf(2)) {
 			VARTYPE(out v);
 			obj.VTO = new VarTypeObject(v); 
 		} else if (la.kind == 44) {
@@ -774,7 +788,7 @@ public class Parser {
 			if (la.kind == 21) {
 				Template te; 
 				TEMPLATE(out te, outObj);
-				obj.VTO.template = te; 
+				obj.VTO.TemplateObject = te; 
 			}
 		} else SynErr(90);
 		IDENT(out blo, obj);
@@ -805,7 +819,7 @@ public class Parser {
 			Get();
 			obj.IsSimple = true; 
 		}
-		if (StartOf(1)) {
+		if (StartOf(2)) {
 			VARTYPE(out v);
 			obj.VTO = new VarTypeObject(v); 
 		} else if (la.kind == 44) {
@@ -817,28 +831,37 @@ public class Parser {
 				Get();
 				isStrict = true; 
 			}
-			IDENTACCESS(out blo, obj);
+			IDENTACCESS(out blo, obj, false);
 			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
 			if (la.kind == 21) {
 				Template te; 
 				TEMPLATE(out te, outObj);
-				obj.VTO.template = te; 
+				obj.VTO.TemplateObject = te; 
 			}
 		} else SynErr(91);
 		if (la.kind == 12) {
 			Get();
 			Expect(13);
-			obj.Operator = "[]"; 
+			obj.OperatorType = OperatorFunctions.ArrayAccess; 
 		} else if (la.kind == 5 || la.kind == 21 || la.kind == 22) {
 			if (la.kind == 5) {
 				Get();
-				obj.Operator = t.val; 
+				switch(t.val) {
+				case "===":
+				obj.OperatorType = OperatorFunctions.ExplicitEquals;
+				break;
+				default:
+				SemErr("The operator '" + t.val + "' is not supported for override");
+				break;
+				}
 			} else if (la.kind == 21) {
 				Get();
-				obj.Operator = t.val; 
+				Expect(21);
+				SemErr("The operator '" + t.val + "' is not supported for override"); 
 			} else {
 				Get();
-				obj.Operator = t.val; 
+				Expect(22);
+				SemErr("The operator '" + t.val + "' is not supported for override"); 
 			}
 		} else SynErr(92);
 		Expect(10);
@@ -890,7 +913,7 @@ public class Parser {
 			Get();
 			obj.IsAsync = true; 
 		}
-		if (StartOf(1)) {
+		if (StartOf(2)) {
 			VARTYPE(out v);
 			obj.varType = new VarTypeObject(v); 
 		} else if (la.kind == 44) {
@@ -907,14 +930,14 @@ public class Parser {
 			if (la.kind == 21) {
 				Template te; 
 				TEMPLATE(out te, outObj);
-				obj.varType.template = te; 
+				obj.varType.TemplateObject = te; 
 			}
 		} else SynErr(93);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		Expect(10);
 		if (StartOf(17)) {
-			if (StartOf(1)) {
+			if (StartOf(2)) {
 				VARTYPE(out v);
 				obj.argTypes.Add(new VarTypeObject(v)); 
 			} else {
@@ -923,10 +946,10 @@ public class Parser {
 			}
 			while (la.kind == 18) {
 				Get();
-				if (StartOf(1)) {
+				if (StartOf(2)) {
 					VARTYPE(out v);
 					obj.argTypes.Add(new VarTypeObject(v)); 
-				} else if (StartOf(2)) {
+				} else if (StartOf(1)) {
 					IDENTACCESS(out blo, obj, false);
 					obj.argTypes.Add(new VarTypeObject((Ident)blo)); 
 				} else SynErr(94);
@@ -977,7 +1000,7 @@ public class Parser {
 	}
 
 	void VARIABLEASSIGNMENT(out pBaseLangObject outObj, pBaseLangObject ident, pBaseLangObject parent) {
-		var obj = new AssignContainer(parent); outObj = obj; pBaseLangObject blo; 
+		var obj = new AssignContainer(parent); obj.Name = (Ident)ident; ident.Parent = obj; outObj = obj; pBaseLangObject blo; 
 		BODY_ASSIGNMENT(out blo, outObj, true);
 		obj.addChild(blo); 
 	}
@@ -1006,12 +1029,12 @@ public class Parser {
 			}
 		} else if (la.kind == 55) {
 			AUTOVARIABLE(out outObj, parent);
-		} else if (StartOf(2)) {
-			IDENTACCESS(out blo, outObj);
+		} else if (StartOf(1)) {
+			IDENTACCESS(out blo, parent);
 			if (la.kind == 7 || la.kind == 8 || la.kind == 9) {
 				VARIABLEASSIGNMENT(out outObj, blo, parent);
 			}
-			if(outObj == null) outObj = blo; else outObj.addChild(blo); 
+			if(outObj == null) outObj = blo; 
 		} else if (la.kind == 72) {
 			OP_SQFCALL(out outObj, parent);
 		} else SynErr(100);
@@ -1272,8 +1295,8 @@ public class Parser {
 	
 	static readonly bool[,] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x},
 		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x},

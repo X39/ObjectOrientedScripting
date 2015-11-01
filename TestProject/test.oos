@@ -96,7 +96,7 @@ namespace X39
         SQF diag_log(hierarchy[0].name());
         SQF diag_log(configObj[0].name());
         
-        auto veh = new vehicle("B_Heli_Light_01_F", 0, 0, 1000);
+        auto veh = new ::std::vehicle("B_Heli_Light_01_F", 0, 0, 1000);
         if(!veh.isAlive())
         {
             return;

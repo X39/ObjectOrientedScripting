@@ -27,7 +27,9 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else if (lExpression is Ident)
                 {
-                    lType = ((Ident)lExpression).ReferencedType;
+                    lType = ((Ident)lExpression).LastIdent.ReferencedObject is Interfaces.iHasType ?
+                        ((Interfaces.iHasType)((Ident)lExpression).LastIdent.ReferencedObject).ReferencedType :
+                        ((Ident)lExpression).LastIdent.ReferencedType;
                 }
                 else if (lExpression is Cast)
                 {
@@ -35,7 +37,7 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else if (lExpression is NewInstance)
                 {
-                    lType = ((Ident)lExpression.children[0]).ReferencedType;
+                    lType = ((NewInstance)lExpression).ReferencedType;
                 }
                 else if (lExpression is SqfCall)
                 {
@@ -65,7 +67,7 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     else if (rExpression is Ident)
                     {
-                        rType = ((Ident)rExpression).ReferencedType;
+                        rType = ((Ident)rExpression).LastIdent.ReferencedType;
                     }
                     else if (rExpression is Cast)
                     {
@@ -73,7 +75,7 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     else if (rExpression is NewInstance)
                     {
-                        rType = ((Ident)rExpression.children[0]).ReferencedType;
+                        rType = ((NewInstance)rExpression).ReferencedType;
                     }
                     else if (rExpression is SqfCall)
                     {
@@ -96,20 +98,29 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     case "&": case "&&": case "|": case "||":
                         if (lType.varType != VarType.Bool || rType.varType != VarType.Bool)
-                            throw new Ex.TypeMissmatch(lType, rType, line, pos, expOperator);
+                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
                         oType = new VarTypeObject(VarType.Bool);
                         break;
                     case "==": case "===":
                         oType = new VarTypeObject(VarType.Bool);
                         break;
                     case "+": case "-": case "*": case "/":
-                        if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                            throw new Ex.TypeMissmatch(lType, rType, line, pos, expOperator);
-                        oType = new VarTypeObject(VarType.Scalar);
+                        if(lType.varType == VarType.String)
+                        {
+                            if (lType.varType != VarType.String || rType.varType != VarType.String)
+                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
+                            oType = new VarTypeObject(VarType.String);
+                        }
+                        else
+                        {
+                            if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
+                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
+                            oType = new VarTypeObject(VarType.Scalar);
+                        }
                         break;
                     case ">": case ">=": case "<": case "<=":
                         if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                            throw new Ex.TypeMissmatch(lType, rType, line, pos, expOperator);
+                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
                         oType = new VarTypeObject(VarType.Bool);
                         break;
                     case "":

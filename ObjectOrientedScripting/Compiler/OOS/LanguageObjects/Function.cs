@@ -54,6 +54,7 @@ namespace Compiler.OOS_LanguageObjects
         /// Return type of this iFunction
         /// </summary>
         public VarTypeObject ReturnType { get { return this.varType; } }
+        public VarTypeObject ReferencedType { get { return this.ReturnType; } }
         /// <summary>
         /// Returns a Template object which then can deref some unknown class conflicts in
         /// ArgList field
@@ -105,5 +106,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             return "fnc->" + this.Name.FullyQualifiedName;
         }
+        public List<Return> ReturnCommands { get { return this.getAllChildrenOf<Return>(); } }
     }
 }

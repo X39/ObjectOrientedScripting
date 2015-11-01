@@ -24,9 +24,9 @@ namespace Compiler.OOS_LanguageObjects
                 List<VarTypeObject> retList = new List<VarTypeObject>();
                 foreach (var it in this.children)
                 {
-                    if (it is Variable)
+                    if (it is Interfaces.iHasType)
                     {
-                        retList.Add(((Variable)it).varType);
+                        retList.Add(((Interfaces.iHasType)it).ReferencedType);
                     }
                     else
                     {

@@ -7,6 +7,7 @@ using Wrapper;
 using Compiler;
 using Compiler.SqfConfigObjects;
 using Compiler.OOS_LanguageObjects;
+using Compiler.OOS_LanguageObjects.HelperClasses;
 using System.IO;
 
 namespace Wrapper
@@ -171,7 +172,7 @@ namespace Wrapper
             //do the preprocessing
             MultiStreamWriter msw = new MultiStreamWriter();
             preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), msw, ppFiles);
-
+            int errCount = 0;
             //Check the syntax of all files in ppFiles
             foreach(var it in ppFiles)
             {
@@ -185,22 +186,52 @@ namespace Wrapper
                 //}
                 Scanner scanner = new Scanner(it.FileStream);
                 Base baseObject = new Base();
-                Parser parser = new Parser(scanner);
-                parser.BaseObject = baseObject;
-                parser.Parse();
-                if (parser.errors.count > 0)
+                Parser p = new Parser(scanner);
+                p.BaseObject = baseObject;
+                p.Parse();
+                if (p.errors.count > 0)
                 {
+                    errCount += p.errors.count;
                     Logger.Instance.log(Logger.LogLevel.INFO, "In file '" + it.Name + "'");
                 }
                 if(!noPrintOut)
                 {
                     var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
                     it.resetPosition();
-                    it.FullFilestream.WriteTo(stream);
+                    it.FileStream.WriteTo(stream);
                     stream.Flush();
                     stream.Close();
+
+
+                    var stream2 = File.Create(proj.Buildfolder + it.Name + ".objF");
+                    it.resetPosition();
+                    it.FullFileStream.WriteTo(stream2);
+                    stream2.Flush();
+                    stream2.Close();
                 }
                 it.resetPosition();
+            }
+            if(errCount > 0)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
+                return;
+            }
+
+
+            //process the actual file
+            var ppMainFile = ppFiles[0];
+
+
+            Base oosTreeBase = new Base();
+            NamespaceResolver.BaseClass = oosTreeBase;
+            Parser parser = new Parser(new Scanner(ppMainFile.FullFileStream));
+            parser.BaseObject = oosTreeBase;
+            parser.Parse();
+            errCount = parser.errors.count + parser.BaseObject.finalize();
+            if (errCount > 0)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
+                return;
             }
         }
         private enum preprocessFile_IfDefModes
@@ -216,7 +247,7 @@ namespace Wrapper
             PostProcessFile ppFile = new PostProcessFile(filePath, name);
             ppFiles.Add(ppFile);
             StreamWriter thisFileWriter = new StreamWriter(ppFile.FileStream);
-            StreamWriter FullFileWriter = new StreamWriter(ppFile.FullFilestream);
+            StreamWriter FullFileWriter = new StreamWriter(ppFile.FullFileStream);
             writer.Add(thisFileWriter);
             writer.Add(FullFileWriter);
 

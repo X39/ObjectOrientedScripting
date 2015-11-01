@@ -43,7 +43,7 @@
     <Compile Include="Compiler\MultiStreamWriter.cs" />
     <Compile Include="Compiler\PostProcessFile.cs" />
     <Compile Include="OOS\ErrorStringResolver.cs" />
-    <Compile Include="OOS\Exceptions\TypeMissmatch.cs" />
+    <Compile Include="OOS\Exceptions\LinkerException.cs" />
     <Compile Include="OOS\LanguageObjects\HelperClasses\NamespaceResolver.cs" />
     <Compile Include="OOS\LanguageObjects\HelperClasses\ArgList.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iArgList.cs" />
@@ -90,7 +90,7 @@
     <Compile Include="OOS\LanguageObjects\oosInterface.cs" />
     <Compile Include="OOS\LanguageObjects\oosClass.cs" />
     <Compile Include="OOS\LanguageObjects\Namespace.cs" />
-    <Compile Include="OOS\LanguageObjects\enums.cs" />
+    <Compile Include="OOS\enums.cs" />
     <Compile Include="OOS\LanguageObjects\Partials\pBaseLangObject.cs" />
     <Compile Include="OOS\LanguageObjects\Base.cs" />
     <Compile Include="OOS\Parser.cs" />

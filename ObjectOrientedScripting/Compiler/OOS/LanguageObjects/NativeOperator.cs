@@ -8,11 +8,9 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class NativeOperator : NativeInstruction, Interfaces.iOperatorFunction
     {
-        public string Operator { get; set; }
-
-
         public NativeOperator(pBaseLangObject parent, int line, int pos) : base(parent, line, pos)
         {
+            this.addChild(null);
             VTO = null;
         }
         public override int doFinalize()
@@ -27,11 +25,12 @@ namespace Compiler.OOS_LanguageObjects
         /// Return type of this iFunction
         /// </summary>
         public VarTypeObject ReturnType { get { return this.VTO; } }
+        public VarTypeObject ReferencedType { get { return this.ReturnType; } }
         /// <summary>
         /// Returns a Template object which then can deref some unknown class conflicts in
         /// ArgList field
         /// </summary>
-        public Template TemplateArguments { get { return this.getFirstOf<Native>().template; } }
+        public Template TemplateArguments { get { return this.getFirstOf<Native>().TemplateObject; } }
         /// <summary>
         /// Returns functions encapsulation
         /// </summary>
@@ -50,6 +49,10 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         retList.Add(((Variable)it).varType);
                     }
+                    else if (it is Ident)
+                    {
+                        //Do nothing as we got the Name here
+                    }
                     else
                     {
                         throw new Exception();
@@ -60,10 +63,15 @@ namespace Compiler.OOS_LanguageObjects
         }
         public bool IsAsync { get { return false; } }
 
-        public Ident Name { get { return null; } set { } }
+        public Ident Name { get { return (Ident)this.children[0]; } set { this.children[0] = value; } }
         public override string ToString()
         {
-            return "nOp->" + this.Operator;
+            return "nOp->" + Enum.GetName(typeof(OperatorFunctions), this.OperatorType);
         }
+        private OperatorFunctions opType;
+        public OperatorFunctions OperatorType { get { return opType; } set { this.Name = new Ident(this, Enum.GetName(typeof(OperatorFunctions), value), this.Line, this.Pos); this.opType = value; } }
+        public List<Return> ReturnCommands { get { return this.getAllChildrenOf<Return>(); } }
+
+
     }
 }

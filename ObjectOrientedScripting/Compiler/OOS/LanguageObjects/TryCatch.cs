@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class TryCatch : pBaseLangObject
+    public class TryCatch : pBaseLangObject, Interfaces.iCodeBlock
     {
         public VarType functionVarType;
         private int endMarker;
@@ -21,16 +21,21 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override int doFinalize()
         {
-            if (((Variable)variable).ReferencedType.varType != VarType.String)
-            {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0042, ((Variable)variable).Line, ((Variable)variable).Pos));
-                return 1;
-            }
+            //if (((Variable)variable).ReferencedType.varType != VarType.String)
+            //{
+            //    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0042, ((Variable)variable).Line, ((Variable)variable).Pos));
+            //    return 1;
+            //}
             return 0;
         }
         public void markIfEnd()
         {
             endMarker = this.children.Count - 1;
+        }
+
+        public List<Return> ReturnCommands
+        {
+            get { return this.getAllChildrenOf<Return>(); }
         }
     }
 }

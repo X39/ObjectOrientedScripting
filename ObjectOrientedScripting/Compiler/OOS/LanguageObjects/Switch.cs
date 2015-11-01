@@ -18,23 +18,23 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            var caseList = this.getAllChildrenOf<Case>();
-            bool flag = false;
-            foreach (var it in caseList)
-            {
-                if (it.expression == null)
-                {
-                    if (flag)
-                    {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0045, it.Line, it.Pos));
-                        errCount++;
-                    }
-                    else
-                    {
-                        flag = true;
-                    }
-                }
-            }
+            //var caseList = this.getAllChildrenOf<Case>();
+            //bool flag = false;
+            //foreach (var it in caseList)
+            //{
+            //    if (it.expression == null)
+            //    {
+            //        if (flag)
+            //        {
+            //            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0045, it.Line, it.Pos));
+            //            errCount++;
+            //        }
+            //        else
+            //        {
+            //            flag = true;
+            //        }
+            //    }
+            //}
             return errCount;
         }
     }

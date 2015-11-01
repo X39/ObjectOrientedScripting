@@ -8,18 +8,18 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class NativeFunction : NativeInstruction, Interfaces.iFunction
     {
-        private Ident name;
-        public Ident Name { get { return name; } set { name = value; } }
+        public Ident Name { get { return (Ident)this.children[0]; } set { this.children[0] = value; } }
 
         /// <summary>
         /// Return type of this iFunction
         /// </summary>
         public VarTypeObject ReturnType { get { return this.VTO; } }
+        public VarTypeObject ReferencedType { get { return this.ReturnType; } }
         /// <summary>
         /// Returns a Template object which then can deref some unknown class conflicts in
         /// ArgList field
         /// </summary>
-        public Template TemplateArguments { get { return this.getFirstOf<Native>().template; } }
+        public Template TemplateArguments { get { return this.getFirstOf<Native>().TemplateObject; } }
         /// <summary>
         /// Returns functions encapsulation
         /// </summary>
@@ -38,6 +38,10 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         retList.Add(((Variable)it).varType);
                     }
+                    else if (it is Ident)
+                    {
+                        //Do nothing as we got the Name here
+                    }
                     else
                     {
                         throw new Exception();
@@ -50,11 +54,12 @@ namespace Compiler.OOS_LanguageObjects
 
         public NativeFunction(pBaseLangObject parent, int line, int pos) : base(parent, line, pos)
         {
+            this.addChild(null);
         }
         public override int doFinalize()
         {
             int errCount = 0;
-            errCount += name.finalize();
+            errCount += this.Name.finalize();
             if (VTO.ident != null)
                 errCount += VTO.ident.finalize();
             return errCount;
@@ -63,5 +68,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             return "nFnc->" + this.Name.FullyQualifiedName;
         }
+        public List<Return> ReturnCommands { get { return new List<Return>(); } }
     }
 }

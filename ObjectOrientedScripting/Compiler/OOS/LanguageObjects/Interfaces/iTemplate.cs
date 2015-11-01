@@ -8,6 +8,6 @@ namespace Compiler.OOS_LanguageObjects.Interfaces
 {
     public interface iTemplate
     {
-        Template template {get; set;}
+        Template TemplateObject { get; set; }
     }
 }

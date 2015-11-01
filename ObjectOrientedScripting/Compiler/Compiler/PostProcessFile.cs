@@ -12,8 +12,8 @@ namespace Compiler
     {
         private MemoryStream fileStream;
         public MemoryStream FileStream { get { return this.fileStream; } }
-        private MemoryStream fullFilestream;
-        public MemoryStream FullFilestream { get { return this.fullFilestream; } }
+        private MemoryStream fullFileStream;
+        public MemoryStream FullFileStream { get { return this.fullFileStream; } }
         private string filePath;
         public string FilePath { get { return filePath; } }
         private string name;
@@ -22,14 +22,14 @@ namespace Compiler
         public PostProcessFile(string path, string name)
         {
             this.fileStream = new MemoryStream();
-            this.fullFilestream = new MemoryStream();
+            this.fullFileStream = new MemoryStream();
             this.filePath = path;
             this.name = name;
         }
         public void resetPosition()
         {
             this.fileStream.Seek(0, SeekOrigin.Begin);
-            this.fullFilestream.Seek(0, SeekOrigin.Begin);
+            this.fullFileStream.Seek(0, SeekOrigin.Begin);
         }
         public override string ToString()
         {

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class VariableAssignment : pBaseLangObject, Interfaces.iName, Interfaces.iHasType
+    public class VariableAssignment : pBaseLangObject, Interfaces.iHasType
     {
-        public Ident Name { get { return ((Interfaces.iName)Parent).Name; } set { ((Interfaces.iName)Parent).Name = value; } }
         public string operation;
         public VarTypeObject ReferencedType
         {

@@ -30,15 +30,18 @@ namespace Compiler.OOS_LanguageObjects
     }
     public enum OperatorFunctions
     {
-        ArrayAccess
+        ArrayAccess,
+        LessThenLessThen,
+        GreaterThenGreaterThen,
+        ExplicitEquals
     }
     public class VarTypeObject : Interfaces.iTemplate
     {
-        Template te;
-        public Template template
+        private Template template;
+        public Template TemplateObject
         {
-            get { return this.te; }
-            set { if(value != null) this.te = value; }
+            get { return this.template; }
+            set { if (value != null) this.template = value; }
         }
         public bool IsObject { get { return this.varType == VarType.Object || this.varType == VarType.ObjectStrict; } }
         public VarTypeObject(Ident i, bool isStrict = false, Template template = null)
@@ -49,7 +52,7 @@ namespace Compiler.OOS_LanguageObjects
 
             if(this.template == null && (this.ident.ReferencedObject is Interfaces.iTemplate))
             {
-                this.template = ((Interfaces.iTemplate)this.ident.ReferencedObject).template;
+                this.template = ((Interfaces.iTemplate)this.ident.ReferencedObject).TemplateObject;
             }
         }
         public VarTypeObject(VarType v)
@@ -60,6 +63,12 @@ namespace Compiler.OOS_LanguageObjects
                 throw new Exception("TODO: Allow anonymous objects");
             template = null;
             //TODO: Allow anonymous objects
+        }
+        public VarTypeObject(VarTypeObject vto)
+        {
+            this.ident = vto.ident;
+            this.varType = vto.varType;
+            template = vto.template;
         }
         public Ident ident;
         public VarType varType;

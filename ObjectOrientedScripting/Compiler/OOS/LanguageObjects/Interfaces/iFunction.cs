@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iFunction : iName, iArgList
+    public interface iFunction : iName, iArgList, iCodeBlock, iHasType
     {
         /// <summary>
         /// Return type of this iFunction

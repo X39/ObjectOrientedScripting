@@ -26,15 +26,15 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            var switchElement = this.Parent.getFirstOf<Switch>();
-            if (expression != null)
-            {
-                if (!((Expression)expression).ReferencedType.Equals(switchElement.ReferencedType))
-                {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0044, this.line, this.pos));
-                    errCount++;
-                }
-            }
+            //var switchElement = this.Parent.getFirstOf<Switch>();
+            //if (expression != null)
+            //{
+            //    if (!((Expression)expression).ReferencedType.Equals(switchElement.ReferencedType))
+            //    {
+            //        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0044, this.line, this.pos));
+            //        errCount++;
+            //    }
+            //}
             return errCount;
         }
     }

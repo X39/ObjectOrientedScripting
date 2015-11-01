@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class oosInterface : pBaseLangObject, Interfaces.iName, Interfaces.iGetFunctionIndex, Interfaces.iGetVariableIndex
+    public class oosInterface : pBaseLangObject, Interfaces.iName, Interfaces.iGetFunctionIndex, Interfaces.iGetVariableIndex, Interfaces.iClass
     {
         public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
+        public List<Ident> ExtendedClasses { get { return new List<Ident>(); } }
+        public VarTypeObject VTO { get; set; }
         
         public oosInterface(pBaseLangObject parent) : base(parent)
         {
@@ -52,6 +54,12 @@ namespace Compiler.OOS_LanguageObjects
                 }
             }
             return tuple == null ? new Tuple<int, int>(-1, -1) : tuple;
+        }
+
+
+        public Interfaces.iOperatorFunction getOperatorFunction(OperatorFunctions op)
+        {
+            return null;
         }
     }
 }
