@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public partial class pBaseLangObject
+    public abstract partial class pBaseLangObject
     {
         public List<pBaseLangObject> children;
         private pBaseLangObject parent;
@@ -30,7 +31,8 @@ namespace Compiler.OOS_LanguageObjects
 
         public void addChild(pBaseLangObject blo)
         {
-            this.children.Add(blo);
+            if(blo == null || !this.children.Contains(blo))
+                this.children.Add(blo);
         }
         public virtual int finalize()
         {
@@ -133,5 +135,6 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         public virtual int doFinalize() { return 0; }
+        public abstract void writeOut(StreamWriter sw);
     }
 }
