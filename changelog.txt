@@ -1,10 +1,18 @@
 Version 0.6.0-ALPHA                                                             
     |- Compiler:  Rewrote entire Linker & Writer
-    |- Compiler:  Reorganized how overwrite should be used (see next INFO)
-    |- Compiler:  Added "async" keyword for functions (see next INFO)
+    |- Compiler:  Added !syntax! to call base constructors via following:
+	|             bar(arg1, arg2, argn) : foo(arg1, "foobar", argn) {...}
+    |- Compiler:  During Linking, functions will now check if they always return
+	|             (only exception for this are VOID functions)
+    |- Compiler:  Added "PRINTMODE=<MODE>" Flag
+	|             Possible modes are: NONE, 0, NEEDED, 1, PARTIAL, 2, ALL, 3
+    |- Compiler:  Added fast assign operators: ++, --, +=, -=, *=, /=
+    |- Compiler:  Reorganized how overwrite should be used (see INFO1)
+    |- Compiler:  Added "async" keyword for functions (see INFO1)
     |             async functions have to have the return type void!
-    |- INFO:      Functions look like so now:
-    |             <encapsulation> [async] [override] <type> <name> ( <argList> )
+    |- INFO1:     Functions syntax got altered:
+    \             <encapsulation> [async] [override] <type> <name> ( <argList> )
+	
 Version 0.5.3-ALPHA                                                             
     |- Compiler:  Fixed invalid type cast with template objects                 
     |- Compiler:  Fixed bug in PreProcessor which caused invalid output if a    
