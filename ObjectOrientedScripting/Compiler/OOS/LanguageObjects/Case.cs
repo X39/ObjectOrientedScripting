@@ -22,7 +22,6 @@ namespace Compiler.OOS_LanguageObjects
         public int Pos { get { return this.pos; } }
         public Case(pBaseLangObject parent, int line, int pos) : base(parent)
         {
-            this.children.Add(null);
             this.line = line;
             this.pos = pos;
         }

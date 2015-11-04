@@ -252,6 +252,7 @@ namespace Wrapper
             }
             SqfConfigFile configFile = new SqfConfigFile(configFileName);
             oosTreeBase.writeOut(null, configFile);
+            configFile.writeOut(proj.OutputFolder);
         }
         private enum preprocessFile_IfDefModes
         {

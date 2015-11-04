@@ -65,7 +65,8 @@ namespace Compiler.OOS_LanguageObjects
             this.IsFinalized = true;
             return errCount;
         }
-        public override int doFinalize() {
+        public override int doFinalize()
+        {
             int errCount = 0;
             var assignList = this.getAllChildrenOf<VariableAssignment>();
             //Make sure that we not got an auto without an assign here
@@ -97,7 +98,7 @@ namespace Compiler.OOS_LanguageObjects
                 }
             }
             //Check variable is not yet existing in above scopes
-            switch(this.encapsulation)
+            switch (this.encapsulation)
             {
                 case Encapsulation.NA:
                     {
@@ -105,9 +106,9 @@ namespace Compiler.OOS_LanguageObjects
                         if (fnc != null)
                         {
                             bool flag = false;
-                            foreach(var it in ((pBaseLangObject)fnc).getAllChildrenOf<Variable>(true, this))
+                            foreach (var it in ((pBaseLangObject)fnc).getAllChildrenOf<Variable>(true, this))
                             {
-                                if(it.Name.FullyQualifiedName == this.Name.FullyQualifiedName)
+                                if (it.Name.FullyQualifiedName == this.Name.FullyQualifiedName)
                                 {
                                     flag = true;
                                     break;
@@ -153,10 +154,12 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
+            if (sw == null)
+                return;
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             var assignList = this.getAllChildrenOf<VariableAssignment>();
             sw.Write(tab + this.SqfVariableName);
-            if(assignList.Count > 0)
+            if (assignList.Count > 0)
             {
                 sw.Write(" = ");
                 assignList[0].writeOut(sw, cfg);

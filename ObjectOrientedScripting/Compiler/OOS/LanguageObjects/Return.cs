@@ -45,8 +45,9 @@ namespace Compiler.OOS_LanguageObjects
             foreach(var it in this.children)
             {
                 it.writeOut(sw, cfg);
+                sw.Write(' ');
             }
-            sw.Write(" breakOut \"" + Wrapper.Compiler.ScopeNames.function + "\"");
+            sw.Write("breakOut \"" + Wrapper.Compiler.ScopeNames.function + "\"");
         }
     }
 }

@@ -134,6 +134,7 @@ namespace Compiler.OOS_LanguageObjects
         public void markArgListEnd()
         {
             endMarker = this.children.Count - 1;
+            markBaseCallEnd();
         }
         public void markBaseCallEnd()
         {
@@ -244,7 +245,7 @@ namespace Compiler.OOS_LanguageObjects
                 var fncList = classObject.AllFunctions;
                 if (varList.Count > 0 || fncList.Count > 0)
                 {
-                    sw.WriteLine("private [");
+                    sw.Write("private [");
                     index = 0;
                     foreach (var it in varList)
                     {
@@ -306,7 +307,7 @@ namespace Compiler.OOS_LanguageObjects
                         throw new Exception("please report to developer, unknown exception happened in function object creation");
                     }
                 }
-                sw.WriteLine("],[");
+                sw.Write("],[");
                 index = 0;
                 foreach (var it in classIdents)
                 {
@@ -351,7 +352,7 @@ namespace Compiler.OOS_LanguageObjects
                                 }
                                 index2++;
                             }
-                            sw.WriteLine("],[");
+                            sw.Write("],[");
                             index2 = 0;
                             foreach (var child in cObj.children)
                             {
@@ -382,7 +383,7 @@ namespace Compiler.OOS_LanguageObjects
                                 }
                                 index2++;
                             }
-                            sw.WriteLine("],[");
+                            sw.Write("],[");
                             sw.Write('"' + ((Ident)it).FullyQualifiedName + '"');
                             sw.Write("]]");
                         }
@@ -401,17 +402,17 @@ namespace Compiler.OOS_LanguageObjects
                         throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
                     }
                 }
-                sw.WriteLine("],");
+                sw.Write("],");
                 //Current active class
-                sw.WriteLine("nil,");
+                sw.Write("nil,");
                 //Reserved for future meta informations
-                sw.WriteLine("[]");
+                sw.Write("[]");
 
                 sw.WriteLine("];");
                 //ToDo: add baseconstructor calls
                 sw.WriteLine("//Actual constructor starts here, we just printed the object till here :)");
             }
-            foreach (var it in this.children)
+            foreach (var it in this.CodeInstructions)
             {
                 it.writeOut(sw, cfg);
             }
