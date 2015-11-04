@@ -28,12 +28,22 @@ namespace Compiler.OOS_LanguageObjects
         BoolArray,
         StringArray
     }
-    public enum OperatorFunctions
+    public enum OverridableOperator
     {
         ArrayAccess,
         LessThenLessThen,
         GreaterThenGreaterThen,
         ExplicitEquals
+    }
+    public enum AssignmentCharacters
+    {
+        SimpleAssign,           // <ident> = <value>
+        PlusOne,                // <ident> ++
+        MinusOne,               // <ident> --
+        AdditionAssign,         // <ident> += <value>
+        SubstractionAssign,     // <ident> -= <value>
+        MultiplicationAssign,   // <ident> *= <value>
+        DivisionAssign          // <ident> /= <value>
     }
     public class VarTypeObject : Interfaces.iTemplate
     {
@@ -82,5 +92,6 @@ namespace Compiler.OOS_LanguageObjects
                 return true;
             return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
         }
+        public override int GetHashCode() { return base.GetHashCode(); }
     }
 }

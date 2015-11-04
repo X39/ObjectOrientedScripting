@@ -66,12 +66,13 @@ namespace Compiler.OOS_LanguageObjects
         public Ident Name { get { return (Ident)this.children[0]; } set { this.children[0] = value; } }
         public override string ToString()
         {
-            return "nOp->" + Enum.GetName(typeof(OperatorFunctions), this.OperatorType);
+            return "nOp->" + Enum.GetName(typeof(OverridableOperator), this.OperatorType);
         }
-        private OperatorFunctions opType;
-        public OperatorFunctions OperatorType { get { return opType; } set { this.Name = new Ident(this, Enum.GetName(typeof(OperatorFunctions), value), this.Line, this.Pos); this.opType = value; } }
-        public List<Return> ReturnCommands { get { return this.getAllChildrenOf<Return>(); } }
+        private OverridableOperator opType;
+        public OverridableOperator OperatorType { get { return opType; } set { this.Name = new Ident(this, Enum.GetName(typeof(OverridableOperator), value), this.Line, this.Pos); this.opType = value; } }
 
+        public List<Return> ReturnCommands { get { return new List<Return>(); } }
+        public bool AlwaysReturns { get { return true; } }
 
     }
 }

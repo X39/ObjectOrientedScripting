@@ -18,5 +18,12 @@ namespace Compiler.OOS_LanguageObjects
         {
             return "ns->" + this.Name.FullyQualifiedName;
         }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            foreach (var it in this.children.GetRange(1, this.children.Count - 1))
+            {
+                it.writeOut(sw, cfg);
+            }
+        }
     }
 }

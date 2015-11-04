@@ -8,7 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class VariableAssignment : pBaseLangObject, Interfaces.iHasType
     {
-        public string operation;
+        public AssignmentCharacters Operation { get; set; }
         public VarTypeObject ReferencedType
         {
             get
@@ -24,5 +24,72 @@ namespace Compiler.OOS_LanguageObjects
 
         public VariableAssignment(pBaseLangObject parent) : base(parent) {}
         public override int doFinalize() { return 0; }
+
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            if (this.Parent is Ident)
+            {
+                Ident parent = (Ident)this.Parent;
+                string varName = "";
+                switch (this.Operation)
+                {
+                    case AssignmentCharacters.PlusOne:
+                        sw.Write(varName + " + 1");
+                        break;
+                    case AssignmentCharacters.MinusOne:
+                        sw.Write(varName + " - 1");
+                        break;
+                    case AssignmentCharacters.AdditionAssign:
+                        sw.Write(varName + " + (");
+                        foreach (var it in this.children)
+                        {
+                            it.writeOut(sw, cfg);
+                        }
+                        sw.Write(varName + ")");
+                        break;
+                    case AssignmentCharacters.SubstractionAssign:
+                        sw.Write(varName + " - (");
+                        foreach (var it in this.children)
+                        {
+                            it.writeOut(sw, cfg);
+                        }
+                        sw.Write(varName + ")");
+                        break;
+                    case AssignmentCharacters.MultiplicationAssign:
+                        sw.Write(varName + " * (");
+                        foreach (var it in this.children)
+                        {
+                            it.writeOut(sw, cfg);
+                        }
+                        sw.Write(varName + ")");
+                        break;
+                    case AssignmentCharacters.DivisionAssign:
+                        sw.Write(varName + " / (");
+                        foreach (var it in this.children)
+                        {
+                            it.writeOut(sw, cfg);
+                        }
+                        sw.Write(varName + ")");
+                        break;
+                    default:
+                        foreach (var it in this.children)
+                        {
+                            it.writeOut(sw, cfg);
+                        }
+                        break;
+                }
+            }
+            else if (this.Parent is Variable)
+            {
+                foreach(var it in this.children)
+                {
+                    it.writeOut(sw, cfg);
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Compiler.OOS_LanguageObjects
         public int ScopeCount { get { return 0; } }
         public bool IsFinalized { get; internal set; }
 
-        public List<pBaseLangObject> getScopeItems(int scopeIndex)
+        public virtual List<pBaseLangObject> getScopeItems(int scopeIndex)
         {
             if (scopeIndex < 0)
                 return this.children;
@@ -135,6 +135,6 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         public virtual int doFinalize() { return 0; }
-        public abstract void writeOut(StreamWriter sw);
+        public abstract void writeOut(StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg);
     }
 }

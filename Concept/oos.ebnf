@@ -370,14 +370,14 @@ COMPILER OOS
             (
                 (
                     T_SQUAREBRACKETOPEN
-                    T_SQUAREBRACKETCLOSE (. obj.OperatorType = OperatorFunctions.ArrayAccess; .)
+                    T_SQUAREBRACKETCLOSE (. obj.OperatorType = OverridableOperator.ArrayAccess; .)
                 )
                 |
                 (
                     (
 						T_EXPOP (. switch(t.val) {
 							case "===":
-								obj.OperatorType = OperatorFunctions.ExplicitEquals;
+								obj.OperatorType = OverridableOperator.ExplicitEquals;
 								break;
 							default:
 								SemErr("The operator '" + t.val + "' is not supported for override");
@@ -525,6 +525,14 @@ COMPILER OOS
 				}
 			]
 			T_ROUNDBRACKETCLOSE (. obj.markArgListEnd(); .)
+			[
+				':'
+				IDENTACCESS<out blo, obj> (. obj.addChild(blo); .)
+				{
+					IDENTACCESS<out blo, obj> (. obj.addChild(blo); .)
+				}
+			]
+			(. obj.markBaseCallEnd(); .)
 			T_CODEBRACKETOPEN
 			{
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
@@ -643,7 +651,7 @@ COMPILER OOS
 		.
 		BODY_ASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject parent, bool allowAlt = false> (. var obj = new VariableAssignment(parent); outObj = obj; pBaseLangObject blo; .) =
             (
-                T_ASSIGNMENTCHAR (. obj.operation = t.val; .)
+                T_ASSIGNMENTCHAR (. obj.Operation = AssignmentCharacters.SimpleAssign; .)
                 (
                     EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
                     |
@@ -653,11 +661,29 @@ COMPILER OOS
             |IF( allowAlt )
             (
                 (
-                    T_FASTASSIGNMENTCHARS (. obj.operation = t.val; .)
+                    T_FASTASSIGNMENTCHARS (. obj.Operation = t.val == "++" ? AssignmentCharacters.PlusOne : AssignmentCharacters.MinusOne; .)
                 )
                 |
                 (
-                    T_EXTENDEDASSIGNMENTCHARS (. obj.operation = t.val; .)
+                    T_EXTENDEDASSIGNMENTCHARS (.
+						switch(t.val)
+						{
+							case "+=":
+								obj.Operation = AssignmentCharacters.AdditionAssign;
+								break;
+							case "-=":
+								obj.Operation = AssignmentCharacters.SubstractionAssign;
+								break;
+							case "*=":
+								obj.Operation = AssignmentCharacters.MultiplicationAssign;
+								break;
+							case "/=":
+								obj.Operation = AssignmentCharacters.DivisionAssign;
+								break;
+							default:
+								throw new Exception();
+						}
+					.)
                     (
                         EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
                         |
@@ -671,8 +697,7 @@ COMPILER OOS
             VALUE<out blo, obj> (. obj.addChild(blo); .)
 			T_SQUAREBRACKETCLOSE
 		.
-		BODY_FUNCTIONCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new FunctionCall(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		BODY_FUNCTIONCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new FunctionCall(parent); outObj = obj; pBaseLangObject blo; .) =
 			T_ROUNDBRACKETOPEN
 			[
 				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
@@ -683,8 +708,7 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 		.
-		OP_FOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new For(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_FOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new For(parent); outObj = obj; pBaseLangObject blo; .) =
 			"for"
 			T_ROUNDBRACKETOPEN
 			[
@@ -716,8 +740,7 @@ COMPILER OOS
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
 		.
-		OP_WHILE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new While(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_WHILE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new While(parent); outObj = obj; pBaseLangObject blo; .) =
 			"while"
 			T_ROUNDBRACKETOPEN
 			EXPRESSION<out blo, obj> (. obj.expression = blo; .)
@@ -739,8 +762,7 @@ COMPILER OOS
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
 		.
-		OP_NEWINSTANCE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewInstance(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .)
-		=
+		OP_NEWINSTANCE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewInstance(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .) =
 			"new"
 			IDENTACCESS<out blo, obj, false> (. obj.Name = (Ident)blo; .)
             [ (. Template te; .)
@@ -748,8 +770,7 @@ COMPILER OOS
             ]
 			BODY_FUNCTIONCALL<out blo2, ((Ident)blo).LastIdent> (. ((Ident)blo).LastIdent.addChild(blo2); .)
 		.
-		OP_NEWARRAY<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewArray(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_NEWARRAY<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewArray(parent); outObj = obj; pBaseLangObject blo; .) =
 			T_CODEBRACKETOPEN
             [
                 EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
@@ -760,8 +781,7 @@ COMPILER OOS
             ]
             T_CODEBRACKETCLOSE
 		.
-		OP_IFELSE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new IfElse(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_IFELSE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new IfElse(parent); outObj = obj; pBaseLangObject blo; .) =
 			"if"
 			T_ROUNDBRACKETOPEN
 			EXPRESSION<out blo, obj> (. obj.expression = blo; .)
@@ -792,8 +812,7 @@ COMPILER OOS
 				)
 			]
 		.
-		OP_TRYCATCH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new TryCatch(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_TRYCATCH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new TryCatch(parent); outObj = obj; pBaseLangObject blo; .) =
 			"try"
 			T_CODEBRACKETOPEN
 			{
@@ -803,36 +822,31 @@ COMPILER OOS
 			"catch"
 			T_ROUNDBRACKETOPEN
 			NEWVARIABLE<out blo, obj> (. obj.variable = blo; .)
-			T_ROUNDBRACKETCLOSE (. obj.markIfEnd(); .)
+			T_ROUNDBRACKETCLOSE (. obj.markEnd(); .)
 			T_CODEBRACKETOPEN
 			{
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			}
 			T_CODEBRACKETCLOSE
 		.
-		OP_BREAK<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Break(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_BREAK<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Break(parent); outObj = obj; pBaseLangObject blo; .) =
 			"break"
 		.
-		OP_INSTANCEOF<out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess> (. var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; .)
-		=
+		OP_INSTANCEOF<out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess> (. var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; .) =
             "is"
             IDENTACCESS<out blo, obj> (. obj.RIdent = (Ident)blo; .)
 		.
-		OP_THROW<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Throw(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_THROW<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Throw(parent); outObj = obj; pBaseLangObject blo; .) =
 			"throw"
 			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 		.
-		OP_RETURN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Return(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_RETURN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Return(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .) =
 			"return"
 			[
 				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 			]
 		.
-		OP_SWITCH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Switch(parent); Case caseObj; outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_SWITCH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Switch(parent); Case caseObj; outObj = obj; pBaseLangObject blo; .) =
 			"switch"
 			T_ROUNDBRACKETOPEN
 			EXPRESSION<out blo, obj> (. obj.expression = blo; .)
@@ -841,24 +855,25 @@ COMPILER OOS
 			{
 				(
 					"case" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
-					EXPRESSION<out blo, obj> (. caseObj.expression = blo; .)
+					EXPRESSION<out blo, obj> (. caseObj.addChild(blo); .)
 					':'
 					{
 						"case"
 						EXPRESSION<out blo, obj> (. caseObj.addChild(blo); .)
 						':'
 					}
+					(. caseObj.markEnd(); .)
 					{
 						CODEINSTRUCTION<out blo, obj> (. caseObj.addChild(blo); .)
 					}
 					(
-						OP_BREAK<out blo, obj> (. caseObj.endOfCase = blo; .)
+						OP_BREAK<out blo, obj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_THROW<out blo, obj> (. caseObj.endOfCase = blo; .)
+						OP_THROW<out blo, obj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_RETURN<out blo, obj> (. caseObj.endOfCase = blo; .)
+						OP_RETURN<out blo, obj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 					)
 				)
@@ -866,31 +881,30 @@ COMPILER OOS
 				(
 					(
 						(
-							"default" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); caseObj.expression = null; .)
+							"default" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
 							':'
 						)
 						|
-						"default:" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); caseObj.expression = null; .)
+						"default:" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
 					)
 					{
 						CODEINSTRUCTION<out blo, obj> (. caseObj.addChild(blo); .)
 					}
 					(
-						OP_BREAK<out blo, obj> (. caseObj.endOfCase = blo; .)
+						OP_BREAK<out blo, obj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_THROW<out blo, obj> (. caseObj.endOfCase = blo; .)
+						OP_THROW<out blo, obj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_RETURN<out blo, obj> (. caseObj.endOfCase = blo; .)
+						OP_RETURN<out blo, obj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 					)
 				)
 			}
 			T_CODEBRACKETCLOSE
 		.
-		OP_SQFCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new SqfCall(parent); outObj = obj; pBaseLangObject blo; .)
-		=
+		OP_SQFCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new SqfCall(parent); outObj = obj; pBaseLangObject blo; .) =
 			"SQF"
 			[
 				T_ROUNDBRACKETOPEN

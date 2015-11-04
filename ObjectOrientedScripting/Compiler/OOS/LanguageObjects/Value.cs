@@ -20,5 +20,9 @@ namespace Compiler.OOS_LanguageObjects
         {
             return this.value;
         }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            sw.Write(this.value);
+        }
     }
 }

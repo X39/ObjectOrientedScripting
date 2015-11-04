@@ -69,5 +69,8 @@ namespace Compiler.OOS_LanguageObjects
             return "nFnc->" + this.Name.FullyQualifiedName;
         }
         public List<Return> ReturnCommands { get { return new List<Return>(); } }
+        public bool AlwaysReturns { get { return true; } }
+
+
     }
 }

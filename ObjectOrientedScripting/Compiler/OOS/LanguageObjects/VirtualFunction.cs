@@ -43,6 +43,8 @@ namespace Compiler.OOS_LanguageObjects
             return "vFnc->" + this.Name.FullyQualifiedName;
         }
 
-        public List<Return> ReturnCommands { get { return this.getAllChildrenOf<Return>(); } }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
+        public List<Return> ReturnCommands { get { return new List<Return>(); } }
+        public bool AlwaysReturns { get { return true; } }
     }
 }

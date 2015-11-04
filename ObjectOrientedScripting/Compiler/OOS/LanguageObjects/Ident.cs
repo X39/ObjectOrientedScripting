@@ -83,6 +83,10 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else
                 {
+                    if (this.Parent is Ident && (((Ident)this.Parent).Access == AccessType.Instance) && ((Ident)this.Parent).ReferencedType != null)
+                    {
+                        return ((Ident)this.Parent).ReferencedType.ident.FullyQualifiedName + "." + this.originalValue;
+                    }
                     string result = "";
                     pBaseLangObject curobject = this;
                     do
@@ -324,7 +328,7 @@ namespace Compiler.OOS_LanguageObjects
                                     if (variable.ReferencedType.ident.LastIdent.referencedObject is Interfaces.iClass)
                                     {
                                         Interfaces.iClass classRef = (Interfaces.iClass)variable.ReferencedType.ident.LastIdent.referencedObject;
-                                        Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OperatorFunctions.ArrayAccess);
+                                        Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OverridableOperator.ArrayAccess);
                                         if (opFnc == null)
                                         {
                                             Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0005, this.Line, this.Pos));
@@ -420,6 +424,11 @@ namespace Compiler.OOS_LanguageObjects
                                 }
                                 else
                                 {
+                                    if(fnc is Function && ((Function)fnc).IsConstructor && this.getFirstOf<NewInstance>() == null)
+                                    {
+                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0026, this.Line, this.Pos));
+                                        errCount++;
+                                    }
                                     //Ref the object to the function
                                     this.referencedObject = (pBaseLangObject)fnc;
                                     //Ref the type to the return type
@@ -500,6 +509,10 @@ namespace Compiler.OOS_LanguageObjects
             {
                 return false;
             }
+        }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            throw new NotImplementedException();
         }
     }
 }

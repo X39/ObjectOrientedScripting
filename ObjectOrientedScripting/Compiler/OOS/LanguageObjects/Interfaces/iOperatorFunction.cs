@@ -8,6 +8,6 @@ namespace Compiler.OOS_LanguageObjects.Interfaces
 {
     public interface iOperatorFunction : iFunction
     {
-        OperatorFunctions OperatorType { get; }
+        OverridableOperator OperatorType { get; }
     }
 }

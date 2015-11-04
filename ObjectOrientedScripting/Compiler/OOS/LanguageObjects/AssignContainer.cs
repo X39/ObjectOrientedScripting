@@ -20,5 +20,12 @@ namespace Compiler.OOS_LanguageObjects
             this.addChild(null);
         }
         public override int doFinalize() { return 0; }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            foreach (var it in this.children)
+            {
+                it.writeOut(sw, cfg);
+            }
+        }
     }
 }

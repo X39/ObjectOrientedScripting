@@ -440,20 +440,20 @@ public class Scanner {
 			case "interface": t.kind = 52; break;
 			case "async": t.kind = 53; break;
 			case "override": t.kind = 54; break;
-			case "auto": t.kind = 55; break;
-			case "for": t.kind = 56; break;
-			case "while": t.kind = 57; break;
-			case "new": t.kind = 58; break;
-			case "if": t.kind = 59; break;
-			case "else": t.kind = 60; break;
-			case "try": t.kind = 61; break;
-			case "catch": t.kind = 62; break;
-			case "break": t.kind = 63; break;
-			case "is": t.kind = 64; break;
-			case "throw": t.kind = 65; break;
-			case "return": t.kind = 66; break;
-			case "switch": t.kind = 67; break;
-			case "case": t.kind = 68; break;
+			case "auto": t.kind = 56; break;
+			case "for": t.kind = 57; break;
+			case "while": t.kind = 58; break;
+			case "new": t.kind = 59; break;
+			case "if": t.kind = 60; break;
+			case "else": t.kind = 61; break;
+			case "try": t.kind = 62; break;
+			case "catch": t.kind = 63; break;
+			case "break": t.kind = 64; break;
+			case "is": t.kind = 65; break;
+			case "throw": t.kind = 66; break;
+			case "return": t.kind = 67; break;
+			case "switch": t.kind = 68; break;
+			case "case": t.kind = 69; break;
 			case "default": t.kind = 70; break;
 			case "SQF": t.kind = 72; break;
 			default: break;
@@ -599,9 +599,9 @@ public class Scanner {
 			case 36:
 				{t.kind = 71; break;}
 			case 37:
-				recEnd = pos; recKind = 69;
+				recEnd = pos; recKind = 55;
 				if (ch == ':') {AddCh(); goto case 19;}
-				else {t.kind = 69; break;}
+				else {t.kind = 55; break;}
 			case 38:
 				recEnd = pos; recKind = 3;
 				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= 'a' && ch <= 'd' || ch >= 'f' && ch <= 'z') {AddCh(); goto case 6;}

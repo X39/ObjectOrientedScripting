@@ -9,5 +9,6 @@ namespace Compiler.OOS_LanguageObjects.Interfaces
     public interface iCodeBlock
     {
         List<Return> ReturnCommands { get; }
+        bool AlwaysReturns { get; }
     }
 }

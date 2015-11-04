@@ -17,7 +17,16 @@ namespace Compiler.OOS_LanguageObjects
             //    return 1;
             //}
             return 0;
+        }
 
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            sw.Write(tab + "throw ");
+            foreach(var it in this.children)
+            {
+                it.writeOut(sw, cfg);
+            }
         }
     }
 }

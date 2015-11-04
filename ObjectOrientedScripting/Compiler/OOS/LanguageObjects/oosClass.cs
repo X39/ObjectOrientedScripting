@@ -33,7 +33,7 @@ namespace Compiler.OOS_LanguageObjects
         }
 
         public VarTypeObject VTO { get { return this.vto; } }
-        private List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
+        public List<pBaseLangObject> ParentClassesIdents { get { return this.children.GetRange(1, endMarker); } }
         public List<pBaseLangObject> ClassContent { get { return this.children.GetRange(endMarker + 1, this.children.Count - (endMarker + 1)); } }
         public List<Function> ThisFunctions
         {
@@ -272,9 +272,16 @@ namespace Compiler.OOS_LanguageObjects
         }
 
 
-        public Interfaces.iOperatorFunction getOperatorFunction(OperatorFunctions op)
+        public Interfaces.iOperatorFunction getOperatorFunction(OverridableOperator op)
         {
             return null;
+        }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            foreach (var it in this.children.GetRange(1, this.children.Count - 1))
+            {
+                it.writeOut(sw, cfg);
+            }
         }
     }
 }

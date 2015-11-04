@@ -25,5 +25,70 @@ namespace Compiler.OOS_LanguageObjects
         {
             get { return this.getAllChildrenOf<Return>(); }
         }
+
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            this.forArg1.writeOut(sw, cfg);
+            sw.WriteLine(";");
+            sw.Write(tab + "while {");
+            this.forArg2.writeOut(sw, cfg);
+            sw.WriteLine("} do");
+            sw.WriteLine(tab + "{");
+            var varList = this.getAllChildrenOf<Variable>();
+            if (varList.Count > 0)
+            {
+                if (varList.Count == 1)
+                    sw.Write("private ");
+                else
+                    sw.Write("private [");
+
+                for (int i = 0; i < varList.Count; i++)
+                {
+                    var it = varList[i];
+                    if (i != 0)
+                    {
+                        sw.Write(", ");
+                    }
+                    if (it is Variable)
+                    {
+                        sw.Write('"' + ((Variable)it).SqfVariableName + '"');
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                if (varList.Count > 1)
+                    sw.Write("]");
+                sw.WriteLine(";");
+            }
+            sw.Write(tab + '\t');
+            this.forArg3.writeOut(sw, cfg);
+            sw.WriteLine(";");
+            foreach (var it in this.CodeInstructions)
+            {
+                it.writeOut(sw, cfg);
+                sw.WriteLine(";");
+            }
+            sw.Write("}");
+        }
+
+
+        public bool AlwaysReturns
+        {
+            get
+            {
+                if (this.ReturnCommands.Count > 0)
+                    return true;
+                var codeBlocks = this.getAllChildrenOf<Interfaces.iCodeBlock>();
+                foreach (var it in codeBlocks)
+                {
+                    if (it.AlwaysReturns)
+                        return true;
+                }
+                return false;
+            }
+        }
     }
 }

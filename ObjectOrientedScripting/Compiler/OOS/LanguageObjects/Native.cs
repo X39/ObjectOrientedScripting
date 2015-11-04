@@ -29,7 +29,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public VarTypeObject VTO { get; set; }
 
-        public Interfaces.iOperatorFunction getOperatorFunction(OperatorFunctions op)
+        public Interfaces.iOperatorFunction getOperatorFunction(OverridableOperator op)
         {
             var opFncList = this.getAllChildrenOf<Interfaces.iOperatorFunction>();
             foreach(var it in opFncList)
@@ -45,5 +45,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             return "native->" + this.Name.FullyQualifiedName;
         }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
     }
 }

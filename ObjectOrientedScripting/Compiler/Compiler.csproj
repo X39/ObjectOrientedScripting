@@ -102,6 +102,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="OOS\Scanner.cs" />
+    <Compile Include="SqfConfigObjects\iSqfConfigChildren.cs" />
     <Compile Include="SqfConfigObjects\iSqfConfig.cs" />
     <Compile Include="SqfConfigObjects\SqfConfigClass.cs" />
     <Compile Include="SqfConfigObjects\SqfConfigField.cs" />

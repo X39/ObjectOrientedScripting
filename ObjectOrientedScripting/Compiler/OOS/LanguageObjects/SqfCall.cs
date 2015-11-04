@@ -109,7 +109,8 @@ namespace Compiler.OOS_LanguageObjects
         private VarTypeObject referencedType;
         public VarTypeObject ReferencedType { get { return referencedType; } }
 
-        public SqfCall(pBaseLangObject parent) : base(parent)
+        public SqfCall(pBaseLangObject parent)
+            : base(parent)
         {
             this.children.Add(null);
             this.referencedType = new VarTypeObject(VarType.Void);
@@ -124,7 +125,7 @@ namespace Compiler.OOS_LanguageObjects
                 if (blo != null)
                     errCount += blo.finalize();
             if (this is Interfaces.iTemplate && ((Interfaces.iTemplate)this).TemplateObject != null)
-                errCount += ((Interfaces.iTemplate)this).TemplateObject.finalize(); 
+                errCount += ((Interfaces.iTemplate)this).TemplateObject.finalize();
             errCount += this.doFinalize();
             if (this is Interfaces.iHasType && ((Interfaces.iHasType)this).ReferencedType.IsObject)
                 errCount += ((Interfaces.iHasType)this).ReferencedType.ident.finalize();
@@ -136,7 +137,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             int errCount = 0;
             var sio = supportInfoList.Find(SupportInfoObject.bySqfCommand(this.Name.OriginalValue.ToLower()));
-            if(sio == null)
+            if (sio == null)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0019, this.Name.Line, this.Name.Pos));
                 return 1;
@@ -174,5 +175,57 @@ namespace Compiler.OOS_LanguageObjects
         {
             supportInfoList = new List<SupportInfoObject>();
         }
+
+        public override void writeOut(StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            var lArgs = this.LArgs;
+            var rArgs = this.RArgs;
+            sw.Write(tab);
+            if (lArgs.Count > 0)
+            {
+                if (lArgs.Count == 1)
+                {
+                    lArgs[0].writeOut(sw, cfg);
+                    sw.Write(" ");
+                }
+                else
+                {
+                    sw.Write("[");
+                    int index = 0;
+                    foreach (var it in lArgs)
+                    {
+                        if (index > 0)
+                            sw.WriteLine(",");
+                        index++;
+                        it.writeOut(sw, cfg);
+                    }
+                    sw.Write("] ");
+                }
+            }
+            sw.Write(this.Name.OriginalValue);
+            if (rArgs.Count > 0)
+            {
+                if (rArgs.Count == 1)
+                {
+                    sw.Write(" ");
+                    rArgs[0].writeOut(sw, cfg);
+                }
+                else
+                {
+                    sw.Write(" [");
+                    int index = 0;
+                    foreach (var it in rArgs)
+                    {
+                        if (index > 0)
+                            sw.WriteLine(",");
+                        index++;
+                        it.writeOut(sw, cfg);
+                    }
+                    sw.Write("]");
+                }
+            }
+        }
     }
 }
+

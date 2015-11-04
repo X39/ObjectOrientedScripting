@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.SqfConfigObjects
 {
-    public class SqfConfigFile : iSqfConfig
+    public class SqfConfigFile : iSqfConfigChildren
     {
         List<iSqfConfig> children;
         string name;
@@ -43,6 +43,62 @@ namespace Compiler.SqfConfigObjects
         {
             foreach (iSqfConfig c in children)
                 c.write(writer, 0);
+        }
+        public void setValue(string path, string value)
+        {
+            string[] pathArray = path.Split(new char[] { '/' });
+            iSqfConfigChildren cfgClass = this;
+            bool flag;
+            for (int i = 0; i < pathArray.Length - 1; i++)
+            {
+                string s = pathArray[i];
+                flag = true;
+                foreach(var it in cfgClass.Children)
+                {
+                    if(it.Name == s)
+                    {
+                        flag = false;
+                        if(it is iSqfConfigChildren)
+                        {
+                            cfgClass = (iSqfConfigChildren)it;
+                            break;
+                        }
+                        else
+                        {
+                            throw new Exception("Action would override existing field '" + s + "' with same name! Cannot continue.");
+                        }
+                    }
+                }
+                if(flag)
+                {
+                    var configClass = new SqfConfigClass(s);
+                    cfgClass.addChild(configClass);
+                    cfgClass = configClass;
+                }
+            }
+            string fieldName = pathArray.Last();
+            flag = true;
+            foreach(var it in cfgClass.Children)
+            {
+                if (it.Name == fieldName)
+                {
+                    flag = false;
+                    if(it is SqfConfigField)
+                    {
+                        ((SqfConfigField)it).value = value;
+                        break;
+                    }
+                    else
+                    {
+                        throw new Exception("Action would override existing class with same name! Cannot continue.");
+                    }
+                }
+            }
+            if(flag)
+            {
+                var field = new SqfConfigField(fieldName, value);
+                cfgClass.addChild(field);
+            }
         }
     }
 }

@@ -149,5 +149,9 @@ namespace Compiler.OOS_LanguageObjects
             this.pos = pos;
         }
         public override int doFinalize() { return 0; }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

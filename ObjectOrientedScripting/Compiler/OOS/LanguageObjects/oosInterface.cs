@@ -57,9 +57,11 @@ namespace Compiler.OOS_LanguageObjects
         }
 
 
-        public Interfaces.iOperatorFunction getOperatorFunction(OperatorFunctions op)
+        public Interfaces.iOperatorFunction getOperatorFunction(OverridableOperator op)
         {
             return null;
         }
+
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
     }
 }

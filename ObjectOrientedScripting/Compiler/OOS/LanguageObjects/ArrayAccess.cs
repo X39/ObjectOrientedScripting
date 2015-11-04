@@ -11,5 +11,9 @@ namespace Compiler.OOS_LanguageObjects
 
         public ArrayAccess(pBaseLangObject parent) : base(parent) { }
         public override int doFinalize() { return 0; }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

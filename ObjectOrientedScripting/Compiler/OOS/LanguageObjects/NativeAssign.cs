@@ -57,7 +57,9 @@ namespace Compiler.OOS_LanguageObjects
                 return retList;
             }
         }
+
         public List<Return> ReturnCommands { get { return new List<Return>(); } }
+        public bool AlwaysReturns { get { return true; } }
         public VarTypeObject ReferencedType { get { return this.ReturnType; } }
     }
 }

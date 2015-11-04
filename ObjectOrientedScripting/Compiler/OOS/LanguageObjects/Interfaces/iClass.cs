@@ -10,6 +10,6 @@ namespace Compiler.OOS_LanguageObjects.Interfaces
     {
         List<Ident> ExtendedClasses { get; }
         VarTypeObject VTO { get; }
-        iOperatorFunction getOperatorFunction(OperatorFunctions op);
+        iOperatorFunction getOperatorFunction(OverridableOperator op);
     }
 }

@@ -16,7 +16,9 @@ namespace Compiler
             LNK0000, LNK0001, LNK0002, LNK0003, LNK0004,
             LNK0005, LNK0006, LNK0007, LNK0008, LNK0009,
             LNK0010, LNK0011, LNK0012, LNK0013, LNK0014,
-            LNK0015, LNK0016, LNK0017, LNK0018, LNK0019
+            LNK0015, LNK0016, LNK0017, LNK0018, LNK0019,
+            LNK0020, LNK0021, LNK0022, LNK0023, LNK0024,
+            LNK0025, LNK0026, LNK0027
 
         }
 
@@ -48,6 +50,14 @@ namespace Compiler
                 case LinkerErrorCode.LNK0017: return "SQF Command is missing RArgs";
                 case LinkerErrorCode.LNK0018: return "SQF Command should have RArgs";
                 case LinkerErrorCode.LNK0019: return "SQF Command is not registered in SupportInfo list";
+                case LinkerErrorCode.LNK0020: return "Invalid case, default was experienced twice";
+                case LinkerErrorCode.LNK0021: return "Function is not always returning a value";
+                case LinkerErrorCode.LNK0022:
+                case LinkerErrorCode.LNK0023: return "Type Missmatch, type differs from functions return type";
+                case LinkerErrorCode.LNK0024: return "Type Missmatch, case type differs from switch type";
+                case LinkerErrorCode.LNK0025: return "Invalid Operation, constructors are not allowed to return values";
+                case LinkerErrorCode.LNK0026: return "Invalid Operation, constructors cannot be callen outside of a NEW operation";
+                case LinkerErrorCode.LNK0027: return "Invalid Operation, entry points have to be static";
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
             }

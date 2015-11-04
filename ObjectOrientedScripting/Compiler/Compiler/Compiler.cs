@@ -36,6 +36,13 @@ namespace Wrapper
         public static string thisVariableName = "___obj___";
         public string stdLibPath;
         private List<string> includedFiles;
+
+        public static Project ProjectFile { get; internal set; }
+        public struct ScopeNames
+        {
+            public static readonly string function = "_FNCSCOPE_";
+            public static readonly string loop = "_LOOPSCOPE_";
+        }
         public Compiler()
         {
             configFileName = "config.cpp";
@@ -119,7 +126,6 @@ namespace Wrapper
             Parser parser = new Parser(scanner);
             parser.Parse();
         }
-        #region Translating
         private void cleanupRecursive(string path)
         {
             foreach (var it in Directory.EnumerateDirectories(path))
@@ -133,41 +139,6 @@ namespace Wrapper
                 File.Delete(it);
             }
         }
-        public void Translate(Project proj)
-        {
-            if(outputFolderCleanup)
-            {
-                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Cleaning up output dir");
-                cleanupRecursive(proj.OutputFolder);
-            }
-            //Read compiled file
-            Scanner scanner = new Scanner(proj.Buildfolder + "_compile_.obj");
-            Base baseObject = new Base();
-            Parser parser = new Parser(scanner);
-            parser.BaseObject = baseObject;
-            parser.Parse();
-            //OosContainer container;
-            //parser.getBaseContainer(out container);
-            int errCount = parser.errors.count + parser.BaseObject.finalize();
-            if (errCount > 0)
-            {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
-                return;
-            }
-            SqfConfigFile file = new SqfConfigFile(configFileName);
-            iSqfConfig cfgClass = file;
-            if (addFunctionsClass)
-            {
-                cfgClass = new SqfConfigClass("cfgFunctions");
-                file.addChild(cfgClass);
-            }
-            if (!Directory.Exists(proj.OutputFolder))
-            {
-                Directory.CreateDirectory(proj.OutputFolder);
-            }
-            //Create config.cpp file
-            file.writeOut(proj.OutputFolder);
-        }
         private void updateTabcount(ref string s, ref int tabCount, int change)
         {
             tabCount += change;
@@ -175,9 +146,12 @@ namespace Wrapper
         }
         public void Compile(Project proj)
         {
+            ProjectFile = proj;
             //Make sure the build directory exists and create it if needed
             if (!Directory.Exists(proj.Buildfolder))
                 Directory.CreateDirectory(proj.Buildfolder);
+            if (!Directory.Exists(proj.OutputFolder))
+                Directory.CreateDirectory(proj.OutputFolder);
 
             //Prepare some stuff needed for preprocessing
             Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
@@ -190,6 +164,11 @@ namespace Wrapper
             preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), msw, ppFiles);
             var ppMainFile = ppFiles[0];
 
+            if (outputFolderCleanup)
+            {
+                Logger.Instance.log(Logger.LogLevel.VERBOSE, "Cleaning up output dir");
+                cleanupRecursive(proj.OutputFolder);
+            }
 
             int errCount = 0;
             //Check the syntax of all files in ppFiles
@@ -271,7 +250,8 @@ namespace Wrapper
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Comnpiling!");
                 return;
             }
-            oosTreeBase.writeOut(null);
+            SqfConfigFile configFile = new SqfConfigFile(configFileName);
+            oosTreeBase.writeOut(null, configFile);
         }
         private enum preprocessFile_IfDefModes
         {
@@ -471,6 +451,5 @@ namespace Wrapper
             ppFile.resetPosition();
             return true;
         }
-        #endregion
     }
 }

@@ -31,5 +31,6 @@ namespace Compiler.OOS_LanguageObjects
             }
             return errCount;
         }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
     }
 }

@@ -70,5 +70,20 @@ namespace Compiler.OOS_LanguageObjects
             }
             return errCount;
         }
+
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            sw.Write("[");
+            bool flag = false;
+            foreach (var it in this.children)
+            {
+                if (flag)
+                    sw.Write(", ");
+                else
+                    flag = true;
+                it.writeOut(sw, cfg);
+            }
+            sw.Write("]");
+        }
     }
 }

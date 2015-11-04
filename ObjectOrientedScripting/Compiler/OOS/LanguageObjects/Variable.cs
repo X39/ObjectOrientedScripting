@@ -150,5 +150,17 @@ namespace Compiler.OOS_LanguageObjects
         {
             return "var->" + this.Name.FullyQualifiedName;
         }
+
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            var assignList = this.getAllChildrenOf<VariableAssignment>();
+            sw.Write(tab + this.SqfVariableName);
+            if(assignList.Count > 0)
+            {
+                sw.Write(" = ");
+                assignList[0].writeOut(sw, cfg);
+            }
+        }
     }
 }

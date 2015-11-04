@@ -68,5 +68,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             return 0;
         }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
     }
 }

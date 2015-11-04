@@ -51,5 +51,9 @@ namespace Compiler.OOS_LanguageObjects
         }
         public pBaseLangObject ReferencedObject { get { return ((Ident)this.children[0]).ReferencedObject; } }
         public VarTypeObject ReferencedType { get { return varType; } }
+        public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
