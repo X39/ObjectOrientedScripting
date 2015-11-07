@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.6.0-ALPHA PRE"
+#define MyAppVersion "0.6.0-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "Wrapper.exe"
@@ -47,9 +47,8 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',         
-'!PRE-RELEASE!   ' + AnsiChar(#10) +
 '                                                                                ' + AnsiChar(#10) +
-'Version 0.6.0-ALPHA PRE                                                         ' + AnsiChar(#10) +
+'Version 0.6.0-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  Rewrote entire Linker & Writer                                ' + AnsiChar(#10) +
 '    |- Compiler:  Added !syntax! to call base constructors via following:       ' + AnsiChar(#10) +
 '    |             bar(arg1, arg2, argn) : foo(arg1, "foobar", argn) {...}       ' + AnsiChar(#10) +
