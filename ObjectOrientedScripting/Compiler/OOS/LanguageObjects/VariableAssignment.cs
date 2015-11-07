@@ -45,7 +45,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             it.writeOut(sw, cfg);
                         }
-                        sw.Write(varName + ")");
+                        sw.Write(")");
                         break;
                     case AssignmentCharacters.SubstractionAssign:
                         sw.Write(varName + " - (");
@@ -53,7 +53,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             it.writeOut(sw, cfg);
                         }
-                        sw.Write(varName + ")");
+                        sw.Write(")");
                         break;
                     case AssignmentCharacters.MultiplicationAssign:
                         sw.Write(varName + " * (");
@@ -61,7 +61,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             it.writeOut(sw, cfg);
                         }
-                        sw.Write(varName + ")");
+                        sw.Write(")");
                         break;
                     case AssignmentCharacters.DivisionAssign:
                         sw.Write(varName + " / (");
@@ -69,7 +69,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             it.writeOut(sw, cfg);
                         }
-                        sw.Write(varName + ")");
+                        sw.Write(")");
                         break;
                     default:
                         foreach (var it in this.children)

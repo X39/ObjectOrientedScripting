@@ -44,7 +44,8 @@ namespace Compiler.OOS_LanguageObjects
                     errCount += blo.finalize();
             if (this is Interfaces.iTemplate && ((Interfaces.iTemplate)this).TemplateObject != null)
                 errCount += ((Interfaces.iTemplate)this).TemplateObject.finalize();
-            if (this is Interfaces.iHasType && ((Interfaces.iHasType)this).ReferencedType.IsObject)
+
+            if (this is Interfaces.iHasType && ((Interfaces.iHasType)this).ReferencedType != null && ((Interfaces.iHasType)this).ReferencedType.IsObject)
                 errCount += ((Interfaces.iHasType)this).ReferencedType.ident.finalize();
             errCount += this.doFinalize();
             this.IsFinalized = true;
