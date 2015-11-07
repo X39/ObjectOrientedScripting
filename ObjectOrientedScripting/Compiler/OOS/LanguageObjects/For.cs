@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class For : pBaseLangObject, Interfaces.iCodeBlock
+    public class For : pBaseLangObject, Interfaces.iCodeBlock, Interfaces.iBreakable
     {
         public pBaseLangObject forArg1 { get { return this.children[0]; } set { this.children[0] = value; } }
         public pBaseLangObject forArg2 { get { return this.children[1]; } set { this.children[1] = value; } }
         public pBaseLangObject forArg3 { get { return this.children[2]; } set { this.children[2] = value; } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(3, this.children.Count - 3); } }
+        public string BreakScope { get { return Wrapper.Compiler.ScopeNames.loop; } }
 
         public For(pBaseLangObject parent) : base(parent)
         {

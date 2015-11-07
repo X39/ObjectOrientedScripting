@@ -14,7 +14,8 @@ namespace Compiler.OOS_LanguageObjects
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
-            sw.Write(tab + "breakOut \"" + Wrapper.Compiler.ScopeNames.loop + "\"");
+            var breakable = this.getFirstOf<Interfaces.iBreakable>();
+            sw.Write(tab + "breakOut \"" + breakable.BreakScope + "\"");
         }
     }
 }

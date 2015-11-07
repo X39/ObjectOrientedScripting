@@ -50,6 +50,7 @@
     <Compile Include="OOS\LanguageObjects\Interfaces\iClass.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iCodeBlock.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iFunction.cs" />
+    <Compile Include="OOS\LanguageObjects\Interfaces\iBreakable.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iOperatorFunction.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iTemplate.cs" />
     <Compile Include="OOS\LanguageObjects\NativeAssign.cs" />

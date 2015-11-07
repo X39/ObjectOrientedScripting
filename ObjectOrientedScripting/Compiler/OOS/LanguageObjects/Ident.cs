@@ -553,62 +553,21 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            /*
-            if (!(this.Parent is Ident))
-            {
-                if (this.children.Count == 0 && this.IsSimpleIdentifier)
-                {
-                    if(this.ReferencedObject is Variable)
-                    {
-                        Variable variable = (Variable)this.ReferencedObject;
-                        sw.Write(variable.SqfVariableName);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                else
-                {
-                    bool flag = this.HasCallWrapper;
-                    if (flag)
-                        sw.Write("[] call {private \"_tmp\";");
-                    foreach (var it in this.children)
-                    {
-                        if (it is Ident)
-                            continue;
-                        it.writeOut(sw, cfg);
-                    }
-                    foreach (var it in this.children)
-                    {
-                        if (it is Ident)
-                            it.writeOut(sw, cfg);
-                    }
-                    if (flag)
-                        sw.Write("_tmp}");
-                }
-            }
-            else
-            {
-                foreach (var it in this.children)
-                {
-                    if (it is Ident)
-                        continue;
-                    it.writeOut(sw, cfg);
-                }
-                foreach (var it in this.children)
-                {
-                    if (it is Ident)
-                        it.writeOut(sw, cfg);
-                }
-            }*/
             bool assignToTmp = this.HasCallWrapper;
             bool callWrapper = !(this.Parent is Ident) && assignToTmp;
             if (callWrapper)
-                sw.Write("[] call {private \"_tmp\";");
+            {
+                sw.Write("[] call {private \"_tmp\"; ");
+                if (this.ReferencedObject is Variable)
+                {
+                    sw.Write("_tmp = " + ((Variable)this.ReferencedObject).SqfVariableName + ';');
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
 
-            if (assignToTmp)
-                sw.Write(" _tmp = ");
 
             if (this.IsSimpleIdentifier)
             {
@@ -632,6 +591,8 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     if (it is Ident)
                         continue;
+                    if (assignToTmp)
+                        sw.Write(" _tmp = ");
                     it.writeOut(sw, cfg);
                     if (assignToTmp)
                         sw.Write(';');
@@ -661,6 +622,8 @@ namespace Compiler.OOS_LanguageObjects
                         if(this.ReferencedObject is Variable)
                         {
                             var variable = (Variable)this.ReferencedObject;
+                            if (this.HasCallWrapper)
+                                return "_tmp";
                             s += variable.SqfVariableName;
                         }
                         else

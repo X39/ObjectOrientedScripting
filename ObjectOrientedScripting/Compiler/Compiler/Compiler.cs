@@ -42,6 +42,7 @@ namespace Wrapper
         {
             public static readonly string function = "_FNCSCOPE_";
             public static readonly string loop = "_LOOPSCOPE_";
+            public static readonly string oosCase = "_CASE_";
         }
         public Compiler()
         {
@@ -118,7 +119,7 @@ namespace Wrapper
         }
         public Version getVersion()
         {
-            return new Version("0.5.0-ALPHA");
+            return new Version("0.6.0-ALPHA");
         }
         public void CheckSyntax(string filepath)
         {

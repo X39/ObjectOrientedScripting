@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class While : pBaseLangObject, Interfaces.iCodeBlock
+    public class While : pBaseLangObject, Interfaces.iCodeBlock, Interfaces.iBreakable
     {
         public pBaseLangObject expression { get { return this.children[0]; } set { this.children[0] = value; } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(1, this.children.Count - 1); } }
+        public string BreakScope { get { return Wrapper.Compiler.ScopeNames.loop; } }
 
         public While(pBaseLangObject parent) : base(parent)
         {

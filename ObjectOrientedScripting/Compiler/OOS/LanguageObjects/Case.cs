@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class Case : pBaseLangObject, Interfaces.iCodeBlock
+    public class Case : pBaseLangObject, Interfaces.iCodeBlock, Interfaces.iBreakable
     {
         int endMarker;
         public List<pBaseLangObject> Cases { get { return this.children.GetRange(0, endMarker); } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(endMarker, this.children.Count - (endMarker)); } }
+        public string BreakScope { get { return Wrapper.Compiler.ScopeNames.oosCase; } }
 
         public void markEnd()
         {
@@ -61,12 +62,14 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 sw.WriteLine("{");
             }
+            var lastInstruction = CodeInstructions.Last();
             foreach(var it in this.CodeInstructions)
             {
+                if (it == lastInstruction)
+                    continue;
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }
-            var lastInstruction = CodeInstructions.Last();
             if (!(lastInstruction is Break))
             {
                 lastInstruction.writeOut(sw, cfg);
@@ -96,5 +99,6 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             }
         }
+
     }
 }

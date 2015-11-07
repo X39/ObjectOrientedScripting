@@ -161,16 +161,19 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize() { return 0; }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
+            bool doBrackets = this.negate || this.rExpression != null;
             if (this.negate)
                 sw.Write('!');
-            sw.Write('(');
+            if (doBrackets)
+                sw.Write('(');
             this.lExpression.writeOut(sw, cfg);
             if(this.rExpression != null)
             {
-                sw.Write(')' + this.expOperator + '(');
+                sw.Write(") " + this.expOperator + " (");
                 this.rExpression.writeOut(sw, cfg);
             }
-            sw.Write(')');
+            if (doBrackets)
+                sw.Write(')');
         }
     }
 }
