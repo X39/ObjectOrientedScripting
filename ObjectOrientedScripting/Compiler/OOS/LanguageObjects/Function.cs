@@ -174,8 +174,20 @@ namespace Compiler.OOS_LanguageObjects
                 sw = new System.IO.StreamWriter(filePath + ".sqf");
 
                 fqn = fqn.Replace("::", "_");
-                var lPath = fqn.Substring(0, fqn.LastIndexOf('_'));
-                var rPath = fqn.Substring(fqn.LastIndexOf('_') + 1);
+                int lIndex = fqn.LastIndexOf('_');
+                string lPath;
+                string rPath;
+                if (lIndex <= 0)
+                {
+                    lPath = "UNCATEGORIZED";
+                    rPath = fqn;
+                    Logger.Instance.log(Logger.LogLevel.WARNING, "Function '" + this.Name.FullyQualifiedName + "' at line " + this.Name.Line + " has no namespace");
+                }
+                else
+                {
+                    lPath = fqn.Substring(0, lIndex);
+                    rPath = fqn.Substring(lIndex + 1);
+                }
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "file", '"' + filePath.Substring(Wrapper.Compiler.ProjectFile.OutputFolder.Length) + '"');
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "preInit", this.Name.OriginalValue == "preInit" ? "1" : "0");
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "postInit", this.Name.OriginalValue == "postInit" ? "1" : "0");
