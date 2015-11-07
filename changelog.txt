@@ -1,15 +1,30 @@
+Version 0.6.0-ALPHA                                                             
+    |- Compiler:  Rewrote entire Linker & Writer
+    |- Compiler:  Added !syntax! to call base constructors via following:
+    |             bar(arg1, arg2, argn) : foo(arg1, "foobar", argn) {...}
+    |- Compiler:  During Linking, functions will now check if they always return
+    |             (only exception for this are VOID functions)
+    |- Compiler:  Added "PRINTMODE=<MODE>" Flag
+    |             Possible modes are: NONE, 0, NEEDED, 1, PARTIAL, 2, ALL, 3
+    |- Compiler:  Added fast assign operators: ++, --, +=, -=, *=, /=
+    |- Compiler:  Reorganized how overwrite should be used (see INFO1)
+    |- Compiler:  Added "async" keyword for functions (see INFO1)
+    |             async functions have to have the return type void!
+    |- INFO1:     Functions syntax got altered:
+    \             <encapsulation> [async] [override] <type> <name> ( <argList> )
+    
 Version 0.5.3-ALPHA                                                             
     |- Compiler:  Fixed invalid type cast with template objects                 
     |- Compiler:  Fixed bug in PreProcessor which caused invalid output if a    
     |             line had whitespace characters after its last valid character 
     |- Compiler:  SQF command arguments where not separated by commas           
     |- Compiler:  Added "scalar length()" function to ::std::array              
-    |- Compiler:  Added 'config' object to stdLibrary
-    |- Compiler:  Added 'namespace' object to stdLibrary
-    |- Compiler:  Added 'vehicle' object to stdLibrary
+    |- Compiler:  Added "config" object to stdLibrary
+    |- Compiler:  Added "namespace" object to stdLibrary
+    |- Compiler:  Added "vehicle" object to stdLibrary
     |- Compiler:  PreProcessor allowed multiple includes of the same file ref.  
     |- Compiler:  Parent classes/interfaces now need to be adressed with        
-    |             extends (for classes) or implements (for interfaces)          
+    \             extends (for classes) or implements (for interfaces)          
                                                                                 
 Version 0.5.2-ALPHA                                                             
     |- Compiler:  Fixed output folder is not getting generated if not existing  

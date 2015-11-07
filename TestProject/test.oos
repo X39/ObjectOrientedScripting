@@ -59,7 +59,7 @@ namespace X39
     }
     static void castStaticTest(strict ::X39::testNamespace::cBar testVar)
     {
-        auto casted = §testNamespace::cFoo§ testVar;
+        auto casted = %testNamespace::cFoo% testVar;
     }
     static bool instanceOfTest(::X39::testNamespace::cFoo testVar)
     {
@@ -89,14 +89,13 @@ namespace X39
         SQF diag_log(arrayObjectTest[0]);
         
         auto configObj = new ::std::config();
-        configObj = configObj.extend("CfgVehicles");
-        configObj = configObj.extend("FooBar");
+        configObj = configObj.extend("CfgVehicles").extend("FooBar");
         configObj = configObj.parent();
         auto hierarchy = configObj.hierarchy();
         SQF diag_log(hierarchy[0].name());
         SQF diag_log(configObj[0].name());
         
-        auto veh = new vehicle("B_Heli_Light_01_F", 0, 0, 1000);
+        auto veh = new ::std::vehicle("B_Heli_Light_01_F", 0, 0, 1000);
         if(!veh.isAlive())
         {
             return;
@@ -112,7 +111,14 @@ namespace X39
         auto scalarValue = scalarArray[0];
         auto stringValue = stringArray[0];
         auto boolValue = boolArray[0];
-        string castedString = §string§ scalarValue;
+        string castedString = %string% scalarValue;
+		
+		scalarValue++;
+		scalarValue--;
+		scalarValue += 3;
+		scalarValue -= 3;
+		scalarValue *= 3;
+		scalarValue /= 3;
         
         
         for(auto _test = 0; _test < 10; _test = _test + 1)

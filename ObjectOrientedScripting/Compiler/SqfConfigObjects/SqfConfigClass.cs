@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.SqfConfigObjects
 {
-    public class SqfConfigClass : iSqfConfig
+    class SqfConfigClass : iSqfConfigChildren
     {
         List<iSqfConfig> children;
         string name;

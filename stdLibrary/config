@@ -11,8 +11,14 @@ namespace std
         fnc simple config extend (string _s)
             _this >> _s
         endFnc
+        fnc simple config extend (::std::String _s)
+            _this >> _s
+        endFnc
         
         fnc simple scalar count (string _s)
+            count _this
+        endFnc
+        fnc simple scalar count (::std::String _s)
             count _this
         endFnc
         
@@ -20,21 +26,26 @@ namespace std
             _this select _i
         endOperator
         
-        
-        fnc string parent ()
-            private "_var";
-            _var = configHierarchy _this;
-            (_var select ((_var pushBack 1) - 1))
+		fnc simple bool isValid ()
+			(configName _this) == ""
         endFnc
         
-        fnc simple ::std::array<config> hierarchy () configHierarchy _this endFnc
+        fnc ::std::String parent ()
+            private ["_var", "_index"];
+            _var = configHierarchy _this;
+			_index = ((_var pushBack 1) - 1);
+			if(_index < 0) exitWith {_this};
+            (_var select _index)
+        endFnc
         
-        fnc simple bool isClass ()      isClass _this       endFnc
-        fnc simple bool isText ()       isText _this        endFnc
-        fnc simple bool isNumber ()     isNumber _this      endFnc
+        fnc simple ::std::array<::std::config> hierarchy () configHierarchy _this endFnc
         
-        fnc simple scalar getNumber ()  getNumber _this     endFnc
-        fnc simple string getText ()    getText _this       endFnc
-        fnc simple string name ()       configName _this    endFnc
+        fnc simple bool isClass ()             isClass _this       endFnc
+        fnc simple bool isText ()              isText _this        endFnc
+        fnc simple bool isNumber ()            isNumber _this      endFnc
+        
+        fnc simple scalar getNumber ()         getNumber _this     endFnc
+        fnc simple ::std::String getText ()    getText _this       endFnc
+        fnc simple ::std::String name ()       configName _this    endFnc
     }
 }

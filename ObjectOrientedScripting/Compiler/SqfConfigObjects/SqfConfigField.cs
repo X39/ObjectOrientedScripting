@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler.SqfConfigObjects
 {
-    public class SqfConfigField : iSqfConfig
+    class SqfConfigField : iSqfConfig
     {
         string name;
         bool isArray;

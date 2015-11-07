@@ -1,3 +1,4 @@
+#include <string>
 namespace std
 {
     native context
@@ -6,21 +7,51 @@ namespace std
             missionNamespace
         endAssign
         
-        fnc simple string getString (string ident, string defValue)         _this getVariable [ident, defValue]     endFnc
-        fnc simple void setString (string ident, string val, bool publish)  _this setVariable [ident, val, publish] endFnc
+        fnc simple string getString (string ident, string defValue)
+			this getVariable [ident, defValue]
+		endFnc
+        fnc simple string getString (::std::String ident, ::std::String defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setString (string ident, string val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
+        fnc simple void setString (::std::String ident, ::std::String val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
         
-        fnc simple scalar getScalar (string ident, scalar defValue)         _this getVariable [ident, defValue]     endFnc
-        fnc simple void setScalar (string ident, scalar val, bool publish)  _this setVariable [ident, val, publish] endFnc
+        fnc simple scalar getScalar (string ident, scalar defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setScalar (string ident, scalar val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
+        fnc simple scalar getScalar (::std::String ident, scalar defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setScalar (::std::String ident, scalar val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
         
-        fnc simple bool getBool (string ident, bool defValue)               _this getVariable [ident, defValue]     endFnc
-        fnc simple void setBool (string ident, bool val, bool publish)      _this setVariable [ident, val, publish] endFnc
+        fnc simple bool getBool (string ident, bool defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setBool (string ident, bool val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
+        fnc simple bool getBool (::std::String ident, bool defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setBool (::std::String ident, bool val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
         
-        fnc simple void setContext (context n)                              n                                       endFnc
-        fnc simple context toMissionContext ()                              missionNamespace                        endFnc
-        fnc simple context toUiContext ()                                   uiNamespace                             endFnc
-        fnc simple context toParsingContext ()                              parsingNamespace                        endFnc
-        fnc simple context toProfileContext ()                              profileNamespace                        endFnc
-        
-        fnc simple void saveProfileContext ()                               saveProfileNamespace                    endFnc
+        fnc simple void setContext (context n)			n						endFnc
+        fnc simple ::std::context toMissionContext ()	missionNamespace		endFnc
+        fnc simple ::std::context toUiContext ()		uiNamespace				endFnc
+        fnc simple ::std::context toParsingContext ()	parsingNamespace		endFnc
+        fnc simple ::std::context toProfileContext ()	profileNamespace		endFnc
+                                                                            
+        fnc simple void saveProfileContext ()			saveProfileNamespace	endFnc
     }
 }

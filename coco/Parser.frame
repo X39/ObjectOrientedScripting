@@ -44,13 +44,11 @@ public class Parser {
 
 -->declarations
 
-	private Base baseObject;
-	public Base BaseObject { get { return baseObject; } }
+	public Base BaseObject { get; set;}
 	
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
-		baseObject = null;
 	}
 	
 	bool peekCompare(params int[] values)
