@@ -40,7 +40,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            string tab = new string('\t', this.Parent.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             sw.WriteLine(tab + "try");
             sw.WriteLine(tab + "{");
             var varListTry = this.getAllChildrenOf<Variable>(false, null, -1, 1);
@@ -108,6 +108,7 @@ namespace Compiler.OOS_LanguageObjects
                 sw.WriteLine(";");
             }
             this.variable.writeOut(sw, cfg);
+            sw.WriteLine(" = _exception;");
             foreach (var it in this.CatchInstructions)
             {
                 it.writeOut(sw, cfg);

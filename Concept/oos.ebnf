@@ -209,7 +209,7 @@ COMPILER OOS
                     T_ROUNDBRACKETCLOSE
                 )
                 |
-                EXPRESSION_HELPER<out outObj, parent, false>
+                EXPRESSION_HELPER<out outObj, parent, negate>
             )
 		.
 		OOS (. if(this.BaseObject == null) throw new Exception("BaseObject was never set"); var obj = this.BaseObject; pBaseLangObject blo; .) =
@@ -797,8 +797,9 @@ COMPILER OOS
 				|
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
+			(. obj.markIfEnd(); .)
 			[
-				"else" (. obj.markIfEnd(); .)
+				"else"
 				(
 					(
 						T_CODEBRACKETOPEN
@@ -855,25 +856,25 @@ COMPILER OOS
 			{
 				(
 					"case" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
-					EXPRESSION<out blo, obj> (. caseObj.addChild(blo); .)
+					EXPRESSION<out blo, caseObj> (. caseObj.addChild(blo); .)
 					':'
 					{
 						"case"
-						EXPRESSION<out blo, obj> (. caseObj.addChild(blo); .)
+						EXPRESSION<out blo, caseObj> (. caseObj.addChild(blo); .)
 						':'
 					}
 					(. caseObj.markEnd(); .)
 					{
-						CODEINSTRUCTION<out blo, obj> (. caseObj.addChild(blo); .)
+						CODEINSTRUCTION<out blo, caseObj> (. caseObj.addChild(blo); .)
 					}
 					(
-						OP_BREAK<out blo, obj> (. caseObj.addChild(blo); .)
+						OP_BREAK<out blo, caseObj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_THROW<out blo, obj> (. caseObj.addChild(blo); .)
+						OP_THROW<out blo, caseObj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_RETURN<out blo, obj> (. caseObj.addChild(blo); .)
+						OP_RETURN<out blo, caseObj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 					)
 				)
@@ -888,16 +889,16 @@ COMPILER OOS
 						"default:" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
 					)
 					{
-						CODEINSTRUCTION<out blo, obj> (. caseObj.addChild(blo); .)
+						CODEINSTRUCTION<out blo, caseObj> (. caseObj.addChild(blo); .)
 					}
 					(
-						OP_BREAK<out blo, obj> (. caseObj.addChild(blo); .)
+						OP_BREAK<out blo, caseObj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_THROW<out blo, obj> (. caseObj.addChild(blo); .)
+						OP_THROW<out blo, caseObj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 						|
-						OP_RETURN<out blo, obj> (. caseObj.addChild(blo); .)
+						OP_RETURN<out blo, caseObj> (. caseObj.addChild(blo); .)
 						TERMINATOR
 					)
 				)

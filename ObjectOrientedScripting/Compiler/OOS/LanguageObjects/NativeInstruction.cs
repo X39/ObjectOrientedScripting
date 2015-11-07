@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Compiler.OOS_LanguageObjects
 {
@@ -26,7 +27,7 @@ namespace Compiler.OOS_LanguageObjects
             this.line = line;
             this.pos = pos;
         }
-        public string getCode(string[] argList)
+        public virtual string getCode(string[] argList)
         {
             if (this.children.Count == 0 && argList.Length == 0)
                 return Code;
@@ -38,10 +39,20 @@ namespace Compiler.OOS_LanguageObjects
             if (this.IsSimple)
             {
                 outString = Code;
-                outString = outString.Replace("_this", argList[0]);
-                for(int i = 1; i < argList.Length; i++)
+                outString = Regex.Replace(outString, "\\b" + "_this" + "\\b", argList[0].Trim());
+                if (this.children.Count > 0 && children[0] is Ident)
                 {
-                    outString = outString.Replace(((Variable)this.children[i - 1]).Name.OriginalValue, argList[i]);
+                    for (int i = 1; i < argList.Length; i++)
+                    {
+                        outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", argList[i].Trim());
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i < argList.Length; i++)
+                    {
+                        outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i - 1]).Name.OriginalValue + "\\b", argList[i].Trim());
+                    }
                 }
             }
             else
@@ -55,10 +66,10 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 outString += "] call {";
                 string tmp = Code;
-                tmp = tmp.Replace("_this", "(_this select 0)");
-                for (int i = 0; i < this.children.Count; i++)
+                tmp = Regex.Replace(tmp, "\\b" + "_this" + "\\b", "(_this select 0)");
+                for (int i = (this.children.Count > 0 && children[0] is Ident ? 1 : 0); i < this.children.Count; i++)
                 {
-                    tmp = tmp.Replace(((Variable)this.children[i]).Name.OriginalValue, "(_this select " + (i + 1) + ")");
+                    tmp = Regex.Replace(tmp, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", "(_this select " + (i + 1) + ")");
                 }
                 outString += tmp + "}";
             }

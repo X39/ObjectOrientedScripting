@@ -472,7 +472,7 @@ public class Parser {
 			EXPRESSION_HELPER(out outObj, parent, negate);
 			Expect(11);
 		} else if (StartOf(5)) {
-			EXPRESSION_HELPER(out outObj, parent, false);
+			EXPRESSION_HELPER(out outObj, parent, negate);
 		} else SynErr(84);
 	}
 
@@ -1181,9 +1181,9 @@ public class Parser {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
 		} else SynErr(104);
+		obj.markIfEnd(); 
 		if (la.kind == 61) {
 			Get();
-			obj.markIfEnd(); 
 			if (la.kind == 14) {
 				Get();
 				while (StartOf(13)) {
@@ -1210,30 +1210,30 @@ public class Parser {
 			if (la.kind == 69) {
 				Get();
 				caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); 
-				EXPRESSION(out blo, obj);
+				EXPRESSION(out blo, caseObj);
 				caseObj.addChild(blo); 
 				Expect(55);
 				while (la.kind == 69) {
 					Get();
-					EXPRESSION(out blo, obj);
+					EXPRESSION(out blo, caseObj);
 					caseObj.addChild(blo); 
 					Expect(55);
 				}
 				caseObj.markEnd(); 
 				while (StartOf(13)) {
-					CODEINSTRUCTION(out blo, obj);
+					CODEINSTRUCTION(out blo, caseObj);
 					caseObj.addChild(blo); 
 				}
 				if (la.kind == 64) {
-					OP_BREAK(out blo, obj);
+					OP_BREAK(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
 				} else if (la.kind == 66) {
-					OP_THROW(out blo, obj);
+					OP_THROW(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
 				} else if (la.kind == 67) {
-					OP_RETURN(out blo, obj);
+					OP_RETURN(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
 				} else SynErr(106);
@@ -1241,25 +1241,25 @@ public class Parser {
 				if (la.kind == 70) {
 					Get();
 					caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); 
-                    Expect(55);
+					Expect(55);
 				} else {
 					Get();
-					caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj);
-                }
+					caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); 
+				}
 				while (StartOf(13)) {
-					CODEINSTRUCTION(out blo, obj);
+					CODEINSTRUCTION(out blo, caseObj);
 					caseObj.addChild(blo); 
 				}
 				if (la.kind == 64) {
-					OP_BREAK(out blo, obj);
+					OP_BREAK(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
 				} else if (la.kind == 66) {
-					OP_THROW(out blo, obj);
+					OP_THROW(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
 				} else if (la.kind == 67) {
-					OP_RETURN(out blo, obj);
+					OP_RETURN(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
 				} else SynErr(107);

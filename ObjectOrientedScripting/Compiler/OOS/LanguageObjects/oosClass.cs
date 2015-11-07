@@ -165,7 +165,7 @@ namespace Compiler.OOS_LanguageObjects
             classIdents.Add(this.Name);
             for(int i = 0; i < classIdents.Count; i++)
             {
-                if (((Ident)classIdents[i]).FullyQualifiedName.Equals(otherClassIdent.FullyQualifiedName))
+                if (((Ident)classIdents[i]).ReferencedType.ident.LastIdent.FullyQualifiedName.Equals(otherClassIdent.LastIdent.FullyQualifiedName))
                     return i;
             }
             return -1;
@@ -178,7 +178,7 @@ namespace Compiler.OOS_LanguageObjects
                 var it = this.children[i];
                 if(it is Function)
                 {
-                    if (((Function)it).Name.FullyQualifiedName.Equals(ident.FullyQualifiedName))
+                    if (((Function)it).Name.FullyQualifiedName.Equals(ident.LastIdent.FullyQualifiedName))
                     {
                         tuple = new Tuple<int, int>(this.parentClasses.Count + this.parentInterfaces.Count, i);
                         break;
@@ -230,7 +230,7 @@ namespace Compiler.OOS_LanguageObjects
                 var it = this.children[i];
                 if (it is Variable)
                 {
-                    if (((Variable)it).Name.FullyQualifiedName.Equals(ident.FullyQualifiedName))
+                    if (((Variable)it).Name.FullyQualifiedName.Equals(ident.LastIdent.FullyQualifiedName))
                     {
                         tuple = new Tuple<int, int>(this.parentClasses.Count + this.parentInterfaces.Count, i);
                         break;
@@ -278,8 +278,12 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            foreach (var it in this.children.GetRange(1, this.children.Count - 1))
+            foreach (var it in ClassContent)
             {
+                if ((it is Interfaces.iFunction && ((Interfaces.iFunction)it).FunctionEncapsulation != Encapsulation.Static) && !(it is Function && ((Function)it).IsConstructor))
+                    continue;
+                if(it is Variable)
+                    continue;
                 it.writeOut(sw, cfg);
             }
         }

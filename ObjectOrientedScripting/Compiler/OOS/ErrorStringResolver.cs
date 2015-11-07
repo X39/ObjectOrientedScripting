@@ -18,7 +18,9 @@ namespace Compiler
             LNK0010, LNK0011, LNK0012, LNK0013, LNK0014,
             LNK0015, LNK0016, LNK0017, LNK0018, LNK0019,
             LNK0020, LNK0021, LNK0022, LNK0023, LNK0024,
-            LNK0025, LNK0026, LNK0027
+            LNK0025, LNK0026, LNK0027, LNK0028, LNK0029,
+            LNK0030, LNK0031, LNK0032, LNK0033, LNK0034,
+            LNK0035, LNK0036
 
         }
 
@@ -58,6 +60,15 @@ namespace Compiler
                 case LinkerErrorCode.LNK0025: return "Invalid Operation, constructors are not allowed to return values";
                 case LinkerErrorCode.LNK0026: return "Invalid Operation, constructors cannot be callen outside of a NEW operation";
                 case LinkerErrorCode.LNK0027: return "Invalid Operation, entry points have to be static";
+                case LinkerErrorCode.LNK0028: return "Type Missmatch, LArg has to refer to an object";
+                case LinkerErrorCode.LNK0029: return "Type Missmatch, RArg has to refer to a class or an interface";
+                case LinkerErrorCode.LNK0030: return "Type Missmatch, LArg is not allowed to be casted";
+                case LinkerErrorCode.LNK0031: return "Cast Exception, non-object to object";
+                case LinkerErrorCode.LNK0032: return "Cast Exception, non-static object got static-casted";
+                case LinkerErrorCode.LNK0033: return "Cast Exception, object to non-object/{string}";
+                case LinkerErrorCode.LNK0034:
+                case LinkerErrorCode.LNK0035: return "Cast Exception, selfcast";
+                case LinkerErrorCode.LNK0036: return "Cast Exception, non-object with dynamic cast";
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
             }

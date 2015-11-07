@@ -54,6 +54,7 @@ namespace Compiler.OOS_LanguageObjects
             set { if (value != null) this.template = value; }
         }
         public bool IsObject { get { return this.varType == VarType.Object || this.varType == VarType.ObjectStrict; } }
+        public bool IsArray { get { return this.varType == VarType.BoolArray || this.varType == VarType.ScalarArray || this.varType == VarType.StringArray; } }
         public VarTypeObject(Ident i, bool isStrict = false, Template template = null)
         {
             this.ident = i;

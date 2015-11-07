@@ -27,10 +27,10 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            if (this.Parent is Ident)
+            if (this.Parent is Ident || this.Parent is AssignContainer)
             {
-                Ident parent = (Ident)this.Parent;
-                string varName = "";
+                Ident parent = this.Parent is AssignContainer ? ((AssignContainer)this.Parent).Name.NextWorkerIdent : (Ident)this.Parent;
+                string varName = '(' + parent.WriteOutValue + ')';
                 switch (this.Operation)
                 {
                     case AssignmentCharacters.PlusOne:

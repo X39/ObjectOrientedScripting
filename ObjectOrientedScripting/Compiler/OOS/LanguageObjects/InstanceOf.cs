@@ -19,37 +19,41 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            //if(LIdent is Cast)
-            //{
-            //    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0028, ((Ident)((Cast)LIdent).children[0]).Line, ((Ident)((Cast)LIdent).children[0]).Pos));
-            //    errCount++;
-            //}
-            //else if (LIdent is Ident)
-            //{
-            //    var varType = ((Ident)LIdent).ReferencedType;
-            //    if (varType.varType != VarType.Object && varType.varType != VarType.ObjectStrict)
-            //    {
-            //        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0026, ((Ident)LIdent).Line, ((Ident)LIdent).Pos));
-            //        errCount++;
-            //    }
-            //}
-            //else
-            //{
-            //    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.UNKNOWN, RIdent.Line, RIdent.Pos));
-            //    errCount++;
-            //}
-            //var refObject = RIdent.ReferencedObject;
-            //if (!(refObject is oosClass || refObject is oosInterface))
-            //{
-            //    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0027, RIdent.Line, RIdent.Pos));
-            //    errCount++;
-            //}
+            if(LIdent is Cast)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0030, ((Ident)((Cast)LIdent).children[0]).Line, ((Ident)((Cast)LIdent).children[0]).Pos));
+                errCount++;
+            }
+            else if (LIdent is Ident)
+            {
+                var varType = ((Ident)LIdent).LastIdent.ReferencedType;
+                if (varType.varType != VarType.Object && varType.varType != VarType.ObjectStrict)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0028, ((Ident)LIdent).Line, ((Ident)LIdent).Pos));
+                    errCount++;
+                }
+            }
+            else
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, RIdent.Line, RIdent.Pos));
+                errCount++;
+            }
+            var refObject = RIdent.LastIdent.ReferencedObject;
+            if (!(refObject is oosClass || refObject is oosInterface))
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0029, RIdent.Line, RIdent.Pos));
+                errCount++;
+            }
             return errCount;
         }
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            throw new NotImplementedException();
+            sw.Write("((");
+            this.LIdent.writeOut(sw, cfg);
+            sw.Write(" select 0) find (");
+            sw.Write('"' + this.RIdent.FullyQualifiedName + '"');
+            sw.Write(") != -1)");
         }
     }
 }

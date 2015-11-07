@@ -45,7 +45,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            string tab = new string('\t', this.Parent.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             var caseList = this.Cases;
             if (caseList.Count == 0)
             {

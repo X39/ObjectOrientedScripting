@@ -39,9 +39,7 @@ namespace Compiler.OOS_LanguageObjects
                 else if (this.encapsulation == Encapsulation.Static || this.IsConstructor)
                 {
                     string fqn = this.Name.FullyQualifiedName;
-                    if (this.IsConstructor)
-                        fqn += "::" + this.Name.OriginalValue;
-                    fqn = fqn.Insert(fqn.LastIndexOf("::"), "_fnc").Replace("::", "_").Substring(1);
+                    fqn = fqn.Insert(fqn.LastIndexOf("::"), "_fnc").Replace("::", "_");
                     return fqn.StartsWith("fnc_") ? "Generic_" + fqn : fqn;
                 }
                 else
@@ -164,6 +162,8 @@ namespace Compiler.OOS_LanguageObjects
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             int index;
+            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            if (this.encapsulation == Encapsulation.Static || this.IsConstructor)
             {
                 var fqn = this.Name.FullyQualifiedName;
 
@@ -171,7 +171,7 @@ namespace Compiler.OOS_LanguageObjects
                 var fileFolderPath = filePath.Substring(0, filePath.LastIndexOf('\\'));
                 if (!Directory.Exists(fileFolderPath))
                     Directory.CreateDirectory(fileFolderPath);
-                sw = new System.IO.StreamWriter(filePath);
+                sw = new System.IO.StreamWriter(filePath + ".sqf");
 
                 fqn = fqn.Replace("::", "_");
                 var lPath = fqn.Substring(0, fqn.LastIndexOf('_'));
@@ -184,11 +184,11 @@ namespace Compiler.OOS_LanguageObjects
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "ext", '"' + ".sqf" + '"');
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "headerType", "-1");
             }
-            sw.WriteLine("scopeName \"" + Wrapper.Compiler.ScopeNames.function + "\";");
+            sw.WriteLine(tab + "scopeName \"" + Wrapper.Compiler.ScopeNames.function + "\";");
             var argList = this.ArgListObjects;
             if (argList.Count > 0)
             {
-                sw.Write("params [");
+                sw.Write(tab + "params [");
                 for (int i = 0; i < argList.Count; i++)
                 {
                     var it = argList[i];
@@ -196,7 +196,7 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         sw.Write(", ");
                     }
-                    if(it is Variable)
+                    if (it is Variable)
                     {
                         sw.Write('"' + ((Variable)it).SqfVariableName + '"');
                     }
@@ -211,9 +211,9 @@ namespace Compiler.OOS_LanguageObjects
             if (localVarList.Count > 0)
             {
                 if (localVarList.Count == 1)
-                    sw.Write("private ");
+                    sw.Write(tab + "private ");
                 else
-                    sw.Write("private [");
+                    sw.Write(tab + "private [");
 
                 for (int i = 0; i < localVarList.Count; i++)
                 {
@@ -245,12 +245,12 @@ namespace Compiler.OOS_LanguageObjects
                 var fncList = classObject.AllFunctions;
                 if (varList.Count > 0 || fncList.Count > 0)
                 {
-                    sw.Write("private [");
+                    sw.Write(tab + "private [");
                     index = 0;
                     foreach (var it in varList)
                     {
                         if (index > 0)
-                            sw.Write(",");
+                            sw.Write(", ");
                         sw.Write("\"" + Wrapper.Compiler.thisVariableName + "var" + it.Name.OriginalValue.Replace("::", "_") + "\"");
                         index++;
                     }
@@ -265,7 +265,6 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     sw.WriteLine("];");
                 }
-                sw.WriteLine("//Object '" + this.Name + "' variables");
                 foreach (var it in varList)
                 {
                     sw.Write(Wrapper.Compiler.thisVariableName + "var" + it.Name.OriginalValue.Replace("::", "_") + " = [");
@@ -276,7 +275,6 @@ namespace Compiler.OOS_LanguageObjects
                         val.writeOut(sw, cfg);
                     sw.WriteLine("];");
                 }
-                sw.WriteLine("//Object '" + this.Name + "' functions");
                 foreach (var it in fncList)
                 {
                     if (((Function)it).IsConstructor)
@@ -285,7 +283,7 @@ namespace Compiler.OOS_LanguageObjects
                     it.writeOut(sw, cfg);
                     sw.WriteLine("};");
                 }
-                sw.Write(Wrapper.Compiler.thisVariableName + " = [");
+                sw.Write(tab + Wrapper.Compiler.thisVariableName + " = [");
 
                 //Write out parents info
                 var classIdents = classObject.ParentClassesIdents;
@@ -296,7 +294,7 @@ namespace Compiler.OOS_LanguageObjects
                 foreach (var it in classIdents)
                 {
                     if (index > 0)
-                        sw.Write(",");
+                        sw.Write(", ");
                     if (it is Ident)
                     {
                         index++;
@@ -326,7 +324,7 @@ namespace Compiler.OOS_LanguageObjects
                             foreach (var child in cObj.children)
                             {
                                 if (index2 > 0)
-                                    sw.Write(",");
+                                    sw.Write(", ");
                                 if (child is Function)
                                 {
                                     if (((Function)child).IsClassFunction && !((Function)child).IsConstructor)
@@ -352,12 +350,12 @@ namespace Compiler.OOS_LanguageObjects
                                 }
                                 index2++;
                             }
-                            sw.Write("],[");
+                            sw.Write("], [");
                             index2 = 0;
                             foreach (var child in cObj.children)
                             {
                                 if (index2 > 0)
-                                    sw.Write(",");
+                                    sw.Write(", ");
                                 if (child is Function)
                                 {
                                     if (((Function)child).IsClassFunction && !((Function)child).IsConstructor)
@@ -383,7 +381,7 @@ namespace Compiler.OOS_LanguageObjects
                                 }
                                 index2++;
                             }
-                            sw.Write("],[");
+                            sw.Write("], [");
                             sw.Write('"' + ((Ident)it).FullyQualifiedName + '"');
                             sw.Write("]]");
                         }
@@ -402,9 +400,9 @@ namespace Compiler.OOS_LanguageObjects
                         throw new Exception("Function has Encapsulation.NA on encapsulation field, please report to developer");
                     }
                 }
-                sw.Write("],");
+                sw.Write("], ");
                 //Current active class
-                sw.Write("nil,");
+                sw.Write("nil, ");
                 //Reserved for future meta informations
                 sw.Write("[]");
 
@@ -414,14 +412,20 @@ namespace Compiler.OOS_LanguageObjects
             }
             foreach (var it in this.CodeInstructions)
             {
+                if (it is Ident)
+                    sw.Write(tab);
                 it.writeOut(sw, cfg);
+                sw.WriteLine(";");
             }
             if (this.IsConstructor)
             {
-                sw.Write(Wrapper.Compiler.thisVariableName);
+                sw.Write(tab + Wrapper.Compiler.thisVariableName);
             }
-            sw.Flush();
-            sw.Close();
+            if (this.encapsulation == Encapsulation.Static || this.IsConstructor)
+            {
+                sw.Flush();
+                sw.Close();
+            }
         }
         public override List<pBaseLangObject> getScopeItems(int scopeIndex)
         {

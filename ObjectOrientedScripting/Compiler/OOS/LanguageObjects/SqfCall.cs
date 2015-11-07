@@ -109,8 +109,7 @@ namespace Compiler.OOS_LanguageObjects
         private VarTypeObject referencedType;
         public VarTypeObject ReferencedType { get { return referencedType; } }
 
-        public SqfCall(pBaseLangObject parent)
-            : base(parent)
+        public SqfCall(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
             this.referencedType = new VarTypeObject(VarType.Void);
@@ -178,7 +177,8 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            string tab = this.Parent is Interfaces.iCodeBlock ? new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count) : "";
+            
             var lArgs = this.LArgs;
             var rArgs = this.RArgs;
             sw.Write(tab);

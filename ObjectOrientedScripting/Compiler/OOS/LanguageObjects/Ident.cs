@@ -163,6 +163,28 @@ namespace Compiler.OOS_LanguageObjects
                     return this;
             }
         }
+        public Ident NextWorkerIdent
+        {
+            get
+            {
+                var list = this.getAllChildrenOf<Ident>();
+                if (list.Count == 0)
+                    return this;
+                if (this.children.Count > 1)
+                    return list[0].NextWorkerIdent;
+                return list[0].NextWorkerIdent;
+            }
+        }
+        public Ident NextIdent
+        {
+            get
+            {
+                var list = this.getAllChildrenOf<Ident>();
+                if (list.Count == 0)
+                    return null;
+                return list[0];
+            }
+        }
         public Ident(pBaseLangObject parent, string origVal, int line, int pos) : base(parent)
         {
             this.originalValue = origVal;
@@ -265,7 +287,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             #endregion
             //And process it then ((unless its a simple ident, then we do not want to process ... here any further))
-            if (this.IsSimpleIdentifier && ((this.Parent is Interfaces.iName && ((Interfaces.iName)this.Parent).Name == this) || (this.Parent is Interfaces.iHasType && !(this.Parent is Expression) && ((Interfaces.iHasType)this.Parent).ReferencedType.ident == this)))
+            if (this.IsSimpleIdentifier && ((this.Parent is Interfaces.iName && ((Interfaces.iName)this.Parent).Name == this) || (this.Parent is Interfaces.iHasType && !(this.Parent is Expression) && ((Interfaces.iHasType)this.Parent).ReferencedType.ident == this)) && !(this.Parent is AssignContainer))
             {
                 this.referencedObject = this.Parent;
                 if (this.Parent is Interfaces.iHasType)
@@ -364,8 +386,16 @@ namespace Compiler.OOS_LanguageObjects
                                     switch (this.referencedType.varType)
                                     {
                                         case VarType.BoolArray:
+                                            this.referencedType = new VarTypeObject(this.referencedType);
+                                            this.referencedType.varType = VarType.Bool;
+                                            break;
                                         case VarType.ScalarArray:
+                                            this.referencedType = new VarTypeObject(this.referencedType);
+                                            this.referencedType.varType = VarType.Scalar;
+                                            break;
                                         case VarType.StringArray:
+                                            this.referencedType = new VarTypeObject(this.referencedType);
+                                            this.referencedType.varType = VarType.String;
                                             break;
                                         default:
                                             Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos));
@@ -510,9 +540,140 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             }
         }
+        public bool HasCallWrapper
+        {
+            get
+            {
+                if (this.Parent is Ident)
+                    return ((Ident)this.Parent).HasCallWrapper;
+                var functionCalls = this.getAllChildrenOf<FunctionCall>(true);
+                var arrayAccesss = this.getAllChildrenOf<ArrayAccess>(true);
+                return functionCalls.Count + arrayAccesss.Count > 1;
+            }
+        }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            throw new NotImplementedException();
+            /*
+            if (!(this.Parent is Ident))
+            {
+                if (this.children.Count == 0 && this.IsSimpleIdentifier)
+                {
+                    if(this.ReferencedObject is Variable)
+                    {
+                        Variable variable = (Variable)this.ReferencedObject;
+                        sw.Write(variable.SqfVariableName);
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                else
+                {
+                    bool flag = this.HasCallWrapper;
+                    if (flag)
+                        sw.Write("[] call {private \"_tmp\";");
+                    foreach (var it in this.children)
+                    {
+                        if (it is Ident)
+                            continue;
+                        it.writeOut(sw, cfg);
+                    }
+                    foreach (var it in this.children)
+                    {
+                        if (it is Ident)
+                            it.writeOut(sw, cfg);
+                    }
+                    if (flag)
+                        sw.Write("_tmp}");
+                }
+            }
+            else
+            {
+                foreach (var it in this.children)
+                {
+                    if (it is Ident)
+                        continue;
+                    it.writeOut(sw, cfg);
+                }
+                foreach (var it in this.children)
+                {
+                    if (it is Ident)
+                        it.writeOut(sw, cfg);
+                }
+            }*/
+            bool assignToTmp = this.HasCallWrapper;
+            bool callWrapper = !(this.Parent is Ident) && assignToTmp;
+            if (callWrapper)
+                sw.Write("[] call {private \"_tmp\";");
+
+            if (assignToTmp)
+                sw.Write(" _tmp = ");
+
+            if (this.IsSimpleIdentifier)
+            {
+                if (this.ReferencedObject is Variable)
+                {
+                    Variable variable = (Variable)this.ReferencedObject;
+                    sw.Write(variable.SqfVariableName);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else if (this.children.Count == 0)
+            {
+                sw.Write(this.WriteOutValue);
+            }
+            else
+            {
+                foreach (var it in this.children)
+                {
+                    if (it is Ident)
+                        continue;
+                    it.writeOut(sw, cfg);
+                    if (assignToTmp)
+                        sw.Write(';');
+                }
+                foreach (var it in this.children)
+                {
+                    if (it is Ident)
+                        it.writeOut(sw, cfg);
+                }
+            }
+
+            if (callWrapper)
+                sw.Write(" _tmp}");
+
+        }
+        public string WriteOutValue
+        {
+            get
+            {
+                string s = this.Parent is Ident ? ((Ident)this.Parent).WriteOutValue : "";
+                switch (this.Type)
+                {
+                    case IdenType.FunctionCall:
+                        break;
+                    case IdenType.ArrayAccess:
+                    case IdenType.VariableAccess:
+                        if(this.ReferencedObject is Variable)
+                        {
+                            var variable = (Variable)this.ReferencedObject;
+                            s += variable.SqfVariableName;
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                        break;
+                    case IdenType.ThisVar:
+                        s += Wrapper.Compiler.thisVariableName;
+                        break;
+                }
+                return s;
+            }
         }
     }
 }

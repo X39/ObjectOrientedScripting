@@ -22,5 +22,6 @@ namespace Compiler.OOS_LanguageObjects.Interfaces
         /// </summary>
         Encapsulation FunctionEncapsulation { get; }
         bool IsAsync { get; }
+        bool IsConstructor { get; }
     }
 }

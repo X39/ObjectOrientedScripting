@@ -30,6 +30,7 @@ namespace Compiler.OOS_LanguageObjects
         /// Returns the Arglist required for this iFunction
         /// </summary>
         public List<VarTypeObject> ArgList { get { return this.argTypes; } }
+        public bool IsConstructor { get { return false; } }
         public bool IsAsync { get; set; }
         public VirtualFunction(pBaseLangObject parent) : base(parent) 
         {
@@ -42,7 +43,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             return "vFnc->" + this.Name.FullyQualifiedName;
         }
-
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
         public List<Return> ReturnCommands { get { return new List<Return>(); } }
         public bool AlwaysReturns { get { return true; } }

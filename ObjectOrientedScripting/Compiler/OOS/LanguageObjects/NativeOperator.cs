@@ -20,6 +20,7 @@ namespace Compiler.OOS_LanguageObjects
                 errCount += VTO.ident.finalize();
             return errCount;
         }
+        public bool IsConstructor { get { return false; } }
 
         /// <summary>
         /// Return type of this iFunction

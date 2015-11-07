@@ -27,9 +27,19 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else if (lExpression is Ident)
                 {
-                    lType = ((Ident)lExpression).LastIdent.ReferencedObject is Interfaces.iHasType ?
-                        ((Interfaces.iHasType)((Ident)lExpression).LastIdent.ReferencedObject).ReferencedType :
-                        ((Ident)lExpression).LastIdent.ReferencedType;
+                    if (((Ident)lExpression).LastIdent.ReferencedObject is Interfaces.iHasType)
+                    {
+                        lType = ((Interfaces.iHasType)((Ident)lExpression).LastIdent.ReferencedObject).ReferencedType;
+                        if (!lType.IsObject && lType.IsArray && !((Ident)lExpression).LastIdent.ReferencedType.IsArray)
+                        {
+                            lType = ((Ident)lExpression).LastIdent.ReferencedType;
+                        }
+                    }
+                    else
+                    {
+                        lType = ((Ident)lExpression).LastIdent.ReferencedType;
+                    }
+                    
                 }
                 else if (lExpression is Cast)
                 {
@@ -151,7 +161,16 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize() { return 0; }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            throw new NotImplementedException();
+            if (this.negate)
+                sw.Write('!');
+            sw.Write('(');
+            this.lExpression.writeOut(sw, cfg);
+            if(this.rExpression != null)
+            {
+                sw.Write(')' + this.expOperator + '(');
+                this.rExpression.writeOut(sw, cfg);
+            }
+            sw.Write(')');
         }
     }
 }

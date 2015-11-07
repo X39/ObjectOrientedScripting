@@ -22,10 +22,16 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize() { return 0; }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            foreach (var it in this.children)
-            {
-                it.writeOut(sw, cfg);
-            }
+            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            sw.Write(tab);
+            this.Name.writeOut(sw, cfg);
+            if (this.Name.ReferencedType.IsObject)
+                sw.Write(" set [0, ");
+            else
+                sw.Write(" = ");
+            this.assign.writeOut(sw, cfg);
+            if (this.Name.ReferencedType.IsObject)
+                sw.Write("]");
         }
     }
 }

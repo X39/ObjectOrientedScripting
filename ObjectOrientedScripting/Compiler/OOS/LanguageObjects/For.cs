@@ -28,7 +28,9 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+            //ToDo: Fix the wrong private of the forArg1 variable from inside of the loop to parent codeblock
+            string tab = new string('\t', this.Parent.getAllParentsOf<Interfaces.iCodeBlock>().Count);
+
             this.forArg1.writeOut(sw, cfg);
             sw.WriteLine(";");
             sw.Write(tab + "while {");
@@ -39,9 +41,9 @@ namespace Compiler.OOS_LanguageObjects
             if (varList.Count > 0)
             {
                 if (varList.Count == 1)
-                    sw.Write("private ");
+                    sw.Write(tab + '\t' + "private ");
                 else
-                    sw.Write("private [");
+                    sw.Write(tab + '\t' + "private [");
 
                 for (int i = 0; i < varList.Count; i++)
                 {
@@ -63,7 +65,6 @@ namespace Compiler.OOS_LanguageObjects
                     sw.Write("]");
                 sw.WriteLine(";");
             }
-            sw.Write(tab + '\t');
             this.forArg3.writeOut(sw, cfg);
             sw.WriteLine(";");
             foreach (var it in this.CodeInstructions)
@@ -71,7 +72,7 @@ namespace Compiler.OOS_LanguageObjects
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }
-            sw.Write("}");
+            sw.Write(tab + "}");
         }
 
 
