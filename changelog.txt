@@ -1,3 +1,6 @@
+Version 0.6.1-ALPHA                                                             
+    |- Compiler:  fixed InstanceOf printout
+	
 Version 0.6.0-ALPHA                                                             
     |- Compiler:  Rewrote entire Linker & Writer
     |- Compiler:  Added !syntax! to call base constructors via following:

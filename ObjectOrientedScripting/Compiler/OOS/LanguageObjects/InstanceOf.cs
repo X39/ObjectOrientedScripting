@@ -52,7 +52,7 @@ namespace Compiler.OOS_LanguageObjects
             sw.Write("((");
             this.LIdent.writeOut(sw, cfg);
             sw.Write(" select 0) find (");
-            sw.Write('"' + this.RIdent.FullyQualifiedName + '"');
+            sw.Write('"' + this.RIdent.LastIdent.FullyQualifiedName + '"');
             sw.Write(") != -1)");
         }
     }
