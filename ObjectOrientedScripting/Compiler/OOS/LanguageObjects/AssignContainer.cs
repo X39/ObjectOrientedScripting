@@ -25,12 +25,12 @@ namespace Compiler.OOS_LanguageObjects
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             sw.Write(tab);
             this.Name.writeOut(sw, cfg);
-            if (this.Name.ReferencedType.IsObject)
+            if (!this.Name.IsSimpleIdentifier && this.Name.ReferencedType.IsObject && !(this.Name.ReferencedType.ident.ReferencedObject is Native))
                 sw.Write(" set [0, ");
             else
                 sw.Write(" = ");
             this.assign.writeOut(sw, cfg);
-            if (this.Name.ReferencedType.IsObject)
+            if (!this.Name.IsSimpleIdentifier && this.Name.ReferencedType.IsObject && !(this.Name.ReferencedType.ident.ReferencedObject is Native))
                 sw.Write("]");
         }
     }

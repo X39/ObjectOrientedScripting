@@ -93,10 +93,10 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     if (printSelect)
                     {
-                        if(((Ident)this.Parent).HasCallWrapper)
-                        {
-                            sw.Write(((Ident)this.Parent).WriteOutValue);
-                        }
+                        //if(((Ident)this.Parent).HasCallWrapper)
+                        //{
+                        sw.Write(((Ident)this.Parent).WriteOutValue);
+                        //}
                         sw.Write(" select ");
                         foreach(var it in this.children)
                         {

@@ -188,7 +188,7 @@ namespace Compiler.OOS_LanguageObjects
                     lPath = fqn.Substring(0, lIndex);
                     rPath = fqn.Substring(lIndex + 1);
                 }
-                cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "file", '"' + filePath.Substring(Wrapper.Compiler.ProjectFile.OutputFolder.Length) + '"');
+                cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "file", '"' + filePath.Substring(Wrapper.Compiler.ProjectFile.OutputFolder.Length) + ".sqf" + '"');
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "preInit", this.Name.OriginalValue == "preInit" ? "1" : "0");
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "postInit", this.Name.OriginalValue == "postInit" ? "1" : "0");
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "preStart", this.Name.OriginalValue == "preStart" ? "1" : "0");
@@ -201,13 +201,16 @@ namespace Compiler.OOS_LanguageObjects
             if (argList.Count > 0)
             {
                 sw.Write(tab + "params [");
-                for (int i = 0; i < argList.Count; i++)
+                bool printComma = false;
+                if (this.encapsulation != Encapsulation.Static && !this.IsConstructor)
                 {
-                    var it = argList[i];
-                    if (i != 0)
-                    {
+                    sw.Write('"' + Wrapper.Compiler.thisVariableName + '"');
+                    printComma = true;
+                }
+                foreach(var it in argList)
+                {
+                    if (printComma)
                         sw.Write(", ");
-                    }
                     if (it is Variable)
                     {
                         sw.Write('"' + ((Variable)it).SqfVariableName + '"');

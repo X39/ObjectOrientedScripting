@@ -96,7 +96,7 @@ namespace Compiler.OOS_LanguageObjects
                         }
                         else
                         {
-                            sw.Write(']' + " call " + '(' + variableName + ')' + ((Function)fnc).SqfVariableName);
+                            sw.Write(']' + " call (" + '(' + variableName + ')' + ((Function)fnc).SqfVariableName + ')');
                         }
                     }
                     else

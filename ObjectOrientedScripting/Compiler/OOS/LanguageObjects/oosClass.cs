@@ -144,6 +144,101 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
+            for (int i = 0; i < ParentClassesIdents.Count; i++)
+            {
+                var it = ParentClassesIdents[i];
+                if (!(it is Ident))
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, Name.Line, Name.Pos));
+                    errCount++;
+                    continue;
+                }
+                if (((Ident)it).ReferencedObject is oosClass)
+                {
+                    if (i >= this.endMarkerParents)
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0037, Name.Line, Name.Pos));
+                        errCount++;
+                    }
+                    var parentClass = (oosClass)((Ident)it).ReferencedObject;
+                    this.parentClasses.Add(parentClass);
+                    this.parentClasses.AddRange(parentClass.parentClasses);
+                }
+                else if (((Ident)it).ReferencedObject is oosInterface)
+                {
+                    if (i < this.endMarkerParents)
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0038, Name.Line, Name.Pos));
+                        errCount++;
+                    }
+                    this.parentInterfaces.Add((oosInterface)((Ident)it).ReferencedObject);
+                }
+                else
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, Name.Line, Name.Pos));
+                    errCount++;
+                }
+            }
+            var functionNameList = new List<string>();
+            var inheritanceFunctions = this.InheritanceFunctions;
+            foreach (var it in this.AllFunctions)
+            {
+                var origVal = it.Name.OriginalValue;
+                if (functionNameList.FirstOrDefault(checkString => checkString.Equals(origVal)) != null)
+                {
+                    var parentFnc = inheritanceFunctions.FirstOrDefault(checkValue => checkValue.Name.OriginalValue == origVal);
+                    if (parentFnc == null)
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0039, it.Name.Line, it.Name.Pos));
+                        errCount++;
+                    }
+                    else
+                    {
+                        if (!it.Override)
+                        {
+                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0040, it.Name.Line, it.Name.Pos));
+                            errCount++;
+                        }
+                        else
+                        {
+                            var argList = parentFnc.ArgList;
+                            var itArgList = it.ArgList;
+                            if (argList.Count != itArgList.Count)
+                            {
+                                if (argList.Count > itArgList.Count)
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0041, it.Name.Line, it.Name.Pos));
+                                    errCount++;
+                                }
+                                else
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0042, it.Name.Line, it.Name.Pos));
+                                    errCount++;
+                                }
+                            }
+                            for (var i = 0; i < argList.Count; i++)
+                            {
+                                if (i > argList.Count || i > itArgList.Count)
+                                    break;
+                                var v = argList[i];
+                                var e = itArgList[i];
+                                if (!v.Equals(e))
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0043));
+                                    errCount++;
+                                }
+                            }
+                            if (!it.varType.Equals(parentFnc.varType))
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0044, it.Name.Line, it.Name.Pos));
+                                errCount++;
+                            }
+                        }
+                    }
+                }
+                functionNameList.Add(it.Name.OriginalValue);
+            }
+            //ToDo: Check interface functions are implemented
             return errCount;
         }
 

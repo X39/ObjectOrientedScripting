@@ -20,7 +20,8 @@ namespace Compiler
             LNK0020, LNK0021, LNK0022, LNK0023, LNK0024,
             LNK0025, LNK0026, LNK0027, LNK0028, LNK0029,
             LNK0030, LNK0031, LNK0032, LNK0033, LNK0034,
-            LNK0035, LNK0036
+            LNK0035, LNK0036, LNK0037, LNK0038, LNK0039,
+            LNK0040, LNK0041, LNK0042, LNK0043, LNK0044
 
         }
 
@@ -69,6 +70,15 @@ namespace Compiler
                 case LinkerErrorCode.LNK0034:
                 case LinkerErrorCode.LNK0035: return "Cast Exception, selfcast";
                 case LinkerErrorCode.LNK0036: return "Cast Exception, non-object with dynamic cast";
+                case LinkerErrorCode.LNK0037: return "Invalid Operation, implementing class";
+                case LinkerErrorCode.LNK0038: return "Invalid Operation, extending interface";
+                case LinkerErrorCode.LNK0039: return "Function overrides existing function";
+                case LinkerErrorCode.LNK0040: return "Missing override keyword on overriding function";
+                case LinkerErrorCode.LNK0041: return "Invalid Operation, too many arguments on override";
+                case LinkerErrorCode.LNK0042: return "Invalid Operation, lacking arguments on override";
+                case LinkerErrorCode.LNK0043: return "Type Missmatch, override has different type then base";
+                case LinkerErrorCode.LNK0044: return "Type Missmatch, override return differs from base";
+
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
             }

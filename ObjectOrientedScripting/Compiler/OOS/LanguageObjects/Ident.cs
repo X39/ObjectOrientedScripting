@@ -569,7 +569,7 @@ namespace Compiler.OOS_LanguageObjects
             }
 
 
-            if (this.IsSimpleIdentifier)
+            if (this.IsSimpleIdentifier && this.children.Count == 0)
             {
                 if (this.ReferencedObject is Variable)
                 {
