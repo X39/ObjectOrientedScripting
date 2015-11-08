@@ -22,6 +22,9 @@ namespace std
             };
             _this setFuel i;
         endFnc
+        fnc simple void                    attachTo        (::std::vehicle vehicle)        _this attachTo [vehicle]                    endFnc
+        fnc simple void                    attachTo        (::std::vehicle vehicle, ::std::array<scalar> offset) _this attachTo [vehicle, offset] endFnc
+        fnc simple void                    attachTo        (::std::vehicle vehicle, ::std::array<scalar> offset, ::std::String memPoint) _this attachTo [vehicle, offset, memPoint) endFnc
 
         fnc simple scalar                  getDamage       ()                              damage _this                                endFnc
         fnc simple scalar                  getDirection    ()                              direction _this                             endFnc
@@ -40,6 +43,7 @@ namespace std
         fnc simple bool                    isKindOf        (::std::String type)            _this isKindOf type                         endFnc
         fnc simple bool                    isAlive         ()                              alive _this                                 endFnc
         fnc simple bool                    isPlayer        ()                              isPlayer _this                              endFnc
+        fnc simple bool                    inVehicle       (::std::Vehicle player)         in _this                                    endFnc
         
     }
 }
