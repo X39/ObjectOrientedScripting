@@ -2,7 +2,7 @@ using <std::Array>
 using <std::Config>
 using <std::Context>
 using <std::String>
-using <std::base:VehicleBase>
+using <std::base::VehicleBase>
 
 namespace std
 {
