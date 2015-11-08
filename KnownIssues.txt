@@ -1,0 +1,4 @@
+- Creating a new variable containing an object requires auto keyword.
+  Thus, the following is not possible:
+  
+  `::std::vehicle variable = new ::std::vehicle("foobar");`
