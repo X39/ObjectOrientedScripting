@@ -1,7 +1,0 @@
-class cBar extends cFoo
-{
-	public override void foobar(string _someRandomArg)
-	{
-		SQF diag_log("class bar " + _someRandomArg);
-	}
-}

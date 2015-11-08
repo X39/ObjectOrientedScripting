@@ -20,8 +20,28 @@ namespace X39
 {
     namespace testNamespace
     {
-        #include "cFoo.oos"
-        #include "cBar.oos"
+        class cFoo
+		{
+			public void foobar(string _someRandomArg)
+			{
+				SQF diag_log("class foo " + _someRandomArg);
+			}
+			public void test(string _test, string _test2)
+			{
+			
+			}
+			private void test2(string _test, string _test2)
+			{
+			
+			}
+		}
+		class cBar extends cFoo
+		{
+			public override void foobar(string _someRandomArg)
+			{
+				SQF diag_log("class bar " + _someRandomArg);
+			}
+		}
     }
     interface testInterface
     {
@@ -72,6 +92,7 @@ namespace X39
     }
     static void preInit()
     {
+		::std::vehice player = SQF player;
         SQF diag_log("preInit");
         auto _obj = new ::X39::testObj();
         _obj.testFncPublic("preInitArg1", "preInitArg2");
