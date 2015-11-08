@@ -1,17 +1,17 @@
-using <std::array>
+using <std::Array>
 
 namespace std
 {
-    native config
+    native Config
     {
         assign simple ()
             configFile
         endAssign
         
-        fnc simple config extend (string _s)
+        fnc simple ::std::Config extend (string _s)
             _this >> _s
         endFnc
-        fnc simple config extend (::std::String _s)
+        fnc simple ::std::Config extend (::std::String _s)
             _this >> _s
         endFnc
         
@@ -22,7 +22,7 @@ namespace std
             count _this
         endFnc
         
-        operator simple config [] (scalar _i)
+        operator simple ::std::Config [] (scalar _i)
             _this select _i
         endOperator
         
@@ -38,7 +38,7 @@ namespace std
             (_var select _index)
         endFnc
         
-        fnc simple ::std::array<::std::config> hierarchy () configHierarchy _this endFnc
+        fnc simple ::std::Array<::std::Config> hierarchy () configHierarchy _this endFnc
         
         fnc simple bool isClass ()             isClass _this       endFnc
         fnc simple bool isText ()              isText _this        endFnc

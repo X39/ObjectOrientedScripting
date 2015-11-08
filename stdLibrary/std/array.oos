@@ -1,6 +1,6 @@
 namespace std
 {
-    native array<T>
+    native Array<T>
     {
         assign simple ()
             []

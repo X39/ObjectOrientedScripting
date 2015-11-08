@@ -1,7 +1,7 @@
 using <std::String>
 namespace std
 {
-    native context
+    native Context
     {
         assign simple ()
             missionNamespace
@@ -47,10 +47,10 @@ namespace std
 		endFnc
         
         fnc simple void setContext (context n)			n						endFnc
-        fnc simple ::std::context toMissionContext ()	missionNamespace		endFnc
-        fnc simple ::std::context toUiContext ()		uiNamespace				endFnc
-        fnc simple ::std::context toParsingContext ()	parsingNamespace		endFnc
-        fnc simple ::std::context toProfileContext ()	profileNamespace		endFnc
+        fnc simple ::std::Context toMissionContext ()	missionNamespace		endFnc
+        fnc simple ::std::Context toUiContext ()		uiNamespace				endFnc
+        fnc simple ::std::Context toParsingContext ()	parsingNamespace		endFnc
+        fnc simple ::std::Context toProfileContext ()	profileNamespace		endFnc
                                                                             
         fnc simple void saveProfileContext ()			saveProfileNamespace	endFnc
     }

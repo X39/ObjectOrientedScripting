@@ -41,7 +41,7 @@ namespace std
 			_this
 		endFnc
 		
-		fnc simple ::std::array<scalar> toArray()
+		fnc simple ::std::Array<scalar> toArray()
 			toArray _this
 		endFnc
 		
@@ -53,11 +53,11 @@ namespace std
 			_this + s
 		endFnc
 		
-		fnc simple ::std::array<::std::String> split(string delimiter)
+		fnc simple ::std::Array<::std::String> split(string delimiter)
 			_this splitString delimiter
 		endFnc
 		
-		fnc simple ::std::array<::std::String> split(::std::String delimiter)
+		fnc simple ::std::Array<::std::String> split(::std::String delimiter)
 			_this splitString delimiter
 		endFnc
 		
