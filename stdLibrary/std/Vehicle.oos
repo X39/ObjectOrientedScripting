@@ -5,7 +5,7 @@ using <std::String>
 
 namespace std
 {
-    native vehicle
+    native Vehicle
     {
         assign simple (string name, scalar i, scalar j, scalar k)                          name createVehicle [i, j, k]                endAssign
         assign simple (::std::String name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
