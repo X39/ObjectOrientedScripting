@@ -15,7 +15,7 @@ namespace Compiler.OOS_LanguageObjects
             public string SqfCommand;
             public bool hasL;
             public bool hasR;
-            public VarType outType;
+            public VarTypeObject outType;
             public enum type
             {
                 b,
@@ -26,7 +26,14 @@ namespace Compiler.OOS_LanguageObjects
             public SupportInfoObject(string command, VarType type, bool hasR = false, bool hasL = false)
             {
                 this.SqfCommand = command;
-                this.outType = type;
+                this.outType = new VarTypeObject(type);
+                this.hasL = hasL;
+                this.hasR = hasR;
+            }
+            public SupportInfoObject(string command, Ident type, bool hasR = false, bool hasL = false)
+            {
+                this.SqfCommand = command;
+                this.outType = new VarTypeObject(type, true);
                 this.hasL = hasL;
                 this.hasR = hasR;
             }
@@ -55,7 +62,7 @@ namespace Compiler.OOS_LanguageObjects
                 while ((line = reader.ReadLine()) != null)
                 {
                     lineIndex++;
-                    string[] splitString = line.Split(':');
+                    string[] splitString = line.Split('#');
                     string command = "";
                     if (splitString[0] == "t")
                         continue;
@@ -66,34 +73,62 @@ namespace Compiler.OOS_LanguageObjects
                     else
                         command = splitString[2];
                     command = command.ToLower();
-                    switch (splitString[1].ToLower())
+                    if (splitString[1].StartsWith("::"))
                     {
-                        default:
-                            throw new Exception("Unknown returnType encountered while parsing SupportInfo.txt, Line: " + lineIndex);
-                        case "nil":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.Void, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "bool":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.Bool, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "bool[]":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.BoolArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "scalar":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.Scalar, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "scalar[]":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.ScalarArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "string":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.String, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "string[]":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.StringArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
-                        case "other":
-                            supportInfoList.Add(new SupportInfoObject(command, VarType.Other, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                            break;
+                        var anotherSplit = splitString[1].Split(new char[] { ':' });
+                        Ident ident = null;
+                        foreach (var s in anotherSplit)
+                        {
+                            if (!string.IsNullOrEmpty(s))
+                            {
+                                Ident tmpIdent = new Ident(ident, s, -1, -1);
+                                tmpIdent.Access = Ident.AccessType.Namespace;
+                                if(ident != null)
+                                {
+                                    ident.addChild(tmpIdent);
+                                    ident = tmpIdent;
+                                }
+                                else
+                                {
+                                    tmpIdent.IsGlobalIdentifier = true;
+                                    ident = tmpIdent;
+                                }
+                            }
+                        }
+                        ident.Access = Ident.AccessType.NA;
+                        supportInfoList.Add(new SupportInfoObject(command, ident.getLastOf<Ident>(), splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                    }
+                    else
+                    {
+                        switch (splitString[1].ToLower())
+                        {
+                            default:
+                                throw new Exception("Unknown returnType encountered while parsing SupportInfo.txt, Line: " + lineIndex);
+                            case "nil":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.Void, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "bool":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.Bool, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "bool[]":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.BoolArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "scalar":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.Scalar, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "scalar[]":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.ScalarArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "string":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.String, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "string[]":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.StringArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                            case "other":
+                                supportInfoList.Add(new SupportInfoObject(command, VarType.Other, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
+                                break;
+                        }
                     }
                 }
             }
@@ -112,7 +147,7 @@ namespace Compiler.OOS_LanguageObjects
         public SqfCall(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
-            this.referencedType = new VarTypeObject(VarType.Void);
+            this.referencedType = null;
         }
 
         public override int finalize()
@@ -163,7 +198,11 @@ namespace Compiler.OOS_LanguageObjects
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0018, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
-            this.referencedType.varType = sio.outType;
+            this.referencedType = sio.outType;
+            if(sio.outType.IsObject)
+            {
+                return sio.outType.ident.finalize();
+            }
             return 0;
         }
         public void markEnd()
