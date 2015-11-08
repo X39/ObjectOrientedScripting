@@ -5,7 +5,7 @@ using <std::String>
 
 namespace std
 {
-    native Vehicle extends ::std::base::BaseVehicle
+    native Vehicle extends ::std::base::Vehicle
     {
         
         fnc void setFuel (scalar i)
