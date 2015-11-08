@@ -2,10 +2,11 @@ using <std::Array>
 using <std::Config>
 using <std::Context>
 using <std::String>
+using <std::base:VehicleBase>
 
 namespace std
 {
-    native Vehicle extends ::std::base::Vehicle
+    native Vehicle extends ::std::base::VehicleBase
     {
         
         fnc void setFuel (scalar i)
