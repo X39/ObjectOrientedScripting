@@ -40,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler\Compiler.cs" />
-    <Compile Include="Compiler\MultiStreamWriter.cs" />
     <Compile Include="Compiler\PostProcessFile.cs" />
     <Compile Include="OOS\ErrorStringResolver.cs" />
     <Compile Include="OOS\Exceptions\LinkerException.cs" />

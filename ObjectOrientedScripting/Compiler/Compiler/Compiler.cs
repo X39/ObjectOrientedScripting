@@ -34,7 +34,7 @@ namespace Wrapper
         private List<PPDefine> flagDefines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
-        public string stdLibPath;
+        public static string stdLibPath;
         private List<string> includedFiles;
 
         public static Project ProjectFile { get; internal set; }
@@ -51,7 +51,7 @@ namespace Wrapper
             stdLibPath = stdLibPath.Substring(0, stdLibPath.LastIndexOf('\\')) + "\\stdLibrary\\";
             addFunctionsClass = true;
             outputFolderCleanup = true;
-            printOutMode = 1;
+            printOutMode = 0;
             flagDefines = new List<PPDefine>();
             SqfCall.readSupportInfoList();
             includedFiles = new List<string>();
@@ -119,7 +119,7 @@ namespace Wrapper
         }
         public Version getVersion()
         {
-            return new Version("0.6.0-ALPHA");
+            return new Version("0.6.1-ALPHA");
         }
         public void CheckSyntax(string filepath)
         {
@@ -161,8 +161,7 @@ namespace Wrapper
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
             List<PostProcessFile> ppFiles = new List<PostProcessFile>();
             //do the preprocessing
-            MultiStreamWriter msw = new MultiStreamWriter();
-            preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), msw, ppFiles);
+            preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), ppFiles);
             var ppMainFile = ppFiles[0];
 
             if (outputFolderCleanup)
@@ -186,12 +185,13 @@ namespace Wrapper
                 Scanner scanner = new Scanner(it.FileStream);
                 Base baseObject = new Base();
                 Parser p = new Parser(scanner);
+                Parser.UsedFiles = new List<string>();
                 p.BaseObject = baseObject;
                 p.Parse();
                 if (p.errors.count > 0)
                 {
                     errCount += p.errors.count;
-                    Logger.Instance.log(Logger.LogLevel.INFO, "In file '" + it.Name + "'");
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "In file '" + it.Name + "'");
                 }
                 if (printOutMode > 0)
                 {
@@ -243,6 +243,7 @@ namespace Wrapper
             Base oosTreeBase = new Base();
             NamespaceResolver.BaseClass = oosTreeBase;
             Parser parser = new Parser(new Scanner(ppMainFile.FullFileStream));
+            Parser.UsedFiles = new List<string>();
             parser.BaseObject = oosTreeBase;
             parser.Parse();
             errCount = parser.errors.count + parser.BaseObject.finalize();
@@ -261,16 +262,13 @@ namespace Wrapper
             FALSE,
             IGNORE
         }
-        private bool preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, PPDefine> defines, Project proj, string filePath, string name, MultiStreamWriter writer, List<PostProcessFile> ppFiles)
+        private bool preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, PPDefine> defines, Project proj, string filePath, string name, List<PostProcessFile> ppFiles)
         {
             //Open given file
             StreamReader reader = new StreamReader(filePath);
             PostProcessFile ppFile = new PostProcessFile(filePath, name);
             ppFiles.Add(ppFile);
-            StreamWriter thisFileWriter = new StreamWriter(ppFile.FileStream);
-            StreamWriter FullFileWriter = new StreamWriter(ppFile.FullFileStream);
-            writer.Add(thisFileWriter);
-            writer.Add(FullFileWriter);
+            StreamWriter writer = new StreamWriter(ppFile.FileStream);
 
             //Prepare some variables needed for the entire processing periode in this function
             string s;
@@ -306,8 +304,6 @@ namespace Wrapper
                         Logger.Instance.log(Logger.LogLevel.ERROR, "Experienced some error while parsing existing defines.");
                         Logger.Instance.log(Logger.LogLevel.CONTINUE, ex.Message + ". file: " + filePath + ". linenumber: " + filelinenumber);
                         reader.Close();
-                        writer.Remove(thisFileWriter);
-                        writer.Remove(FullFileWriter);
                         return false;
                     }
                     writer.WriteLine(leading + s);
@@ -349,7 +345,7 @@ namespace Wrapper
                         {
                             //Ohhh no ... some problem in OSI layer 8
                             reader.Close();
-                            writer.KillAll();
+                            writer.Close();
                             throw new Exception("Include contains self reference. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //Check if file was already included
@@ -358,17 +354,14 @@ namespace Wrapper
                         //process the file before continuing with this
                         try
                         {
-                            writer.Remove(thisFileWriter);
-                            if (!preprocessFile(ifdefs, defines, proj, newFile, afterDefine.Trim(new char[] { '<', '>', '"', '\'', ' ' }), writer, ppFiles))
+                            if (!preprocessFile(ifdefs, defines, proj, newFile, afterDefine.Trim(new char[] { '<', '>', '"', '\'', ' ' }), ppFiles))
                             {
                                 //A sub file encountered an error, so stop here to prevent useles waste of ressources
                                 reader.Close();
-                                writer.Remove(thisFileWriter);
-                                writer.Remove(FullFileWriter);
+                                writer.Close();
                                 return false;
                             }
                             includedFiles.Add(newFile);
-                            writer.Add(thisFileWriter);
                         }
                         catch (Exception e)
                         {
@@ -379,7 +372,7 @@ namespace Wrapper
                         //The user wants to define something here
                         while (s.EndsWith("\\"))
                         {
-                            thisFileWriter.WriteLine();
+                            writer.WriteLine();
                             afterDefine += reader.ReadLine();
                             filelinenumber++;
                         }
@@ -396,7 +389,7 @@ namespace Wrapper
                         {
                             //Redefining something is not allowed, so throw an error here
                             reader.Close();
-                            writer.KillAll();
+                            writer.Close();
                             throw new Exception("Redefining a define is not allowed! Use #undefine to undef something. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //FINALLY add the define
@@ -426,7 +419,7 @@ namespace Wrapper
                         if (index < 0)
                         {
                             reader.Close();
-                            writer.KillAll();
+                            writer.Close();
                             throw new Exception("unexpected #else. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //swap the value of currents if scope to the correct value
@@ -438,7 +431,7 @@ namespace Wrapper
                         if (index < 0)
                         {
                             reader.Close();
-                            writer.KillAll();
+                            writer.Close();
                             throw new Exception("unexpected #endif. file: " + filePath + ". linenumber: " + filelinenumber);
                         }
                         //remove current if scope
@@ -448,8 +441,6 @@ namespace Wrapper
             }
             reader.Close();
             writer.Flush();
-            writer.Remove(thisFileWriter);
-            writer.Remove(FullFileWriter);
             ppFile.resetPosition();
             return true;
         }

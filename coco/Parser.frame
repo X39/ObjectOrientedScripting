@@ -50,6 +50,7 @@ public class Parser {
 		this.scanner = scanner;
 		errors = new Errors();
 	}
+	public static List<string> UsedFiles = new List<string>();
 	
 	bool peekCompare(params int[] values)
 	{

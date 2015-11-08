@@ -1,4 +1,4 @@
-#include <array>
+using <std::String>
 namespace std
 {
     native String
@@ -11,7 +11,7 @@ namespace std
             s
         endAssign
 		
-        assign simple (String s)
+        assign simple (::std::String s)
             s
         endAssign
         
@@ -19,25 +19,25 @@ namespace std
             count _this
         endFnc
         
-        fnc simple String subString (scalar off, scalar len)
+        fnc simple ::std::String subString (scalar off, scalar len)
             _this select [off, len]
         endFnc
 		
-        fnc simple String indexOf (string s)
+        fnc simple scalar indexOf (string s)
             _this find s
         endFnc
-        fnc simple String indexOf (String s)
+        fnc simple scalar indexOf (::std::String s)
             _this find s
         endFnc
 		
         fnc simple bool contains (string s)
             (_this find s) >= 0
         endFnc
-        fnc simple bool contains (String s)
+        fnc simple bool contains (::std::String s)
             (_this find s) >= 0
         endFnc
 		
-		fnc simple string toString ()
+		fnc simple ::std::String toString ()
 			_this
 		endFnc
 		
@@ -49,7 +49,7 @@ namespace std
 			_this + s
 		endFnc
 		
-		fnc simple String append(String s)
+		fnc simple ::std::String append(::std::String s)
 			_this + s
 		endFnc
 		
@@ -57,19 +57,19 @@ namespace std
 			_this splitString delimiter
 		endFnc
 		
-		fnc simple ::std::array<::std::String> split(String delimiter)
+		fnc simple ::std::array<::std::String> split(::std::String delimiter)
 			_this splitString delimiter
 		endFnc
 		
-		fnc simple bool equals(String s)
+		fnc simple bool equals(::std::String s)
 			_this isEqualTo s
 		endFnc
 		
-		fnc simple String toUpper()
+		fnc simple ::std::String toUpper()
 			toUpper _this
 		endFnc
 		
-		fnc simple String toLower()
+		fnc simple ::std::String toLower()
 			toLower _this
 		endFnc
     }

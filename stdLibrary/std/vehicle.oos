@@ -1,7 +1,7 @@
-#include <array>
-#include <config>
-#include <context>
-#include <string>
+using <std::array>
+using <std::config>
+using <std::context>
+using <std::String>
 
 namespace std
 {

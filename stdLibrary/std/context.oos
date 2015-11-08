@@ -1,4 +1,4 @@
-#include <string>
+using <std::String>
 namespace std
 {
     native context

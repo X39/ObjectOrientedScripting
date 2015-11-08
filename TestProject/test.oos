@@ -1,3 +1,8 @@
+using <std::array>
+using <std::config>
+using <std::vehicle>
+using <std::context>
+
 #include "test.def"
 #define SOMEDEF //testmore
 #define somethingWithArgs(TEST) //test TEST TEST6
@@ -11,10 +16,6 @@ somethingWithArgs((, approved))
 somethingWithArgs({a,p,r,o,v,e,d})
 mergeTest(its something with )
 mergeTest(itsMergedDude!)
-#include <array>
-#include <config>
-#include <vehicle>
-#include <context>
 namespace X39
 {
     namespace testNamespace

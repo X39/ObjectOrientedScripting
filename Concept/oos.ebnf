@@ -1,4 +1,9 @@
 using Compiler.OOS_LanguageObjects;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 COMPILER OOS
 	CHARACTERS
@@ -13,7 +18,7 @@ COMPILER OOS
 		T_STRING = '"' { STRINGCHARS | "\\\""} '"'.
 		T_IDENT = ( CHARACTER | '_' ) { CHARACTER | '_' | DIGIT }.
 		T_TERMINATOR = ';'.
-		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | '/' | ">=" | "<=".
+		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | ">=" | "<=".
         T_OTHEROP = ">>" | "<<".
 		T_ASSIGNMENTCHAR = '='.
 		T_EXTENDEDASSIGNMENTCHARS = "+=" | "-=" | "*=" | "/=".
@@ -31,6 +36,8 @@ COMPILER OOS
 		T_DYNAMICCASTOPERATOR = '$'.
 		T_TEMPLATEOPEN = '<'.
 		T_TEMPLATECLOSE = '>'.
+		T_SLASH = '/'.
+		T_BACKSLASH = '\\'.
 		
 	COMMENTS FROM "/*" TO "*/" NESTED
 	COMMENTS FROM "//" TO '\n'
@@ -191,6 +198,8 @@ COMPILER OOS
 				(
                     T_EXPOP (. obj.expOperator = t.val; .)
                     |
+                    T_SLASH (. obj.expOperator = t.val; .)
+                    |
                     T_TEMPLATEOPEN (. obj.expOperator = t.val; .)
                     |
                     T_TEMPLATECLOSE (. obj.expOperator = t.val; .)
@@ -213,6 +222,12 @@ COMPILER OOS
             )
 		.
 		OOS (. if(this.BaseObject == null) throw new Exception("BaseObject was never set"); var obj = this.BaseObject; pBaseLangObject blo; .) =
+			[
+				OP_USING
+				{
+					OP_USING
+				}
+			]
 			{
 				NAMESPACE<out blo, obj> (. obj.addChild(blo); .)
 				|
@@ -232,6 +247,104 @@ COMPILER OOS
 					)
 				)
 			}
+		.
+		OP_USING (. List<string> identList = new List<string>(); bool isLocal = false; .) =
+			"using"
+			(
+				( (. isLocal = true; .)
+					'"'
+					T_IDENT (. identList.Add(t.val); .)
+					{
+						T_NAMESPACEACCESS
+						T_IDENT (. identList.Add(t.val); .)
+					}
+					'"'
+				)
+				|
+				(
+					T_TEMPLATEOPEN
+					T_IDENT (. identList.Add(t.val); .)
+					{
+						T_NAMESPACEACCESS
+						T_IDENT (. identList.Add(t.val); .)
+					}
+					T_TEMPLATECLOSE
+				)
+			)
+			(.
+        if (errDist >= minErrDist)
+        {
+            string lookupPath = isLocal ? Wrapper.Compiler.ProjectFile.ProjectPath : Wrapper.Compiler.stdLibPath;
+            string currentFile = lookupPath;
+            bool flag = true;
+            foreach (var it in identList)
+            {
+                string tmp = lookupPath + it;
+                if (Directory.Exists(tmp))
+                {
+                    lookupPath += it + '\\';
+                }
+                else if (Directory.EnumerateFiles(lookupPath).Any(file =>
+                {
+                    int index = file.LastIndexOf('\\');
+                    string tmpFile = file;
+                    file = file.Substring(0, index);
+                    if (file.StartsWith(it))
+                    {
+                        index = file.IndexOf('.');
+                        if (index >= 0)
+                        {
+                            file = file.Substring(0, index);
+                        }
+                        if (file == it)
+                        {
+                            currentFile = tmpFile;
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }))
+                {
+                    if (identList.Last() != it)
+                    {
+                        flag = false;
+                        SemErr("Invalid Operation, hit file before end: " + lookupPath);
+                        break;
+                    }
+                }
+                else
+                {
+                    flag = false;
+                    SemErr("Invalid Operation, path could not be dereferenced: " + lookupPath);
+                    break;
+                }
+            }
+            if (flag)
+            {
+                if (!UsedFiles.Contains(currentFile))
+                {
+                    UsedFiles.Add(currentFile);
+                    Scanner scanner = new Scanner(currentFile);
+                    Base baseObject = new Base();
+                    Parser p = new Parser(scanner);
+                    p.BaseObject = this.BaseObject;
+                    p.Parse();
+                    if (p.errors.count > 0)
+                    {
+                        this.errors.count += p.errors.count;
+                        Logger.Instance.log(Logger.LogLevel.ERROR, "In file '" + lookupPath + "'");
+                    }
+                }
+            }
+        }
+			.)
 		.
 		NAMESPACE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Namespace(parent); outObj = obj; pBaseLangObject blo; .) =
 			"namespace"
@@ -383,6 +496,10 @@ COMPILER OOS
 								SemErr("The operator '" + t.val + "' is not supported for override");
 								break;
 						}.)
+					)
+                    |
+					(
+						T_SLASH (. SemErr("The operator '" + t.val + "' is not supported for override"); .)
 					)
                     |
 					(
