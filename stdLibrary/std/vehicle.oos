@@ -15,7 +15,7 @@ namespace std
         fnc simple void                    setPositionASL  (scalar i, scalar j, scalar k)  _this setPosASL [i, j, k]                   endFnc
         fnc simple void                    setVelocity     (scalar i, scalar j, scalar k)  _this setVelocity [i, j, k]                 endFnc
         fnc simple void                    setDamage       (scalar i)                      _this setDamage include                     endFnc
-        fnc simple void                    setFuel         (scalar i)                      
+        fnc        void                    setFuel         (scalar i)                      
             if(!local _this) exitWith
             {
                 throw "VehicleNotLocalException";
