@@ -1,0 +1,12 @@
+using <std::array>
+using <std::config>
+using <std::context>
+using <std::String>
+
+namespace std
+{
+    native Man extends ::std::BaseVehicle
+    {
+    
+    }
+}
