@@ -5,49 +5,19 @@ using <std::String>
 
 namespace std
 {
-    native Vehicle
+    native Vehicle etends ::std::base::BaseVehicle
     {
-        assign simple (string name, scalar i, scalar j, scalar k)                          name createVehicle [i, j, k]                endAssign
-        assign simple (::std::String name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
         
-        fnc simple void                    setDirection    (scalar i)                      _this setDir i                              endFnc
-        fnc simple void                    setPosition     (scalar i, scalar j, scalar k)  _this setPos [i, j, k]                      endFnc
-        fnc simple void                    setPositionASL  (scalar i, scalar j, scalar k)  _this setPosASL [i, j, k]                   endFnc
-        fnc simple void                    setVelocity     (scalar i, scalar j, scalar k)  _this setVelocity [i, j, k]                 endFnc
-        fnc simple void                    setDamage       (scalar i)                      _this setDamage include                     endFnc
-        fnc        void                    setFuel         (scalar i)                      
+        fnc void setFuel (scalar i)
             if(!local _this) exitWith
             {
                 throw "VehicleNotLocalException";
             };
             _this setFuel i;
         endFnc
-        fnc simple void                    attachTo        (::std::Vehicle vehicle)        _this attachTo [vehicle]                    endFnc
-        fnc simple void                    attachTo        (::std::Vehicle vehicle, ::std::Array<scalar> offset) _this attachTo [vehicle, offset] endFnc
-        fnc simple void                    attachTo        (::std::Vehicle vehicle, ::std::Array<scalar> offset, ::std::String memPoint) _this attachTo [vehicle, offset, memPoint) endFnc
-
-        fnc simple scalar                  getDamage       ()                              damage _this                                endFnc
-        fnc simple scalar                  getDirection    ()                              direction _this                             endFnc
-        fnc simple ::std::Array<scalar>    getPosition     ()                              position _this                              endFnc
-        fnc simple ::std::Array<scalar>    getPositionASL  ()                              getPosASL _this                             endFnc
-        fnc simple ::std::Array<scalar>    getVectorDir    ()                              vectorDir _this                             endFnc
-        fnc simple ::std::Array<scalar>    getVectorUp     ()                              vectorUp _this                              endFnc
-        fnc simple ::std::Array<scalar>    getVelocity     ()                              velocity _this                              endFnc
-        fnc simple scalar                  getSpeed        ()                              speed _this                                 endFnc
-        fnc simple ::std::String           getType         ()                              typeOf _this                                endFnc
-        fnc simple ::std::Config           getConfigEntry  ()                              configBin >> "CfgVehicles" >> typeOf _this  endFnc
-        fnc simple ::std::context          getContext      ()                              _this                                       endFnc
-        fnc simple scalar                  getFuel         ()                              fuel _this                                  endFnc
-        fnc simple ::std::Vehicle          getAttachedToObject ()                          attachedTo _this                            endFnc
-        fnc simple ::std::Array<::std::Vehicle> getAttachedObjects()                       attachedObjects _this                       endFnc
         
+        fnc simple scalar getFuel() fuel _this endFnc
         
-
-        fnc simple bool                    isKindOf        (string type)                   _this isKindOf type                         endFnc
-        fnc simple bool                    isKindOf        (::std::String type)            _this isKindOf type                         endFnc
-        fnc simple bool                    isAlive         ()                              alive _this                                 endFnc
-        fnc simple bool                    isPlayer        ()                              isPlayer _this                              endFnc
-        fnc simple bool                    inVehicle       (::std::Vehicle player)         in _this                                    endFnc
-        fnc        bool                    isAttachedTo    (::std::Vehicle vehicle)        attachedTo _this == vehicle                 endFnc
+        fnc simple bool inVehicle(::std::Unit unit) unit in _this endFnc
     }
 }
