@@ -31,6 +31,7 @@ namespace std
         fnc simple bool                    isKindOf        (string type)                   _this isKindOf type                         endFnc
         fnc simple bool                    isKindOf        (::std::String type)            _this isKindOf type                         endFnc
         fnc simple bool                    isAlive         ()                              alive _this                                 endFnc
+        fnc simple bool                    isPlayer        ()                              isPlayer _this                              endFnc
         
     }
 }
