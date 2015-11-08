@@ -91,7 +91,10 @@ namespace Compiler.OOS_LanguageObjects
         public T getLastOf<T>()
         {
             if (this.parent == null)
-                return default(T);
+                if (this is T)
+                    return (T)(object)this;
+                else
+                    return default(T);
             if(this.parent is T)
                 return this.parent.getLastOf<T>();
             if (this is T)
