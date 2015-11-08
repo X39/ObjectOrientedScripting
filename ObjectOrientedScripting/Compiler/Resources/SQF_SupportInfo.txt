@@ -1977,7 +1977,7 @@ u#nil#sizeof STRING
 u#nil#formationtask OBJECT
 u#nil#enablesaving BOOL,ARRAY
 u#nil#clearbackpackcargoglobal OBJECT
-u#nil#getplayeruid OBJECT
+u#string#getplayeruid OBJECT
 u#nil#lnbsize CONTROL
 u#nil#lnbsize SCALAR
 u#nil#sendaumessage ARRAY
@@ -2071,7 +2071,7 @@ n#nil#visiblegps
 n#nil#selectnoplayer
 n#nil#estimatedendservertime
 n#nil#resetcamshake
-n#nil#pi
+n#scalar#pi
 n#nil#disabledebriefingstats
 n#nil#shownuavfeed
 n#nil#isautotest
@@ -2094,18 +2094,18 @@ n#nil#airdensitycurvertd
 n#nil#productversion
 n#nil#copyfromclipboard
 n#nil#groupiconselectable
-n#nil#missionnamespace
-n#nil#uinamespace
-n#nil#activatedaddons
-n#nil#viewdistance
+n#::std::Context#missionnamespace
+n#::std::Context#uinamespace
+n#string[]#activatedaddons
+n#scalar#viewdistance
 n#nil#librarydisclaimers
 n#nil#clearitempool
-n#nil#dialog
-n#nil#profilenamesteam
-n#::std::vehicle#player
+n#bool#dialog
+n#string#profilenamesteam
+n#::std::Man#player
 n#bool#getRemoteSensorsDisabled
 n#nil#shownartillerycomputer
-n#nil#showncompass
+n#bool#showncompass
 n#nil#visiblecompass
 n#other#west
 n#nil#exit
@@ -2115,22 +2115,22 @@ n#nil#vehicles
 n#nil#switchableunits
 n#nil#playerrespawntime
 n#nil#playableunits
-n#nil#currentnamespace
+n#::std::Context#currentnamespace
 n#nil#linebreak
-n#nil#language
-n#nil#cheatsenabled
+n#string#language
+n#bool#cheatsenabled
 n#nil#opencuratorinterface
 n#nil#curatorselected
 n#nil#slingloadassistantshown
 n#nil#buldozer_isenabledroaddiag
 n#nil#sidelogic
 n#nil#runinitscript
-n#nil#winddir
-n#nil#worldname
-n#nil#diag_fps
+n#scalar#winddir
+n#string#worldname
+n#scalar#diag_fps
 n#nil#getobjectviewdistance
 n#nil#sunormoon
-n#nil#allmapmarkers
+n#string[]#allmapmarkers
 n#nil#getdlcassetsusage
 n#nil#independent
 n#nil#soundvolume
@@ -2142,7 +2142,7 @@ n#nil#halt
 n#nil#scriptnull
 n#nil#getartillerycomputersettings
 n#other#east
-n#nil#overcast
+n#scalar#overcast
 n#nil#rain
 n#nil#teamswitch
 n#nil#diag_activesqsscripts
@@ -2154,11 +2154,11 @@ n#nil#forceweatherchange
 n#nil#curatorcamera
 n#nil#netobjnull
 n#nil#timemultiplier
-n#nil#shownchat
+n#bool#shownchat
 n#nil#windstr
 n#nil#armorypoints
 n#nil#groupiconsvisible
-n#nil#profilenamespace
+n#::std::Context#profilenamespace
 n#nil#isdedicated
 n#nil#isstreamfriendlyuienabled
 n#nil#configfile
