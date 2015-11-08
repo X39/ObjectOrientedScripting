@@ -92,11 +92,11 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         if (fnc.FunctionEncapsulation == Encapsulation.Static || fnc.IsConstructor)
                         {
-                            sw.Write(']' + " call " + ((Function)fnc).SqfVariableName);
+                            sw.Write(']' + (fnc.IsAsync ? " call " : " spawn ") + ((Function)fnc).SqfVariableName);
                         }
                         else
                         {
-                            sw.Write(']' + " call (" + '(' + variableName + ')' + ((Function)fnc).SqfVariableName + ')');
+                            sw.Write(']' + (fnc.IsAsync ? " call (" : " spawn (")  + '(' + variableName + ')' + ((Function)fnc).SqfVariableName + ')');
                         }
                     }
                     else
