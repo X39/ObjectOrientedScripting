@@ -8,6 +8,8 @@ namespace std
 {
     native Man extends ::std::base::VehicleBase
     {
-    
+		assign simple ()
+			throw "InvalidOperation";
+		endAssign
     }
 }

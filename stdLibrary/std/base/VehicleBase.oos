@@ -9,6 +9,9 @@ namespace std
     {
         native VehicleBase
         {
+			assign simple ()
+				throw "InvalidOperation";
+			endAssign
             fnc simple void                    setDirection    (scalar i)                      _this setDir i                              endFnc
             fnc simple void                    setPosition     (scalar i, scalar j, scalar k)  _this setPos [i, j, k]                      endFnc
             fnc simple void                    setPositionASL  (scalar i, scalar j, scalar k)  _this setPosASL [i, j, k]                   endFnc
