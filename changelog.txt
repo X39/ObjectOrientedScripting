@@ -1,11 +1,18 @@
 Version 0.6.1-ALPHA                                                             
     |- Compiler:  fixed InstanceOf printout
-    |- Compiler:  Introduced "using" operation, will replace #include
+    |- Compiler:  Introduced "using" operation, replaces #include
+	|- Compiler:  #include now wont "include" the file anymore and instead just
+	|             checks the PreProcessor directives in given file
     |- Compiler:  Added "extends" keyword to native classes --> you now can
 	|             extend native classes
     |- Compiler:  Added code for the "async" keyword on functions (sorry)
     |- Compiler:  "PRINTMODE" flag modes have changed:
     |             Possible modes are: NONE, 0, NEEDED, 1, ALL, 2
+    |- Compiler:  Renamed all stdLibrary objects to have first char uppercase
+    |- Compiler:  Added "VehicleBase" object to stdLibrary (not intended to be
+	|             created via new, will throw an error when you attempt)
+    |- Compiler:  Added "Man" object to stdLibrary, represents all CAManBase
+	|             ArmA objects
 	
 Version 0.6.0-ALPHA                                                             
     |- Compiler:  Rewrote entire Linker & Writer                                
