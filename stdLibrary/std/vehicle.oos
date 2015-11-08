@@ -38,12 +38,16 @@ namespace std
         fnc simple ::std::config           getConfigEntry  ()                              configBin >> "CfgVehicles" >> typeOf _this  endFnc
         fnc simple ::std::context          getContext      ()                              _this                                       endFnc
         fnc simple scalar                  getFuel         ()                              fuel _this                                  endFnc
+        fnc simple ::std::vehicle          getAttachedToObject ()                          attachedTo _this                            endFnc
+        fnc simple ::std::array<::std::vehicle> getAttachedObjects()                       attachedObjects _this                       endFnc
+        
+        
 
         fnc simple bool                    isKindOf        (string type)                   _this isKindOf type                         endFnc
         fnc simple bool                    isKindOf        (::std::String type)            _this isKindOf type                         endFnc
         fnc simple bool                    isAlive         ()                              alive _this                                 endFnc
         fnc simple bool                    isPlayer        ()                              isPlayer _this                              endFnc
-        fnc simple bool                    inVehicle       (::std::Vehicle player)         in _this                                    endFnc
-        
+        fnc simple bool                    inVehicle       (::std::vehicle player)         in _this                                    endFnc
+        fnc        bool                    isAttachedTo    (::std::vehicle vehicle)        attachedTo _this == vehicle                 endFnc
     }
 }
