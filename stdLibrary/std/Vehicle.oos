@@ -1,0 +1,24 @@
+using <std::Array>
+using <std::Config>
+using <std::Context>
+using <std::String>
+using <std::base::VehicleBase>
+
+namespace std
+{
+    native Vehicle extends ::std::base::VehicleBase
+    {
+        
+        fnc void setFuel (scalar i)
+            if(!local _this) exitWith
+            {
+                throw "VehicleNotLocalException";
+            };
+            _this setFuel i;
+        endFnc
+        
+        fnc simple scalar getFuel() fuel _this endFnc
+        
+        fnc simple bool inVehicle(::std::Man man) unit in _this endFnc
+    }
+}
