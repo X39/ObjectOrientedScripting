@@ -7,7 +7,7 @@ namespace std
 {
     namespace base
     {
-        native Vehicle
+        native VehicleBase
         {
             fnc simple void                    setDirection    (scalar i)                      _this setDir i                              endFnc
             fnc simple void                    setPosition     (scalar i, scalar j, scalar k)  _this setPos [i, j, k]                      endFnc
@@ -36,7 +36,7 @@ namespace std
             fnc simple bool                    isKindOf        (string type)                   _this isKindOf type                         endFnc
             fnc simple bool                    isKindOf        (::std::String type)            _this isKindOf type                         endFnc
             fnc simple bool                    isAlive         ()                              alive _this                                 endFnc
-            fnc        bool                    isAttachedTo    (::std::Vehicle vehicle)        attachedTo _this == vehicle                 endFnc
+            fnc simple bool                    isAttachedTo    (::std::Vehicle vehicle)        attachedTo _this == vehicle                 endFnc
         }
     }
 }
