@@ -81,7 +81,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             if (!string.IsNullOrEmpty(s))
                             {
-                                Ident tmpIdent = new Ident(ident, s, -1, -1);
+                                Ident tmpIdent = new Ident(ident, s, -1, -1, "");
                                 tmpIdent.Access = Ident.AccessType.Namespace;
                                 if(ident != null)
                                 {

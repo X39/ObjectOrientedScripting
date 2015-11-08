@@ -51,7 +51,7 @@ COMPILER OOS
 				T_TERMINATOR
 			}
 		.
-        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col); pBaseLangObject blo; VarType e; .) =
+        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col, this.file); pBaseLangObject blo; VarType e; .) =
             T_TEMPLATEOPEN
             (
                 IDENTACCESS<out blo, obj> (. obj.vtoList.Add(new VarTypeObject((Ident)blo)); .)
@@ -69,7 +69,7 @@ COMPILER OOS
             T_TEMPLATECLOSE
         .
 		IDENT<out pBaseLangObject outObj, pBaseLangObject parent> =
-            T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col); .)
+            T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col, this.file); .)
 		.
 		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; .) =
             [
@@ -174,7 +174,7 @@ COMPILER OOS
 			|
 			BOOLEAN<out flag> (. obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); .)
 		.
-		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent, bool flag> (. var obj = new Expression(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; obj.negate = flag; .) =
+		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent, bool flag> (. var obj = new Expression(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; obj.negate = flag; .) =
 			[
 				'!' (. obj.negate = true; .)
 			]
@@ -294,7 +294,7 @@ COMPILER OOS
                 {
                     int index = file.LastIndexOf('\\');
                     string tmpFile = file;
-                    file = file.Substring(0, index);
+                    file = file.Substring(index + 1);
                     if (file.StartsWith(it))
                     {
                         index = file.IndexOf('.');
@@ -339,7 +339,7 @@ COMPILER OOS
                     UsedFiles.Add(currentFile);
                     Scanner scanner = new Scanner(currentFile);
                     Base baseObject = new Base();
-                    Parser p = new Parser(scanner);
+                    Parser p = new Parser(scanner, currentFile);
                     p.BaseObject = this.BaseObject;
                     p.Parse();
                     if (p.errors.count > 0)
@@ -393,12 +393,16 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-        NATIVECLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Native(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; Template te; bool flag = false; .) =
+        NATIVECLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Native(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; Template te; bool flag = false; .) =
             "native"
             IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
             [
                 TEMPLATE<out te, obj> (. obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name, true, te); .)
             ]
+			[
+				"extends"
+				IDENTACCESS<out blo, obj, false> (. obj.addParent((Ident)blo); .)
+			]
 			(. if(!flag) obj.VTO = new VarTypeObject(obj.Name, true); .)
 			T_CODEBRACKETOPEN
             NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
@@ -411,8 +415,8 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
         .
-        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeAssign(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .) =
-            (. obj.Name = new Ident(obj, ((Native)parent).Name.OriginalValue, ((Native)parent).Name.Line, ((Native)parent).Name.Pos); .)
+        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeAssign(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
+            (. obj.Name = new Ident(obj, ((Native)parent).Name.OriginalValue, ((Native)parent).Name.Line, ((Native)parent).Name.Pos, this.file); .)
             "assign"
             [
                 "simple" (. obj.IsSimple = true; .)
@@ -431,7 +435,7 @@ COMPILER OOS
 			}
 			"endAssign" (. obj.Code = obj.Code.Trim(); .)
         .
-        NATIVEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeFunction(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; VarType v; .) =
+        NATIVEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeFunction(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarType v; .) =
             "fnc"
             [
                 "simple" (. obj.IsSimple = true; .)
@@ -466,7 +470,7 @@ COMPILER OOS
 			}
 			"endFnc" (. obj.Code = obj.Code.Trim(); .)
         .
-        NATIVEOPERATOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeOperator(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; VarType v; .) =
+        NATIVEOPERATOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeOperator(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarType v; .) =
             "operator"
             [
                 "simple" (. obj.IsSimple = true; .)
@@ -578,7 +582,7 @@ COMPILER OOS
 									  constructor.encapsulation = Encapsulation.Public;
                                       try
                                       {
-                                        constructor.Name = new Ident(constructor, obj.Name.OriginalValue, obj.Name.Line, obj.Name.Pos);
+                                        constructor.Name = new Ident(constructor, obj.Name.OriginalValue, obj.Name.Line, obj.Name.Pos, this.file);
                                       }
                                       catch (Exception ex)
                                       {
@@ -702,7 +706,7 @@ COMPILER OOS
 			T_ROUNDBRACKETCLOSE
 			TERMINATOR
 		.
-		NEWVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; .) =
+		NEWVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.line, la.col, this.file); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; .) =
 			(
 				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
@@ -724,7 +728,7 @@ COMPILER OOS
         VARIABLEASSIGNMENT<out pBaseLangObject outObj, pBaseLangObject ident, pBaseLangObject parent> (. var obj = new AssignContainer(parent); obj.Name = (Ident)ident; ident.Parent = obj; outObj = obj; pBaseLangObject blo; .) =
             BODY_ASSIGNMENT<out blo, outObj, true> (. obj.assign = (VariableAssignment)blo; .)
         .
-		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.col, la.line); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .) =
+		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.line, la.col, this.file); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .) =
 			"auto"(. obj.varType = new VarTypeObject(VarType.Auto); .)
 			IDENT<out blo, outObj> (. obj.Name = (Ident)blo; .)
             BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
@@ -964,7 +968,7 @@ COMPILER OOS
 			"throw"
 			EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 		.
-		OP_RETURN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Return(parent, t.line, t.col); outObj = obj; pBaseLangObject blo; .) =
+		OP_RETURN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Return(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
 			"return"
 			[
 				EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
@@ -978,7 +982,7 @@ COMPILER OOS
 			T_CODEBRACKETOPEN
 			{
 				(
-					"case" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
+					"case" (. caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); .)
 					EXPRESSION<out blo, caseObj> (. caseObj.addChild(blo); .)
 					':'
 					{
@@ -1005,11 +1009,11 @@ COMPILER OOS
 				(
 					(
 						(
-							"default" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
+							"default" (. caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); .)
 							':'
 						)
 						|
-						"default:" (. caseObj = new Case(obj, t.line, t.col); obj.addChild(caseObj); .)
+						"default:" (. caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); .)
 					)
 					{
 						CODEINSTRUCTION<out blo, caseObj> (. caseObj.addChild(blo); .)

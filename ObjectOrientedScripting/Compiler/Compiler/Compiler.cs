@@ -121,7 +121,7 @@ namespace Wrapper
         public void CheckSyntax(string filepath)
         {
             Scanner scanner = new Scanner(filepath);
-            Parser parser = new Parser(scanner);
+            Parser parser = new Parser(scanner, filepath);
             parser.Parse();
         }
         private void cleanupRecursive(string path)
@@ -181,7 +181,7 @@ namespace Wrapper
                 //}
                 Scanner scanner = new Scanner(it.FileStream);
                 Base baseObject = new Base();
-                Parser p = new Parser(scanner);
+                Parser p = new Parser(scanner, it.FilePath);
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = baseObject;
                 p.Parse();
@@ -223,7 +223,7 @@ namespace Wrapper
 
             Base oosTreeBase = new Base();
             NamespaceResolver.BaseClass = oosTreeBase;
-            Parser parser = new Parser(new Scanner(ppMainFile.FileStream));
+            Parser parser = new Parser(new Scanner(ppMainFile.FileStream), ppMainFile.FilePath);
             Parser.UsedFiles = new List<string>();
             parser.BaseObject = oosTreeBase;
             parser.Parse();

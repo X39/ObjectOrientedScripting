@@ -8,7 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class NativeOperator : NativeInstruction, Interfaces.iOperatorFunction
     {
-        public NativeOperator(pBaseLangObject parent, int line, int pos) : base(parent, line, pos)
+        public NativeOperator(pBaseLangObject parent, int line, int pos, string file) : base(parent, line, pos, file)
         {
             this.addChild(null);
             VTO = null;
@@ -70,7 +70,7 @@ namespace Compiler.OOS_LanguageObjects
             return "nOp->" + Enum.GetName(typeof(OverridableOperator), this.OperatorType);
         }
         private OverridableOperator opType;
-        public OverridableOperator OperatorType { get { return opType; } set { this.Name = new Ident(this, Enum.GetName(typeof(OverridableOperator), value), this.Line, this.Pos); this.opType = value; } }
+        public OverridableOperator OperatorType { get { return opType; } set { this.Name = new Ident(this, Enum.GetName(typeof(OverridableOperator), value), this.Line, this.Pos, this.File); this.opType = value; } }
 
         public List<Return> ReturnCommands { get { return new List<Return>(); } }
         public bool AlwaysReturns { get { return true; } }

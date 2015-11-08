@@ -9,10 +9,9 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class NativeInstruction : pBaseLangObject
     {
-        private int line;
-        public int Line { get { return this.line; } }
-        private int pos;
-        public int Pos { get { return this.pos; } }
+        public int Line { get; internal set; }
+        public int Pos { get; internal set; }
+        public string File { get; internal set; }
         VarTypeObject vto;
         public VarTypeObject VTO
         {
@@ -22,10 +21,11 @@ namespace Compiler.OOS_LanguageObjects
         public string Code { get; set; }
         public bool IsSimple { get; set; }
 
-        public NativeInstruction(pBaseLangObject parent, int line, int pos) : base(parent)
+        public NativeInstruction(pBaseLangObject parent, int line, int pos, string file) : base(parent)
         {
-            this.line = line;
-            this.pos = pos;
+            this.Line = line;
+            this.Pos = pos;
+            this.File = file;
         }
         public virtual string getCode(string[] argList)
         {

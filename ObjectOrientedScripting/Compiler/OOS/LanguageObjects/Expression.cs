@@ -108,7 +108,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     case "&": case "&&": case "|": case "||":
                         if (lType.varType != VarType.Bool || rType.varType != VarType.Bool)
-                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
+                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
                         oType = new VarTypeObject(VarType.Bool);
                         break;
                     case "==": case "===":
@@ -118,19 +118,19 @@ namespace Compiler.OOS_LanguageObjects
                         if(lType.varType == VarType.String)
                         {
                             if (lType.varType != VarType.String || rType.varType != VarType.String)
-                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
+                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
                             oType = new VarTypeObject(VarType.String);
                         }
                         else
                         {
                             if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
+                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
                             oType = new VarTypeObject(VarType.Scalar);
                         }
                         break;
                     case ">": case ">=": case "<": case "<=":
                         if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, line, pos);
+                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
                         oType = new VarTypeObject(VarType.Bool);
                         break;
                     case "":
@@ -144,19 +144,19 @@ namespace Compiler.OOS_LanguageObjects
         public string expOperator;
         public bool negate;
 
-        private int line;
-        public int Line { get { return this.line; } }
-        private int pos;
-        public int Pos { get { return this.pos; } }
+        public int Line { get; internal set; }
+        public int Pos { get; internal set; }
+        public string File { get; internal set; }
 
-        public Expression(pBaseLangObject parent, int line, int pos) : base(parent)
+        public Expression(pBaseLangObject parent, int line, int pos, string file) : base(parent)
         {
             this.children.Add(null);
             this.children.Add(null);
             negate = false;
             expOperator = "";
-            this.line = line;
-            this.pos = pos;
+            this.Line = line;
+            this.Pos = pos;
+            this.File = file;
         }
         public override int doFinalize() { return 0; }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)

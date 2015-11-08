@@ -41,13 +41,15 @@ namespace Compiler.OOS_LanguageObjects
 
         public int Line { get; internal set; }
         public int Pos { get; internal set; }
+        public string File { get; internal set; }
 
-        public Variable(pBaseLangObject parent, int pos, int line) : base(parent)
+        public Variable(pBaseLangObject parent, int line, int pos, string file) : base(parent)
         {
             this.addChild(null);
             varType = null;
             this.Line = line;
             this.Pos = pos;
+            this.File = file;
         }
         public override int finalize()
         {
@@ -72,7 +74,7 @@ namespace Compiler.OOS_LanguageObjects
             //Make sure that we not got an auto without an assign here
             if (this.varType.varType == VarType.Auto && assignList.Count == 0)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0007, this.Line, this.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0007, this.Line, this.Pos, this.File));
                 errCount++;
             }
             //Check if we got an assign and validate the value after that
@@ -92,7 +94,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     if (!assignType.Equals(thisType))
                     {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0008, this.Line, this.Pos));
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0008, this.Line, this.Pos, this.File));
                         errCount++;
                     }
                 }
@@ -116,7 +118,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                             if (flag)
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0009, this.Line, this.Pos));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0009, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
                         }
@@ -129,7 +131,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             if (!((pBaseLangObject)classRef).getAllChildrenOf<Variable>(true, this).TrueForAll(it => it.Name.FullyQualifiedName != this.Name.FullyQualifiedName))
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0010, this.Line, this.Pos));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0010, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
                         }
@@ -138,7 +140,7 @@ namespace Compiler.OOS_LanguageObjects
                             var topObject = this.getFirstOf<Base>();
                             if (!topObject.getAllChildrenOf<Variable>(true, this).TrueForAll(it => it.Name.FullyQualifiedName != this.Name.FullyQualifiedName))
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0011, this.Line, this.Pos));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0011, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
                         }

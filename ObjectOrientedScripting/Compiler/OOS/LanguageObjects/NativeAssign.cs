@@ -11,7 +11,7 @@ namespace Compiler.OOS_LanguageObjects
         private Ident name;
         public Ident Name { get { return name; } set { name = value; } }
         public bool IsConstructor { get { return true; } }
-        public NativeAssign(pBaseLangObject parent, int line, int pos) : base(parent, line, pos)
+        public NativeAssign(pBaseLangObject parent, int line, int pos, string file) : base(parent, line, pos, file)
         {
             if (parent is Native)
             {

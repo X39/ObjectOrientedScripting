@@ -53,7 +53,7 @@ namespace Compiler.OOS_LanguageObjects
         }
         public bool IsAsync { get { return false; } }
 
-        public NativeFunction(pBaseLangObject parent, int line, int pos) : base(parent, line, pos)
+        public NativeFunction(pBaseLangObject parent, int line, int pos, string file) : base(parent, line, pos, file)
         {
             this.addChild(null);
         }

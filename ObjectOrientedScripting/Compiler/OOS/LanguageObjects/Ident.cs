@@ -85,7 +85,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     if (this.Parent is Ident && (((Ident)this.Parent).Access == AccessType.Instance) && ((Ident)this.Parent).ReferencedType != null)
                     {
-                        return ((Ident)this.Parent).ReferencedType.ident.FullyQualifiedName + "." + this.originalValue;
+                        return ((Ident)this.Parent).ReferencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
                     }
                     string result = "";
                     pBaseLangObject curobject = this;
@@ -150,6 +150,7 @@ namespace Compiler.OOS_LanguageObjects
         public string OriginalValue { get { return this.originalValue; } }
         public int Line { get; internal set; }
         public int Pos { get; internal set; }
+        public string File { get; internal set; }
         public AccessType Access { get; set; }
 
         public Ident LastIdent
@@ -185,13 +186,14 @@ namespace Compiler.OOS_LanguageObjects
                 return list[0];
             }
         }
-        public Ident(pBaseLangObject parent, string origVal, int line, int pos) : base(parent)
+        public Ident(pBaseLangObject parent, string origVal, int line, int pos, string file) : base(parent)
         {
             this.originalValue = origVal;
             referencedObject = null;
             referencedType = new VarTypeObject(VarType.Void);
             this.Line = line;
             this.Pos = pos;
+            this.File = file;
             this.Access = AccessType.NA;
             this.isGlobalIdentifier = false;
         }
@@ -267,6 +269,12 @@ namespace Compiler.OOS_LanguageObjects
                ))
             {
                 var ntr = HelperClasses.NamespaceResolver.createNSR(this);
+                if(ntr == null)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0012, this.Line, this.Pos, this.File));
+                    errCount++;
+                    return errCount;
+                }
                 if (ntr.Reference is Interfaces.iClass)
                     type = IdenType.NamespaceAccess;
                 else
@@ -282,7 +290,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             else
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
                 errCount++;
             }
             #endregion
@@ -335,7 +343,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                             if (variable == null)
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0012, this.Line, this.Pos));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0012, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
                             this.referencedObject = variable;
@@ -353,7 +361,7 @@ namespace Compiler.OOS_LanguageObjects
                                         Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OverridableOperator.ArrayAccess);
                                         if (opFnc == null)
                                         {
-                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0005, this.Line, this.Pos));
+                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0005, this.Line, this.Pos, this.File));
                                             errCount++;
                                         }
                                         else
@@ -376,7 +384,7 @@ namespace Compiler.OOS_LanguageObjects
                                     }
                                     else
                                     {
-                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos));
+                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
                                         errCount++;
                                     }
                                 }
@@ -398,7 +406,7 @@ namespace Compiler.OOS_LanguageObjects
                                             this.referencedType.varType = VarType.String;
                                             break;
                                         default:
-                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos));
+                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos, this.File));
                                             errCount++;
                                             break;
                                     }
@@ -431,7 +439,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                             if (fncList.Count == 0)
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
                             else
@@ -449,14 +457,14 @@ namespace Compiler.OOS_LanguageObjects
                                 //Raise new linker issue if we could not locate a matching function
                                 if (fnc == null)
                                 {
-                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0002, this.Line, this.Pos));
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0002, this.Line, this.Pos, this.File));
                                     errCount++;
                                 }
                                 else
                                 {
                                     if(fnc is Function && ((Function)fnc).IsConstructor && this.getFirstOf<NewInstance>() == null)
                                     {
-                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0026, this.Line, this.Pos));
+                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0026, this.Line, this.Pos, this.File));
                                         errCount++;
                                     }
                                     //Ref the object to the function
@@ -475,7 +483,7 @@ namespace Compiler.OOS_LanguageObjects
                                             //Private encapsulation just requires checking the current class we are operating in
                                             if (!fncNsr.isInNamespace(parentClass.Name))
                                             {
-                                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0003, this.Line, this.Pos));
+                                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0003, this.Line, this.Pos, this.File));
                                                 errCount++;
                                             }
                                         }
@@ -494,7 +502,7 @@ namespace Compiler.OOS_LanguageObjects
                                             }
                                             if (!flag)
                                             {
-                                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0004, this.Line, this.Pos));
+                                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0004, this.Line, this.Pos, this.File));
                                                 errCount++;
                                             }
                                         }

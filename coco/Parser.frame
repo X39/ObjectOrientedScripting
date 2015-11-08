@@ -36,6 +36,7 @@ public class Parser {
 	const int minErrDist = 2;
 	
 	public Scanner scanner;
+    public string file;
 	public Errors  errors;
 
 	public Token t;    // last recognized token
@@ -46,8 +47,9 @@ public class Parser {
 
 	public Base BaseObject { get; set;}
 	
-	public Parser(Scanner scanner) {
+	public Parser(Scanner scanner, string file) {
 		this.scanner = scanner;
+        this.file = file;
 		errors = new Errors();
 	}
 	public static List<string> UsedFiles = new List<string>();

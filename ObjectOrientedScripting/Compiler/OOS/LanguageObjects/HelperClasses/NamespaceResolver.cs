@@ -102,6 +102,8 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
             int index = fqn.LastIndexOf(':');
             string prQN = index > 0 ? fqn.Substring(fqn.LastIndexOf(':') + 1) : fqn;
             Interfaces.iName lastRef = nsr.Reference is Interfaces.iName ? (Interfaces.iName)nsr.Reference : null;
+            if (lastRef == null)
+                return null;
             while(!nsr.IsValid)
             {
                 if (nsr.Reference == null)

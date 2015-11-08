@@ -17,14 +17,14 @@ namespace Compiler.OOS_LanguageObjects
         {
             endMarker = this.children.Count;
         }
-        private int line;
-        public int Line { get { return this.line; } }
-        private int pos;
-        public int Pos { get { return this.pos; } }
-        public Case(pBaseLangObject parent, int line, int pos) : base(parent)
+        public int Line { get; internal set; }
+        public int Pos { get; internal set; }
+        public string File { get; internal set; }
+        public Case(pBaseLangObject parent, int line, int pos, string file) : base(parent)
         {
-            this.line = line;
-            this.pos = pos;
+            this.Line = line;
+            this.Pos = pos;
+            this.File = file;
         }
         public override int doFinalize()
         {
@@ -36,7 +36,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     if (!((Expression)expression).ReferencedType.Equals(switchElement.ReferencedType))
                     {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0024, this.line, this.pos));
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0024, this.Line, this.Pos, this.File));
                         errCount++;
                     }
                 }

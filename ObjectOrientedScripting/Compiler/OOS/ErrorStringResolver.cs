@@ -21,13 +21,14 @@ namespace Compiler
             LNK0025, LNK0026, LNK0027, LNK0028, LNK0029,
             LNK0030, LNK0031, LNK0032, LNK0033, LNK0034,
             LNK0035, LNK0036, LNK0037, LNK0038, LNK0039,
-            LNK0040, LNK0041, LNK0042, LNK0043, LNK0044
+            LNK0040, LNK0041, LNK0042, LNK0043, LNK0044,
+            LNK0045
 
         }
 
-        public static string resolve(LinkerErrorCode errCode, int line = -1, int pos = -1)
+        public static string resolve(LinkerErrorCode errCode, int line = -1, int pos = -1, string file = default(string))
         {
-            return Enum.GetName(typeof(LinkerErrorCode), errCode) + ": " + doResolve(errCode) + ". " + (line == -1 ? "" : "line " + line.ToString() + (pos == -1 ? "" : " col " + pos.ToString()));
+            return Enum.GetName(typeof(LinkerErrorCode), errCode) + ": " + doResolve(errCode) + ". " + (line == -1 ? "" : "line " + line.ToString() + (pos == -1 ? "" : " col " + pos.ToString()) + (string.IsNullOrEmpty(file) ? "" : " file '" + file + "'"));
         }
         private static string doResolve(LinkerErrorCode errCode)
         {
@@ -45,7 +46,7 @@ namespace Compiler
                 case LinkerErrorCode.LNK0009:
                 case LinkerErrorCode.LNK0010:
                 case LinkerErrorCode.LNK0011: return "Invalid Operation, variable is defined twice";
-                case LinkerErrorCode.LNK0012: return "Could not locate variable reference for Ident";
+                case LinkerErrorCode.LNK0012: return "Could not locate reference for Ident";
                 case LinkerErrorCode.LNK0013: return "Type Missmatch, Array type is not consistent";
                 case LinkerErrorCode.LNK0014: return "Type Missmatch, Expression arg types not valid. ";
                 case LinkerErrorCode.LNK0015: return "SQF Command is missing LArgs";
@@ -78,6 +79,7 @@ namespace Compiler
                 case LinkerErrorCode.LNK0042: return "Invalid Operation, lacking arguments on override";
                 case LinkerErrorCode.LNK0043: return "Type Missmatch, override has different type then base";
                 case LinkerErrorCode.LNK0044: return "Type Missmatch, override return differs from base";
+                case LinkerErrorCode.LNK0045: return "Resolving ident failed";
 
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
