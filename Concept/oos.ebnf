@@ -253,6 +253,9 @@ COMPILER OOS
 			(
 				( (. isLocal = true; .)
 					'"'
+					[
+						T_NAMESPACEACCESS
+					]
 					T_IDENT (. identList.Add(t.val); .)
 					{
 						T_NAMESPACEACCESS
@@ -263,6 +266,9 @@ COMPILER OOS
 				|
 				(
 					T_TEMPLATEOPEN
+					[
+						T_NAMESPACEACCESS
+					]
 					T_IDENT (. identList.Add(t.val); .)
 					{
 						T_NAMESPACEACCESS
