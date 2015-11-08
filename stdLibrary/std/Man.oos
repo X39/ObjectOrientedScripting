@@ -2,10 +2,11 @@ using <std::Array>
 using <std::Config>
 using <std::Context>
 using <std::String>
+using <std::base:Vehicle>
 
 namespace std
 {
-    native Man extends ::std::base:Vehicle
+    native Man extends ::std::base::Vehicle
     {
     
     }
