@@ -5,7 +5,7 @@ using <std::String>
 
 namespace std
 {
-    native Man extends ::std::BaseVehicle
+    native Man extends ::std::base:Vehicle
     {
     
     }
