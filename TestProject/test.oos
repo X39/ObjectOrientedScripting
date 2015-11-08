@@ -1,7 +1,7 @@
-using <std::array>
-using <std::config>
-using <std::vehicle>
-using <std::context>
+using <std::Array>
+using <std::Config>
+using <std::Vehicle>
+using <std::Context>
 
 #include "test.def"
 #define SOMEDEF //testmore
@@ -92,7 +92,7 @@ namespace X39
     }
     static void preInit()
     {
-		::std::vehice player = SQF player;
+		auto player = SQF player;
         SQF diag_log("preInit");
         auto _obj = new ::X39::testObj();
         _obj.testFncPublic("preInitArg1", "preInitArg2");
@@ -104,20 +104,20 @@ namespace X39
         _foo.foobar("normal bar");
 
         auto _testing = 0;
-        auto arrayObjectTest = new ::std::array<scalar>();
+        auto arrayObjectTest = new ::std::Array<scalar>();
         arrayObjectTest.pushBack(0);
         arrayObjectTest.pushBack(1);
         arrayObjectTest.pushBack(2);
         SQF diag_log(arrayObjectTest[0]);
         
-        auto configObj = new ::std::config();
+        auto configObj = new ::std::Config();
         configObj = configObj.extend("CfgVehicles").extend("FooBar");
         configObj = configObj.parent();
         auto hierarchy = configObj.hierarchy();
         SQF diag_log(hierarchy[0].name());
         SQF diag_log(configObj[0].name());
         
-        auto veh = new ::std::vehicle("B_Heli_Light_01_F", 0, 0, 1000);
+        auto veh = new ::std::Vehicle("B_Heli_Light_01_F", 0, 0, 1000);
         if(!veh.isAlive())
         {
             return;
