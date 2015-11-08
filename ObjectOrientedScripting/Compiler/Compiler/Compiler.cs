@@ -101,10 +101,7 @@ namespace Wrapper
                             case "NEEDED": case "1":
                                 printOutMode = 1;
                                 break;
-                            case "PARTIAL": case "2":
-                                printOutMode = 2;
-                                break;
-                            case "ALL": case "3":
+                            case "ALL": case "2":
                                 printOutMode = 3;
                                 break;
                             default:
@@ -197,9 +194,9 @@ namespace Wrapper
                 {
                     if (printOutMode == 1 && it == ppMainFile)
                     {
-                        var stream = File.Create(proj.Buildfolder + it.Name + ".objF");
+                        var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
                         it.resetPosition();
-                        it.FullFileStream.WriteTo(stream);
+                        it.FileStream.WriteTo(stream);
                         stream.Flush();
                         stream.Close();
                     }
@@ -210,22 +207,6 @@ namespace Wrapper
                         it.FileStream.WriteTo(stream);
                         stream.Flush();
                         stream.Close();
-                        if (printOutMode >= 3)
-                        {
-                            var stream2 = File.Create(proj.Buildfolder + it.Name + ".objF");
-                            it.resetPosition();
-                            it.FullFileStream.WriteTo(stream2);
-                            stream2.Flush();
-                            stream2.Close();
-                        }
-                        else if(it == ppMainFile)
-                        {
-                            var stream2 = File.Create(proj.Buildfolder + it.Name + ".objF");
-                            it.resetPosition();
-                            it.FullFileStream.WriteTo(stream2);
-                            stream2.Flush();
-                            stream2.Close();
-                        }
                     }
                 }
                 it.resetPosition();
@@ -242,7 +223,7 @@ namespace Wrapper
 
             Base oosTreeBase = new Base();
             NamespaceResolver.BaseClass = oosTreeBase;
-            Parser parser = new Parser(new Scanner(ppMainFile.FullFileStream));
+            Parser parser = new Parser(new Scanner(ppMainFile.FileStream));
             Parser.UsedFiles = new List<string>();
             parser.BaseObject = oosTreeBase;
             parser.Parse();
