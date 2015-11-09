@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.6.0-ALPHA"
+#define MyAppVersion "0.6.1-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
-#define MyAppExeName "Wrapper.exe"
+#define MyAppExeName "WrapperUI.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -29,8 +29,10 @@ SolidCompression=yes
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Files]
-Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Wrapper.exe"; DestDir: "{app}"; Flags: ignoreversion
+[Files]    
+Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Wrapper.exe"; DestDir: "{app}"; Flags: ignoreversion    
+Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\WrapperUI\bin\Release\WrapperUI.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\GitHub\ObjectOrientedScripting\KnownIssues.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\GitHub\ObjectOrientedScripting\CompilerDlls\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Source: "D:\GitHub\ObjectOrientedScripting\ObjectOrientedScripting\Wrapper\bin\Release\Logger.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\GitHub\ObjectOrientedScripting\stdLibrary\*"; DestDir: "{app}\stdLibrary\"; Flags: ignoreversion recursesubdirs
@@ -46,7 +48,23 @@ var
 
 procedure InitializeWizard;
 begin
-  ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',         
+  ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
+'Version 0.6.1-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Compiler:  fixed InstanceOf printout                                     ' + AnsiChar(#10) +
+'    |- Compiler:  Introduced "using" operation, replaces #include               ' + AnsiChar(#10) +
+'    |- Compiler:  #include now wont "include" the file anymore and instead just ' + AnsiChar(#10) +
+'    |             checks the PreProcessor directives in given file              ' + AnsiChar(#10) +
+'    |- Compiler:  Added "extends" keyword to native classes --> you now can     ' + AnsiChar(#10) +
+'    |             extend native classes                                         ' + AnsiChar(#10) +
+'    |- Compiler:  Added code for the "async" keyword on functions (sorry)       ' + AnsiChar(#10) +
+'    |- Compiler:  "PRINTMODE" flag modes have changed:                          ' + AnsiChar(#10) +
+'    |             Possible modes are: NONE, 0, NEEDED, 1, ALL, 2                ' + AnsiChar(#10) +
+'    |- Compiler:  Renamed all stdLibrary objects to have first char uppercase   ' + AnsiChar(#10) +
+'    |- Compiler:  Added "VehicleBase" object to stdLibrary (not intended to be  ' + AnsiChar(#10) +
+'    |             created via new, will throw an error when you attempt)        ' + AnsiChar(#10) +
+'    |- Compiler:  Added "Man" object to stdLibrary, represents all CAManBase    ' + AnsiChar(#10) +
+'    |             ArmA objects                                                  ' + AnsiChar(#10) +
+'    \- WrapperUI: Introduced WrapperUI.exe, a UI for OOS <3 (to be improved)    ' + AnsiChar(#10) +    
 '                                                                                ' + AnsiChar(#10) +
 'Version 0.6.0-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  Rewrote entire Linker & Writer                                ' + AnsiChar(#10) +
