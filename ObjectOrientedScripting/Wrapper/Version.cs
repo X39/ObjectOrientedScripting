@@ -16,6 +16,10 @@ namespace Wrapper
         public int Side { get { return this._side; } set { this._side = value; } }
         public int Revision { get { return this._rev; } set { this._rev = value; } }
         public string Extra { get { return this._extra; } set { this._extra = value; } }
+        public static implicit operator Version(string input)
+        {
+            return new Version(input);
+        }
         public Version(string s)
         {
             _main = -1;
