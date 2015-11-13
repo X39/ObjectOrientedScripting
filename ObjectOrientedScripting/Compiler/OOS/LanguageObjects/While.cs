@@ -49,9 +49,9 @@ namespace Compiler.OOS_LanguageObjects
             if (varList.Count > 0)
             {
                 if (varList.Count == 1)
-                    sw.Write("private ");
+                    sw.Write(tab + '\t' + "private ");
                 else
-                    sw.Write("private [");
+                    sw.Write(tab + '\t' + "private [");
 
                 for (int i = 0; i < varList.Count; i++)
                 {

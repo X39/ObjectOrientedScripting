@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects.Interfaces
 {
-    public interface iGetVariableIndex
+    public interface iGetIndex
     {
-        Tuple<int, int> getVariableIndex(Ident ident);
+        int getIndex(Ident ident);
     }
 }

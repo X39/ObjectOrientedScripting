@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 77;
-	const int noSym = 77;
+	const int maxT = 75;
+	const int noSym = 75;
 
 
 	public Buffer buffer; // scanner buffer
@@ -420,44 +420,42 @@ public class Scanner {
 			case "bool": t.kind = 32; break;
 			case "boolean": t.kind = 33; break;
 			case "string": t.kind = 34; break;
-			case "object": t.kind = 35; break;
-			case "true": t.kind = 36; break;
-			case "false": t.kind = 37; break;
-			case "static": t.kind = 39; break;
-			case "using": t.kind = 40; break;
-			case "namespace": t.kind = 42; break;
-			case "native": t.kind = 43; break;
-			case "extends": t.kind = 44; break;
-			case "assign": t.kind = 45; break;
-			case "simple": t.kind = 46; break;
-			case "endAssign": t.kind = 47; break;
-			case "fnc": t.kind = 48; break;
-			case "void": t.kind = 49; break;
-			case "strict": t.kind = 50; break;
-			case "endFnc": t.kind = 51; break;
-			case "operator": t.kind = 52; break;
-			case "endOperator": t.kind = 53; break;
-			case "class": t.kind = 54; break;
-			case "implements": t.kind = 55; break;
-			case "interface": t.kind = 56; break;
-			case "async": t.kind = 57; break;
-			case "override": t.kind = 58; break;
-			case "auto": t.kind = 60; break;
-			case "for": t.kind = 61; break;
-			case "while": t.kind = 62; break;
-			case "new": t.kind = 63; break;
-			case "if": t.kind = 64; break;
-			case "else": t.kind = 65; break;
-			case "try": t.kind = 66; break;
-			case "catch": t.kind = 67; break;
-			case "break": t.kind = 68; break;
-			case "is": t.kind = 69; break;
-			case "throw": t.kind = 70; break;
-			case "return": t.kind = 71; break;
-			case "switch": t.kind = 72; break;
-			case "case": t.kind = 73; break;
-			case "default": t.kind = 74; break;
-			case "SQF": t.kind = 76; break;
+			case "true": t.kind = 35; break;
+			case "false": t.kind = 36; break;
+			case "static": t.kind = 38; break;
+			case "using": t.kind = 39; break;
+			case "namespace": t.kind = 41; break;
+			case "native": t.kind = 42; break;
+			case "extends": t.kind = 43; break;
+			case "assign": t.kind = 44; break;
+			case "simple": t.kind = 45; break;
+			case "endAssign": t.kind = 46; break;
+			case "fnc": t.kind = 47; break;
+			case "void": t.kind = 48; break;
+			case "endFnc": t.kind = 49; break;
+			case "operator": t.kind = 50; break;
+			case "endOperator": t.kind = 51; break;
+			case "class": t.kind = 52; break;
+			case "implements": t.kind = 53; break;
+			case "interface": t.kind = 54; break;
+			case "async": t.kind = 55; break;
+			case "virtual": t.kind = 56; break;
+			case "auto": t.kind = 58; break;
+			case "for": t.kind = 59; break;
+			case "while": t.kind = 60; break;
+			case "new": t.kind = 61; break;
+			case "if": t.kind = 62; break;
+			case "else": t.kind = 63; break;
+			case "try": t.kind = 64; break;
+			case "catch": t.kind = 65; break;
+			case "break": t.kind = 66; break;
+			case "is": t.kind = 67; break;
+			case "throw": t.kind = 68; break;
+			case "return": t.kind = 69; break;
+			case "switch": t.kind = 70; break;
+			case "case": t.kind = 71; break;
+			case "default": t.kind = 72; break;
+			case "SQF": t.kind = 74; break;
 			default: break;
 		}
 	}
@@ -599,19 +597,19 @@ public class Scanner {
 				else if (ch == 92) {AddCh(); goto case 33;}
 				else {t.kind = 2; break;}
 			case 36:
-				{t.kind = 38; break;}
+				{t.kind = 37; break;}
 			case 37:
-				{t.kind = 75; break;}
+				{t.kind = 73; break;}
 			case 38:
-				recEnd = pos; recKind = 41;
+				recEnd = pos; recKind = 40;
 				if (ch <= 9 || ch >= 11 && ch <= 12 || ch >= 14 && ch <= '!' || ch >= '#' && ch <= '[' || ch >= ']' && ch <= 65535) {AddCh(); goto case 4;}
 				else if (ch == '"') {AddCh(); goto case 5;}
 				else if (ch == 92) {AddCh(); goto case 33;}
-				else {t.kind = 41; break;}
+				else {t.kind = 40; break;}
 			case 39:
-				recEnd = pos; recKind = 59;
+				recEnd = pos; recKind = 57;
 				if (ch == ':') {AddCh(); goto case 19;}
-				else {t.kind = 59; break;}
+				else {t.kind = 57; break;}
 			case 40:
 				recEnd = pos; recKind = 3;
 				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= 'a' && ch <= 'd' || ch >= 'f' && ch <= 'z') {AddCh(); goto case 6;}

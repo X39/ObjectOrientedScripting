@@ -27,7 +27,7 @@ namespace Compiler.OOS_LanguageObjects
             else if (LIdent is Ident)
             {
                 var varType = ((Ident)LIdent).LastIdent.ReferencedType;
-                if (varType.varType != VarType.Object && varType.varType != VarType.ObjectStrict)
+                if (!varType.IsObject)
                 {
                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0028, ((Ident)LIdent).Line, ((Ident)LIdent).Pos));
                     errCount++;

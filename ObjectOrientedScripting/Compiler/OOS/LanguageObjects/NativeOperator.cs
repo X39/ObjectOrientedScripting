@@ -21,7 +21,7 @@ namespace Compiler.OOS_LanguageObjects
             return errCount;
         }
         public bool IsConstructor { get { return false; } }
-
+        public bool IsVirtual { get { return false; } }
         /// <summary>
         /// Return type of this iFunction
         /// </summary>

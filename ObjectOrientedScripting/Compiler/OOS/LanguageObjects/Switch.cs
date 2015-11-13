@@ -62,9 +62,9 @@ namespace Compiler.OOS_LanguageObjects
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             string tab = new string('\t', this.Parent.getAllParentsOf<Interfaces.iCodeBlock>().Count);
-            sw.Write(tab + "switch ");
+            sw.Write(tab + "switch (");
             this.expression.writeOut(sw, cfg);
-            sw.WriteLine(" do");
+            sw.WriteLine(") do");
             sw.WriteLine(tab + "{");
             foreach (var it in this.CodeInstructions)
             {

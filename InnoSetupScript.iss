@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.6.1-ALPHA"
+#define MyAppVersion "0.6.2-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "WrapperUI.exe"
@@ -49,6 +49,18 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
+'Version 0.6.2-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Compiler:  fixed various minor issues                                    ' + AnsiChar(#10) +
+'    |- Compiler:  removed multi-base classes                                    ' + AnsiChar(#10) +
+'    |- Compiler:  improved object structure (==> less overhead)                 ' + AnsiChar(#10) +
+'    |- Compiler:  fixed overloaded functions overwriting themself               ' + AnsiChar(#10) +
+'    |- Compiler:  fixed different case same name functions overwriting themself ' + AnsiChar(#10) +
+'    |- Compiler:  temporary disabled interfaces as function argument            ' + AnsiChar(#10) +
+'    |- Compiler:  fixedasync keyword made functions being callen instead of     ' + AnsiChar(#10) +
+'    |             spawned (and vice versa)                                      ' + AnsiChar(#10) +
+'    |- Compiler:  unlocked the native "object" object (actually thats a speciall' + AnsiChar(#10) +
+'    \             internal class now, might happen with string too soon)        ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.6.1-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  fixed InstanceOf printout                                     ' + AnsiChar(#10) +
 '    |- Compiler:  Introduced "using" operation, replaces #include               ' + AnsiChar(#10) +

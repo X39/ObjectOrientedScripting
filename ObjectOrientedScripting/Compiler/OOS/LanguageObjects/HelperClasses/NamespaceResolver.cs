@@ -113,6 +113,18 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
                     lastRef = (Interfaces.iName)((pBaseLangObject)lastRef).Parent;
                     nsr = new HelperClasses.NamespaceResolver(lastRef.Name.FullyQualifiedName + "." + prQN);
                 }
+                else if (((pBaseLangObject)lastRef).Parent is Base)
+                {
+                    nsr = new HelperClasses.NamespaceResolver(prQN);
+                    if (nsr.IsValid)
+                    {
+                        return nsr;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
                 else
                 {
                     return null;

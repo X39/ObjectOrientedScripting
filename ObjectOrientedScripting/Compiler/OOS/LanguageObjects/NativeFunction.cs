@@ -10,7 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     {
         public Ident Name { get { return (Ident)this.children[0]; } set { this.children[0] = value; } }
         public bool IsConstructor { get { return false; } }
-
+        public bool IsVirtual { get { return false; } }
         /// <summary>
         /// Return type of this iFunction
         /// </summary>

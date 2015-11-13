@@ -36,9 +36,9 @@ namespace Compiler.OOS_LanguageObjects
             if (varListFirstScope.Count > 0)
             {
                 if (varListFirstScope.Count == 1)
-                    sw.Write("private ");
+                    sw.Write(tab + '\t' + "private ");
                 else
-                    sw.Write("private [");
+                    sw.Write(tab + '\t' + "private [");
 
                 for (int i = 0; i < varListFirstScope.Count; i++)
                 {
@@ -74,9 +74,9 @@ namespace Compiler.OOS_LanguageObjects
                 if (varListSecondScope.Count > 0)
                 {
                     if (varListSecondScope.Count == 1)
-                        sw.Write("private ");
+                        sw.Write(tab + '\t' + "private ");
                     else
-                        sw.Write("private [");
+                        sw.Write(tab + '\t' + "private [");
 
                     for (int i = 0; i < varListSecondScope.Count; i++)
                     {

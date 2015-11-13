@@ -32,8 +32,6 @@ COMPILER OOS
 		T_INSTANCEACCESS = '.'.
 		T_NAMESPACEACCESS = "::".
 		T_COMMA = ','.
-		T_STATICCASTOPERATOR = '%'.
-		T_DYNAMICCASTOPERATOR = '$'.
 		T_TEMPLATEOPEN = '<'.
 		T_TEMPLATECLOSE = '>'.
 		T_SLASH = '/'.
@@ -96,25 +94,13 @@ COMPILER OOS
             ]
         .
         CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarType vt; pBaseLangObject ident; .) =
+            T_ROUNDBRACKETOPEN
             (
-                T_STATICCASTOPERATOR (. obj.isStaticCast = true; .)
-                (
-                    VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
-                    |
-                    IDENTACCESS<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
-                )
-                T_STATICCASTOPERATOR
+                VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
+                |
+                IDENTACCESS<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
             )
-            |
-            (
-                T_DYNAMICCASTOPERATOR (. obj.isStaticCast = false; .)
-                (
-                    VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
-                    |
-                    IDENTACCESS<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
-                )
-                T_DYNAMICCASTOPERATOR
-            )
+            T_ROUNDBRACKETCLOSE
         .
 		ENCAPSULATION<out Encapsulation e> (. e = Encapsulation.NA; .) =
 			"public" (. e = Encapsulation.Public; .)
@@ -138,8 +124,6 @@ COMPILER OOS
                 "boolean" (. e = VarType.Bool; .)
                 |
                 "string" (. e = VarType.String; .)
-                |
-                "object" (. e = VarType.Object; .)
             )
             [
                 T_SQUAREBRACKETOPEN
@@ -397,13 +381,13 @@ COMPILER OOS
             "native"
             IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
             [
-                TEMPLATE<out te, obj> (. obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name, true, te); .)
+                TEMPLATE<out te, obj> (. obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name); .)
             ]
 			[
 				"extends"
 				IDENTACCESS<out blo, obj, false> (. obj.addParent((Ident)blo); .)
 			]
-			(. if(!flag) obj.VTO = new VarTypeObject(obj.Name, true); .)
+			(. if(!flag) obj.VTO = new VarTypeObject(obj.Name); .)
 			T_CODEBRACKETOPEN
             NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
 			{
@@ -445,11 +429,8 @@ COMPILER OOS
 				|
 				"void" (. obj.VTO = new VarTypeObject(VarType.Void); .)
 				|
-                (   (. bool isStrict = false; .)                    
-                    [
-                        "strict" (. isStrict = true; .)
-                    ]
-                    IDENTACCESS<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
+                (
+                    IDENTACCESS<out blo, obj> (. obj.VTO = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.VTO.TemplateObject = te; .)
                     ]
@@ -480,11 +461,8 @@ COMPILER OOS
 				|
 				"void" (. obj.VTO = new VarTypeObject(VarType.Void); .)
 				|
-                (   (. bool isStrict = false; .)                    
-                    [
-                        "strict" (. isStrict = true; .)
-                    ]
-                    IDENTACCESS<out blo, obj, false> (. obj.VTO = new VarTypeObject((Ident)blo, isStrict); .)
+                (
+                    IDENTACCESS<out blo, obj, false> (. obj.VTO = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.VTO.TemplateObject = te; .)
                     ]
@@ -543,11 +521,16 @@ COMPILER OOS
 			[
 				"extends"
 				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
+			]
+			(. 
+				obj.markEnd();
+				if(obj.ParentClassesIdents.Count == 0)
 				{
-					','
-					IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
+				    var ident = new Ident(obj, "object", -1, -1, "");
+				    obj.addParentClass(ident);
 				}
-			](. obj.markExtendsEnd(); .)
+				obj.markExtendsEnd();
+			.)
 			[
 				"implements"
 				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
@@ -595,7 +578,7 @@ COMPILER OOS
 		.
 		INTERFACE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosInterface(parent); outObj = obj; pBaseLangObject blo; .) =
 			"interface"
-			IDENT<out blo, obj> (. obj.Name = (Ident)blo; obj.VTO = new VarTypeObject((Ident)blo, true); .)
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; obj.VTO = new VarTypeObject((Ident)blo); .)
 			T_CODEBRACKETOPEN
 			{
 				VFUNCTION<out blo, obj> (. obj.addChild(blo); .)
@@ -607,18 +590,15 @@ COMPILER OOS
                 "async" (. obj.IsAsync = true; .)
             ]
             [
-                "override" (. obj.Override = true; .)
+                "virtual" (. obj.IsVirtual = true; .)
             ]
 			(
 				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
 				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
 				|
-                (   (. bool isStrict = false; .)                    
-                    [
-                        "strict" (. isStrict = true; .)
-                    ]
-                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                (
+                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.varType.TemplateObject = te; .)
                     ]
@@ -641,7 +621,7 @@ COMPILER OOS
 			T_CODEBRACKETCLOSE
 			
 		.
-		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name, true); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .) =
+		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .) =
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_ROUNDBRACKETOPEN
 			[
@@ -676,11 +656,8 @@ COMPILER OOS
 				|
 				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
 				|
-                (   (. bool isStrict = false; .)                    
-                    [
-                        "strict" (. isStrict = true; .)
-                    ]
-                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                (
+                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.varType.TemplateObject = te; .)
                     ]
@@ -710,11 +687,8 @@ COMPILER OOS
 			(
 				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
-                ( (. bool isStrict = false; .)
-                    [
-                        "strict" (. isStrict = true; .)
-                    ]
-                    IDENTACCESS<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo, isStrict); .)
+                (
+                    IDENTACCESS<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
                         TEMPLATE<out te, outObj> (. obj.varType.TemplateObject = te; .)
                     ]

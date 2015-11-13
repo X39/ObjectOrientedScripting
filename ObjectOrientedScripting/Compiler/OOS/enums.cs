@@ -22,7 +22,6 @@ namespace Compiler.OOS_LanguageObjects
         Auto,
         Void,
         Object,
-        ObjectStrict,
         Other,
         ScalarArray,
         BoolArray,
@@ -53,12 +52,12 @@ namespace Compiler.OOS_LanguageObjects
             get { return this.template; }
             set { if (value != null) this.template = value; }
         }
-        public bool IsObject { get { return this.varType == VarType.Object || this.varType == VarType.ObjectStrict; } }
+        public bool IsObject { get { return this.varType == VarType.Object; } }
         public bool IsArray { get { return this.varType == VarType.BoolArray || this.varType == VarType.ScalarArray || this.varType == VarType.StringArray; } }
-        public VarTypeObject(Ident i, bool isStrict = false, Template template = null)
+        public VarTypeObject(Ident i, Template template = null)
         {
             this.ident = i;
-            this.varType = isStrict ? VarType.ObjectStrict : VarType.Object;
+            this.varType = VarType.Object;
             this.template = template;
 
             if(this.template == null && (this.ident.ReferencedObject is Interfaces.iTemplate))
@@ -70,8 +69,8 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.ident = null;
             this.varType = v;
-            if (v == VarType.ObjectStrict || v == VarType.Object)
-                throw new Exception("TODO: Allow anonymous objects");
+            if (v == VarType.Object)
+                throw new Exception("Not possible! Please create a new ident refering to ::object");
             template = null;
             //TODO: Allow anonymous objects
         }
@@ -89,7 +88,7 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             if (((VarTypeObject)obj).varType != this.varType)
                 return false;
-            if (this.varType != VarType.Object && this.varType != VarType.ObjectStrict)
+            if (this.varType != VarType.Object)
                 return true;
             return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
         }

@@ -59,6 +59,10 @@ namespace Compiler.OOS_LanguageObjects
         {
             get
             {
+                if(this.IsSelfReference && this.children.Count == 0)
+                {
+                    return Wrapper.Compiler.thisVariableName;
+                }
                 var templateList = this.getAllParentsOf<Interfaces.iTemplate>();
                 if (this.Parent is Template)
                 {
@@ -106,7 +110,7 @@ namespace Compiler.OOS_LanguageObjects
                         }
                         else if (curobject is Ident)
                         {
-                            if (curobject.Parent is Interfaces.iName && ((Interfaces.iName)curobject.Parent).Name == this && !(curobject.Parent is NewInstance))
+                            if (curobject.Parent is Interfaces.iName && ((Interfaces.iName)curobject.Parent).Name == this && !(curobject.Parent is NewInstance) && !((Ident)curobject).isGlobalIdentifier)
                             {
                                 //Do nothing
                             }
@@ -134,18 +138,21 @@ namespace Compiler.OOS_LanguageObjects
                         }
                         curobject = curobject.Parent;
                     } while (!(curobject is Base) && curobject != null);
-                    return result.TrimEnd(new char[] { ':', '.' });
+                    result = result.TrimEnd(new char[] { ':', '.' });
+                    //if (this.getLastOf<Ident>().Parent is Function)
+                    //{
+                    //    result += ((Function)this.getLastOf<Ident>().Parent).SqfSuffix;
+                    //}
+                    return result;
                 }
             }
         }
 
         private string originalValue;
-        private pBaseLangObject referencedObject;
-        private VarTypeObject referencedType;
         private IdenType type;
 
-        public pBaseLangObject ReferencedObject { get { return referencedObject; } }
-        public VarTypeObject ReferencedType { get { return referencedType; } }
+        public pBaseLangObject ReferencedObject { get; internal set; }
+        public VarTypeObject ReferencedType { get; internal set; }
         public IdenType Type { get { return this.type; } }
         public string OriginalValue { get { return this.originalValue; } }
         public int Line { get; internal set; }
@@ -189,8 +196,8 @@ namespace Compiler.OOS_LanguageObjects
         public Ident(pBaseLangObject parent, string origVal, int line, int pos, string file) : base(parent)
         {
             this.originalValue = origVal;
-            referencedObject = null;
-            referencedType = new VarTypeObject(VarType.Void);
+            this.ReferencedObject = null;
+            this.ReferencedType = new VarTypeObject(VarType.Void);
             this.Line = line;
             this.Pos = pos;
             this.File = file;
@@ -297,11 +304,11 @@ namespace Compiler.OOS_LanguageObjects
             //And process it then ((unless its a simple ident, then we do not want to process ... here any further))
             if (this.IsSimpleIdentifier && ((this.Parent is Interfaces.iName && ((Interfaces.iName)this.Parent).Name == this) || (this.Parent is Interfaces.iHasType && !(this.Parent is Expression) && ((Interfaces.iHasType)this.Parent).ReferencedType.ident == this)) && !(this.Parent is AssignContainer))
             {
-                this.referencedObject = this.Parent;
+                this.ReferencedObject = this.Parent;
                 if (this.Parent is Interfaces.iHasType)
-                    this.referencedType = ((Interfaces.iHasType)this.Parent).ReferencedType;
+                    this.ReferencedType = ((Interfaces.iHasType)this.Parent).ReferencedType;
                 else //todo: try to replace with proper refObject type
-                    this.referencedType = new VarTypeObject(this, true, (this.Parent is Interfaces.iTemplate ? ((Interfaces.iTemplate)this.Parent).TemplateObject : null) );
+                    this.ReferencedType = new VarTypeObject(this, (this.Parent is Interfaces.iTemplate ? ((Interfaces.iTemplate)this.Parent).TemplateObject : null) );
             }
             else
             {
@@ -311,24 +318,24 @@ namespace Compiler.OOS_LanguageObjects
                     case IdenType.ThisVar:
                         {
                             Interfaces.iClass curObject = this.getFirstOf<Interfaces.iClass>();
-                            this.referencedObject = (pBaseLangObject)curObject;
-                            this.referencedType = curObject.VTO;
+                            this.ReferencedObject = (pBaseLangObject)curObject;
+                            this.ReferencedType = curObject.VTO;
                         }
                         break;
                     #endregion
                     #region TemplateVar
                     case IdenType.TemplateVar:
                         {
-                            this.referencedObject = (pBaseLangObject)this.getFirstOf<Interfaces.iClass>();
-                            this.referencedType = ((Interfaces.iClass)this.referencedObject).VTO;
+                            this.ReferencedObject = (pBaseLangObject)this.getFirstOf<Interfaces.iClass>();
+                            this.ReferencedType = ((Interfaces.iClass)this.ReferencedObject).VTO;
                         }
                         break;
                     #endregion
                     #region SqfCommandName
                     case IdenType.SqfCommandName:
                         {
-                            this.referencedObject = this.Parent;
-                            this.referencedType = ((SqfCall)this.Parent).ReferencedType;
+                            this.ReferencedObject = this.Parent;
+                            this.ReferencedType = ((SqfCall)this.Parent).ReferencedType;
                         }
                         break;
                     #endregion
@@ -346,18 +353,18 @@ namespace Compiler.OOS_LanguageObjects
                                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0012, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
-                            this.referencedObject = variable;
+                            this.ReferencedObject = variable;
                             //Set type to variable type
-                            this.referencedType = variable.varType;
+                            this.ReferencedType = variable.varType;
 
                             if (type == IdenType.ArrayAccess)
                             {
                                 if (variable.ReferencedType.IsObject)
                                 {
                                     //Check if given object is implementing the ArrayAccess operator
-                                    if (variable.ReferencedType.ident.LastIdent.referencedObject is Interfaces.iClass)
+                                    if (variable.ReferencedType.ident.LastIdent.ReferencedObject is Interfaces.iClass)
                                     {
-                                        Interfaces.iClass classRef = (Interfaces.iClass)variable.ReferencedType.ident.LastIdent.referencedObject;
+                                        Interfaces.iClass classRef = (Interfaces.iClass)variable.ReferencedType.ident.LastIdent.ReferencedObject;
                                         Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OverridableOperator.ArrayAccess);
                                         if (opFnc == null)
                                         {
@@ -366,7 +373,7 @@ namespace Compiler.OOS_LanguageObjects
                                         }
                                         else
                                         {
-                                            this.referencedType = opFnc.ReturnType;
+                                            this.ReferencedType = opFnc.ReturnType;
                                             if (variable.TemplateObject != null)
                                             {
                                                 var templateList = ((pBaseLangObject)opFnc).getAllParentsOf<Interfaces.iTemplate>();
@@ -375,7 +382,7 @@ namespace Compiler.OOS_LanguageObjects
                                                     var tmp = HelperClasses.ArgList.resolveVarTypeObject(opFnc.ReturnType, it.TemplateObject, variable.TemplateObject);
                                                     if (tmp != opFnc.ReturnType)
                                                     {
-                                                        this.referencedType = tmp;
+                                                        this.ReferencedType = tmp;
                                                         break;
                                                     }
                                                 }
@@ -391,19 +398,19 @@ namespace Compiler.OOS_LanguageObjects
                                 else
                                 {
                                     //just check if this is an array type
-                                    switch (this.referencedType.varType)
+                                    switch (this.ReferencedType.varType)
                                     {
                                         case VarType.BoolArray:
-                                            this.referencedType = new VarTypeObject(this.referencedType);
-                                            this.referencedType.varType = VarType.Bool;
+                                            this.ReferencedType = new VarTypeObject(this.ReferencedType);
+                                            this.ReferencedType.varType = VarType.Bool;
                                             break;
                                         case VarType.ScalarArray:
-                                            this.referencedType = new VarTypeObject(this.referencedType);
-                                            this.referencedType.varType = VarType.Scalar;
+                                            this.ReferencedType = new VarTypeObject(this.ReferencedType);
+                                            this.ReferencedType.varType = VarType.Scalar;
                                             break;
                                         case VarType.StringArray:
-                                            this.referencedType = new VarTypeObject(this.referencedType);
-                                            this.referencedType.varType = VarType.String;
+                                            this.ReferencedType = new VarTypeObject(this.ReferencedType);
+                                            this.ReferencedType.varType = VarType.String;
                                             break;
                                         default:
                                             Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos, this.File));
@@ -427,7 +434,7 @@ namespace Compiler.OOS_LanguageObjects
                                 //if (((Variable)parentIdent.ReferencedObject).ReferencedType.IsObject)
                                 //    fqn = ((Interfaces.iClass)((Variable)parentIdent.ReferencedObject).ReferencedType.ident.LastIdent.ReferencedObject).Name.LastIdent.FullyQualifiedName + "." + this.originalValue;
                                 //else
-                                    fqn = parentIdent.ReferencedType.ident.LastIdent.referencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
+                                    fqn = parentIdent.ReferencedType.ident.LastIdent.ReferencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
                             }
                             if (newInstance == null)
                             {
@@ -448,7 +455,7 @@ namespace Compiler.OOS_LanguageObjects
                                 Interfaces.iFunction fnc = null;
                                 foreach (var it in fncList)
                                 {
-                                    if (HelperClasses.ArgList.matchesArglist(it.ArgList, fncCall.ArgList, (parentIdent.ReferencedObject is Variable ? (Variable)parentIdent.ReferencedObject : null)))
+                                    if (HelperClasses.ArgList.matchesArglist(it.ArgList, fncCall.ArgList, (parentIdent != null && parentIdent.ReferencedObject is Variable ? (Variable)parentIdent.ReferencedObject : null)))
                                     {
                                         fnc = it;
                                         break;
@@ -468,9 +475,9 @@ namespace Compiler.OOS_LanguageObjects
                                         errCount++;
                                     }
                                     //Ref the object to the function
-                                    this.referencedObject = (pBaseLangObject)fnc;
+                                    this.ReferencedObject = (pBaseLangObject)fnc;
                                     //Ref the type to the return type
-                                    this.referencedType = fnc.ReturnType;
+                                    this.ReferencedType = fnc.ReturnType;
 
                                     //As last step make sure we got the correct encapsulation here
                                     var enc = fnc.FunctionEncapsulation;
@@ -517,13 +524,13 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             var nsr = HelperClasses.NamespaceResolver.createNSR(this, this.IsAnonymousIdent);
                             var reference = nsr.Reference;
-                            this.referencedObject = reference;
+                            this.ReferencedObject = reference;
                             if (reference is Interfaces.iClass)
-                                this.referencedType = ((Interfaces.iClass)reference).VTO;
+                                this.ReferencedType = ((Interfaces.iClass)reference).VTO;
                             else if (reference is Interfaces.iFunction)
-                                this.referencedType = ((Interfaces.iFunction)reference).ReturnType;
+                                this.ReferencedType = ((Interfaces.iFunction)reference).ReturnType;
                             else
-                                this.referencedType = null;
+                                this.ReferencedType = null;
                         }
                         break;
                     #endregion
@@ -535,7 +542,16 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override string ToString()
         {
-            return "ident->(" + this.originalValue + ")" + this.FullyQualifiedName;
+            string s = "ident->";
+            try
+            {
+                s = "ident->(" + this.originalValue + ")" + this.FullyQualifiedName;
+            }
+            catch(Exception ex)
+            {
+                s += ex.Message;
+            }
+            return s;
         }
         public override bool Equals(object obj)
         {
@@ -583,6 +599,10 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     Variable variable = (Variable)this.ReferencedObject;
                     sw.Write(variable.SqfVariableName);
+                }
+                else if(this.ReferencedObject is oosClass && this.IsSelfReference)
+                {
+                    sw.Write(Wrapper.Compiler.thisVariableName);
                 }
                 else
                 {
@@ -632,7 +652,8 @@ namespace Compiler.OOS_LanguageObjects
                             var variable = (Variable)this.ReferencedObject;
                             if (this.HasCallWrapper)
                                 return "_tmp";
-                            s += variable.SqfVariableName;
+                            if (s == "")
+                                s += variable.SqfVariableName;
                         }
                         else
                         {

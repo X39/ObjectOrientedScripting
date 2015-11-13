@@ -31,13 +31,11 @@ public class Parser {
 	public const int _T_INSTANCEACCESS = 16;
 	public const int _T_NAMESPACEACCESS = 17;
 	public const int _T_COMMA = 18;
-	public const int _T_STATICCASTOPERATOR = 19;
-	public const int _T_DYNAMICCASTOPERATOR = 20;
-	public const int _T_TEMPLATEOPEN = 21;
-	public const int _T_TEMPLATECLOSE = 22;
-	public const int _T_SLASH = 23;
-	public const int _T_BACKSLASH = 24;
-	public const int maxT = 77;
+	public const int _T_TEMPLATEOPEN = 19;
+	public const int _T_TEMPLATECLOSE = 20;
+	public const int _T_SLASH = 21;
+	public const int _T_BACKSLASH = 22;
+	public const int maxT = 73;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -159,25 +157,25 @@ public class Parser {
 
 	void TEMPLATE(out Template obj, pBaseLangObject parent) {
 		obj = new Template(parent, t.line, t.col, this.file); pBaseLangObject blo; VarType e; 
-		Expect(21);
-		if (StartOf(1)) {
+		Expect(19);
+		if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, obj);
 			obj.vtoList.Add(new VarTypeObject((Ident)blo)); 
-		} else if (StartOf(2)) {
+		} else if (StartOf(1)) {
 			VARTYPE(out e);
 			obj.vtoList.Add(new VarTypeObject(e)); 
-		} else SynErr(78);
+		} else SynErr(74);
 		while (la.kind == 18) {
 			Get();
-			if (StartOf(1)) {
+			if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 				IDENTACCESS(out blo, obj);
 				obj.vtoList.Add(new VarTypeObject((Ident)blo)); 
-			} else if (StartOf(2)) {
+			} else if (StartOf(1)) {
 				VARTYPE(out e);
 				obj.vtoList.Add(new VarTypeObject(e)); 
-			} else SynErr(79);
+			} else SynErr(75);
 		}
-		Expect(22);
+		Expect(20);
 	}
 
 	void IDENTACCESS(out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true) {
@@ -186,7 +184,7 @@ public class Parser {
 			Get();
 			isGlobalIdent = true; 
 		}
-		if (la.kind == 19 || la.kind == 20) {
+		if (la.kind == 10) {
 			CAST(out outObj, parent);
 		}
 		IDENT(out ident, (outObj == null ? parent : outObj));
@@ -218,6 +216,16 @@ public class Parser {
 	void VARTYPE(out VarType e) {
 		e = VarType.Void; 
 		switch (la.kind) {
+		case 26: {
+			Get();
+			e = VarType.Scalar; 
+			break;
+		}
+		case 27: {
+			Get();
+			e = VarType.Scalar; 
+			break;
+		}
 		case 28: {
 			Get();
 			e = VarType.Scalar; 
@@ -230,35 +238,20 @@ public class Parser {
 		}
 		case 30: {
 			Get();
-			e = VarType.Scalar; 
+			e = VarType.Bool; 
 			break;
 		}
 		case 31: {
 			Get();
-			e = VarType.Scalar; 
+			e = VarType.Bool; 
 			break;
 		}
 		case 32: {
 			Get();
-			e = VarType.Bool; 
-			break;
-		}
-		case 33: {
-			Get();
-			e = VarType.Bool; 
-			break;
-		}
-		case 34: {
-			Get();
 			e = VarType.String; 
 			break;
 		}
-		case 35: {
-			Get();
-			e = VarType.Object; 
-			break;
-		}
-		default: SynErr(80); break;
+		default: SynErr(76); break;
 		}
 		if (la.kind == 12) {
 			Get();
@@ -288,35 +281,21 @@ public class Parser {
 
 	void CAST(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Cast(parent); outObj = obj; VarType vt; pBaseLangObject ident; 
-		if (la.kind == 19) {
-			Get();
-			obj.isStaticCast = true; 
-			if (StartOf(2)) {
-				VARTYPE(out vt);
-				obj.varType = new VarTypeObject(vt); 
-			} else if (StartOf(1)) {
-				IDENTACCESS(out ident, obj);
-				obj.varType = new VarTypeObject((Ident)ident); 
-			} else SynErr(81);
-			Expect(19);
-		} else if (la.kind == 20) {
-			Get();
-			obj.isStaticCast = false; 
-			if (StartOf(2)) {
-				VARTYPE(out vt);
-				obj.varType = new VarTypeObject(vt); 
-			} else if (StartOf(1)) {
-				IDENTACCESS(out ident, obj);
-				obj.varType = new VarTypeObject((Ident)ident); 
-			} else SynErr(82);
-			Expect(20);
-		} else SynErr(83);
+		Expect(10);
+		if (StartOf(1)) {
+			VARTYPE(out vt);
+			obj.varType = new VarTypeObject(vt); 
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
+			IDENTACCESS(out ident, obj);
+			obj.varType = new VarTypeObject((Ident)ident); 
+		} else SynErr(77);
+		Expect(11);
 	}
 
 	void BODY_FUNCTIONCALL(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new FunctionCall(parent); outObj = obj; pBaseLangObject blo; 
 		Expect(10);
-		if (StartOf(3)) {
+		if (StartOf(2)) {
 			EXPRESSION(out blo, obj);
 			obj.addChild(blo); 
 			while (la.kind == 18) {
@@ -338,27 +317,27 @@ public class Parser {
 
 	void ENCAPSULATION(out Encapsulation e) {
 		e = Encapsulation.NA; 
-		if (la.kind == 25) {
+		if (la.kind == 23) {
 			Get();
 			e = Encapsulation.Public; 
-		} else if (la.kind == 26) {
+		} else if (la.kind == 24) {
 			Get();
 			e = Encapsulation.Private; 
-		} else if (la.kind == 27) {
+		} else if (la.kind == 25) {
 			Get();
 			e = Encapsulation.Protected; 
-		} else SynErr(84);
+		} else SynErr(78);
 	}
 
 	void BOOLEAN(out bool flag) {
 		flag = la.val == "true"; Get(); return; 
-		if (la.kind == 36) {
+		if (la.kind == 33) {
 			Get();
 			flag = true; 
-		} else if (la.kind == 37) {
+		} else if (la.kind == 34) {
 			Get();
 			flag = false; 
-		} else SynErr(85);
+		} else SynErr(79);
 	}
 
 	void VALUE(out pBaseLangObject outObj, pBaseLangObject parent) {
@@ -372,46 +351,46 @@ public class Parser {
 		} else if (la.val == "true" || la.val == "false") {
 			BOOLEAN(out flag);
 			obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); 
-		} else if (la.kind == 36 || la.kind == 37) {
+		} else if (la.kind == 33 || la.kind == 34) {
 			BOOLEAN(out flag);
 			obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); 
-		} else SynErr(86);
+		} else SynErr(80);
 	}
 
 	void EXPRESSION_HELPER(out pBaseLangObject outObj, pBaseLangObject parent, bool flag) {
 		var obj = new Expression(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; obj.negate = flag; 
-		if (la.kind == 38) {
+		if (la.kind == 35) {
 			Get();
 			obj.negate = true; 
 		}
-		if (la.kind == 63) {
+		if (la.kind == 59) {
 			OP_NEWINSTANCE(out blo, obj);
 			obj.lExpression = blo; 
 		} else if (la.val == "true" || la.val == "false" ) {
 			VALUE(out blo, obj);
 			obj.lExpression = blo; 
-		} else if (StartOf(4)) {
+		} else if (StartOf(3)) {
 			VALUE(out blo, obj);
 			obj.lExpression = blo; 
-		} else if (StartOf(1)) {
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, obj);
 			obj.lExpression = blo; 
-			if (la.kind == 69) {
+			if (la.kind == 65) {
 				OP_INSTANCEOF(out blo, obj, blo);
 				obj.lExpression = blo; 
 			}
-		} else if (la.kind == 76) {
+		} else if (la.kind == 72) {
 			OP_SQFCALL(out blo, obj);
 			obj.lExpression = blo; 
-		} else SynErr(87);
-		while (StartOf(5)) {
+		} else SynErr(81);
+		while (StartOf(4)) {
 			if (la.kind == 5) {
 				Get();
 				obj.expOperator = t.val; 
-			} else if (la.kind == 23) {
+			} else if (la.kind == 21) {
 				Get();
 				obj.expOperator = t.val; 
-			} else if (la.kind == 21) {
+			} else if (la.kind == 19) {
 				Get();
 				obj.expOperator = t.val; 
 			} else {
@@ -425,10 +404,10 @@ public class Parser {
 
 	void OP_NEWINSTANCE(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new NewInstance(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; 
-		Expect(63);
+		Expect(59);
 		IDENTACCESS(out blo, obj, false);
 		obj.Name = (Ident)blo; 
-		if (la.kind == 21) {
+		if (la.kind == 19) {
 			Template te; 
 			TEMPLATE(out te, ((Ident)blo).LastIdent);
 			obj.TemplateObject = te; 
@@ -439,14 +418,14 @@ public class Parser {
 
 	void OP_INSTANCEOF(out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess) {
 		var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; 
-		Expect(69);
+		Expect(65);
 		IDENTACCESS(out blo, obj);
 		obj.RIdent = (Ident)blo; 
 	}
 
 	void OP_SQFCALL(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new SqfCall(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(76);
+		Expect(72);
 		if (la.kind == 10) {
 			Get();
 			EXPRESSION(out blo, obj);
@@ -476,7 +455,7 @@ public class Parser {
 
 	void EXPRESSION(out pBaseLangObject outObj, pBaseLangObject parent) {
 		outObj = null; bool negate = false; 
-		if (la.kind == 38) {
+		if (la.kind == 35) {
 			Get();
 			negate = true; 
 		}
@@ -484,30 +463,30 @@ public class Parser {
 			Get();
 			EXPRESSION_HELPER(out outObj, parent, negate);
 			Expect(11);
-		} else if (StartOf(6)) {
+		} else if (StartOf(2)) {
 			EXPRESSION_HELPER(out outObj, parent, negate);
-		} else SynErr(88);
+		} else SynErr(82);
 	}
 
 	void OOS() {
 		if(this.BaseObject == null) throw new Exception("BaseObject was never set"); var obj = this.BaseObject; pBaseLangObject blo; 
-		if (la.kind == 40) {
+		if (la.kind == 37) {
 			OP_USING();
-			while (la.kind == 40) {
+			while (la.kind == 37) {
 				OP_USING();
 			}
 		}
-		while (StartOf(7)) {
-			if (la.kind == 42) {
+		while (StartOf(5)) {
+			if (la.kind == 39) {
 				NAMESPACE(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 54) {
+			} else if (la.kind == 50) {
 				CLASS(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 43) {
+			} else if (la.kind == 40) {
 				NATIVECLASS(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 56) {
+			} else if (la.kind == 52) {
 				INTERFACE(out blo, obj);
 				obj.addChild(blo); 
 			} else {
@@ -515,18 +494,18 @@ public class Parser {
 				if (peekCompare(-1, -1, _T_TERMINATOR) ) {
 					NEWVARIABLE(out blo, obj, Encapsulation.Static);
 					obj.addChild(blo); 
-				} else if (StartOf(8)) {
+				} else if (StartOf(6)) {
 					FUNCTION(out blo, obj, Encapsulation.Static);
 					obj.addChild(blo); 
-				} else SynErr(89);
+				} else SynErr(83);
 			}
 		}
 	}
 
 	void OP_USING() {
 		List<string> identList = new List<string>(); bool isLocal = false; 
-		Expect(40);
-		if (la.kind == 41) {
+		Expect(37);
+		if (la.kind == 38) {
 			isLocal = true; 
 			Get();
 			if (la.kind == 17) {
@@ -539,8 +518,8 @@ public class Parser {
 				Expect(3);
 				identList.Add(t.val); 
 			}
-			Expect(41);
-		} else if (la.kind == 21) {
+			Expect(38);
+		} else if (la.kind == 19) {
 			Get();
 			if (la.kind == 17) {
 				Get();
@@ -552,8 +531,8 @@ public class Parser {
 				Expect(3);
 				identList.Add(t.val); 
 			}
-			Expect(22);
-		} else SynErr(90);
+			Expect(20);
+		} else SynErr(84);
 		if (errDist >= minErrDist)
 		{
 		   string lookupPath = isLocal ? Wrapper.Compiler.ProjectFile.ProjectPath : Wrapper.Compiler.stdLibPath;
@@ -631,7 +610,7 @@ public class Parser {
 
 	void NAMESPACE(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Namespace(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(42);
+		Expect(39);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo;
 		
@@ -647,17 +626,17 @@ public class Parser {
 		}
 		
 		Expect(14);
-		while (StartOf(7)) {
-			if (la.kind == 42) {
+		while (StartOf(5)) {
+			if (la.kind == 39) {
 				NAMESPACE(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 54) {
+			} else if (la.kind == 50) {
 				CLASS(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 43) {
+			} else if (la.kind == 40) {
 				NATIVECLASS(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 56) {
+			} else if (la.kind == 52) {
 				INTERFACE(out blo, obj);
 				obj.addChild(blo); 
 			} else {
@@ -666,10 +645,10 @@ public class Parser {
 					NEWVARIABLE(out blo, obj, Encapsulation.Static);
 					obj.addChild(blo); 
 					TERMINATOR();
-				} else if (StartOf(8)) {
+				} else if (StartOf(6)) {
 					FUNCTION(out blo, obj, Encapsulation.Static);
 					obj.addChild(blo); 
-				} else SynErr(91);
+				} else SynErr(85);
 			}
 		}
 		Expect(15);
@@ -677,21 +656,23 @@ public class Parser {
 
 	void CLASS(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new oosClass(parent); outObj = obj; pBaseLangObject blo; Encapsulation e = Encapsulation.Private; bool hasConstructor = false; 
-		Expect(54);
+		Expect(50);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
-		if (la.kind == 44) {
+		if (la.kind == 41) {
 			Get();
 			IDENTACCESS(out blo, obj, false);
 			obj.addParentClass((Ident)blo); 
-			while (la.kind == 18) {
-				Get();
-				IDENTACCESS(out blo, obj, false);
-				obj.addParentClass((Ident)blo); 
-			}
 		}
-		obj.markExtendsEnd(); 
-		if (la.kind == 55) {
+		obj.markEnd();
+		if(obj.ParentClassesIdents.Count == 0)
+		{
+		   var ident = new Ident(obj, "object", -1, -1, "");
+		   obj.addParentClass(ident);
+		}
+		obj.markExtendsEnd();
+		
+		if (la.kind == 51) {
 			Get();
 			IDENTACCESS(out blo, obj, false);
 			obj.addParentClass((Ident)blo); 
@@ -703,10 +684,10 @@ public class Parser {
 		}
 		obj.markEnd(); 
 		Expect(14);
-		while (StartOf(9)) {
+		while (StartOf(7)) {
 			e = Encapsulation.Private; 
-			if (StartOf(10)) {
-				if (la.kind == 25 || la.kind == 26 || la.kind == 27) {
+			if (StartOf(8)) {
+				if (la.kind == 23 || la.kind == 24 || la.kind == 25) {
 					ENCAPSULATION(out e);
 				} else {
 					Get();
@@ -720,10 +701,10 @@ public class Parser {
 			} else if (peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) ) {
 				CONSTRUCTOR(out blo, obj, e);
 				obj.addChild(blo); hasConstructor = true; 
-			} else if (StartOf(8)) {
+			} else if (StartOf(6)) {
 				FUNCTION(out blo, obj, e);
 				obj.addChild(blo); 
-			} else SynErr(92);
+			} else SynErr(86);
 		}
 		Expect(15);
 		if(!hasConstructor) {
@@ -745,27 +726,27 @@ public class Parser {
 
 	void NATIVECLASS(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Native(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; Template te; bool flag = false; 
-		Expect(43);
+		Expect(40);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
-		if (la.kind == 21) {
+		if (la.kind == 19) {
 			TEMPLATE(out te, obj);
-			obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name, true, te); 
+			obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name); 
 		}
-		if (la.kind == 44) {
+		if (la.kind == 41) {
 			Get();
 			IDENTACCESS(out blo, obj, false);
 			obj.addParent((Ident)blo); 
 		}
-		if(!flag) obj.VTO = new VarTypeObject(obj.Name, true); 
+		if(!flag) obj.VTO = new VarTypeObject(obj.Name); 
 		Expect(14);
 		NATIVEASSIGN(out blo, obj);
 		obj.addChild(blo); 
-		while (la.kind == 45 || la.kind == 48 || la.kind == 52) {
-			if (la.kind == 45) {
+		while (la.kind == 42 || la.kind == 45 || la.kind == 48) {
+			if (la.kind == 42) {
 				NATIVEASSIGN(out blo, obj);
 				obj.addChild(blo); 
-			} else if (la.kind == 48) {
+			} else if (la.kind == 45) {
 				NATIVEFUNCTION(out blo, obj);
 				obj.addChild(blo); 
 			} else {
@@ -778,11 +759,11 @@ public class Parser {
 
 	void INTERFACE(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new oosInterface(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(56);
+		Expect(52);
 		IDENT(out blo, obj);
-		obj.Name = (Ident)blo; obj.VTO = new VarTypeObject((Ident)blo, true); 
+		obj.Name = (Ident)blo; obj.VTO = new VarTypeObject((Ident)blo); 
 		Expect(14);
-		while (StartOf(11)) {
+		while (StartOf(9)) {
 			VFUNCTION(out blo, obj);
 			obj.addChild(blo); 
 		}
@@ -791,23 +772,18 @@ public class Parser {
 
 	void NEWVARIABLE(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA) {
 		var obj = new Variable(parent, la.line, la.col, this.file); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
-		if (StartOf(2)) {
+		if (StartOf(1)) {
 			VARTYPE(out v);
 			obj.varType = new VarTypeObject(v); 
-		} else if (StartOf(12)) {
-			bool isStrict = false; 
-			if (la.kind == 50) {
-				Get();
-				isStrict = true; 
-			}
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, obj);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
-			if (la.kind == 21) {
+			obj.varType = new VarTypeObject((Ident)blo); 
+			if (la.kind == 19) {
 				Template te; 
 				TEMPLATE(out te, outObj);
 				obj.varType.TemplateObject = te; 
 			}
-		} else SynErr(93);
+		} else SynErr(87);
 		IDENT(out blo, outObj);
 		obj.Name = (Ident)blo; 
 		if (la.kind == 7 || la.kind == 8 || la.kind == 9) {
@@ -818,38 +794,33 @@ public class Parser {
 
 	void FUNCTION(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e) {
 		var obj = new Function(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarType v; 
-		if (la.kind == 57) {
+		if (la.kind == 53) {
 			Get();
 			obj.IsAsync = true; 
 		}
-		if (la.kind == 58) {
+		if (la.kind == 54) {
 			Get();
-			obj.Override = true; 
+			obj.IsVirtual = true; 
 		}
-		if (StartOf(2)) {
+		if (StartOf(1)) {
 			VARTYPE(out v);
 			obj.varType = new VarTypeObject(v); 
-		} else if (la.kind == 49) {
+		} else if (la.kind == 46) {
 			Get();
 			obj.varType = new VarTypeObject(VarType.Void); 
-		} else if (StartOf(12)) {
-			bool isStrict = false; 
-			if (la.kind == 50) {
-				Get();
-				isStrict = true; 
-			}
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, obj, false);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
-			if (la.kind == 21) {
+			obj.varType = new VarTypeObject((Ident)blo); 
+			if (la.kind == 19) {
 				Template te; 
 				TEMPLATE(out te, outObj);
 				obj.varType.TemplateObject = te; 
 			}
-		} else SynErr(94);
+		} else SynErr(88);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		Expect(10);
-		if (StartOf(13)) {
+		if (StartOf(10)) {
 			NEWVARIABLE(out blo, obj);
 			obj.addChild(blo); 
 			while (la.kind == 18) {
@@ -861,7 +832,7 @@ public class Parser {
 		Expect(11);
 		obj.markArgListEnd(); 
 		Expect(14);
-		while (StartOf(14)) {
+		while (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
 		}
@@ -871,13 +842,13 @@ public class Parser {
 	void NATIVEASSIGN(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new NativeAssign(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; 
 		obj.Name = new Ident(obj, ((Native)parent).Name.OriginalValue, ((Native)parent).Name.Line, ((Native)parent).Name.Pos, this.file); 
-		Expect(45);
-		if (la.kind == 46) {
+		Expect(42);
+		if (la.kind == 43) {
 			Get();
 			obj.IsSimple = true; 
 		}
 		Expect(10);
-		if (StartOf(13)) {
+		if (StartOf(10)) {
 			NEWVARIABLE(out blo, obj);
 			obj.addChild(blo); 
 			while (la.kind == 18) {
@@ -887,7 +858,50 @@ public class Parser {
 			}
 		}
 		Expect(11);
-		while (StartOf(15)) {
+		while (StartOf(12)) {
+			Get();
+			obj.Code += t.val + (la.val == ";" ? "" : " "); 
+		}
+		Expect(44);
+		obj.Code = obj.Code.Trim(); 
+	}
+
+	void NATIVEFUNCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
+		var obj = new NativeFunction(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarType v; 
+		Expect(45);
+		if (la.kind == 43) {
+			Get();
+			obj.IsSimple = true; 
+		}
+		if (StartOf(1)) {
+			VARTYPE(out v);
+			obj.VTO = new VarTypeObject(v); 
+		} else if (la.kind == 46) {
+			Get();
+			obj.VTO = new VarTypeObject(VarType.Void); 
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
+			IDENTACCESS(out blo, obj);
+			obj.VTO = new VarTypeObject((Ident)blo); 
+			if (la.kind == 19) {
+				Template te; 
+				TEMPLATE(out te, outObj);
+				obj.VTO.TemplateObject = te; 
+			}
+		} else SynErr(89);
+		IDENT(out blo, obj);
+		obj.Name = (Ident)blo; 
+		Expect(10);
+		if (StartOf(10)) {
+			NEWVARIABLE(out blo, obj);
+			obj.addChild(blo); 
+			while (la.kind == 18) {
+				Get();
+				NEWVARIABLE(out blo, obj);
+				obj.addChild(blo); 
+			}
+		}
+		Expect(11);
+		while (StartOf(13)) {
 			Get();
 			obj.Code += t.val + (la.val == ";" ? "" : " "); 
 		}
@@ -895,86 +909,33 @@ public class Parser {
 		obj.Code = obj.Code.Trim(); 
 	}
 
-	void NATIVEFUNCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new NativeFunction(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarType v; 
-		Expect(48);
-		if (la.kind == 46) {
-			Get();
-			obj.IsSimple = true; 
-		}
-		if (StartOf(2)) {
-			VARTYPE(out v);
-			obj.VTO = new VarTypeObject(v); 
-		} else if (la.kind == 49) {
-			Get();
-			obj.VTO = new VarTypeObject(VarType.Void); 
-		} else if (StartOf(12)) {
-			bool isStrict = false; 
-			if (la.kind == 50) {
-				Get();
-				isStrict = true; 
-			}
-			IDENTACCESS(out blo, obj);
-			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
-			if (la.kind == 21) {
-				Template te; 
-				TEMPLATE(out te, outObj);
-				obj.VTO.TemplateObject = te; 
-			}
-		} else SynErr(95);
-		IDENT(out blo, obj);
-		obj.Name = (Ident)blo; 
-		Expect(10);
-		if (StartOf(13)) {
-			NEWVARIABLE(out blo, obj);
-			obj.addChild(blo); 
-			while (la.kind == 18) {
-				Get();
-				NEWVARIABLE(out blo, obj);
-				obj.addChild(blo); 
-			}
-		}
-		Expect(11);
-		while (StartOf(16)) {
-			Get();
-			obj.Code += t.val + (la.val == ";" ? "" : " "); 
-		}
-		Expect(51);
-		obj.Code = obj.Code.Trim(); 
-	}
-
 	void NATIVEOPERATOR(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new NativeOperator(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarType v; 
-		Expect(52);
-		if (la.kind == 46) {
+		Expect(48);
+		if (la.kind == 43) {
 			Get();
 			obj.IsSimple = true; 
 		}
-		if (StartOf(2)) {
+		if (StartOf(1)) {
 			VARTYPE(out v);
 			obj.VTO = new VarTypeObject(v); 
-		} else if (la.kind == 49) {
+		} else if (la.kind == 46) {
 			Get();
 			obj.VTO = new VarTypeObject(VarType.Void); 
-		} else if (StartOf(12)) {
-			bool isStrict = false; 
-			if (la.kind == 50) {
-				Get();
-				isStrict = true; 
-			}
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, obj, false);
-			obj.VTO = new VarTypeObject((Ident)blo, isStrict); 
-			if (la.kind == 21) {
+			obj.VTO = new VarTypeObject((Ident)blo); 
+			if (la.kind == 19) {
 				Template te; 
 				TEMPLATE(out te, outObj);
 				obj.VTO.TemplateObject = te; 
 			}
-		} else SynErr(96);
+		} else SynErr(90);
 		if (la.kind == 12) {
 			Get();
 			Expect(13);
 			obj.OperatorType = OverridableOperator.ArrayAccess; 
-		} else if (StartOf(5)) {
+		} else if (StartOf(4)) {
 			if (la.kind == 5) {
 				Get();
 				switch(t.val) {
@@ -985,21 +946,21 @@ public class Parser {
 				SemErr("The operator '" + t.val + "' is not supported for override");
 				break;
 				}
-			} else if (la.kind == 23) {
-				Get();
-				SemErr("The operator '" + t.val + "' is not supported for override"); 
 			} else if (la.kind == 21) {
 				Get();
-				Expect(21);
+				SemErr("The operator '" + t.val + "' is not supported for override"); 
+			} else if (la.kind == 19) {
+				Get();
+				Expect(19);
 				SemErr("The operator '" + t.val + "' is not supported for override"); 
 			} else {
 				Get();
-				Expect(22);
+				Expect(20);
 				SemErr("The operator '" + t.val + "' is not supported for override"); 
 			}
-		} else SynErr(97);
+		} else SynErr(91);
 		Expect(10);
-		if (StartOf(13)) {
+		if (StartOf(10)) {
 			NEWVARIABLE(out blo, obj);
 			obj.addChild(blo); 
 			while (la.kind == 18) {
@@ -1009,20 +970,20 @@ public class Parser {
 			}
 		}
 		Expect(11);
-		while (StartOf(17)) {
+		while (StartOf(14)) {
 			Get();
 			obj.Code += t.val + (la.val == ";" ? "" : " "); 
 		}
-		Expect(53);
+		Expect(49);
 		obj.Code = obj.Code.Trim(); 
 	}
 
 	void CONSTRUCTOR(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e) {
-		var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name, true); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; 
+		var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; 
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		Expect(10);
-		if (StartOf(13)) {
+		if (StartOf(10)) {
 			NEWVARIABLE(out blo, obj);
 			obj.addChild(blo); 
 			while (la.kind == 18) {
@@ -1033,18 +994,18 @@ public class Parser {
 		}
 		Expect(11);
 		obj.markArgListEnd(); 
-		if (la.kind == 59) {
+		if (la.kind == 55) {
 			Get();
 			IDENTACCESS(out blo, obj);
 			obj.addChild(blo); 
-			while (StartOf(1)) {
+			while (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 				IDENTACCESS(out blo, obj);
 				obj.addChild(blo); 
 			}
 		}
 		obj.markBaseCallEnd(); 
 		Expect(14);
-		while (StartOf(14)) {
+		while (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
 		}
@@ -1053,35 +1014,30 @@ public class Parser {
 
 	void VFUNCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new VirtualFunction(parent); outObj = obj; pBaseLangObject blo; VarType v; 
-		if (la.kind == 57) {
+		if (la.kind == 53) {
 			Get();
 			obj.IsAsync = true; 
 		}
-		if (StartOf(2)) {
+		if (StartOf(1)) {
 			VARTYPE(out v);
 			obj.varType = new VarTypeObject(v); 
-		} else if (la.kind == 49) {
+		} else if (la.kind == 46) {
 			Get();
 			obj.varType = new VarTypeObject(VarType.Void); 
-		} else if (StartOf(12)) {
-			bool isStrict = false; 
-			if (la.kind == 50) {
-				Get();
-				isStrict = true; 
-			}
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, obj, false);
-			obj.varType = new VarTypeObject((Ident)blo, isStrict); 
-			if (la.kind == 21) {
+			obj.varType = new VarTypeObject((Ident)blo); 
+			if (la.kind == 19) {
 				Template te; 
 				TEMPLATE(out te, outObj);
 				obj.varType.TemplateObject = te; 
 			}
-		} else SynErr(98);
+		} else SynErr(92);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		Expect(10);
-		if (StartOf(18)) {
-			if (StartOf(2)) {
+		if (StartOf(10)) {
+			if (StartOf(1)) {
 				VARTYPE(out v);
 				obj.argTypes.Add(new VarTypeObject(v)); 
 			} else {
@@ -1090,13 +1046,13 @@ public class Parser {
 			}
 			while (la.kind == 18) {
 				Get();
-				if (StartOf(2)) {
+				if (StartOf(1)) {
 					VARTYPE(out v);
 					obj.argTypes.Add(new VarTypeObject(v)); 
-				} else if (StartOf(1)) {
+				} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 					IDENTACCESS(out blo, obj, false);
 					obj.argTypes.Add(new VarTypeObject((Ident)blo)); 
-				} else SynErr(99);
+				} else SynErr(93);
 			}
 		}
 		Expect(11);
@@ -1105,12 +1061,12 @@ public class Parser {
 
 	void CODEINSTRUCTION(out pBaseLangObject outObj, pBaseLangObject parent) {
 		outObj = null; 
-		if (StartOf(19)) {
+		if (StartOf(15)) {
 			CODEINSTRUCTION_SC(out outObj, parent);
 			TERMINATOR();
-		} else if (StartOf(20)) {
+		} else if (StartOf(16)) {
 			CODEINSTRUCTION_NSC(out outObj, parent);
-		} else SynErr(100);
+		} else SynErr(94);
 	}
 
 	void BODY_ASSIGNMENT(out pBaseLangObject outObj, pBaseLangObject parent, bool allowAlt = false) {
@@ -1118,13 +1074,13 @@ public class Parser {
 		if (la.kind == 7) {
 			Get();
 			obj.Operation = AssignmentCharacters.SimpleAssign; 
-			if (StartOf(3)) {
+			if (StartOf(2)) {
 				EXPRESSION(out blo, obj);
 				obj.addChild(blo); 
 			} else if (la.kind == 14) {
 				OP_NEWARRAY(out blo, obj);
 				obj.addChild(blo); 
-			} else SynErr(101);
+			} else SynErr(95);
 		} else if (allowAlt ) {
 			if (la.kind == 9) {
 				Get();
@@ -1149,15 +1105,15 @@ public class Parser {
 					throw new Exception();
 				}
 				
-				if (StartOf(3)) {
+				if (StartOf(2)) {
 					EXPRESSION(out blo, obj);
 					obj.addChild(blo); 
 				} else if (la.kind == 14) {
 					OP_NEWARRAY(out blo, obj);
 					obj.addChild(blo); 
-				} else SynErr(102);
-			} else SynErr(103);
-		} else SynErr(104);
+				} else SynErr(96);
+			} else SynErr(97);
+		} else SynErr(98);
 	}
 
 	void VARIABLEASSIGNMENT(out pBaseLangObject outObj, pBaseLangObject ident, pBaseLangObject parent) {
@@ -1168,7 +1124,7 @@ public class Parser {
 
 	void AUTOVARIABLE(out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA) {
 		var obj = new Variable(parent, la.line, la.col, this.file); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; 
-		Expect(60);
+		Expect(56);
 		obj.varType = new VarTypeObject(VarType.Auto); 
 		IDENT(out blo, outObj);
 		obj.Name = (Ident)blo; 
@@ -1178,9 +1134,9 @@ public class Parser {
 
 	void CODEINSTRUCTION_SC(out pBaseLangObject outObj, pBaseLangObject parent) {
 		outObj = null; pBaseLangObject blo; 
-		if (la.kind == 70) {
+		if (la.kind == 66) {
 			OP_THROW(out outObj, parent);
-		} else if (la.kind == 71) {
+		} else if (la.kind == 67) {
 			OP_RETURN(out outObj, parent);
 		} else if ((peekString(0, "scalar", "int", "double", "float", "bool", "string", "object") && peekCompare(-1, _T_IDENT)) || peekCompare(_T_IDENT, _T_IDENT) ) {
 			NEWVARIABLE(out outObj, parent);
@@ -1188,30 +1144,30 @@ public class Parser {
 				BODY_ASSIGNMENT(out blo, outObj);
 				outObj.addChild(blo); 
 			}
-		} else if (la.kind == 60) {
+		} else if (la.kind == 56) {
 			AUTOVARIABLE(out outObj, parent);
-		} else if (StartOf(1)) {
+		} else if (la.kind == 3 || la.kind == 10 || la.kind == 17) {
 			IDENTACCESS(out blo, parent);
 			if (la.kind == 7 || la.kind == 8 || la.kind == 9) {
 				VARIABLEASSIGNMENT(out outObj, blo, parent);
 			}
 			if(outObj == null) outObj = blo; 
-		} else if (la.kind == 76) {
+		} else if (la.kind == 72) {
 			OP_SQFCALL(out outObj, parent);
-		} else SynErr(105);
+		} else SynErr(99);
 	}
 
 	void OP_THROW(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Throw(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(70);
+		Expect(66);
 		EXPRESSION(out blo, obj);
 		obj.addChild(blo); 
 	}
 
 	void OP_RETURN(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Return(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; 
-		Expect(71);
-		if (StartOf(3)) {
+		Expect(67);
+		if (StartOf(2)) {
 			EXPRESSION(out blo, obj);
 			obj.addChild(blo); 
 		}
@@ -1219,42 +1175,42 @@ public class Parser {
 
 	void CODEINSTRUCTION_NSC(out pBaseLangObject outObj, pBaseLangObject parent) {
 		outObj = null; 
-		if (la.kind == 61) {
+		if (la.kind == 57) {
 			OP_FOR(out outObj, parent);
-		} else if (la.kind == 62) {
+		} else if (la.kind == 58) {
 			OP_WHILE(out outObj, parent);
-		} else if (la.kind == 64) {
+		} else if (la.kind == 60) {
 			OP_IFELSE(out outObj, parent);
-		} else if (la.kind == 72) {
+		} else if (la.kind == 68) {
 			OP_SWITCH(out outObj, parent);
-		} else if (la.kind == 66) {
+		} else if (la.kind == 62) {
 			OP_TRYCATCH(out outObj, parent);
-		} else SynErr(106);
+		} else SynErr(100);
 	}
 
 	void OP_FOR(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new For(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(61);
+		Expect(57);
 		Expect(10);
-		if (StartOf(19)) {
+		if (StartOf(15)) {
 			CODEINSTRUCTION_SC(out blo, obj);
 			obj.forArg1 = blo; 
 		}
 		TERMINATOR();
-		if (StartOf(3)) {
+		if (StartOf(2)) {
 			EXPRESSION(out blo, obj);
 			obj.forArg2 = blo; 
 		}
 		TERMINATOR();
-		if (StartOf(19)) {
+		if (StartOf(15)) {
 			CODEINSTRUCTION_SC(out blo, obj);
 			obj.forArg3 = blo; 
 		}
 		Expect(11);
 		if (la.kind == 14) {
 			Get();
-			while (StartOf(21)) {
-				if (StartOf(14)) {
+			while (StartOf(17)) {
+				if (StartOf(11)) {
 					CODEINSTRUCTION(out blo, obj);
 					obj.addChild(blo); 
 				} else {
@@ -1264,23 +1220,23 @@ public class Parser {
 				}
 			}
 			Expect(15);
-		} else if (StartOf(14)) {
+		} else if (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(107);
+		} else SynErr(101);
 	}
 
 	void OP_WHILE(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new While(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(62);
+		Expect(58);
 		Expect(10);
 		EXPRESSION(out blo, obj);
 		obj.expression = blo; 
 		Expect(11);
 		if (la.kind == 14) {
 			Get();
-			while (StartOf(21)) {
-				if (StartOf(14)) {
+			while (StartOf(17)) {
+				if (StartOf(11)) {
 					CODEINSTRUCTION(out blo, obj);
 					obj.addChild(blo); 
 				} else {
@@ -1290,112 +1246,112 @@ public class Parser {
 				}
 			}
 			Expect(15);
-		} else if (StartOf(14)) {
+		} else if (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(108);
+		} else SynErr(102);
 	}
 
 	void OP_IFELSE(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new IfElse(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(64);
+		Expect(60);
 		Expect(10);
 		EXPRESSION(out blo, obj);
 		obj.expression = blo; 
 		Expect(11);
 		if (la.kind == 14) {
 			Get();
-			while (StartOf(14)) {
+			while (StartOf(11)) {
 				CODEINSTRUCTION(out blo, obj);
 				obj.addChild(blo); 
 			}
 			Expect(15);
-		} else if (StartOf(14)) {
+		} else if (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
-		} else SynErr(109);
+		} else SynErr(103);
 		obj.markIfEnd(); 
-		if (la.kind == 65) {
+		if (la.kind == 61) {
 			Get();
 			if (la.kind == 14) {
 				Get();
-				while (StartOf(14)) {
+				while (StartOf(11)) {
 					CODEINSTRUCTION(out blo, obj);
 					obj.addChild(blo); 
 				}
 				Expect(15);
-			} else if (StartOf(14)) {
+			} else if (StartOf(11)) {
 				CODEINSTRUCTION(out blo, obj);
 				obj.addChild(blo); 
-			} else SynErr(110);
+			} else SynErr(104);
 		}
 	}
 
 	void OP_SWITCH(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Switch(parent); Case caseObj; outObj = obj; pBaseLangObject blo; 
-		Expect(72);
+		Expect(68);
 		Expect(10);
 		EXPRESSION(out blo, obj);
 		obj.expression = blo; 
 		Expect(11);
 		Expect(14);
-		while (la.kind == 73 || la.kind == 74 || la.kind == 75) {
-			if (la.kind == 73) {
+		while (la.kind == 69 || la.kind == 70 || la.kind == 71) {
+			if (la.kind == 69) {
 				Get();
 				caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); 
 				EXPRESSION(out blo, caseObj);
 				caseObj.addChild(blo); 
-				Expect(59);
-				while (la.kind == 73) {
+				Expect(55);
+				while (la.kind == 69) {
 					Get();
 					EXPRESSION(out blo, caseObj);
 					caseObj.addChild(blo); 
-					Expect(59);
+					Expect(55);
 				}
 				caseObj.markEnd(); 
-				while (StartOf(14)) {
+				while (StartOf(11)) {
 					CODEINSTRUCTION(out blo, caseObj);
 					caseObj.addChild(blo); 
 				}
-				if (la.kind == 68) {
+				if (la.kind == 64) {
 					OP_BREAK(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
-				} else if (la.kind == 70) {
+				} else if (la.kind == 66) {
 					OP_THROW(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
-				} else if (la.kind == 71) {
+				} else if (la.kind == 67) {
 					OP_RETURN(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
-				} else SynErr(111);
+				} else SynErr(105);
 			} else {
-				if (la.kind == 74) {
+				if (la.kind == 70) {
 					Get();
 					caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); 
-					Expect(59);
+					Expect(55);
 				} else {
 					Get();
 					caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); 
 				}
-				while (StartOf(14)) {
+				while (StartOf(11)) {
 					CODEINSTRUCTION(out blo, caseObj);
 					caseObj.addChild(blo); 
 				}
-				if (la.kind == 68) {
+				if (la.kind == 64) {
 					OP_BREAK(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
-				} else if (la.kind == 70) {
+				} else if (la.kind == 66) {
 					OP_THROW(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
-				} else if (la.kind == 71) {
+				} else if (la.kind == 67) {
 					OP_RETURN(out blo, caseObj);
 					caseObj.addChild(blo); 
 					TERMINATOR();
-				} else SynErr(112);
+				} else SynErr(106);
 			}
 		}
 		Expect(15);
@@ -1403,21 +1359,21 @@ public class Parser {
 
 	void OP_TRYCATCH(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new TryCatch(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(66);
+		Expect(62);
 		Expect(14);
-		while (StartOf(14)) {
+		while (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
 		}
 		Expect(15);
-		Expect(67);
+		Expect(63);
 		Expect(10);
 		NEWVARIABLE(out blo, obj);
 		obj.variable = blo; 
 		Expect(11);
 		obj.markEnd(); 
 		Expect(14);
-		while (StartOf(14)) {
+		while (StartOf(11)) {
 			CODEINSTRUCTION(out blo, obj);
 			obj.addChild(blo); 
 		}
@@ -1427,7 +1383,7 @@ public class Parser {
 	void OP_NEWARRAY(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new NewArray(parent); outObj = obj; pBaseLangObject blo; 
 		Expect(14);
-		if (StartOf(3)) {
+		if (StartOf(2)) {
 			EXPRESSION(out blo, obj);
 			obj.addChild(blo); 
 			while (la.kind == 18) {
@@ -1441,7 +1397,7 @@ public class Parser {
 
 	void OP_BREAK(out pBaseLangObject outObj, pBaseLangObject parent) {
 		var obj = new Break(parent); outObj = obj; pBaseLangObject blo; 
-		Expect(68);
+		Expect(64);
 	}
 
 
@@ -1456,28 +1412,24 @@ public class Parser {
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x},
-		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _T,_x,_T,_x, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_x},
-		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x},
-		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x},
-		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _T,_x,_T,_x, _T,_x,_T,_T, _T,_x,_x,_x, _T,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x},
+		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _T,_x,_T,_x, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_x},
+		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x},
+		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x},
+		{_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _T,_x,_T,_x, _T,_x,_T,_T, _T,_x,_x,_x, _T,_x,_x}
 
 	};
 } // end Parser
@@ -1510,100 +1462,94 @@ public class Errors {
 			case 16: s = "T_INSTANCEACCESS expected"; break;
 			case 17: s = "T_NAMESPACEACCESS expected"; break;
 			case 18: s = "T_COMMA expected"; break;
-			case 19: s = "T_STATICCASTOPERATOR expected"; break;
-			case 20: s = "T_DYNAMICCASTOPERATOR expected"; break;
-			case 21: s = "T_TEMPLATEOPEN expected"; break;
-			case 22: s = "T_TEMPLATECLOSE expected"; break;
-			case 23: s = "T_SLASH expected"; break;
-			case 24: s = "T_BACKSLASH expected"; break;
-			case 25: s = "\"public\" expected"; break;
-			case 26: s = "\"private\" expected"; break;
-			case 27: s = "\"protected\" expected"; break;
-			case 28: s = "\"scalar\" expected"; break;
-			case 29: s = "\"int\" expected"; break;
-			case 30: s = "\"double\" expected"; break;
-			case 31: s = "\"float\" expected"; break;
-			case 32: s = "\"bool\" expected"; break;
-			case 33: s = "\"boolean\" expected"; break;
-			case 34: s = "\"string\" expected"; break;
-			case 35: s = "\"object\" expected"; break;
-			case 36: s = "\"true\" expected"; break;
-			case 37: s = "\"false\" expected"; break;
-			case 38: s = "\"!\" expected"; break;
-			case 39: s = "\"static\" expected"; break;
-			case 40: s = "\"using\" expected"; break;
-			case 41: s = "\"\"\" expected"; break;
-			case 42: s = "\"namespace\" expected"; break;
-			case 43: s = "\"native\" expected"; break;
-			case 44: s = "\"extends\" expected"; break;
-			case 45: s = "\"assign\" expected"; break;
-			case 46: s = "\"simple\" expected"; break;
-			case 47: s = "\"endAssign\" expected"; break;
-			case 48: s = "\"fnc\" expected"; break;
-			case 49: s = "\"void\" expected"; break;
-			case 50: s = "\"strict\" expected"; break;
-			case 51: s = "\"endFnc\" expected"; break;
-			case 52: s = "\"operator\" expected"; break;
-			case 53: s = "\"endOperator\" expected"; break;
-			case 54: s = "\"class\" expected"; break;
-			case 55: s = "\"implements\" expected"; break;
-			case 56: s = "\"interface\" expected"; break;
-			case 57: s = "\"async\" expected"; break;
-			case 58: s = "\"override\" expected"; break;
-			case 59: s = "\":\" expected"; break;
-			case 60: s = "\"auto\" expected"; break;
-			case 61: s = "\"for\" expected"; break;
-			case 62: s = "\"while\" expected"; break;
-			case 63: s = "\"new\" expected"; break;
-			case 64: s = "\"if\" expected"; break;
-			case 65: s = "\"else\" expected"; break;
-			case 66: s = "\"try\" expected"; break;
-			case 67: s = "\"catch\" expected"; break;
-			case 68: s = "\"break\" expected"; break;
-			case 69: s = "\"is\" expected"; break;
-			case 70: s = "\"throw\" expected"; break;
-			case 71: s = "\"return\" expected"; break;
-			case 72: s = "\"switch\" expected"; break;
-			case 73: s = "\"case\" expected"; break;
-			case 74: s = "\"default\" expected"; break;
-			case 75: s = "\"default:\" expected"; break;
-			case 76: s = "\"SQF\" expected"; break;
-			case 77: s = "??? expected"; break;
-			case 78: s = "invalid TEMPLATE"; break;
-			case 79: s = "invalid TEMPLATE"; break;
-			case 80: s = "invalid VARTYPE"; break;
-			case 81: s = "invalid CAST"; break;
-			case 82: s = "invalid CAST"; break;
-			case 83: s = "invalid CAST"; break;
-			case 84: s = "invalid ENCAPSULATION"; break;
-			case 85: s = "invalid BOOLEAN"; break;
-			case 86: s = "invalid VALUE"; break;
-			case 87: s = "invalid EXPRESSION_HELPER"; break;
-			case 88: s = "invalid EXPRESSION"; break;
-			case 89: s = "invalid OOS"; break;
-			case 90: s = "invalid OP_USING"; break;
-			case 91: s = "invalid NAMESPACE"; break;
-			case 92: s = "invalid CLASS"; break;
-			case 93: s = "invalid NEWVARIABLE"; break;
-			case 94: s = "invalid FUNCTION"; break;
-			case 95: s = "invalid NATIVEFUNCTION"; break;
-			case 96: s = "invalid NATIVEOPERATOR"; break;
-			case 97: s = "invalid NATIVEOPERATOR"; break;
-			case 98: s = "invalid VFUNCTION"; break;
-			case 99: s = "invalid VFUNCTION"; break;
-			case 100: s = "invalid CODEINSTRUCTION"; break;
-			case 101: s = "invalid BODY_ASSIGNMENT"; break;
-			case 102: s = "invalid BODY_ASSIGNMENT"; break;
-			case 103: s = "invalid BODY_ASSIGNMENT"; break;
-			case 104: s = "invalid BODY_ASSIGNMENT"; break;
-			case 105: s = "invalid CODEINSTRUCTION_SC"; break;
-			case 106: s = "invalid CODEINSTRUCTION_NSC"; break;
-			case 107: s = "invalid OP_FOR"; break;
-			case 108: s = "invalid OP_WHILE"; break;
-			case 109: s = "invalid OP_IFELSE"; break;
-			case 110: s = "invalid OP_IFELSE"; break;
-			case 111: s = "invalid OP_SWITCH"; break;
-			case 112: s = "invalid OP_SWITCH"; break;
+			case 19: s = "T_TEMPLATEOPEN expected"; break;
+			case 20: s = "T_TEMPLATECLOSE expected"; break;
+			case 21: s = "T_SLASH expected"; break;
+			case 22: s = "T_BACKSLASH expected"; break;
+			case 23: s = "\"public\" expected"; break;
+			case 24: s = "\"private\" expected"; break;
+			case 25: s = "\"protected\" expected"; break;
+			case 26: s = "\"scalar\" expected"; break;
+			case 27: s = "\"int\" expected"; break;
+			case 28: s = "\"double\" expected"; break;
+			case 29: s = "\"float\" expected"; break;
+			case 30: s = "\"bool\" expected"; break;
+			case 31: s = "\"boolean\" expected"; break;
+			case 32: s = "\"string\" expected"; break;
+			case 33: s = "\"true\" expected"; break;
+			case 34: s = "\"false\" expected"; break;
+			case 35: s = "\"!\" expected"; break;
+			case 36: s = "\"static\" expected"; break;
+			case 37: s = "\"using\" expected"; break;
+			case 38: s = "\"\"\" expected"; break;
+			case 39: s = "\"namespace\" expected"; break;
+			case 40: s = "\"native\" expected"; break;
+			case 41: s = "\"extends\" expected"; break;
+			case 42: s = "\"assign\" expected"; break;
+			case 43: s = "\"simple\" expected"; break;
+			case 44: s = "\"endAssign\" expected"; break;
+			case 45: s = "\"fnc\" expected"; break;
+			case 46: s = "\"void\" expected"; break;
+			case 47: s = "\"endFnc\" expected"; break;
+			case 48: s = "\"operator\" expected"; break;
+			case 49: s = "\"endOperator\" expected"; break;
+			case 50: s = "\"class\" expected"; break;
+			case 51: s = "\"implements\" expected"; break;
+			case 52: s = "\"interface\" expected"; break;
+			case 53: s = "\"async\" expected"; break;
+			case 54: s = "\"virtual\" expected"; break;
+			case 55: s = "\":\" expected"; break;
+			case 56: s = "\"auto\" expected"; break;
+			case 57: s = "\"for\" expected"; break;
+			case 58: s = "\"while\" expected"; break;
+			case 59: s = "\"new\" expected"; break;
+			case 60: s = "\"if\" expected"; break;
+			case 61: s = "\"else\" expected"; break;
+			case 62: s = "\"try\" expected"; break;
+			case 63: s = "\"catch\" expected"; break;
+			case 64: s = "\"break\" expected"; break;
+			case 65: s = "\"is\" expected"; break;
+			case 66: s = "\"throw\" expected"; break;
+			case 67: s = "\"return\" expected"; break;
+			case 68: s = "\"switch\" expected"; break;
+			case 69: s = "\"case\" expected"; break;
+			case 70: s = "\"default\" expected"; break;
+			case 71: s = "\"default:\" expected"; break;
+			case 72: s = "\"SQF\" expected"; break;
+			case 73: s = "??? expected"; break;
+			case 74: s = "invalid TEMPLATE"; break;
+			case 75: s = "invalid TEMPLATE"; break;
+			case 76: s = "invalid VARTYPE"; break;
+			case 77: s = "invalid CAST"; break;
+			case 78: s = "invalid ENCAPSULATION"; break;
+			case 79: s = "invalid BOOLEAN"; break;
+			case 80: s = "invalid VALUE"; break;
+			case 81: s = "invalid EXPRESSION_HELPER"; break;
+			case 82: s = "invalid EXPRESSION"; break;
+			case 83: s = "invalid OOS"; break;
+			case 84: s = "invalid OP_USING"; break;
+			case 85: s = "invalid NAMESPACE"; break;
+			case 86: s = "invalid CLASS"; break;
+			case 87: s = "invalid NEWVARIABLE"; break;
+			case 88: s = "invalid FUNCTION"; break;
+			case 89: s = "invalid NATIVEFUNCTION"; break;
+			case 90: s = "invalid NATIVEOPERATOR"; break;
+			case 91: s = "invalid NATIVEOPERATOR"; break;
+			case 92: s = "invalid VFUNCTION"; break;
+			case 93: s = "invalid VFUNCTION"; break;
+			case 94: s = "invalid CODEINSTRUCTION"; break;
+			case 95: s = "invalid BODY_ASSIGNMENT"; break;
+			case 96: s = "invalid BODY_ASSIGNMENT"; break;
+			case 97: s = "invalid BODY_ASSIGNMENT"; break;
+			case 98: s = "invalid BODY_ASSIGNMENT"; break;
+			case 99: s = "invalid CODEINSTRUCTION_SC"; break;
+			case 100: s = "invalid CODEINSTRUCTION_NSC"; break;
+			case 101: s = "invalid OP_FOR"; break;
+			case 102: s = "invalid OP_WHILE"; break;
+			case 103: s = "invalid OP_IFELSE"; break;
+			case 104: s = "invalid OP_IFELSE"; break;
+			case 105: s = "invalid OP_SWITCH"; break;
+			case 106: s = "invalid OP_SWITCH"; break;
 
 			default: s = "error " + n; break;
 		}

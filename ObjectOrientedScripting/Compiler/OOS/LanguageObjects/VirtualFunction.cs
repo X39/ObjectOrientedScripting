@@ -46,5 +46,8 @@ namespace Compiler.OOS_LanguageObjects
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg) { }
         public List<Return> ReturnCommands { get { return new List<Return>(); } }
         public bool AlwaysReturns { get { return true; } }
+
+
+        public bool IsVirtual { get { return false; } }
     }
 }

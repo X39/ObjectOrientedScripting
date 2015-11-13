@@ -31,7 +31,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public void addChild(pBaseLangObject blo)
         {
-            if(blo == null || !this.children.Contains(blo))
+            if(blo == null || this.children.TrueForAll( it => it != blo ))
                 this.children.Add(blo);
         }
         public virtual int finalize()

@@ -66,15 +66,15 @@ namespace Compiler
                 case LinkerErrorCode.LNK0029: return "Type Missmatch, RArg has to refer to a class or an interface";
                 case LinkerErrorCode.LNK0030: return "Type Missmatch, LArg is not allowed to be casted";
                 case LinkerErrorCode.LNK0031: return "Cast Exception, non-object to object";
-                case LinkerErrorCode.LNK0032: return "Cast Exception, non-static object got static-casted";
-                case LinkerErrorCode.LNK0033: return "Cast Exception, object to non-object/{string}";
-                case LinkerErrorCode.LNK0034:
-                case LinkerErrorCode.LNK0035: return "Cast Exception, selfcast";
-                case LinkerErrorCode.LNK0036: return "Cast Exception, non-object with dynamic cast";
+                /*case LinkerErrorCode.LNK0032: return "Cast Exception, non-static object got static-casted";*/
+                case LinkerErrorCode.LNK0033: return "Cast Exception, object to non-object";
+                case LinkerErrorCode.LNK0034: return "Cast Exception, selfcast";
+                /*case LinkerErrorCode.LNK0035: return "Cast Exception, selfcast";*/
+                /*case LinkerErrorCode.LNK0036: return "Cast Exception, non-object with dynamic cast";*/
                 case LinkerErrorCode.LNK0037: return "Invalid Operation, implementing class";
                 case LinkerErrorCode.LNK0038: return "Invalid Operation, extending interface";
-                case LinkerErrorCode.LNK0039: return "Function overrides existing function";
-                case LinkerErrorCode.LNK0040: return "Missing override keyword on overriding function";
+                case LinkerErrorCode.LNK0039: return "Invalid Operation, Parent function is not marked as virtual";
+                case LinkerErrorCode.LNK0040: return "Missing virtual keyword on overriding function";
                 case LinkerErrorCode.LNK0041: return "Invalid Operation, too many arguments on override";
                 case LinkerErrorCode.LNK0042: return "Invalid Operation, lacking arguments on override";
                 case LinkerErrorCode.LNK0043: return "Type Missmatch, override has different type then base";

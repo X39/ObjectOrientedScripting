@@ -90,13 +90,13 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     if (fnc is Function)
                     {
-                        if (fnc.FunctionEncapsulation == Encapsulation.Static || fnc.IsConstructor)
+                        if (fnc.IsVirtual)
                         {
-                            sw.Write(']' + (fnc.IsAsync ? " call " : " spawn ") + ((Function)fnc).SqfVariableName);
+                            sw.Write(']' + (!fnc.IsAsync ? " call (" : " spawn (") + '(' + variableName + ')' + ((Function)fnc).SqfVariableName + ')');
                         }
                         else
                         {
-                            sw.Write(']' + (fnc.IsAsync ? " call (" : " spawn (")  + '(' + variableName + ')' + ((Function)fnc).SqfVariableName + ')');
+                            sw.Write(']' + (!fnc.IsAsync ? " call " : " spawn ") + ((Function)fnc).SqfVariableName);
                         }
                     }
                     else

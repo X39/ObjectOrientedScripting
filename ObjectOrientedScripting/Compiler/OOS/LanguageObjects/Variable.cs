@@ -28,13 +28,13 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else if (this.encapsulation == Encapsulation.Static)
                 {
-                    return "GLOBAL" + this.Name.FullyQualifiedName.Replace("::", "_");
+                    return "GVAR_" + this.Name.FullyQualifiedName.Replace("::", "_");
                 }
                 else
                 {
-                    var casted = (Interfaces.iGetVariableIndex)this.Parent;
-                    var res = casted.getVariableIndex(this.Name);
-                    return " select 1 select " + res.Item1 + " select 1 select " + res.Item2;
+                    var casted = (Interfaces.iGetIndex)this.Parent;
+                    var res = casted.getIndex(this.Name);
+                    return (res + Function.ObjectValueOffset).ToString();
                 }
             }
         }

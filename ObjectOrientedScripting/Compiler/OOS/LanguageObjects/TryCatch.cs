@@ -47,9 +47,9 @@ namespace Compiler.OOS_LanguageObjects
             if (varListTry.Count > 0)
             {
                 if (varListTry.Count == 1)
-                    sw.Write("private ");
+                    sw.Write(tab + '\t' + "private ");
                 else
-                    sw.Write("private [");
+                    sw.Write(tab + '\t' + "private [");
 
                 for (int i = 0; i < varListTry.Count; i++)
                 {
@@ -80,12 +80,13 @@ namespace Compiler.OOS_LanguageObjects
             sw.WriteLine(tab + "catch");
             sw.WriteLine(tab + "{");
             var varListCatch = this.getAllChildrenOf<Variable>(false, null, -1, 2);
+            varListCatch.Add((Variable)this.variable);
             if (varListCatch.Count > 0)
             {
                 if (varListCatch.Count == 1)
-                    sw.Write("private ");
+                    sw.Write(tab + '\t' + "private ");
                 else
-                    sw.Write("private [");
+                    sw.Write(tab + '\t' + "private [");
 
                 for (int i = 0; i < varListCatch.Count; i++)
                 {

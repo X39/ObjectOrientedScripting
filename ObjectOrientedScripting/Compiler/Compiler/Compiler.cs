@@ -116,7 +116,7 @@ namespace Wrapper
         }
         public Version getVersion()
         {
-            return new Version("0.6.1-ALPHA");
+            return new Version("0.6.2-ALPHA");
         }
         public void CheckSyntax(string filepath)
         {

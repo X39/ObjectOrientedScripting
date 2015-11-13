@@ -134,7 +134,7 @@ namespace Wrapper
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.6.1-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.6.2-ALPHA\" />");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!File.Exists(path + "Main.oos"))

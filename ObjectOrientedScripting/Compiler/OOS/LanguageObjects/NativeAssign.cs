@@ -23,6 +23,7 @@ namespace Compiler.OOS_LanguageObjects
                 throw new Exception("Never NEVER ever this should happen! If it does, report to dev.");
             }
         }
+        public bool IsVirtual { get { return false; } }
         public override int doFinalize()
         {
             int errCount = 0;

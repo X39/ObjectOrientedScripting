@@ -33,7 +33,7 @@ namespace Compiler.OOS_LanguageObjects
             public SupportInfoObject(string command, Ident type, bool hasR = false, bool hasL = false)
             {
                 this.SqfCommand = command;
-                this.outType = new VarTypeObject(type, true);
+                this.outType = new VarTypeObject(type);
                 this.hasL = hasL;
                 this.hasR = hasR;
             }
@@ -147,7 +147,7 @@ namespace Compiler.OOS_LanguageObjects
         public SqfCall(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
-            this.referencedType = null;
+            this.referencedType = new VarTypeObject(VarType.Void);
         }
 
         public override int finalize()
@@ -198,7 +198,9 @@ namespace Compiler.OOS_LanguageObjects
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0018, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
-            this.referencedType = sio.outType;
+            this.referencedType.ident = sio.outType.ident;
+            this.referencedType.varType = sio.outType.varType;
+            this.referencedType.TemplateObject = sio.outType.TemplateObject;
             if(sio.outType.IsObject)
             {
                 return sio.outType.ident.finalize();
@@ -225,8 +227,9 @@ namespace Compiler.OOS_LanguageObjects
             {
                 if (lArgs.Count == 1)
                 {
+                    sw.Write("(");
                     lArgs[0].writeOut(sw, cfg);
-                    sw.Write(" ");
+                    sw.Write(") ");
                 }
                 else
                 {
@@ -247,8 +250,9 @@ namespace Compiler.OOS_LanguageObjects
             {
                 if (rArgs.Count == 1)
                 {
-                    sw.Write(" ");
+                    sw.Write(" (");
                     rArgs[0].writeOut(sw, cfg);
+                    sw.Write(")");
                 }
                 else
                 {
