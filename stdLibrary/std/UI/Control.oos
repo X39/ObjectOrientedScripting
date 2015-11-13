@@ -1,0 +1,57 @@
+using <std::array>
+namespace std
+{
+	namespace UI
+	{
+		native Control
+		{
+			assign (::std::UI::Display d, scalar idc, string className)
+				(uiNamespace getVariable d) ctrlCreate [className, idc];
+				[d, idc]
+			endAssign
+			
+			fnc simple string className ()
+				ctrlClassName ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			
+			fnc simple string className ()
+				ctrlClassName ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			
+			fnc simple bool isCommited ()
+				ctrlCommitted ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			
+			fnc simple bool getEnabled ()
+				ctrlEnabled ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			fnc simple ::std::array<scalar> getPosition()
+				ctrlPosition ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			
+			fnc simple void setEnabled (bool flag)
+				((uiNamespace getVariable (_this select 0)) displayControl (_this select 1)) ctrlEnable flag
+			endFnc
+			fnc simple void setPosition(scalar x, scalar y)
+				((uiNamespace getVariable (_this select 0)) displayControl (_this select 1)) ctrlSetPosition [x, y]
+			endFnc
+			fnc simple void setPosition(scalar x, scalar y, scalar w, scalar h)
+				((uiNamespace getVariable (_this select 0)) displayControl (_this select 1)) ctrlSetPosition [x, y, w, h]
+			endFnc
+			
+			
+			fnc simple void commit (scalar time)
+				((uiNamespace getVariable (_this select 0)) displayControl (_this select 1)) ctrlCommit time
+			endFnc
+			
+			fnc simple void delete ()
+				ctrlDelete ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			
+			fnc simple void delete ()
+				ctrlDelete ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
+			endFnc
+			
+		}
+    }
+}
