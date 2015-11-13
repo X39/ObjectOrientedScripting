@@ -9,6 +9,7 @@ Version 0.6.2-ALPHA
     |             spawned (and vice versa)
     |- Compiler:  unlocked the native "object" object (actually thats a speciall
     \             internal class now, might happen with string too soon)
+	
 Version 0.6.1-ALPHA
     |- Compiler:  fixed InstanceOf printout
     |- Compiler:  Introduced "using" operation, replaces #include
