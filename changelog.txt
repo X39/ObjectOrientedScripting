@@ -1,4 +1,6 @@
 Version 0.6.2-ALPHA
+	|- Compiler:  fixed invalid encapsulation on object function "toString"
+Version 0.6.2-ALPHA
     |- Compiler:  fixed various minor issues
     |- Compiler:  removed multi-base classes
     |- Compiler:  improved object structure (==> less overhead)

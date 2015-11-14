@@ -22,6 +22,7 @@ namespace Compiler.OOS_LanguageObjects
                     toStringFunction.Name = new Ident(toStringFunction, "toString", -1, -1, "");
                     toStringFunction.IsVirtual = true;
                     toStringFunction.varType = new VarTypeObject(VarType.String);
+                    toStringFunction.encapsulation = Encapsulation.Public;
                     toStringFunction.markArgListEnd();
                     objectClass.addChild(toStringFunction);
                     {
