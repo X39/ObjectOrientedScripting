@@ -592,7 +592,9 @@ public class Parser {
 		       if (!UsedFiles.Contains(currentFile))
 		       {
 		           UsedFiles.Add(currentFile);
-		           Scanner scanner = new Scanner(currentFile);
+                   var ppList = new List<Compiler.PostProcessFile>();
+                   Wrapper.Compiler.Instance.preprocessFile(new List<Wrapper.Compiler.preprocessFile_IfDefModes>(), currentFile, "", ppList);
+                   Scanner scanner = new Scanner(ppList.First().FileStream);
 		           Base baseObject = new Base();
 		           Parser p = new Parser(scanner, currentFile);
 		           p.BaseObject = this.BaseObject;
