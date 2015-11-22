@@ -1,9 +1,28 @@
-Version 0.6.2-ALPHA
+Version 0.7.0-ALPHA
 	|- Compiler:  fixed objects added using the using instruction where not
 	|             touched by the PreProcessor
 	|- Compiler:  fixed invalid encapsulation on object function "toString"
+	|- Compiler:  Changed cast operator from %...% to <...>
+	|- Compiler:  fixed templates only could use native types
+	|- Compiler:  added internal class "array"
+	|- Compiler:  added internal class "string"
+	|- Compiler:  class & native syntax now supports flags
+	|             (not important for generic oos users)
+	|             class <IDENT> flags <FLAG1> <FLAG2> <FLAGN>
+	|             Flags which got introduced:
+	|             - disableConstructor
+	|             - noObjectExtends
+	|             - virtualFunctionsOnly (not available in native)
+	|- Compiler:  Introduced enum's. They got following syntax:
+	|             enum { <IDENT1> [ = <VALUE2> ], <IDENTN> [ = <VALUEN> ] }
+	|- Compiler:  SQF instruction now supports forcedType via "as". Example:
+	|             SQF allPlayers as ::std::Array<::std::Men>
 	|- stdLib:    added ::std::UI::Display object
 	|- stdLib:    added ::std::UI::Control object
+	|- stdLib:    added ::std::Marker object
+	|- stdLib:    removed ::std::Array object (moved to internal classes)
+	|- stdLib:    removed ::std::String object (moved to internal classes)
+	|- stdLib:    added get-/setObject function to ::std::Context
 	
 Version 0.6.2-ALPHA
     |- Compiler:  fixed various minor issues
@@ -23,7 +42,7 @@ Version 0.6.1-ALPHA
     |- Compiler:  #include now wont "include" the file anymore and instead just
     |             checks the PreProcessor directives in given file
     |- Compiler:  Added "extends" keyword to native classes --> you now can
-    |             extend native classes
+    |             extend native classes now
     |- Compiler:  Added code for the "async" keyword on functions (sorry)
     |- Compiler:  "PRINTMODE" flag modes have changed:
     |             Possible modes are: NONE, 0, NEEDED, 1, ALL, 2
