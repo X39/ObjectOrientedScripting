@@ -242,7 +242,7 @@ namespace Compiler.OOS_LanguageObjects
             type = IdenType.NamespaceAccess;
             var fncCalls = this.getAllChildrenOf<FunctionCall>();
             var arrAccess = this.getAllChildrenOf<ArrayAccess>();
-            if (this.Parent is Template)
+            if (this.Parent is Template && !(this.Parent.Parent is Ident))
             {
                 type = IdenType.TemplateVar;
             }
