@@ -1,4 +1,3 @@
-using <std::array>
 namespace std
 {
 	namespace UI
@@ -25,7 +24,7 @@ namespace std
 			fnc simple bool getEnabled ()
 				ctrlEnabled ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
 			endFnc
-			fnc simple ::std::array<scalar> getPosition()
+			fnc simple array<scalar> getPosition()
 				ctrlPosition ((uiNamespace getVariable (_this select 0)) displayControl (_this select 1))
 			endFnc
 			

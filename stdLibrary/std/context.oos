@@ -1,4 +1,3 @@
-using <std::String>
 namespace std
 {
     native Context
@@ -10,13 +9,13 @@ namespace std
         fnc simple string getString (string ident, string defValue)
 			this getVariable [ident, defValue]
 		endFnc
-        fnc simple string getString (::std::String ident, ::std::String defValue)
+        fnc simple string getString (string ident, string defValue)
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setString (string ident, string val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
-        fnc simple void setString (::std::String ident, ::std::String val, bool publish)
+        fnc simple void setString (string ident, string val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
@@ -26,10 +25,10 @@ namespace std
         fnc simple void setScalar (string ident, scalar val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
-        fnc simple scalar getScalar (::std::String ident, scalar defValue)
+        fnc simple scalar getScalar (string ident, scalar defValue)
 			_this getVariable [ident, defValue]
 		endFnc
-        fnc simple void setScalar (::std::String ident, scalar val, bool publish)
+        fnc simple void setScalar (string ident, scalar val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
@@ -39,10 +38,10 @@ namespace std
         fnc simple void setBool (string ident, bool val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
-        fnc simple bool getBool (::std::String ident, bool defValue)
+        fnc simple bool getBool (string ident, bool defValue)
 			_this getVariable [ident, defValue]
 		endFnc
-        fnc simple void setBool (::std::String ident, bool val, bool publish)
+        fnc simple void setBool (string ident, bool val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
@@ -52,10 +51,10 @@ namespace std
         fnc simple void setObject (string ident, object val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
-        fnc simple bool getObject (::std::String ident, object defValue)
+        fnc simple bool getObject (string ident, object defValue)
 			_this getVariable [ident, defValue]
 		endFnc
-        fnc simple void setObject (::std::String ident, object val, bool publish)
+        fnc simple void setObject (string ident, object val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         

@@ -1,5 +1,3 @@
-using <std::Array>
-
 namespace std
 {
     native Config
@@ -11,14 +9,8 @@ namespace std
         fnc simple ::std::Config extend (string _s)
             _this >> _s
         endFnc
-        fnc simple ::std::Config extend (::std::String _s)
-            _this >> _s
-        endFnc
         
         fnc simple scalar count (string _s)
-            count _this
-        endFnc
-        fnc simple scalar count (::std::String _s)
             count _this
         endFnc
         
@@ -30,7 +22,7 @@ namespace std
 			(configName _this) == ""
         endFnc
         
-        fnc ::std::String parent ()
+        fnc string parent ()
             private ["_var", "_index"];
             _var = configHierarchy _this;
 			_index = ((_var pushBack 1) - 1);
@@ -38,14 +30,14 @@ namespace std
             (_var select _index)
         endFnc
         
-        fnc simple ::std::Array<::std::Config> hierarchy () configHierarchy _this endFnc
+        fnc simple array<::std::Config> hierarchy () configHierarchy _this endFnc
         
         fnc simple bool isClass ()             isClass _this       endFnc
         fnc simple bool isText ()              isText _this        endFnc
         fnc simple bool isNumber ()            isNumber _this      endFnc
         
         fnc simple scalar getNumber ()         getNumber _this     endFnc
-        fnc simple ::std::String getText ()    getText _this       endFnc
-        fnc simple ::std::String name ()       configName _this    endFnc
+        fnc simple string getText ()    getText _this       endFnc
+        fnc simple string name ()       configName _this    endFnc
     }
 }

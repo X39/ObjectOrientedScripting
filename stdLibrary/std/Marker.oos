@@ -1,0 +1,35 @@
+using <std::Config>
+using <std::Context>
+using <std::base::VehicleBase>
+using <std::Man>
+
+namespace std
+{
+    native Marker
+    {
+		enum Brush
+		{
+			Solid = "Solid",
+			SolidFull = "SolidFull",
+			Horizontal = "Horizontal",
+			Vertical = "Vertical",
+			Grid = "Grid",
+			FDiagonal = "FDiagonal",
+			BDiagonal = "BDiagonal",
+			DiagGrid = "DiagGrid",
+			Cross = "Cross",
+			Border = "Border",
+			SolidBorder = "SolidBorder"
+		}
+		assign simple (string name, scalar i, scalar j, scalar k)
+			createMarker [name, [i, j, k]]
+		endAssign
+		
+		fnc simple void setDirection(scalar angle)	_this setMarkerDir angle	endFnc
+		fnc simple scalar getDirection()			markerDir _this				endFnc
+		fnc simple void setAlpha(scalar angle)		_this setMarkerAlpha angle	endFnc
+		fnc simple scalar getAlpha()				markerAlpha _this			endFnc
+		fnc simple void setBrush(Brush brush)		_this setMarkerBrush brush	endFnc
+		fnc simple Brush getBrush()					markerBrush _this			endFnc
+    }
+}
