@@ -46,6 +46,19 @@ namespace std
 			_this setVariable [ident, val, publish]
 		endFnc
         
+        fnc simple bool getObject (string ident, object defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setObject (string ident, object val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
+        fnc simple bool getObject (::std::String ident, object defValue)
+			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setObject (::std::String ident, object val, bool publish)
+			_this setVariable [ident, val, publish]
+		endFnc
+        
         fnc simple void setContext (context n)			n						endFnc
         fnc simple ::std::Context toMissionContext ()	missionNamespace		endFnc
         fnc simple ::std::Context toUiContext ()		uiNamespace				endFnc
