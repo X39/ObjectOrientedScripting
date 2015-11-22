@@ -49,17 +49,23 @@ COMPILER OOS
 				T_TERMINATOR
 			}
 		.
-        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col, this.file); pBaseLangObject blo; VarType e; .) =
+        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col, this.file); pBaseLangObject blo; VarType e; VarTypeObject vto; .) =
             T_TEMPLATEOPEN
             (
-                IDENTACCESS<out blo, obj> (. obj.vtoList.Add(new VarTypeObject((Ident)blo)); .)
+                IDENTACCESS<out blo, obj, false> (. vto = new VarTypeObject((Ident)blo); obj.vtoList.Add(vto); .)
+				[ (. Template te; .)
+					TEMPLATE<out te, ((Ident)blo).LastIdent> (. vto.TemplateObject = te; .)
+				]
                 |
                 VARTYPE<out e> (. obj.vtoList.Add(new VarTypeObject(e)); .)
             )
             {
                 T_COMMA
                 (
-                    IDENTACCESS<out blo, obj> (. obj.vtoList.Add(new VarTypeObject((Ident)blo)); .)
+                    IDENTACCESS<out blo, obj, false> (. vto = new VarTypeObject((Ident)blo); obj.vtoList.Add(vto); .)
+					[ (. Template te; .)
+						TEMPLATE<out te, ((Ident)blo).LastIdent> (. vto.TemplateObject = te; .)
+					]
                     |
                     VARTYPE<out e> (. obj.vtoList.Add(new VarTypeObject(e)); .)
                 )
@@ -94,13 +100,13 @@ COMPILER OOS
             ]
         .
         CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarType vt; pBaseLangObject ident; .) =
-            T_ROUNDBRACKETOPEN
+            T_TEMPLATEOPEN
             (
                 VARTYPE<out vt> (. obj.varType = new VarTypeObject(vt); .)
                 |
                 IDENTACCESS<out ident, obj> (. obj.varType = new VarTypeObject((Ident)ident); .)
             )
-            T_ROUNDBRACKETCLOSE
+            T_TEMPLATECLOSE
         .
 		ENCAPSULATION<out Encapsulation e> (. e = Encapsulation.NA; .) =
 			"public" (. e = Encapsulation.Public; .)
@@ -336,6 +342,27 @@ COMPILER OOS
         }
 			.)
 		.
+		ENUM<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosEnum(parent); outObj = obj; pBaseLangObject blo; .) =
+			"enum"
+			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
+			T_CODEBRACKETOPEN
+			[
+				IDENT<out blo, obj> (. obj.addChild(blo); obj.addChild(null); .)
+				[
+					T_ASSIGNMENTCHAR
+					VALUE<out blo, obj> (. obj.children[obj.children.Count - 1] = blo; .)
+				]
+				{
+					T_COMMA
+					IDENT<out blo, obj> (. obj.addChild(blo); obj.addChild(null); .)
+					[
+						T_ASSIGNMENTCHAR
+						VALUE<out blo, obj> (. obj.children[obj.children.Count - 1] = blo; .)
+					]
+				}
+			]
+			T_CODEBRACKETCLOSE
+		.
 		NAMESPACE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Namespace(parent); outObj = obj; pBaseLangObject blo; .) =
 			"namespace"
 			IDENT<out blo, obj> (.
@@ -358,6 +385,8 @@ COMPILER OOS
 				|
 				CLASS<out blo, obj> (. obj.addChild(blo); .)
 				|
+				ENUM<out blo, obj> (. obj.addChild(blo); .)
+				|
 				NATIVECLASS<out blo, obj> (. obj.addChild(blo); .)
 				|
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
@@ -377,26 +406,53 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-        NATIVECLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Native(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; Template te; bool flag = false; .) =
+        NATIVECLASS<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			var obj = new Native(parent, t.line, t.col, this.file);
+			outObj = obj;
+			pBaseLangObject blo;
+			Template te;
+			bool flag = false;
+			bool flag_disableConstructor = false;
+			bool flag_noObjectExtends = false;
+		.) =
             "native"
             IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
             [
                 TEMPLATE<out te, obj> (. obj.TemplateObject = te; flag = true; obj.VTO = new VarTypeObject(obj.Name); .)
             ]
 			[
+				"flags"
+				{
+					"disableConstructor" (. flag_disableConstructor = true; .)
+					|
+					"noObjectExtends" (. flag_noObjectExtends = true; .)
+				}
+			]
+			[
 				"extends"
 				IDENTACCESS<out blo, obj, false> (. obj.addParent((Ident)blo); .)
 			]
+			(. if(obj.parentIdents.Count == 0 && !flag_noObjectExtends) { obj.addParent(new Ident(obj, "nobject", obj.Name.Line, obj.Name.Pos, obj.Name.File)); } .)
 			(. if(!flag) obj.VTO = new VarTypeObject(obj.Name); .)
+			(. flag = false; .)
 			T_CODEBRACKETOPEN
-            NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
 			{
-                NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); .)
+                NATIVEASSIGN<out blo, obj> (. obj.addChild(blo); flag = true; if(flag_disableConstructor)  { SemErr("Constructors are disabled in flags for this class"); } .)
                 |
 				NATIVEFUNCTION<out blo, obj> (. obj.addChild(blo); .)
                 |
+				ENUM<out blo, obj> (. obj.addChild(blo); .)
+				|
                 NATIVEOPERATOR<out blo, obj> (. obj.addChild(blo); .)
 			}
+			(.	if(!flag && !flag_disableConstructor)
+				{
+					var assign = new NativeAssign(obj, obj.Name.Line, obj.Name.Pos, obj.Name.File);
+					assign.IsSimple = true;
+					assign.Code = "throw \"Object is missing constructor\";";
+					obj.addChild(assign);
+				}
+			.)
 			T_CODEBRACKETCLOSE
         .
         NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeAssign(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
@@ -515,16 +571,35 @@ COMPILER OOS
 			}
 			"endOperator" (. obj.Code = obj.Code.Trim(); .)
         .
-		CLASS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosClass(parent); outObj = obj; pBaseLangObject blo; Encapsulation e = Encapsulation.Private; bool hasConstructor = false; .) =
+		CLASS<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			var obj = new oosClass(parent);
+			outObj = obj;
+			pBaseLangObject blo;
+			Encapsulation e = Encapsulation.Private;
+			bool hasConstructor = false;
+			bool flag_disableConstructor = false;
+			bool flag_noObjectExtends = false;
+			bool flag_virtualFunctionsOnly = false;
+		.) =
 			"class"
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
+			[
+				"flags"
+				{
+					"disableConstructor" (. flag_disableConstructor = true; .)
+					|
+					"noObjectExtends" (. flag_noObjectExtends = true; .)
+					|
+					"virtualFunctionsOnly" (. flag_virtualFunctionsOnly = true; .)
+				}
+			]
 			[
 				"extends"
 				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
 			]
 			(. 
 				obj.markEnd();
-				if(obj.ParentClassesIdents.Count == 0)
+				if(obj.ParentClassesIdents.Count == 0 && !flag_noObjectExtends)
 				{
 				    var ident = new Ident(obj, "object", -1, -1, "");
 				    obj.addParentClass(ident);
@@ -539,6 +614,7 @@ COMPILER OOS
 					IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
 				}
 			]
+			
             (. obj.markEnd(); .)
 			T_CODEBRACKETOPEN
 			{
@@ -555,12 +631,14 @@ COMPILER OOS
 						TERMINATOR
 					)
 					|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) )
-					CONSTRUCTOR<out blo, obj, e> (. obj.addChild(blo); hasConstructor = true; .)
+					CONSTRUCTOR<out blo, obj, e> (. obj.addChild(blo); hasConstructor = true; if(flag_disableConstructor)  { SemErr("Constructors are disabled in flags for this class"); } .)
 					|
-					FUNCTION<out blo, obj, e> (. obj.addChild(blo); .)
+					FUNCTION<out blo, obj, e> (. obj.addChild(blo); if(!((Function)blo).IsVirtual && flag_virtualFunctionsOnly) { SemErr("Non-Virtual function on VirtualOnly class"); } .)
+					|
+					ENUM<out blo, obj> (. obj.addChild(blo); .)
 				)
 			}
-			T_CODEBRACKETCLOSE (. if(!hasConstructor) {
+			T_CODEBRACKETCLOSE (. if(!hasConstructor && !flag_disableConstructor) {
                                       var constructor = new Function(obj);
 									  constructor.encapsulation = Encapsulation.Public;
                                       try
@@ -600,7 +678,7 @@ COMPILER OOS
                 (
                     IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. obj.varType.TemplateObject = te; .)
+                        TEMPLATE<out te, ((Ident)blo).LastIdent> (. obj.varType.TemplateObject = te; .)
                     ]
                 )
 			)
@@ -659,7 +737,7 @@ COMPILER OOS
                 (
                     IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. obj.varType.TemplateObject = te; .)
+                        TEMPLATE<out te, ((Ident)blo).LastIdent> (. obj.varType.TemplateObject = te; .)
                     ]
                 )
 			)
@@ -688,9 +766,9 @@ COMPILER OOS
 				VARTYPE<out v> (. obj.varType = new VarTypeObject(v); .)
 				|
                 (
-                    IDENTACCESS<out blo, obj> (. obj.varType = new VarTypeObject((Ident)blo); .)
+                    IDENTACCESS<out blo, obj, false> (. obj.varType = new VarTypeObject((Ident)blo); .)
                     [ (. Template te; .)
-                        TEMPLATE<out te, outObj> (. obj.varType.TemplateObject = te; .)
+                        TEMPLATE<out te, ((Ident)blo).LastIdent> (. obj.varType.TemplateObject = te; .)
                     ]
                 )
 			)
@@ -1006,7 +1084,7 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-		OP_SQFCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new SqfCall(parent); outObj = obj; pBaseLangObject blo; .) =
+		OP_SQFCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new SqfCall(parent); outObj = obj; pBaseLangObject blo; VarType vt; .) =
 			"SQF"
 			[
 				T_ROUNDBRACKETOPEN
@@ -1026,6 +1104,17 @@ COMPILER OOS
 					EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 				}
 				T_ROUNDBRACKETCLOSE
+			]
+			[ (. obj.HasAs = true; .)
+				"as"
+                (
+					VARTYPE<out vt> (. obj.ReferencedType = new VarTypeObject(vt); .)
+					|
+					IDENTACCESS<out blo, obj, false> (. obj.ReferencedType = new VarTypeObject((Ident)blo); .)					
+					[ (. Template te; .)
+						TEMPLATE<out te, ((Ident)blo).LastIdent> (. obj.ReferencedType.TemplateObject = te; .)
+					]
+				)
 			]
 		.
 END OOS.
