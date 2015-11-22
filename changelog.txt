@@ -1,6 +1,7 @@
 Version 0.7.0-ALPHA
 	|- Compiler:  fixed objects added using the using instruction where not
 	|             touched by the PreProcessor
+	|- Compiler:  using directive threw out folder path instead of file path
 	|- Compiler:  fixed invalid encapsulation on object function "toString"
 	|- Compiler:  Changed cast operator from %...% to <...>
 	|- Compiler:  fixed templates only could use native types
