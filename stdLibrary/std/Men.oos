@@ -6,7 +6,7 @@ using <std::base::VehicleBase>
 
 namespace std
 {
-    native Man extends ::std::base::VehicleBase
+    native Men extends ::std::base::VehicleBase
     {
 		assign simple ()
 			throw "InvalidOperation";
