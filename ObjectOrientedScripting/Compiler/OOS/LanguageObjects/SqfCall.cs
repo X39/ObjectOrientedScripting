@@ -141,13 +141,13 @@ namespace Compiler.OOS_LanguageObjects
 
         private int endMarker;
 
-        private VarTypeObject referencedType;
-        public VarTypeObject ReferencedType { get { return referencedType; } }
+        public bool HasAs { get; set; }
+        public VarTypeObject ReferencedType { get; set; }
 
         public SqfCall(pBaseLangObject parent) : base(parent)
         {
             this.children.Add(null);
-            this.referencedType = new VarTypeObject(VarType.Void);
+            this.ReferencedType = new VarTypeObject(VarType.Void);
         }
 
         public override int finalize()
@@ -198,12 +198,15 @@ namespace Compiler.OOS_LanguageObjects
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0018, this.Name.Line, this.Name.Pos));
                 errCount++;
             }
-            this.referencedType.ident = sio.outType.ident;
-            this.referencedType.varType = sio.outType.varType;
-            this.referencedType.TemplateObject = sio.outType.TemplateObject;
-            if(sio.outType.IsObject)
+            if (!this.HasAs)
             {
-                return sio.outType.ident.finalize();
+                this.ReferencedType.ident = sio.outType.ident;
+                this.ReferencedType.varType = sio.outType.varType;
+                this.ReferencedType.TemplateObject = sio.outType.TemplateObject;
+                if (sio.outType.IsObject)
+                {
+                    return sio.outType.ident.finalize();
+                }
             }
             return 0;
         }
@@ -211,11 +214,6 @@ namespace Compiler.OOS_LanguageObjects
         {
             this.endMarker = this.children.Count - 1;
         }
-        public static void readSupportInfoList(string pathToFile)
-        {
-            supportInfoList = new List<SupportInfoObject>();
-        }
-
         public override void writeOut(StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             string tab = this.Parent is Interfaces.iCodeBlock ? new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count) : "";
