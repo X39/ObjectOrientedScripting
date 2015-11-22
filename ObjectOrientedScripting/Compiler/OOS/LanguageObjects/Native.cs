@@ -13,7 +13,7 @@ namespace Compiler.OOS_LanguageObjects
         public string File { get; internal set; }
         public Template TemplateObject { get; set; }
         public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
-        private List<Ident> parentIdents;
+        public List<Ident> parentIdents;
         public Native(pBaseLangObject parent, int line, int pos, string file) : base(parent)
         {
             this.addChild(null);
@@ -42,7 +42,8 @@ namespace Compiler.OOS_LanguageObjects
                             var nf2 = new NativeFunction(this, nf.Line, nf.Pos, nf.File);
                             nf2.Code = nf.Code;
                             nf2.IsSimple = nf.IsSimple;
-                            nf2.children = nf.children;
+                            for (int i = 1; i < nf.children.Count; i++)
+                                nf2.addChild(nf.children[i]);
                             nf2.VTO = new VarTypeObject(nf.VTO);
                             nf2.Name = new Ident(this, nf.Name.OriginalValue, nf.Name.Line, nf.Name.Pos, nf.Name.File);
                             this.addChild(nf2);
@@ -54,7 +55,8 @@ namespace Compiler.OOS_LanguageObjects
                             var no2 = new NativeOperator(this, no.Line, no.Pos, no.File);
                             no2.Code = no.Code;
                             no2.IsSimple = no.IsSimple;
-                            no2.children = no.children;
+                            for (int i = 1; i < no.children.Count; i++)
+                                no2.addChild(no.children[i]);
                             no2.OperatorType = no.OperatorType;
                             no2.VTO = new VarTypeObject(no.VTO);
                             no2.Name = new Ident(this, no.Name.OriginalValue, no.Name.Line, no.Name.Pos, no.Name.File);
