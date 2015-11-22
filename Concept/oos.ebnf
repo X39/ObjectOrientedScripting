@@ -311,14 +311,14 @@ COMPILER OOS
                     if (identList.Last() != it)
                     {
                         flag = false;
-                        SemErr("Invalid Operation, hit file before end: " + lookupPath);
+                        SemErr("Invalid Operation, hit file before end: " + tmp);
                         break;
                     }
                 }
                 else
                 {
                     flag = false;
-                    SemErr("Invalid Operation, path could not be dereferenced: " + lookupPath);
+                    SemErr("Invalid Operation, path could not be dereferenced: " + tmp);
                     break;
                 }
             }
@@ -335,7 +335,7 @@ COMPILER OOS
                     if (p.errors.count > 0)
                     {
                         this.errors.count += p.errors.count;
-                        Logger.Instance.log(Logger.LogLevel.ERROR, "In file '" + lookupPath + "'");
+                        Logger.Instance.log(Logger.LogLevel.ERROR, "In file '" + currentFile + "'");
                     }
                 }
             }
