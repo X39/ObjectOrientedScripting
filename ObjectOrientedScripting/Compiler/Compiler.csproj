@@ -129,7 +129,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\InternalClasses\array - Kopie.oos" />
     <None Include="Resources\InternalClasses\array.oos" />
     <None Include="Resources\InternalClasses\object.oos" />
     <None Include="Resources\InternalClasses\string.oos" />
