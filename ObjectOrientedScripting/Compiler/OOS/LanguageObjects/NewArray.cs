@@ -63,9 +63,6 @@ namespace Compiler.OOS_LanguageObjects
                     case VarType.Scalar:
                         this.ReferencedType.varType = VarType.ScalarArray;
                         break;
-                    case VarType.String:
-                        this.ReferencedType.varType = VarType.StringArray;
-                        break;
                 }
             }
             return errCount;

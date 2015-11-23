@@ -53,8 +53,6 @@ namespace Compiler.OOS_LanguageObjects
             if (supportInfoList != null)
                 throw new Exception("SupportInfoList cannot be read twice!");
             supportInfoList = new List<SupportInfoObject>();
-            var assembly = Assembly.GetExecutingAssembly();
-            //var resourceName = ;
             using (var reader = new StringReader(Compiler.Properties.Resources.SQF_SupportInfo))
             {
                 string line = "";
@@ -118,12 +116,6 @@ namespace Compiler.OOS_LanguageObjects
                                 break;
                             case "scalar[]":
                                 supportInfoList.Add(new SupportInfoObject(command, VarType.ScalarArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                                break;
-                            case "string":
-                                supportInfoList.Add(new SupportInfoObject(command, VarType.String, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
-                                break;
-                            case "string[]":
-                                supportInfoList.Add(new SupportInfoObject(command, VarType.StringArray, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));
                                 break;
                             case "other":
                                 supportInfoList.Add(new SupportInfoObject(command, VarType.Other, splitString[0] == "u" || splitString[0] == "b", splitString[0] == "b"));

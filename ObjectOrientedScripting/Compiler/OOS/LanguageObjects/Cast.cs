@@ -21,8 +21,8 @@ namespace Compiler.OOS_LanguageObjects
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0031, ((Ident)this.children[0]).Line, ((Ident)this.children[0]).Pos));
                 errCount++;
             }
-            if ((this.varType.varType != VarType.Object && this.varType.varType != VarType.String) && childType.varType == VarType.Object)
-            {//Object to scalar/boolean
+            if (this.varType.varType != VarType.Object && childType.varType == VarType.Object)
+            {//Object to non-object
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0033, ((Ident)this.children[0]).Line, ((Ident)this.children[0]).Pos));
                 errCount++;
             }
@@ -54,10 +54,6 @@ namespace Compiler.OOS_LanguageObjects
                             sw.Write("parseNumber ");
                             ident.writeOut(sw, cfg);
                             break;
-                        case VarType.String:
-                            sw.Write("str ");
-                            ident.writeOut(sw, cfg);
-                            break;
                         default:
                             ident.writeOut(sw, cfg);
                             break;
@@ -70,27 +66,6 @@ namespace Compiler.OOS_LanguageObjects
                             sw.Write("if(");
                             ident.writeOut(sw, cfg);
                             sw.Write(" > 0) then {true} else {false}");
-                            break;
-                        case VarType.String:
-                            sw.Write("str ");
-                            ident.writeOut(sw, cfg);
-                            break;
-                        default:
-                            ident.writeOut(sw, cfg);
-                            break;
-                    }
-                    break;
-                case VarType.String:
-                    switch (this.ReferencedType.varType)
-                    {
-                        case VarType.Bool:
-                            sw.Write("if(");
-                            ident.writeOut(sw, cfg);
-                            sw.Write(" == \"true\") then {true} else {false}");
-                            break;
-                        case VarType.Scalar:
-                            sw.Write("parseNumber ");
-                            ident.writeOut(sw, cfg);
                             break;
                         default:
                             ident.writeOut(sw, cfg);
