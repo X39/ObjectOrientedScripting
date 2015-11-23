@@ -4,7 +4,7 @@ native string
         ""
     endAssign
 	
-    assign simple (string s)
+    assign simple (::string s)
         s
     endAssign
     
@@ -16,11 +16,11 @@ native string
         _this select [off, len]
     endFnc
 	
-    fnc simple scalar indexOf (string s)
+    fnc simple scalar indexOf (::string s)
         _this find s
     endFnc
 	
-    fnc simple bool contains (string s)
+    fnc simple bool contains (::string s)
         (_this find s) >= 0
     endFnc
 	
@@ -32,11 +32,11 @@ native string
 		toArray _this
 	endFnc
 	
-	fnc simple string append(string s)
+	fnc simple string append(::string s)
 		_this + s
 	endFnc
 	
-	fnc simple array<string> split(string delimiter)
+	fnc simple array<string> split(::string delimiter)
 		_this splitString delimiter
 	endFnc
 	
