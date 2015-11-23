@@ -128,8 +128,6 @@ COMPILER OOS
                 "bool" (. e = VarType.Bool; .)
                 |
                 "boolean" (. e = VarType.Bool; .)
-                |
-                "string" (. e = VarType.String; .)
             )
             [
                 T_SQUAREBRACKETOPEN
@@ -141,30 +139,27 @@ COMPILER OOS
                                             case VarType.Bool:
                                                 e = VarType.BoolArray;
                                                 break;
-                                            case VarType.String:
-                                                e = VarType.StringArray;
-                                                break;
                                             default:
                                                 SemErr("Cannot Arrayify VarTypes which are not string/scalar/bool");
                                                 break;
                                        } .)
             ]
 		.
-		BOOLEAN<out bool flag> (. flag = la.val == "true"; Get(); return; .) =
+		BOOLEAN<out bool flag> (. flag = la.val == "true"; Get(); return; /*fix for weirdo coco bug ...*/ .) =
 			"true" (. flag = true; .)
 			|
 			"false" (. flag = false; .)
 		.
-		VALUE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Value(parent); outObj = obj; outObj = obj; pBaseLangObject blo; bool flag; .) =
-			T_STRING (. obj.varType = VarType.String; obj.value = t.val; .)
+		VALUE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Value(parent); outObj = obj; outObj = obj; bool flag; .) =
+			T_STRING (. obj.varType.varType = VarType.Object; obj.value = t.val; obj.varType.ident = new Ident(obj, "string", t.line, t.col, this.file); obj.varType.ident.IsGlobalIdentifier = true; .)
 			|
-			T_SCALAR (. obj.varType = VarType.Scalar; obj.value = t.val; .)
+			T_SCALAR (. obj.varType.varType = VarType.Scalar; obj.value = t.val; .)
 			|IF(la.val == "true" || la.val == "false")
-			BOOLEAN<out flag> (. obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); .)
+			BOOLEAN<out flag> (. obj.varType.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); .)
 			|
-			BOOLEAN<out flag> (. obj.varType = VarType.Bool; obj.value = (flag ? "true" : "false"); .)
+			BOOLEAN<out flag> (. /*fix for weirdo coco bug ... */ .)
 		.
-		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent, bool flag> (. var obj = new Expression(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; obj.negate = flag; .) =
+		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent, bool flag> (. var obj = new Expression(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; obj.negate = flag; .) =
 			[
 				'!' (. obj.negate = true; .)
 			]
@@ -224,6 +219,8 @@ COMPILER OOS
 				CLASS<out blo, obj> (. obj.addChild(blo); .)
 				|
 				NATIVECLASS<out blo, obj> (. obj.addChild(blo); .)
+				|
+				ENUM<out blo, obj> (. obj.addChild(blo); .)
 				|
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
@@ -432,7 +429,7 @@ COMPILER OOS
 				"extends"
 				IDENTACCESS<out blo, obj, false> (. obj.addParent((Ident)blo); .)
 			]
-			(. if(obj.parentIdents.Count == 0 && !flag_noObjectExtends) { obj.addParent(new Ident(obj, "nobject", obj.Name.Line, obj.Name.Pos, obj.Name.File)); } .)
+			(. if(obj.parentIdents.Count == 0 && !flag_noObjectExtends) { var ident = new Ident(obj, "nobject", obj.Name.Line, obj.Name.Pos, obj.Name.File); ident.IsGlobalIdentifier = true; obj.addParent(ident); } .)
 			(. if(!flag) obj.VTO = new VarTypeObject(obj.Name); .)
 			(. flag = false; .)
 			T_CODEBRACKETOPEN
@@ -602,6 +599,7 @@ COMPILER OOS
 				if(obj.ParentClassesIdents.Count == 0 && !flag_noObjectExtends)
 				{
 				    var ident = new Ident(obj, "object", -1, -1, "");
+					ident.IsGlobalIdentifier = true;
 				    obj.addParentClass(ident);
 				}
 				obj.markExtendsEnd();
@@ -1009,7 +1007,7 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-		OP_BREAK<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Break(parent); outObj = obj; pBaseLangObject blo; .) =
+		OP_BREAK<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Break(parent); outObj = obj; .) =
 			"break"
 		.
 		OP_INSTANCEOF<out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess> (. var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; .) =
