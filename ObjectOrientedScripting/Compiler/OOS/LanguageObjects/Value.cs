@@ -8,11 +8,11 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Value : pBaseLangObject
     {
-        public VarType varType;
+        public VarTypeObject varType;
         public string value;
         public Value(pBaseLangObject parent) : base(parent) 
         {
-            varType = VarType.Void;
+            varType = new VarTypeObject(VarType.Void);
             value = "";
         }
         public override int doFinalize() { return 0; }
