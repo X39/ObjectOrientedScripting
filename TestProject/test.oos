@@ -49,6 +49,42 @@ namespace X39
 			}
 		}
     }
+	enum testEnum
+	{
+		String = 1,
+		Scalar,
+		Boolean,
+		Auto1,
+		Auto2
+	}
+	enum WarnedEnum
+	{
+		foo
+	}
+	static void EnumTestFunction(testEnum e)
+	{
+		switch(e)
+		{
+			case testEnum.String:
+				SQF diag_log("String");
+				break;
+			case testEnum.Scalar:
+				SQF diag_log("Scalar");
+				break;
+			case testEnum.Boolean:
+				SQF diag_log("Boolean");
+				break;
+			case testEnum.Auto1:
+				SQF diag_log("Auto1");
+				break;
+			case testEnum.Auto2:
+				SQF diag_log("Auto2");
+				break;
+			default:
+				EnumTestFunction(testEnum.Auto1);
+				break;
+		}
+	}
     interface testInterface
     {
         void interfaceFnc(string, scalar, scalar);
@@ -199,5 +235,6 @@ namespace X39
         {
             break;
         }
+		
     }
 }
