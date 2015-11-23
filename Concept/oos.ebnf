@@ -339,25 +339,25 @@ COMPILER OOS
         }
 			.)
 		.
-		ENUM<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosEnum(parent); outObj = obj; pBaseLangObject blo; .) =
+		ENUM<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosEnum(parent); outObj = obj; pBaseLangObject blo; oosEnum.EnumEntry entry; .) =
 			"enum"
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_CODEBRACKETOPEN
+			(. entry = new oosEnum.EnumEntry(obj); obj.addChild(entry); .)
+			IDENT<out blo, entry> (. entry.Name = (Ident)blo; .)
 			[
-				IDENT<out blo, obj> (. obj.addChild(blo); obj.addChild(null); .)
+				T_ASSIGNMENTCHAR
+				VALUE<out blo, entry> (. entry.Value = (Value) blo; .)
+			]
+			{ (. entry = new oosEnum.EnumEntry(obj); obj.addChild(entry); .)
+				T_COMMA
+				IDENT<out blo, entry> (.  entry.Name = (Ident)blo; .)
 				[
 					T_ASSIGNMENTCHAR
-					VALUE<out blo, obj> (. obj.children[obj.children.Count - 1] = blo; .)
+					VALUE<out blo, entry> (. entry.Value = (Value) blo; .)
 				]
-				{
-					T_COMMA
-					IDENT<out blo, obj> (. obj.addChild(blo); obj.addChild(null); .)
-					[
-						T_ASSIGNMENTCHAR
-						VALUE<out blo, obj> (. obj.children[obj.children.Count - 1] = blo; .)
-					]
-				}
-			]
+			}
+			
 			T_CODEBRACKETCLOSE
 		.
 		NAMESPACE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Namespace(parent); outObj = obj; pBaseLangObject blo; .) =

@@ -865,27 +865,29 @@ public class Parser {
 	}
 
 	void ENUM(out pBaseLangObject outObj, pBaseLangObject parent) {
-		var obj = new oosEnum(parent); outObj = obj; pBaseLangObject blo; 
+		var obj = new oosEnum(parent); outObj = obj; pBaseLangObject blo; oosEnum.EnumEntry entry; 
 		Expect(38);
 		IDENT(out blo, obj);
 		obj.Name = (Ident)blo; 
 		Expect(14);
 		if (la.kind == 3) {
-			IDENT(out blo, obj);
-			obj.addChild(blo); obj.addChild(null); 
+			entry = new oosEnum.EnumEntry(obj); obj.addChild(entry); 
+			IDENT(out blo, entry);
+			entry.Name = (Ident)blo; 
 			if (la.kind == 7) {
 				Get();
-				VALUE(out blo, obj);
-				obj.children[obj.children.Count - 1] = blo; 
+				VALUE(out blo, entry);
+				entry.Value = (Value) blo; 
 			}
 			while (la.kind == 18) {
+				entry = new oosEnum.EnumEntry(obj); obj.addChild(entry); 
 				Get();
-				IDENT(out blo, obj);
-				obj.addChild(blo); obj.addChild(null); 
+				IDENT(out blo, entry);
+				entry.Name = (Ident)blo; 
 				if (la.kind == 7) {
 					Get();
-					VALUE(out blo, obj);
-					obj.children[obj.children.Count - 1] = blo; 
+					VALUE(out blo, entry);
+					entry.Value = (Value) blo; 
 				}
 			}
 		}
