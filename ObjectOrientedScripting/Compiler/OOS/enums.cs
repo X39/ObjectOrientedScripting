@@ -18,7 +18,6 @@ namespace Compiler.OOS_LanguageObjects
     {
         Scalar,
         Bool,
-        String,
         Auto,
         Void,
         Object,
@@ -90,7 +89,12 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             if (this.varType != VarType.Object)
                 return true;
-            return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
+            HelperClasses.NamespaceResolver nsrL = this.ident;
+            HelperClasses.NamespaceResolver nsrR = ((VarTypeObject)obj).ident;
+            if(nsrL != null && nsrR != null)
+                return nsrL.isSame(nsrR);
+            else
+                return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
         }
         public override int GetHashCode() { return base.GetHashCode(); }
     }
