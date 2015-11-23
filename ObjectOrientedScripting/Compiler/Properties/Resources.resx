@@ -118,7 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="array" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\internalclasses\array.oos;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="SQF_SupportInfo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SQF_SupportInfo.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_object" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\internalclasses\object.oos;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="_string" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\internalclasses\string.oos;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
