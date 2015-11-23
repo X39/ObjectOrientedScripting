@@ -58,7 +58,7 @@ namespace std
 			_this setVariable [ident, val, publish]
 		endFnc
         
-        fnc simple void setContext (context n)			n						endFnc
+        fnc simple void setContext (::std::Context n)	n						endFnc
         fnc simple ::std::Context toMissionContext ()	missionNamespace		endFnc
         fnc simple ::std::Context toUiContext ()		uiNamespace				endFnc
         fnc simple ::std::Context toParsingContext ()	parsingNamespace		endFnc
