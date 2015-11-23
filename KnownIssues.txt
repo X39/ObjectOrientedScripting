@@ -2,3 +2,10 @@
   Thus, the following is not possible:
   
   `::std::vehicle variable = new ::std::vehicle("foobar");`
+
+- (Not rly an issue but more of a note) currently only idents are allowed to be
+  callen. Thus you cannot call from an expression
+  following would be invalid:
+  `(new foobar()).foo()`
+  due to the fact that it is the following:
+  <EXPRESSION>.<IDENT><FUNCTIONCALL>
