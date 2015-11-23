@@ -1,6 +1,6 @@
-using <std::Array>
 using <std::Config>
 using <std::Vehicle>
+using <std::Man>
 using <std::Context>
 
 #include "test.def"
@@ -26,7 +26,8 @@ namespace X39
 			public string cFooVariable2;
 			public virtual void foobar(string _someRandomArg)
 			{
-				SQF diag_log("class foo " + _someRandomArg);
+				auto str = "class foo ";
+				SQF diag_log(str.append(_someRandomArg));
 			}
 			public void test(string _test, string _test2)
 			{
@@ -43,7 +44,8 @@ namespace X39
 			public string cBarVariable2;
 			public virtual void foobar(string _someRandomArg)
 			{
-				SQF diag_log("class bar " + _someRandomArg);
+				auto str = "class bar ";
+				SQF diag_log(str.append(_someRandomArg));
 			}
 		}
     }
@@ -84,7 +86,7 @@ namespace X39
     static string testVarStatic2;
     static void castStaticTest(::X39::testNamespace::cBar testVar)
     {
-        auto casted = %testNamespace::cFoo% testVar;
+        auto casted = <testNamespace::cFoo> testVar;
     }
     static bool instanceOfTest(object testVar)
     {
@@ -127,7 +129,7 @@ namespace X39
         _foo.foobar("normal bar");
 
         auto _testing = 0;
-        auto arrayObjectTest = new ::std::Array<scalar>();
+        auto arrayObjectTest = new array<scalar>();
         arrayObjectTest.pushBack(0);
         arrayObjectTest.pushBack(1);
         arrayObjectTest.pushBack(2);
@@ -139,6 +141,9 @@ namespace X39
         auto hierarchy = configObj.hierarchy();
         SQF diag_log(hierarchy[0].name());
         SQF diag_log(configObj[0].name());
+		
+		auto arr = SQF allPlayers as array<::std::Man>;
+		arr[0].getType();
         
         auto veh = new ::std::Vehicle("B_Heli_Light_01_F", 0, 0, 1000);
         if(!veh.isAlive())
@@ -151,12 +156,9 @@ namespace X39
         vehContext.setString("foo", "foobar", true);
         
         auto scalarArray = {1, 2, 3, 4, 5, 6};
-        auto stringArray = {"test1", "test2", "test3"};
         auto boolArray = {false, true, false};
         auto scalarValue = scalarArray[0];
-        auto stringValue = stringArray[0];
         auto boolValue = boolArray[0];
-        string castedString = %string% scalarValue;
 		
 		scalarValue++;
 		scalarValue--;
