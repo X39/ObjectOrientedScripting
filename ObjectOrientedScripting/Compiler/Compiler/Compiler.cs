@@ -145,6 +145,16 @@ namespace Wrapper
             tabCount += change;
             s = new string('\t', tabCount);
         }
+
+        public static Stream toStream(byte[] barr)
+        {
+            MemoryStream memStream = new MemoryStream();
+            StreamWriter sw = new StreamWriter(memStream);
+            sw.Write(Encoding.ASCII.GetChars(barr));
+            sw.Flush();
+            memStream.Seek(0, SeekOrigin.Begin);
+            return memStream;
+        }
         public void Compile(Project proj)
         {
             ProjectFile = proj;
@@ -169,7 +179,7 @@ namespace Wrapper
 
             int errCount = 0;
             //Check the syntax of all files in ppFiles
-            foreach(var it in ppFiles)
+            foreach (var it in ppFiles)
             {
                 //if (!noPrintOut)
                 //{
@@ -211,22 +221,37 @@ namespace Wrapper
                 }
                 it.resetPosition();
             }
-            if(errCount > 0)
+            if (errCount > 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
                 return;
             }
 
-
-            //process the actual file
-
-
+            //Read in all internal objects
             Base oosTreeBase = new Base();
             NamespaceResolver.BaseClass = oosTreeBase;
+            {
+                Parser p;
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._object)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.array)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._string)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+            }
+
+            //process the actual file
             Parser parser = new Parser(new Scanner(ppMainFile.FileStream), ppMainFile.FilePath);
             Parser.UsedFiles = new List<string>();
             parser.BaseObject = oosTreeBase;
             parser.Parse();
+            
             errCount = parser.errors.count + parser.BaseObject.finalize();
             if (errCount > 0)
             {

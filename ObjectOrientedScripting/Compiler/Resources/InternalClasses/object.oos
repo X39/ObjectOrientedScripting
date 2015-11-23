@@ -1,0 +1,20 @@
+class object flags disableConstructor noObjectExtends virtualFunctionsOnly
+{
+	public virtual string toString()
+	{
+		return SQF str(this) as string;
+	}
+	public virtual bool equals(object obj)
+	{
+		return SQF (this) isEqualTo (obj) as bool;
+	}
+}
+native nobject flags disableConstructor noObjectExtends
+{
+	fnc string toString()
+		str _this
+	endFnc
+	fnc bool equals(nobject obj)
+		_this isEqualTo obj
+	endFnc
+}
