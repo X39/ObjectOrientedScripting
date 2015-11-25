@@ -1,6 +1,8 @@
 Version 0.7.0-ALPHA
 	|- Compiler:  fixed objects added using the using instruction where not
 	|             touched by the PreProcessor
+	|- Compiler:  fixed for required all params or it would throw a
+	|             null exception during printout
 	|- Compiler:  fixed StackOverflow case with this variable
 	|- Compiler:  using directive threw out folder path instead of file path
 	|- Compiler:  using now is generalized (no difference between local and std
