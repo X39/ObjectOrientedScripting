@@ -861,7 +861,7 @@ b#nil#ARRAY,OBJECT distance ARRAY,OBJECT
 b#nil#LOCATION distance LOCATION
 b#nil#LOCATION distance ARRAY
 b#nil#ARRAY distance LOCATION
-b#nil#SCALAR,NaN mod SCALAR,NaN
+b#scalar#SCALAR,NaN mod SCALAR,NaN
 b#nil#ARRAY,OBJECT say3d STRING
 b#nil#ARRAY,OBJECT say3d ARRAY
 b#nil#SCALAR cutobj ARRAY

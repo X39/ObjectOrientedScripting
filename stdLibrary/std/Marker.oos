@@ -66,7 +66,7 @@ namespace std
 		fnc simple Brush getBrush()									markerBrush _this				endFnc
 		fnc simple void setSize(scalar x, scalar y)					_this setMarkerSize [x, y]		endFnc
 		fnc simple array<scalar> getSize()							markerSize _this				endFnc
-		fnc simple void setPosition(scalar x, scalar y, scalar z)	_this setMarkerPos [x, y, z]	endFnc
+		fnc simple void setPosition(scalar x, scalar y)				_this setMarkerPos [x, y, 0]	endFnc
 		fnc simple array<scalar> getPosition()						markerPos _this					endFnc
     }
 }
