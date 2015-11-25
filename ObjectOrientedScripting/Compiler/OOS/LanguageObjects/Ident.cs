@@ -30,34 +30,12 @@ namespace Compiler.OOS_LanguageObjects
         public bool IsGlobalIdentifier { get { return this.isGlobalIdentifier; } set { if (value && this.Parent is Ident) throw new Exception("Double Namespace Access experienced"); this.isGlobalIdentifier = value; } }
         public bool IsRelativeIdentifier { get { return this.Access == AccessType.Namespace; } }
         public bool IsSelfReference { get { return this.originalValue == "this"; } }
-        public bool IsAnonymousIdent
-        {
-            get
-            {
-                var templateList = this.getAllParentsOf<Interfaces.iTemplate>();
-                if (this.Parent is Template)
-                {
-                    return true;
-                }
-                else if (templateList.Count > 0 && !(this.Parent is Ident) && this.getAllChildrenOf<Ident>().Count == 0)
-                {
-                    foreach (var template in templateList)
-                    {
-                        if (template.TemplateObject == null)
-                            continue;
-                        foreach (var it in template.TemplateObject.vtoList)
-                        {
-                            if (it.ident != null && it.ident.originalValue == this.originalValue)
-                                return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        }
+        public bool IsAnonymousIdent { get { return this.getClassTemplate() != null; } }
         private bool IsNamespaceAccess()
         {
-            var nsr = HelperClasses.NamespaceResolver.createNSR(this, this.IsAnonymousIdent);
+            if (this.IsAnonymousIdent)
+                return true;
+            var nsr = HelperClasses.NamespaceResolver.createNSR(this, false);
             if (nsr == null)
                 return false;
             var reference = nsr.Reference;
@@ -67,6 +45,28 @@ namespace Compiler.OOS_LanguageObjects
                 return true;
             else
                 return false;
+        }
+        private Template getClassTemplate()
+        {
+            var templateList = this.getAllParentsOf<Interfaces.iTemplate>();
+            if (this.Parent is Template && this.Parent.Parent is Interfaces.iClass)
+            {
+                return (Template)this.Parent;
+            }
+            else if (templateList.Count > 0 && !(this.Parent is Ident) && this.getAllChildrenOf<Ident>().Count == 0)
+            {
+                foreach (var template in templateList)
+                {
+                    if (template.TemplateObject == null)
+                        continue;
+                    foreach (var it in template.TemplateObject.vtoList)
+                    {
+                        if (it.ident != null && it.ident.originalValue == this.originalValue)
+                            return template.TemplateObject;
+                    }
+                }
+            }
+            return null;
         }
         public string FullyQualifiedName
         {
@@ -94,9 +94,12 @@ namespace Compiler.OOS_LanguageObjects
                         }
                     }
                 }
-                if (this.IsSelfReference && this.ReferencedObject != null && this.ReferencedObject is Interfaces.iName)
+                if (this.IsSelfReference)
                 {
-                    return ((Interfaces.iName)this.ReferencedObject).Name.FullyQualifiedName;
+                    var tmp = this.getFirstOf<Interfaces.iClass>();
+                    if (tmp == null)
+                        throw new Exception();
+                    return tmp.Name.FullyQualifiedName;
                 }
                 else
                 {
@@ -200,6 +203,7 @@ namespace Compiler.OOS_LanguageObjects
                 return list[0].NextWorkerIdent;
             }
         }
+        public bool IsPureIdent { get { return this.getAllChildrenOf<FunctionCall>(true).Count == 0 && this.getAllChildrenOf<ArrayAccess>(true).Count == 0; } }
         public Ident NextIdent
         {
             get
@@ -566,22 +570,30 @@ namespace Compiler.OOS_LanguageObjects
                     #region NamespaceAccess
                     case IdenType.NamespaceAccess:
                         {
-                            var nsr = HelperClasses.NamespaceResolver.createNSR(this, this.IsAnonymousIdent);
-                            if (nsr == null)
+                            if (this.IsAnonymousIdent)
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0046, this.Line, this.Pos, this.File));
-                                errCount++;
+                                this.ReferencedObject = getClassTemplate();
+                                this.ReferencedObject = null;
                             }
                             else
                             {
-                                var reference = nsr.Reference;
-                                this.ReferencedObject = reference;
-                                if (reference is Interfaces.iClass)
-                                    this.ReferencedType = ((Interfaces.iClass)reference).VTO;
-                                else if (reference is Interfaces.iFunction)
-                                    this.ReferencedType = ((Interfaces.iFunction)reference).ReturnType;
+                                var nsr = HelperClasses.NamespaceResolver.createNSR(this);
+                                if (nsr == null)
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0046, this.Line, this.Pos, this.File));
+                                    errCount++;
+                                }
                                 else
-                                    this.ReferencedType = null;
+                                {
+                                    var reference = nsr.Reference;
+                                    this.ReferencedObject = reference;
+                                    if (reference is Interfaces.iClass)
+                                        this.ReferencedType = ((Interfaces.iClass)reference).VTO;
+                                    else if (reference is Interfaces.iFunction)
+                                        this.ReferencedType = ((Interfaces.iFunction)reference).ReturnType;
+                                    else
+                                        this.ReferencedType = null;
+                                }
                             }
                         }
                         break;
