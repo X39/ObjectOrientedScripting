@@ -49,6 +49,9 @@ namespace std
 			ColorIndependent = "ColorIndependent",
 			ColorOPFOR = "ColorOPFOR"
 		}
+		assign simple (string name)
+			createMarker [name, [0, 0, 0]]
+		endAssign
 		assign simple (string name, scalar i, scalar j, scalar k)
 			createMarker [name, [i, j, k]]
 		endAssign
