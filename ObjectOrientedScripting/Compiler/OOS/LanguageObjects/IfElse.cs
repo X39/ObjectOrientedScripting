@@ -62,6 +62,8 @@ namespace Compiler.OOS_LanguageObjects
             }
             foreach (var it in this.IfInstructions)
             {
+                if (it is Ident)
+                    sw.Write(tab + '\t');
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }

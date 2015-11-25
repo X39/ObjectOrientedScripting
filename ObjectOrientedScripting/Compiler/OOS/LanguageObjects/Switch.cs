@@ -68,6 +68,8 @@ namespace Compiler.OOS_LanguageObjects
             sw.WriteLine(tab + "{");
             foreach (var it in this.CodeInstructions)
             {
+                if (it is Ident)
+                    sw.Write(tab + '\t');
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }
