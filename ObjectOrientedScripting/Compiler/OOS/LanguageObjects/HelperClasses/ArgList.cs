@@ -19,6 +19,10 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
                 {
                     var lIt = lArgs[i];
                     var rIt = rArgs[i];
+                    if (lIt.IsObject && lIt.ident.ReferencedObject is oosEnum)
+                    {
+                        lIt = ((oosEnum)lIt.ident.ReferencedObject).ReferencedType;
+                    }
                     if (!lIt.Equals(rIt))
                     {
                         flag = false;

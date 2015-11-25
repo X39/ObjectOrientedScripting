@@ -31,7 +31,7 @@ namespace Wrapper
         private bool addFunctionsClass;
         private bool outputFolderCleanup;
         private int printOutMode;
-        private List<PPDefine> flagDefines;
+        Dictionary<string, PPDefine> defines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
         public static string stdLibPath;
@@ -44,15 +44,17 @@ namespace Wrapper
             public static readonly string loop = "_LOOPSCOPE_";
             public static readonly string oosCase = "_CASE_";
         }
+        public static Compiler Instance { get; internal set; }
         public Compiler()
         {
+            Instance = this;
             configFileName = "config.cpp";
             stdLibPath = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath;
             stdLibPath = stdLibPath.Substring(0, stdLibPath.LastIndexOf('\\')) + "\\stdLibrary\\";
             addFunctionsClass = true;
             outputFolderCleanup = true;
             printOutMode = 0;
-            flagDefines = new List<PPDefine>();
+            defines = new Dictionary<string, PPDefine>();
             SqfCall.readSupportInfoList();
             includedFiles = new List<string>();
         }
@@ -79,7 +81,8 @@ namespace Wrapper
                         addFunctionsClass = false;
                         break;
                     case "DEFINE":
-                        flagDefines.Add(new PPDefine('#' + s.Substring(count + 1)));
+                        var def = new PPDefine('#' + s.Substring(count + 1));
+                        defines.Add(def.Name, def);
                         break;
                     case "NOCLEANUP":
                         outputFolderCleanup = false;
@@ -116,7 +119,7 @@ namespace Wrapper
         }
         public Version getVersion()
         {
-            return new Version("0.6.2-ALPHA");
+            return new Version("0.7.0-ALPHA");
         }
         public void CheckSyntax(string filepath)
         {
@@ -137,10 +140,15 @@ namespace Wrapper
                 File.Delete(it);
             }
         }
-        private void updateTabcount(ref string s, ref int tabCount, int change)
+
+        public static Stream toStream(byte[] barr)
         {
-            tabCount += change;
-            s = new string('\t', tabCount);
+            MemoryStream memStream = new MemoryStream();
+            StreamWriter sw = new StreamWriter(memStream);
+            sw.Write(Encoding.ASCII.GetChars(barr));
+            sw.Flush();
+            memStream.Seek(0, SeekOrigin.Begin);
+            return memStream;
         }
         public void Compile(Project proj)
         {
@@ -152,13 +160,10 @@ namespace Wrapper
                 Directory.CreateDirectory(proj.OutputFolder);
 
             //Prepare some stuff needed for preprocessing
-            Dictionary<string, PPDefine> defines = new Dictionary<string, PPDefine>();
-            foreach (var it in flagDefines)
-                defines.Add(it.Name, it);
             List<preprocessFile_IfDefModes> ifdefs = new List<preprocessFile_IfDefModes>();
             List<PostProcessFile> ppFiles = new List<PostProcessFile>();
             //do the preprocessing
-            preprocessFile(ifdefs, defines, proj, proj.Mainfile, proj.Mainfile.Substring(proj.Mainfile.LastIndexOf('\\') + 1), ppFiles);
+            preprocessFile(ifdefs, proj.Mainfile, "", ppFiles);
             var ppMainFile = ppFiles[0];
 
             if (outputFolderCleanup)
@@ -169,7 +174,7 @@ namespace Wrapper
 
             int errCount = 0;
             //Check the syntax of all files in ppFiles
-            foreach(var it in ppFiles)
+            foreach (var it in ppFiles)
             {
                 //if (!noPrintOut)
                 //{
@@ -211,22 +216,37 @@ namespace Wrapper
                 }
                 it.resetPosition();
             }
-            if(errCount > 0)
+            if (errCount > 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
                 return;
             }
 
-
-            //process the actual file
-
-
+            //Read in all internal objects
             Base oosTreeBase = new Base();
             NamespaceResolver.BaseClass = oosTreeBase;
+            {
+                Parser p;
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._object)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.array)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._string)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+            }
+
+            //process the actual file
             Parser parser = new Parser(new Scanner(ppMainFile.FileStream), ppMainFile.FilePath);
             Parser.UsedFiles = new List<string>();
             parser.BaseObject = oosTreeBase;
             parser.Parse();
+            
             errCount = parser.errors.count + parser.BaseObject.finalize();
             if (errCount > 0)
             {
@@ -235,20 +255,27 @@ namespace Wrapper
             }
             SqfConfigFile configFile = new SqfConfigFile(configFileName);
             oosTreeBase.writeOut(null, configFile);
+            if (addFunctionsClass)
+            {
+                configFile.addParentalClass("CfgFunctions");
+            }
             configFile.writeOut(proj.OutputFolder);
         }
-        private enum preprocessFile_IfDefModes
+        public enum preprocessFile_IfDefModes
         {
             TRUE = 0,
             FALSE,
             IGNORE
         }
-        private bool preprocessFile(List<preprocessFile_IfDefModes> ifdefs, Dictionary<string, PPDefine> defines, Project proj, string filePath, string name, List<PostProcessFile> ppFiles)
+        public bool preprocessFile(List<preprocessFile_IfDefModes> ifdefs, string filePath, string name = "", List<PostProcessFile> ppFiles = null)
         {
+            if (name == "")
+                name = filePath.Substring(filePath.LastIndexOf('\\') + 1);
             //Open given file
             StreamReader reader = new StreamReader(filePath);
             PostProcessFile ppFile = new PostProcessFile(filePath, name);
-            ppFiles.Add(ppFile);
+            if (ppFiles != null)
+                ppFiles.Add(ppFile);
             StreamWriter writer = new StreamWriter(ppFile.FileStream);
 
             //Prepare some variables needed for the entire processing periode in this function
@@ -319,7 +346,7 @@ namespace Wrapper
                         }
                         else
                         {
-                            newFile = proj.ProjectPath + afterDefine.Trim(new char[] { '"', '\'', ' ' });
+                            newFile = ProjectFile.SrcFolder + afterDefine.Trim(new char[] { '"', '\'', ' ' });
                         }
                         //make sure we have no self reference here
                         if (newFile.Equals(filePath, StringComparison.OrdinalIgnoreCase))
@@ -335,7 +362,7 @@ namespace Wrapper
                         //process the file before continuing with this
                         try
                         {
-                            if (!preprocessFile(ifdefs, defines, proj, newFile, afterDefine.Trim(new char[] { '<', '>', '"', '\'', ' ' }), ppFiles))
+                            if (!preprocessFile(ifdefs, newFile, afterDefine.Trim(new char[] { '<', '>', '"', '\'', ' ' }), ppFiles))
                             {
                                 //A sub file encountered an error, so stop here to prevent useles waste of ressources
                                 reader.Close();

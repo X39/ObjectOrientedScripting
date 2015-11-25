@@ -44,6 +44,13 @@ namespace Compiler.SqfConfigObjects
             foreach (iSqfConfig c in children)
                 c.write(writer, 0);
         }
+        public void addParentalClass(string name)
+        {
+            var configClass = new SqfConfigClass(name);
+            configClass.Children.AddRange(this.Children);
+            this.children.Clear();
+            this.addChild(configClass);
+        }
         public void setValue(string path, string value)
         {
             string[] pathArray = path.Split(new char[] { '/' });

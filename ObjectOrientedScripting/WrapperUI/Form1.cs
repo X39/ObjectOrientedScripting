@@ -55,6 +55,7 @@ namespace WrapperUI
             tbProjectMainFile.Text = proj.Mainfile;
             tbProjectOutFolder.Text = proj.OutputFolder;
             tbProjectBuildFolder.Text = proj.Buildfolder;
+            tbProjectSrcFolder.Text = proj.SrcFolder;
             tbCompilerVersion.Text = proj.CompilerVersion.ToString();
 
             lbCompilerFlags.Items.Clear();
@@ -63,7 +64,7 @@ namespace WrapperUI
                 this.lbCompilerFlags.Items.Add(it);
             }
             this.btnSaveFile.Enabled = true;
-            gbCompilerFlags.Enabled = true;
+            tcDefinesRessources.Enabled = true;
             gbProjectInformations.Enabled = true;
             btnDoCompile.Enabled = true;
         }
@@ -119,7 +120,8 @@ namespace WrapperUI
                 proj.Mainfile = tbProjectMainFile.Text;
                 proj.OutputFolder = tbProjectOutFolder.Text;
                 proj.Buildfolder = tbProjectBuildFolder.Text;
-                proj.CompilerVersion = tbCompilerVersion.Text;
+                proj.SrcFolder = tbProjectSrcFolder.Text;
+                proj.CompilerVersion = tbProjectSrcFolder.Text;
 
                 proj.writeToFile(tbProjPath.Text);
             }
@@ -184,6 +186,67 @@ namespace WrapperUI
             p.StartInfo.Arguments = '"' + tbProjPath.Text + '"';
             p.Start();
             p.WaitForExit();
+        }
+
+        private void tbRessourcesInPath_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                tbRessourcesInPath.Text = openFileDialog1.FileName;
+            }
+        }
+
+        private void btnAddRessource_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var res = new Project.Ressource(tbRessourcesInPath.Text, tbRessourcesOutPath.Text);
+                proj.Ressources.Add(res);
+                lbRessources.Items.Add(res);
+                lbRessources.SelectedItem = res;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Exception was raised", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnSetRessource_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //ToDo: Finish Ressource rebinding
+                var res = ((Project.Ressource)lbCompilerFlags.SelectedItem);
+                Project.Define.fromReal(tbDefineRealString.Text, (Project.Define)lbCompilerFlags.SelectedItem);
+                int index = lbCompilerFlags.Items.IndexOf(res);
+                lbCompilerFlags.Items.RemoveAt(index);
+                lbCompilerFlags.Items.Insert(index, res);
+                lbCompilerFlags.SelectedItem = res;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Exception was raised", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void lbRessources_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!(lbRessources.SelectedItem is Project.Ressource))
+                return;
+            tbRessourcesInPath.Text = ((Project.Ressource)lbRessources.SelectedItem).InPath;
+            tbRessourcesOutPath.Text = ((Project.Ressource)lbRessources.SelectedItem).OutPath;
+            btnSetRessource.Enabled = true;
+        }
+
+        private void lbRessources_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (lbRessources.SelectedItem == null)
+                return;
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
+            {
+                proj.Ressources.Remove((Project.Ressource)lbRessources.SelectedItem);
+                lbRessources.Items.Remove(lbRessources.SelectedItem);
+            }
         }
     }
 }

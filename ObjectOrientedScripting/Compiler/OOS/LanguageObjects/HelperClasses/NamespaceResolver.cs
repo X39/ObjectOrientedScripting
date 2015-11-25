@@ -26,7 +26,7 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
             pBaseLangObject curObject = BaseClass;
             objectTree.Add(BaseClass);
             bool flag = false;
-            foreach(var s in sArr)
+            foreach (var s in sArr)
             {
                 flag = false;
                 if (string.IsNullOrEmpty(s))
@@ -41,7 +41,7 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
                         break;
                     }
                 }
-                if(!flag)
+                if (!flag)
                 {
                     break;
                 }
@@ -58,7 +58,7 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
             if (nsr.LayerCount != this.LayerCount)
                 return false;
             bool flag = true;
-            for(int i = 0; i < this.LayerCount; i++)
+            for (int i = 0; i < this.LayerCount; i++)
             {
                 var it1 = this.objectTree[i];
                 var it2 = nsr.objectTree[i];
@@ -104,7 +104,7 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
             Interfaces.iName lastRef = nsr.Reference is Interfaces.iName ? (Interfaces.iName)nsr.Reference : null;
             if (lastRef == null)
                 return null;
-            while(!nsr.IsValid)
+            while (!nsr.IsValid)
             {
                 if (nsr.Reference == null)
                     return null;
@@ -145,9 +145,9 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
             var obj = nsr.objectTree.Last().Parent;
             if (nsr.objectTree.Last() is Interfaces.iClass)
                 obj = nsr.objectTree.Last();
-            foreach(var it in obj.getAllChildrenOf<Interfaces.iFunction>())
+            foreach (var it in obj.getAllChildrenOf<Interfaces.iFunction>())
             {
-                if(nsr.isSame(it.Name))
+                if (nsr.isSame(it.Name))
                 {
                     retList.Add(it);
                 }
@@ -168,7 +168,7 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
                 return null;
             if (!nsr.IsValid && !localVariables)
                 return null;
-            if(!nsr.IsValid)
+            if (!nsr.IsValid)
             {
                 if (blo == null)
                     return null;
@@ -181,9 +181,9 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
                         break;
                     privateVarList.AddRange(curObj.getAllChildrenOf<Variable>());
                 }
-                foreach(var it in privateVarList)
+                foreach (var it in privateVarList)
                 {
-                    if (it.Name.FullyQualifiedName == nsr.origString)
+                    if (nsr.origString.EndsWith(':' + it.Name.OriginalValue))
                         return it;
                 }
                 return null;

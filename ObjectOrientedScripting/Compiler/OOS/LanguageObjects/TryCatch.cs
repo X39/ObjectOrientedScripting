@@ -73,6 +73,8 @@ namespace Compiler.OOS_LanguageObjects
             }
             foreach(var it in this.TryInstructions)
             {
+                if (it is Ident)
+                    sw.Write(tab + '\t');
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }
@@ -112,6 +114,8 @@ namespace Compiler.OOS_LanguageObjects
             sw.WriteLine(" = _exception;");
             foreach (var it in this.CatchInstructions)
             {
+                if (it is Ident)
+                    sw.Write(tab + '\t');
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }

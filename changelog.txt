@@ -1,3 +1,47 @@
+Version 0.7.0-ALPHA
+    |- Compiler:  fixed objects added using the using instruction where not
+    |             touched by the PreProcessor
+    |- Compiler:  printout syntax got altered slightly (missing tabs and invalid
+    |             new lines)
+    |- Compiler:  fixed for required all params or it would throw a NPE
+    |- Compiler:  fixed NPE when assigning variables in other namespaces
+    |- Compiler:  fixed StackOverflow case with this variable
+    |- Compiler:  using directive threw out folder path instead of file path
+    |- Compiler:  using now is generalized (no difference between local and std
+    |             includes) thus syntax changed:
+    |             using ::foo::bar
+    |             instead of
+    |             using "::foo::bar" or using <::foo::bar>
+    |- Compiler:  fixed invalid encapsulation on object function "toString"
+    |- Compiler:  Changed cast operator from %...% to <...>
+    |- Compiler:  fixed templates only could use native types
+    |- Compiler:  added internal class "array"
+    |- Compiler:  added internal class "string"
+    |- Compiler:  Parser is more solid now (side effect thx to EBNF changes)
+    |- Compiler:  Fixed CfgFunctions class is never written out regardless of
+    |             the NFNC flag
+    |- Compiler:  Fixed invalid distinction between variable and function when
+    |             using a class variable with an object as type
+    |- Compiler:  class & native syntax now supports flags
+    |             (not important for generic oos users)
+    |             `class <IDENT> flags <FLAG1> <FLAG2> <FLAGN>`
+    |             Flags which got introduced:
+    |             - disableConstructor
+    |             - noObjectExtends
+    |             - virtualFunctionsOnly (not available in native)
+    |- Compiler:  Introduced enum`s. They got following syntax:
+    |             enum { <IDENT1> [ = <VALUE2> ], <IDENTN> [ = <VALUEN> ] }
+    |- Compiler:  SQF instruction now supports forcedType via "as". Example:
+    |             `SQF allPlayers as ::std::Array<::std::Men>`
+    |- stdLib:    added ::std::UI::Display object
+    |- stdLib:    added ::std::UI::Control object
+    |- stdLib:    added ::std::Marker object
+    |- stdLib:    fixed invalid typing in ::std::base::VehicleBase object
+    |- stdLib:    removed ::std::Array object (moved to internal classes)
+    |- stdLib:    removed ::std::String object (moved to internal classes)
+    |- stdLib:    added get-/setObject function to ::std::Context
+    \- .oosproj:  Added <srcfolder> attribute to set the source folder
+    
 Version 0.6.2-ALPHA
     |- Compiler:  fixed various minor issues
     |- Compiler:  removed multi-base classes
@@ -9,21 +53,21 @@ Version 0.6.2-ALPHA
     |             spawned (and vice versa)
     |- Compiler:  unlocked the native "object" object (actually thats a speciall
     \             internal class now, might happen with string too soon)
-	
+    
 Version 0.6.1-ALPHA
     |- Compiler:  fixed InstanceOf printout
     |- Compiler:  Introduced "using" operation, replaces #include
     |- Compiler:  #include now wont "include" the file anymore and instead just
     |             checks the PreProcessor directives in given file
     |- Compiler:  Added "extends" keyword to native classes --> you now can
-    |             extend native classes
+    |             extend native classes now
     |- Compiler:  Added code for the "async" keyword on functions (sorry)
     |- Compiler:  "PRINTMODE" flag modes have changed:
     |             Possible modes are: NONE, 0, NEEDED, 1, ALL, 2
-    |- Compiler:  Renamed all stdLibrary objects to have first char uppercase
-    |- Compiler:  Added "VehicleBase" object to stdLibrary (not intended to be
+    |- stdLib:    Renamed all stdLibrary objects to have first char uppercase
+    |- stdLib:    Added "VehicleBase" object to stdLibrary (not intended to be
     |             created via new, will throw an error when you attempt)
-    |- Compiler:  Added "Man" object to stdLibrary, represents all CAManBase
+    |- stdLib:    Added "Man" object to stdLibrary, represents all CAManBase
     |             ArmA objects
     \- WrapperUI: Introduced WrapperUI.exe, a UI for OOS <3 (to be improved)
     
@@ -49,9 +93,9 @@ Version 0.5.3-ALPHA
     |             line had whitespace characters after its last valid character 
     |- Compiler:  SQF command arguments where not separated by commas           
     |- Compiler:  Added "scalar length()" function to ::std::array              
-    |- Compiler:  Added "config" object to stdLibrary
-    |- Compiler:  Added "namespace" object to stdLibrary
-    |- Compiler:  Added "vehicle" object to stdLibrary
+    |- stdLib:    Added "config" object to stdLibrary
+    |- stdLib:    Added "namespace" object to stdLibrary
+    |- stdLib:    Added "vehicle" object to stdLibrary
     |- Compiler:  PreProcessor allowed multiple includes of the same file ref.  
     |- Compiler:  Parent classes/interfaces now need to be adressed with        
     \             extends (for classes) or implements (for interfaces)          

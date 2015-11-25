@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             sw.Write(tab);
-            if (!this.Name.IsSimpleIdentifier && this.Name.ReferencedType.IsObject && !(this.Name.ReferencedType.ident.ReferencedObject is Native))
+            if (!this.Name.IsSimpleIdentifier && this.Name.LastIdent.ReferencedType.IsObject && !(this.Name.LastIdent.ReferencedType.ident.ReferencedObject is Native))
             {
                 this.Name.writeOut(sw, cfg);
                 sw.Write(" set [" + ((Variable)this.Name.LastIdent.ReferencedObject).SqfVariableName + ", ");

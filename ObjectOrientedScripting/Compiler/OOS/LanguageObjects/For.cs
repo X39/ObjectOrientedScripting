@@ -32,10 +32,20 @@ namespace Compiler.OOS_LanguageObjects
             //ToDo: Fix the wrong private of the forArg1 variable from inside of the loop to parent codeblock
             string tab = new string('\t', this.Parent.getAllParentsOf<Interfaces.iCodeBlock>().Count);
 
-            this.forArg1.writeOut(sw, cfg);
-            sw.WriteLine(";");
+            if (this.forArg1 != null)
+            {
+                this.forArg1.writeOut(sw, cfg);
+                sw.WriteLine(";");
+            }
             sw.Write(tab + "while {");
-            this.forArg2.writeOut(sw, cfg);
+            if (this.forArg2 != null)
+            {
+                this.forArg2.writeOut(sw, cfg);
+            }
+            else
+            {
+                sw.Write("true");
+            }
             sw.WriteLine("} do");
             sw.WriteLine(tab + "{");
             var varList = this.getAllChildrenOf<Variable>();
@@ -66,10 +76,15 @@ namespace Compiler.OOS_LanguageObjects
                     sw.Write("]");
                 sw.WriteLine(";");
             }
-            this.forArg3.writeOut(sw, cfg);
+            if (this.forArg3 != null)
+            {
+                this.forArg3.writeOut(sw, cfg);
+            }
             sw.WriteLine(";");
             foreach (var it in this.CodeInstructions)
             {
+                if (it is Ident)
+                    sw.Write(tab + '\t');
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }

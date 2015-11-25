@@ -115,18 +115,9 @@ namespace Compiler.OOS_LanguageObjects
                         oType = new VarTypeObject(VarType.Bool);
                         break;
                     case "+": case "-": case "*": case "/":
-                        if(lType.varType == VarType.String)
-                        {
-                            if (lType.varType != VarType.String || rType.varType != VarType.String)
-                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
-                            oType = new VarTypeObject(VarType.String);
-                        }
-                        else
-                        {
-                            if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                                throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
-                            oType = new VarTypeObject(VarType.Scalar);
-                        }
+                        if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
+                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
+                        oType = new VarTypeObject(VarType.Scalar);
                         break;
                     case ">": case ">=": case "<": case "<=":
                         if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)

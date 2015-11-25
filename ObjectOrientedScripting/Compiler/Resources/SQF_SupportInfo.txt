@@ -861,7 +861,7 @@ b#nil#ARRAY,OBJECT distance ARRAY,OBJECT
 b#nil#LOCATION distance LOCATION
 b#nil#LOCATION distance ARRAY
 b#nil#ARRAY distance LOCATION
-b#nil#SCALAR,NaN mod SCALAR,NaN
+b#scalar#SCALAR,NaN mod SCALAR,NaN
 b#nil#ARRAY,OBJECT say3d STRING
 b#nil#ARRAY,OBJECT say3d ARRAY
 b#nil#SCALAR cutobj ARRAY
@@ -1109,7 +1109,7 @@ u#nil#fullcrew OBJECT
 u#nil#fullcrew ARRAY
 u#nil#binocular OBJECT
 u#nil#sqrt SCALAR,NaN
-u#string#typename ANY
+u#::string#typename ANY
 u#nil#forcerespawn OBJECT
 u#nil#assignedgunner OBJECT
 u#nil#composetext ARRAY
@@ -1283,7 +1283,7 @@ u#nil#setcurrentchannel SCALAR
 u#nil#default CODE
 u#nil#firstbackpack OBJECT
 u#nil#formleader OBJECT
-u#string#loadfile STRING
+u#::string#loadfile STRING
 u#nil#checkaifeature STRING
 u#nil#isonroad ARRAY,OBJECT
 u#nil#titlecut ARRAY
@@ -1331,7 +1331,7 @@ u#nil#leaderboardstate STRING
 u#nil#exportjipmessages STRING
 u#nil#deletelocation LOCATION
 u#nil#soldiermagazines OBJECT
-u#string#format ARRAY
+u#::string#format ARRAY
 u#nil#disableRemoteSensors BOOL
 u#nil#finite SCALAR,NaN
 u#nil#waypointhouseposition ARRAY
@@ -1360,7 +1360,7 @@ u#nil#primaryweaponmagazine OBJECT
 u#nil#getmarkerpos STRING
 u#nil#cameraeffectenablehud BOOL
 u#nil#goto STRING
-u#string#configname CONFIG
+u#::string#configname CONFIG
 u#nil#ctrlhtmlloaded CONTROL
 u#nil#lbselection CONTROL
 u#nil#lnbgetcolumnsposition CONTROL
@@ -1402,7 +1402,7 @@ u#nil#createmarkerlocal ARRAY
 u#nil#settrafficdistance SCALAR
 u#nil#tvsettooltip ARRAY
 u#nil#ropecreate ARRAY
-u#string#str ANY
+u#::string#str ANY
 u#nil#execfsm STRING
 u#nil#enableradio BOOL
 u#nil#fleeing OBJECT
@@ -1426,7 +1426,7 @@ u#nil#teammember OBJECT
 u#bool#isagent TEAM_MEMBER
 u#bool#isburning OBJECT
 u#nil#setlocalwindparams ARRAY
-u#string#tostring ARRAY
+u#::string#tostring ARRAY
 u#nil#actionkeysimages ARRAY,STRING
 u#nil#assignedvehicle OBJECT
 u#nil#hcremoveallgroups OBJECT
@@ -1481,7 +1481,7 @@ u#nil#exp SCALAR,NaN
 u#nil#enablesentences BOOL
 u#nil#loadabs OBJECT
 u#nil#round SCALAR,NaN
-u#string[]#items OBJECT
+u#nil#items OBJECT
 u#nil#gearslotammocount CONTROL
 u#nil#tvsetpicturecolor ARRAY
 u#nil#onbriefingnotes STRING
@@ -1977,7 +1977,7 @@ u#nil#sizeof STRING
 u#nil#formationtask OBJECT
 u#nil#enablesaving BOOL,ARRAY
 u#nil#clearbackpackcargoglobal OBJECT
-u#string#getplayeruid OBJECT
+u#::string#getplayeruid OBJECT
 u#nil#lnbsize CONTROL
 u#nil#lnbsize SCALAR
 u#nil#sendaumessage ARRAY
@@ -2018,7 +2018,7 @@ n#nil#curatormouseover
 n#other#playerside
 n#scalar#daytime
 n#nil#radiovolume
-n#string#servername
+n#::string#servername
 n#nil#lightnings
 n#nil#date
 n#nil#allplayers
@@ -2042,7 +2042,7 @@ n#scalar#difficulty
 n#nil#windrtd
 n#nil#allcurators
 n#nil#agents
-n#string#briefingname
+n#::string#briefingname
 n#other#grpnull
 n#bool#shownmap
 n#bool#shownpad
@@ -2096,12 +2096,12 @@ n#nil#copyfromclipboard
 n#nil#groupiconselectable
 n#::std::Context#missionnamespace
 n#::std::Context#uinamespace
-n#string[]#activatedaddons
+n#nil#activatedaddons
 n#scalar#viewdistance
 n#nil#librarydisclaimers
 n#nil#clearitempool
 n#bool#dialog
-n#string#profilenamesteam
+n#::string#profilenamesteam
 n#::std::Man#player
 n#bool#getRemoteSensorsDisabled
 n#nil#shownartillerycomputer
@@ -2117,7 +2117,7 @@ n#nil#playerrespawntime
 n#nil#playableunits
 n#::std::Context#currentnamespace
 n#nil#linebreak
-n#string#language
+n#::string#language
 n#bool#cheatsenabled
 n#nil#opencuratorinterface
 n#nil#curatorselected
@@ -2126,11 +2126,11 @@ n#nil#buldozer_isenabledroaddiag
 n#nil#sidelogic
 n#nil#runinitscript
 n#scalar#winddir
-n#string#worldname
+n#::string#worldname
 n#scalar#diag_fps
 n#nil#getobjectviewdistance
 n#nil#sunormoon
-n#string[]#allmapmarkers
+n#nil#allmapmarkers
 n#nil#getdlcassetsusage
 n#nil#independent
 n#nil#soundvolume
@@ -2190,5 +2190,5 @@ n#nil#diag_fpsmin
 n#nil#diag_activesqfscripts
 n#nil#safezonewabs
 n#nil#librarycredits
-n#string#profilename
+n#::string#profilename
 n#nil#campaignconfigfile

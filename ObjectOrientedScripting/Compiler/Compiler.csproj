@@ -52,6 +52,7 @@
     <Compile Include="OOS\LanguageObjects\Interfaces\iBreakable.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iOperatorFunction.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iTemplate.cs" />
+    <Compile Include="OOS\LanguageObjects\oosEnum.cs" />
     <Compile Include="OOS\LanguageObjects\NativeAssign.cs" />
     <Compile Include="OOS\LanguageObjects\NativeOperator.cs" />
     <Compile Include="OOS\LanguageObjects\NativeFunction.cs" />
@@ -128,6 +129,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\InternalClasses\array.oos" />
+    <None Include="Resources\InternalClasses\object.oos" />
+    <None Include="Resources\InternalClasses\string.oos" />
     <None Include="Resources\SQF_SupportInfo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

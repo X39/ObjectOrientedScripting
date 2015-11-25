@@ -34,7 +34,7 @@ namespace Compiler.OOS_LanguageObjects
             {
                 if (expression != null)
                 {
-                    if (!((Expression)expression).ReferencedType.Equals(switchElement.ReferencedType))
+                    if (!((Expression)expression).ReferencedType.Equals(switchElement.ReferencedType) && !(switchElement.ReferencedType.IsObject && switchElement.ReferencedType.ident.ReferencedObject is oosEnum))
                     {
                         Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0024, this.Line, this.Pos, this.File));
                         errCount++;
@@ -67,6 +67,8 @@ namespace Compiler.OOS_LanguageObjects
             {
                 if (it == lastInstruction)
                     continue;
+                if (it is Ident)
+                    sw.Write(tab + '\t');
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }

@@ -1,16 +1,13 @@
-using <std::Array>
-using <std::Config>
-using <std::Context>
-using <std::String>
-using <std::base::VehicleBase>
-using <std::Man>
+using std::Config
+using std::Context
+using std::base::VehicleBase
+using std::Man
 
 namespace std
 {
     native Vehicle extends ::std::base::VehicleBase
     {
-		assign simple (string name, scalar i, scalar j, scalar k)                          name createVehicle [i, j, k]                endAssign
-		assign simple (::std::String name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
+		assign simple (string name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
 
         fnc void setFuel (scalar i)
             if(!local _this) exitWith

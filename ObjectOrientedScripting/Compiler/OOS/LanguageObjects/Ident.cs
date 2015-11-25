@@ -30,30 +30,43 @@ namespace Compiler.OOS_LanguageObjects
         public bool IsGlobalIdentifier { get { return this.isGlobalIdentifier; } set { if (value && this.Parent is Ident) throw new Exception("Double Namespace Access experienced"); this.isGlobalIdentifier = value; } }
         public bool IsRelativeIdentifier { get { return this.Access == AccessType.Namespace; } }
         public bool IsSelfReference { get { return this.originalValue == "this"; } }
-        public bool IsAnonymousIdent
+        public bool IsAnonymousIdent { get { return this.getClassTemplate() != null; } }
+        private bool IsNamespaceAccess()
         {
-            get
+            if (this.IsAnonymousIdent)
+                return true;
+            var nsr = HelperClasses.NamespaceResolver.createNSR(this, false);
+            if (nsr == null)
+                return false;
+            var reference = nsr.Reference;
+            if (reference is Interfaces.iClass)
+                return true;
+            else if (reference is Interfaces.iFunction)
+                return true;
+            else
+                return false;
+        }
+        private Template getClassTemplate()
+        {
+            var templateList = this.getAllParentsOf<Interfaces.iTemplate>();
+            if (this.Parent is Template && this.Parent.Parent is Interfaces.iClass)
             {
-                var templateList = this.getAllParentsOf<Interfaces.iTemplate>();
-                if (this.Parent is Template)
+                return (Template)this.Parent;
+            }
+            else if (templateList.Count > 0 && !(this.Parent is Ident) && this.getAllChildrenOf<Ident>().Count == 0)
+            {
+                foreach (var template in templateList)
                 {
-                    return true;
-                }
-                else if (templateList.Count > 0 && !(this.Parent is Ident) && this.getAllChildrenOf<Ident>().Count == 0)
-                {
-                    foreach (var template in templateList)
+                    if (template.TemplateObject == null)
+                        continue;
+                    foreach (var it in template.TemplateObject.vtoList)
                     {
-                        if (template.TemplateObject == null)
-                            continue;
-                        foreach (var it in template.TemplateObject.vtoList)
-                        {
-                            if (it.ident != null && it.ident.originalValue == this.originalValue)
-                                return true;
-                        }
+                        if (it.ident != null && it.ident.originalValue == this.originalValue)
+                            return template.TemplateObject;
                     }
                 }
-                return false;
             }
+            return null;
         }
         public string FullyQualifiedName
         {
@@ -81,13 +94,16 @@ namespace Compiler.OOS_LanguageObjects
                         }
                     }
                 }
-                if (this.IsSelfReference && this.ReferencedObject != null && this.ReferencedObject is Interfaces.iName)
+                if (this.IsSelfReference)
                 {
-                    return ((Interfaces.iName)this.ReferencedObject).Name.FullyQualifiedName;
+                    var tmp = this.getFirstOf<Interfaces.iClass>();
+                    if (tmp == null)
+                        throw new Exception();
+                    return tmp.Name.FullyQualifiedName;
                 }
                 else
                 {
-                    if (this.Parent is Ident && (((Ident)this.Parent).Access == AccessType.Instance) && ((Ident)this.Parent).ReferencedType != null)
+                    if (this.Parent is Ident && (((Ident)this.Parent).Access == AccessType.Instance) && ((Ident)this.Parent).ReferencedType != null && !(((Ident)this.Parent).ReferencedObject is oosEnum))
                     {
                         return ((Ident)this.Parent).ReferencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
                     }
@@ -122,10 +138,14 @@ namespace Compiler.OOS_LanguageObjects
                             else
                             {
                                 result = (((Ident)curobject).IsSelfReference ? ((Ident)curobject).FullyQualifiedName : ((Ident)curobject).OriginalValue) +
-                                    (((Ident)curobject).Access == AccessType.Namespace ? "::" : ((Ident)curobject).Access == AccessType.Instance ? "." : "") + result;
+                                    (((Ident)curobject).Access == AccessType.Namespace ? "::" : ((Ident)curobject).Access == AccessType.Instance ? "." : ":") + result;
                             }
                             if (((Ident)curobject).isGlobalIdentifier)
                                 break;
+                        }
+                        else if((curobject is NewInstance))
+                        {
+                            
                         }
                         else if (curobject is Interfaces.iName)
                         {
@@ -183,6 +203,7 @@ namespace Compiler.OOS_LanguageObjects
                 return list[0].NextWorkerIdent;
             }
         }
+        public bool IsPureIdent { get { return this.getAllChildrenOf<FunctionCall>(true).Count == 0 && this.getAllChildrenOf<ArrayAccess>(true).Count == 0; } }
         public Ident NextIdent
         {
             get
@@ -242,7 +263,7 @@ namespace Compiler.OOS_LanguageObjects
             type = IdenType.NamespaceAccess;
             var fncCalls = this.getAllChildrenOf<FunctionCall>();
             var arrAccess = this.getAllChildrenOf<ArrayAccess>();
-            if (this.Parent is Template)
+            if (this.Parent is Template && !(this.Parent.Parent is Ident))
             {
                 type = IdenType.TemplateVar;
             }
@@ -262,9 +283,13 @@ namespace Compiler.OOS_LanguageObjects
             {
                 type = IdenType.ArrayAccess;
             }
+            else if(IsNamespaceAccess())
+            {
+                type = IdenType.NamespaceAccess;
+            }
             else if (parentIdent == null && this.Access == AccessType.NA)
             {
-                if (this.Parent is Interfaces.iClass || (this.Parent is Interfaces.iFunction && ((Interfaces.iFunction)this.Parent).ReturnType.ident == this))
+                if (this.Parent is Interfaces.iClass || (this.Parent is Interfaces.iFunction && ((Interfaces.iFunction)this.Parent).ReturnType.ident == this) || this.Parent is Value || this.Parent is Variable)
                     type = IdenType.NamespaceAccess;
                 else
                     type = IdenType.VariableAccess;
@@ -302,13 +327,22 @@ namespace Compiler.OOS_LanguageObjects
             }
             #endregion
             //And process it then ((unless its a simple ident, then we do not want to process ... here any further))
-            if (this.IsSimpleIdentifier && ((this.Parent is Interfaces.iName && ((Interfaces.iName)this.Parent).Name == this) || (this.Parent is Interfaces.iHasType && !(this.Parent is Expression) && ((Interfaces.iHasType)this.Parent).ReferencedType.ident == this)) && !(this.Parent is AssignContainer))
+            if (
+                this.IsSimpleIdentifier &&
+                (
+                    (this.Parent is Interfaces.iName && ((Interfaces.iName)this.Parent).Name == this) ||
+                    (this.Parent is Interfaces.iHasType && !(this.Parent is Expression) && ((Interfaces.iHasType)this.Parent).ReferencedType.ident == this)
+                ) &&
+                !(this.Parent is AssignContainer) &&
+                !(this.Parent is NewInstance) &&
+                !(this.Parent is Interfaces.iHasType && ((Interfaces.iHasType)this.Parent).ReferencedType.ident == this)
+            )
             {
                 this.ReferencedObject = this.Parent;
                 if (this.Parent is Interfaces.iHasType)
                     this.ReferencedType = ((Interfaces.iHasType)this.Parent).ReferencedType;
                 else //todo: try to replace with proper refObject type
-                    this.ReferencedType = new VarTypeObject(this, (this.Parent is Interfaces.iTemplate ? ((Interfaces.iTemplate)this.Parent).TemplateObject : null) );
+                    this.ReferencedType = new VarTypeObject(this, (this.Parent is Interfaces.iTemplate ? ((Interfaces.iTemplate)this.Parent).TemplateObject : null));
             }
             else
             {
@@ -343,7 +377,25 @@ namespace Compiler.OOS_LanguageObjects
                     case IdenType.VariableAccess:
                     case IdenType.ArrayAccess:
                         {
-                            var variable = HelperClasses.NamespaceResolver.getVariableReferenceOfFQN(HelperClasses.NamespaceResolver.createNSR(this,true), true, this);
+                            var nsr = HelperClasses.NamespaceResolver.createNSR(this);
+                            if(nsr != null && nsr.IsValid && (nsr.Reference is oosEnum.EnumEntry || nsr.Reference is oosEnum))
+                            {
+                                if (nsr.Reference is oosEnum.EnumEntry)
+                                {
+                                    var entry = (oosEnum.EnumEntry)nsr.Reference;
+                                    this.ReferencedObject = entry;
+                                    this.ReferencedType = ((oosEnum)entry.Parent).ReferencedType;
+                                    break;
+                                }
+                                else if(nsr.Reference is oosEnum)
+                                {
+                                    var e = (oosEnum)nsr.Reference;
+                                    this.ReferencedObject = e;
+                                    this.ReferencedType = e.ReferencedType;
+                                    break;
+                                }
+                            }
+                            var variable = HelperClasses.NamespaceResolver.getVariableReferenceOfFQN(HelperClasses.NamespaceResolver.createNSR(this, true), true, this);
                             if (variable == null)
                             {
                                 variable = HelperClasses.NamespaceResolver.getVariableReferenceOfFQN(this, false, this);
@@ -408,10 +460,6 @@ namespace Compiler.OOS_LanguageObjects
                                             this.ReferencedType = new VarTypeObject(this.ReferencedType);
                                             this.ReferencedType.varType = VarType.Scalar;
                                             break;
-                                        case VarType.StringArray:
-                                            this.ReferencedType = new VarTypeObject(this.ReferencedType);
-                                            this.ReferencedType.varType = VarType.String;
-                                            break;
                                         default:
                                             Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos, this.File));
                                             errCount++;
@@ -434,7 +482,7 @@ namespace Compiler.OOS_LanguageObjects
                                 //if (((Variable)parentIdent.ReferencedObject).ReferencedType.IsObject)
                                 //    fqn = ((Interfaces.iClass)((Variable)parentIdent.ReferencedObject).ReferencedType.ident.LastIdent.ReferencedObject).Name.LastIdent.FullyQualifiedName + "." + this.originalValue;
                                 //else
-                                    fqn = parentIdent.ReferencedType.ident.LastIdent.ReferencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
+                                fqn = parentIdent.ReferencedType.ident.LastIdent.ReferencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
                             }
                             if (newInstance == null)
                             {
@@ -442,7 +490,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                             else
                             {
-                                fncList = HelperClasses.NamespaceResolver.getFunctionReferenceOfFQN(HelperClasses.NamespaceResolver.createNSR(fqn + "::" + this.originalValue));
+                                fncList = HelperClasses.NamespaceResolver.getFunctionReferenceOfFQN(HelperClasses.NamespaceResolver.createNSR(fqn + "." + this.originalValue));
                             }
                             if (fncList.Count == 0)
                             {
@@ -469,7 +517,7 @@ namespace Compiler.OOS_LanguageObjects
                                 }
                                 else
                                 {
-                                    if(fnc is Function && ((Function)fnc).IsConstructor && this.getFirstOf<NewInstance>() == null)
+                                    if (fnc is Function && ((Function)fnc).IsConstructor && this.getFirstOf<NewInstance>() == null)
                                     {
                                         Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0026, this.Line, this.Pos, this.File));
                                         errCount++;
@@ -522,15 +570,31 @@ namespace Compiler.OOS_LanguageObjects
                     #region NamespaceAccess
                     case IdenType.NamespaceAccess:
                         {
-                            var nsr = HelperClasses.NamespaceResolver.createNSR(this, this.IsAnonymousIdent);
-                            var reference = nsr.Reference;
-                            this.ReferencedObject = reference;
-                            if (reference is Interfaces.iClass)
-                                this.ReferencedType = ((Interfaces.iClass)reference).VTO;
-                            else if (reference is Interfaces.iFunction)
-                                this.ReferencedType = ((Interfaces.iFunction)reference).ReturnType;
+                            if (this.IsAnonymousIdent)
+                            {
+                                this.ReferencedObject = getClassTemplate();
+                                this.ReferencedObject = null;
+                            }
                             else
-                                this.ReferencedType = null;
+                            {
+                                var nsr = HelperClasses.NamespaceResolver.createNSR(this);
+                                if (nsr == null)
+                                {
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0046, this.Line, this.Pos, this.File));
+                                    errCount++;
+                                }
+                                else
+                                {
+                                    var reference = nsr.Reference;
+                                    this.ReferencedObject = reference;
+                                    if (reference is Interfaces.iClass)
+                                        this.ReferencedType = ((Interfaces.iClass)reference).VTO;
+                                    else if (reference is Interfaces.iFunction)
+                                        this.ReferencedType = ((Interfaces.iFunction)reference).ReturnType;
+                                    else
+                                        this.ReferencedType = null;
+                                }
+                            }
                         }
                         break;
                     #endregion
@@ -654,6 +718,14 @@ namespace Compiler.OOS_LanguageObjects
                                 return "_tmp";
                             if (s == "")
                                 s += variable.SqfVariableName;
+                        }
+                        else if (this.ReferencedObject is oosEnum.EnumEntry)
+                        {
+                            var entry = this.ReferencedObject as oosEnum.EnumEntry;
+                            s += entry.Value.value;
+                        }
+                        else if (this.ReferencedObject is oosEnum)
+                        {
                         }
                         else
                         {

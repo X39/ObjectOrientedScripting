@@ -10,37 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     {
         public Base() : base(null)
         {
-            {
-                oosClass objectClass = new oosClass(this);
-                objectClass.Name = new Ident(objectClass, "object", -1, -1, "");
-                objectClass.Name.IsGlobalIdentifier = true;
-                objectClass.markEnd();
-                objectClass.markExtendsEnd();
-                this.addChild(objectClass);
-                {
-                    Function toStringFunction = new Function(objectClass);
-                    toStringFunction.Name = new Ident(toStringFunction, "toString", -1, -1, "");
-                    toStringFunction.IsVirtual = true;
-                    toStringFunction.varType = new VarTypeObject(VarType.String);
-                    toStringFunction.markArgListEnd();
-                    objectClass.addChild(toStringFunction);
-                    {
-                        Return returnInstruction = new Return(toStringFunction, -1, -1, "");
-                        toStringFunction.addChild(returnInstruction);
-                        {
-                            Expression expression = new Expression(returnInstruction, -1, -1, "");
-                            returnInstruction.addChild(expression);
-                            {
-                                SqfCall sqfCall = new SqfCall(expression);
-                                sqfCall.Name = new Ident(sqfCall, "str", -1, -1, "");
-                                sqfCall.markEnd();
-                                sqfCall.addChild(new Ident(sqfCall, "this", -1, -1, ""));
-                                expression.lExpression = sqfCall;
-                            }
-                        }
-                    }
-                }
-            }
+            
         }
         public override int finalize()
         {

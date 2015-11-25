@@ -61,41 +61,71 @@ namespace Compiler.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to t:nil:SCALAR
-        ///t:nil:BOOL
-        ///t:nil:ARRAY
-        ///t:nil:STRING
-        ///t:nil:NOTHING
-        ///t:nil:ANY
-        ///t:nil:NAMESPACE
-        ///t:nil:NaN
-        ///t:nil:IF
-        ///t:nil:WHILE
-        ///t:nil:FOR
-        ///t:nil:SWITCH
-        ///t:nil:EXCEPTION
-        ///t:nil:WITH
-        ///t:nil:CODE
-        ///t:nil:OBJECT
-        ///t:nil:VECTOR
-        ///t:nil:TRANS
-        ///t:nil:ORIENT
-        ///t:nil:SIDE
-        ///t:nil:GROUP
-        ///t:nil:TEXT
-        ///t:nil:SCRIPT
-        ///t:nil:TARGET
-        ///t:nil:JCLASS
-        ///t:nil:CONFIG
-        ///t:nil:DISPLAY
-        ///t:nil:CONTROL
-        ///t:nil:NetObject
-        ///t:nil:SUBGROUP
-        ///t:nil:TEAM_MEMBER
-        ///t:nil:TASK
-        ///t:nil:DIARY_RECORD
-        ///t:nil:LOCATION
-        ///b:nil:ARRAY waypointattachobject SCALA [rest of string was truncated]&quot;;.
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] _object {
+            get {
+                object obj = ResourceManager.GetObject("_object", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] _string {
+            get {
+                object obj = ResourceManager.GetObject("_string", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] array {
+            get {
+                object obj = ResourceManager.GetObject("array", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to t#nil#SCALAR
+        ///t#nil#BOOL
+        ///t#nil#ARRAY
+        ///t#nil#STRING
+        ///t#nil#NOTHING
+        ///t#nil#ANY
+        ///t#nil#NAMESPACE
+        ///t#nil#NaN
+        ///t#nil#IF
+        ///t#nil#WHILE
+        ///t#nil#FOR
+        ///t#nil#SWITCH
+        ///t#nil#EXCEPTION
+        ///t#nil#WITH
+        ///t#nil#CODE
+        ///t#nil#OBJECT
+        ///t#nil#VECTOR
+        ///t#nil#TRANS
+        ///t#nil#ORIENT
+        ///t#nil#SIDE
+        ///t#nil#GROUP
+        ///t#nil#TEXT
+        ///t#nil#SCRIPT
+        ///t#nil#TARGET
+        ///t#nil#JCLASS
+        ///t#nil#CONFIG
+        ///t#nil#DISPLAY
+        ///t#nil#CONTROL
+        ///t#nil#NetObject
+        ///t#nil#SUBGROUP
+        ///t#nil#TEAM_MEMBER
+        ///t#nil#TASK
+        ///t#nil#DIARY_RECORD
+        ///t#nil#LOCATION
+        ///b#nil#ARRAY waypointattachobject SCALA [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SQF_SupportInfo {
             get {
