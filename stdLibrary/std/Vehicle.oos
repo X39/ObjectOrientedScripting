@@ -1,7 +1,7 @@
-using <std::Config>
-using <std::Context>
-using <std::base::VehicleBase>
-using <std::Man>
+using std::Config
+using std::Context
+using std::base::VehicleBase
+using std::Man
 
 namespace std
 {
