@@ -28,6 +28,10 @@ native array<T>
         count _this
     endFnc
     
+    fnc simple scalar join (array<T> arr)
+        _this append arr
+    endFnc
+    
     operator simple T [] (scalar _i)
         _this select _i
     endOperator
