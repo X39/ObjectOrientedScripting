@@ -228,7 +228,7 @@ namespace Compiler.OOS_LanguageObjects
                     foreach (var it in lArgs)
                     {
                         if (index > 0)
-                            sw.Write(",");
+                            sw.Write(", ");
                         index++;
                         it.writeOut(sw, cfg);
                     }
@@ -251,7 +251,7 @@ namespace Compiler.OOS_LanguageObjects
                     foreach (var it in rArgs)
                     {
                         if (index > 0)
-                            sw.Write(",");
+                            sw.Write(", ");
                         index++;
                         it.writeOut(sw, cfg);
                     }
