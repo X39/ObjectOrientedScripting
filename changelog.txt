@@ -2,6 +2,11 @@ Version 0.7.0-ALPHA
 	|- Compiler:  fixed objects added using the using instruction where not
 	|             touched by the PreProcessor
 	|- Compiler:  using directive threw out folder path instead of file path
+	|- Compiler:  using now is generalized (no difference between local and std
+	|             includes) thus syntax changed:
+	|             using ::foo::bar
+	|             instead of
+	|             using "::foo::bar" or using <::foo::bar>
 	|- Compiler:  fixed invalid encapsulation on object function "toString"
 	|- Compiler:  Changed cast operator from %...% to <...>
 	|- Compiler:  fixed templates only could use native types
@@ -24,6 +29,7 @@ Version 0.7.0-ALPHA
 	|- stdLib:    removed ::std::Array object (moved to internal classes)
 	|- stdLib:    removed ::std::String object (moved to internal classes)
 	|- stdLib:    added get-/setObject function to ::std::Context
+	|- .oosproj:  Added <srcfolder> attribute to set the source folder
 	
 Version 0.6.2-ALPHA
     |- Compiler:  fixed various minor issues
