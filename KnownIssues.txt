@@ -14,4 +14,4 @@
   following would be invalid:
   `(new foobar()).foo()`
   due to the fact that it is the following:
-  <EXPRESSION>.<IDENT><FUNCTIONCALL>
+  `<EXPRESSION>.<IDENT><FUNCTIONCALL>`
