@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.6.2-ALPHA"
+#define MyAppVersion "0.7.0-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "WrapperUI.exe"
@@ -49,6 +49,50 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
+'Version 0.7.0-ALPHA                                                            ' + AnsiChar(#10) +
+'    |- Compiler:  fixed objects added using the using instruction where not     ' + AnsiChar(#10) +
+'    |             touched by the PreProcessor                                   ' + AnsiChar(#10) +
+'    |- Compiler:  printout syntax got altered slightly (missing tabs and invalid' + AnsiChar(#10) +
+'    |             new lines)                                                    ' + AnsiChar(#10) +
+'    |- Compiler:  fixed for required all params or it would throw a NPE         ' + AnsiChar(#10) +
+'    |- Compiler:  fixed NPE when assigning variables in other namespaces        ' + AnsiChar(#10) +
+'    |- Compiler:  fixed StackOverflow case with this variable                   ' + AnsiChar(#10) +
+'    |- Compiler:  using directive threw out folder path instead of file path    ' + AnsiChar(#10) +
+'    |- Compiler:  using now is generalized (no difference between local and std ' + AnsiChar(#10) +
+'    |             includes) thus syntax changed:                                ' + AnsiChar(#10) +
+'    |             using ::foo::bar                                              ' + AnsiChar(#10) +
+'    |             instead of                                                    ' + AnsiChar(#10) +
+'    |             using "::foo::bar" or using <::foo::bar>                      ' + AnsiChar(#10) +
+'    |- Compiler:  fixed invalid encapsulation on object function "toString"     ' + AnsiChar(#10) +
+'    |- Compiler:  Changed cast operator from %...% to <...>                     ' + AnsiChar(#10) +
+'    |- Compiler:  fixed templates only could use native types                   ' + AnsiChar(#10) +
+'    |- Compiler:  added internal class "array"                                  ' + AnsiChar(#10) +
+'    |- Compiler:  added internal class "string"                                 ' + AnsiChar(#10) +
+'    |- Compiler:  Parser is more solid now (side effect thx to EBNF changes)    ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed CfgFunctions class is never written out regardless of   ' + AnsiChar(#10) +
+'    |             the NFNC flag                                                 ' + AnsiChar(#10) +
+'    |- Compiler:  Fixed invalid distinction between variable and function when  ' + AnsiChar(#10) +
+'    |             using a class variable with an object as type                 ' + AnsiChar(#10) +
+'    |- Compiler:  class & native syntax now supports flags                      ' + AnsiChar(#10) +
+'    |             (not important for generic oos users)                         ' + AnsiChar(#10) +
+'    |             `class <IDENT> flags <FLAG1> <FLAG2> <FLAGN>`                 ' + AnsiChar(#10) +
+'    |             Flags which got introduced:                                   ' + AnsiChar(#10) +
+'    |             - disableConstructor                                          ' + AnsiChar(#10) +
+'    |             - noObjectExtends                                             ' + AnsiChar(#10) +
+'    |             - virtualFunctionsOnly (not available in native)              ' + AnsiChar(#10) +
+'    |- Compiler:  Introduced enum`s. They got following syntax:                 ' + AnsiChar(#10) +
+'    |             enum { <IDENT1> [ = <VALUE2> ], <IDENTN> [ = <VALUEN> ] }     ' + AnsiChar(#10) +
+'    |- Compiler:  SQF instruction now supports forcedType via "as". Example:    ' + AnsiChar(#10) +
+'    |             `SQF allPlayers as ::std::Array<::std::Men>`                  ' + AnsiChar(#10) +
+'    |- stdLib:    added ::std::UI::Display object                               ' + AnsiChar(#10) +
+'    |- stdLib:    added ::std::UI::Control object                               ' + AnsiChar(#10) +
+'    |- stdLib:    added ::std::Marker object                                    ' + AnsiChar(#10) +
+'    |- stdLib:    fixed invalid typing in ::std::base::VehicleBase object       ' + AnsiChar(#10) +
+'    |- stdLib:    removed ::std::Array object (moved to internal classes)       ' + AnsiChar(#10) +
+'    |- stdLib:    removed ::std::String object (moved to internal classes)      ' + AnsiChar(#10) +
+'    |- stdLib:    added get-/setObject function to ::std::Context               ' + AnsiChar(#10) +
+'    \- .oosproj:  Added <srcfolder> attribute to set the source folder          ' + AnsiChar(#10) +      
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.6.2-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  fixed various minor issues                                    ' + AnsiChar(#10) +
 '    |- Compiler:  removed multi-base classes                                    ' + AnsiChar(#10) +
