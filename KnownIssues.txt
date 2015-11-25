@@ -3,6 +3,12 @@
   
   `::std::vehicle variable = new ::std::vehicle("foobar");`
 
+- Passing an object of the same class which you are in right now will result in
+  the object getting assigned an invalid type
+  ((Internally it will ref to the function which is for sure nonsense ...
+    however ... harder to fix then it might sounds in first place due to the
+	lower logic behind it))
+
 - (Not rly an issue but more of a note) currently only idents are allowed to be
   callen. Thus you cannot call from an expression
   following would be invalid:
