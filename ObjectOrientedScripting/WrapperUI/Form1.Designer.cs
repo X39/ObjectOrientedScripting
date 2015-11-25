@@ -30,6 +30,23 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabCompile = new System.Windows.Forms.TabPage();
+            this.tcDefinesRessources = new System.Windows.Forms.TabControl();
+            this.tpDefines = new System.Windows.Forms.TabPage();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.lbCompilerFlags = new System.Windows.Forms.ListBox();
+            this.btnCompilerFlagAdd = new System.Windows.Forms.Button();
+            this.btnCompilerflagSet = new System.Windows.Forms.Button();
+            this.tbDefineRealString = new System.Windows.Forms.TextBox();
+            this.tpRessources = new System.Windows.Forms.TabPage();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.lbRessources = new System.Windows.Forms.ListBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.tbRessourcesOutPath = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.tbRessourcesInPath = new System.Windows.Forms.TextBox();
+            this.btnAddRessource = new System.Windows.Forms.Button();
+            this.btnSetRessource = new System.Windows.Forms.Button();
             this.gbProjectInformations = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tbProjectBuildFolder = new System.Windows.Forms.TextBox();
@@ -42,13 +59,11 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.tbProjectTitle = new System.Windows.Forms.TextBox();
+            this.tbProjectSrcFolder = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.tbCompilerVersion = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.btnSaveFile = new System.Windows.Forms.Button();
-            this.gbCompilerFlags = new System.Windows.Forms.GroupBox();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.lbCompilerFlags = new System.Windows.Forms.ListBox();
-            this.btnCompilerFlagAdd = new System.Windows.Forms.Button();
-            this.btnCompilerflagSet = new System.Windows.Forms.Button();
-            this.tbDefineRealString = new System.Windows.Forms.TextBox();
             this.btnDoCompile = new System.Windows.Forms.Button();
             this.btnSetProjectPath = new System.Windows.Forms.Button();
             this.tbProjPath = new System.Windows.Forms.TextBox();
@@ -59,17 +74,22 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.label6 = new System.Windows.Forms.Label();
-            this.tbCompilerVersion = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabCompile.SuspendLayout();
-            this.gbProjectInformations.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
-            this.gbCompilerFlags.SuspendLayout();
+            this.tcDefinesRessources.SuspendLayout();
+            this.tpDefines.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.tpRessources.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
+            this.gbProjectInformations.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.tabGenProject.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -86,9 +106,9 @@
             // 
             // tabCompile
             // 
+            this.tabCompile.Controls.Add(this.tcDefinesRessources);
             this.tabCompile.Controls.Add(this.gbProjectInformations);
             this.tabCompile.Controls.Add(this.btnSaveFile);
-            this.tabCompile.Controls.Add(this.gbCompilerFlags);
             this.tabCompile.Controls.Add(this.btnDoCompile);
             this.tabCompile.Controls.Add(this.btnSetProjectPath);
             this.tabCompile.Controls.Add(this.tbProjPath);
@@ -99,6 +119,217 @@
             this.tabCompile.Text = "Compile";
             this.tabCompile.UseVisualStyleBackColor = true;
             // 
+            // tcDefinesRessources
+            // 
+            this.tcDefinesRessources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tcDefinesRessources.Controls.Add(this.tpDefines);
+            this.tcDefinesRessources.Controls.Add(this.tpRessources);
+            this.tcDefinesRessources.Enabled = false;
+            this.tcDefinesRessources.Location = new System.Drawing.Point(8, 241);
+            this.tcDefinesRessources.Name = "tcDefinesRessources";
+            this.tcDefinesRessources.SelectedIndex = 0;
+            this.tcDefinesRessources.Size = new System.Drawing.Size(472, 170);
+            this.tcDefinesRessources.TabIndex = 9;
+            // 
+            // tpDefines
+            // 
+            this.tpDefines.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.tpDefines.Controls.Add(this.splitContainer1);
+            this.tpDefines.Location = new System.Drawing.Point(4, 22);
+            this.tpDefines.Name = "tpDefines";
+            this.tpDefines.Padding = new System.Windows.Forms.Padding(3);
+            this.tpDefines.Size = new System.Drawing.Size(464, 144);
+            this.tpDefines.TabIndex = 0;
+            this.tpDefines.Text = "Defines";
+            this.tpDefines.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.lbCompilerFlags);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnCompilerFlagAdd);
+            this.splitContainer1.Panel2.Controls.Add(this.btnCompilerflagSet);
+            this.splitContainer1.Panel2.Controls.Add(this.tbDefineRealString);
+            this.splitContainer1.Size = new System.Drawing.Size(458, 138);
+            this.splitContainer1.SplitterDistance = 152;
+            this.splitContainer1.TabIndex = 0;
+            // 
+            // lbCompilerFlags
+            // 
+            this.lbCompilerFlags.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbCompilerFlags.FormattingEnabled = true;
+            this.lbCompilerFlags.Location = new System.Drawing.Point(0, 0);
+            this.lbCompilerFlags.Name = "lbCompilerFlags";
+            this.lbCompilerFlags.Size = new System.Drawing.Size(152, 138);
+            this.lbCompilerFlags.TabIndex = 0;
+            this.lbCompilerFlags.SelectedIndexChanged += new System.EventHandler(this.lbCompilerFlags_SelectedIndexChanged);
+            this.lbCompilerFlags.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbCompilerFlags_KeyDown);
+            // 
+            // btnCompilerFlagAdd
+            // 
+            this.btnCompilerFlagAdd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCompilerFlagAdd.Location = new System.Drawing.Point(159, 112);
+            this.btnCompilerFlagAdd.Name = "btnCompilerFlagAdd";
+            this.btnCompilerFlagAdd.Size = new System.Drawing.Size(140, 23);
+            this.btnCompilerFlagAdd.TabIndex = 2;
+            this.btnCompilerFlagAdd.Text = "Add Flag";
+            this.btnCompilerFlagAdd.UseVisualStyleBackColor = true;
+            this.btnCompilerFlagAdd.Click += new System.EventHandler(this.btnCompilerFlagAdd_Click);
+            // 
+            // btnCompilerflagSet
+            // 
+            this.btnCompilerflagSet.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCompilerflagSet.Enabled = false;
+            this.btnCompilerflagSet.Location = new System.Drawing.Point(3, 112);
+            this.btnCompilerflagSet.Name = "btnCompilerflagSet";
+            this.btnCompilerflagSet.Size = new System.Drawing.Size(150, 23);
+            this.btnCompilerflagSet.TabIndex = 1;
+            this.btnCompilerflagSet.Text = "Set Flag";
+            this.btnCompilerflagSet.UseVisualStyleBackColor = true;
+            this.btnCompilerflagSet.Click += new System.EventHandler(this.btnCompilerflagSet_Click);
+            // 
+            // tbDefineRealString
+            // 
+            this.tbDefineRealString.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbDefineRealString.Location = new System.Drawing.Point(3, 3);
+            this.tbDefineRealString.Multiline = true;
+            this.tbDefineRealString.Name = "tbDefineRealString";
+            this.tbDefineRealString.Size = new System.Drawing.Size(296, 103);
+            this.tbDefineRealString.TabIndex = 0;
+            // 
+            // tpRessources
+            // 
+            this.tpRessources.Controls.Add(this.splitContainer2);
+            this.tpRessources.Location = new System.Drawing.Point(4, 22);
+            this.tpRessources.Name = "tpRessources";
+            this.tpRessources.Padding = new System.Windows.Forms.Padding(3);
+            this.tpRessources.Size = new System.Drawing.Size(464, 144);
+            this.tpRessources.TabIndex = 1;
+            this.tpRessources.Text = "Ressources";
+            this.tpRessources.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer2
+            // 
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.lbRessources);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.tableLayoutPanel2);
+            this.splitContainer2.Panel2.Controls.Add(this.btnAddRessource);
+            this.splitContainer2.Panel2.Controls.Add(this.btnSetRessource);
+            this.splitContainer2.Size = new System.Drawing.Size(458, 138);
+            this.splitContainer2.SplitterDistance = 152;
+            this.splitContainer2.TabIndex = 1;
+            // 
+            // lbRessources
+            // 
+            this.lbRessources.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbRessources.FormattingEnabled = true;
+            this.lbRessources.Location = new System.Drawing.Point(0, 0);
+            this.lbRessources.Name = "lbRessources";
+            this.lbRessources.Size = new System.Drawing.Size(152, 138);
+            this.lbRessources.TabIndex = 0;
+            this.lbRessources.SelectedIndexChanged += new System.EventHandler(this.lbRessources_SelectedIndexChanged);
+            this.lbRessources.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbRessources_KeyDown);
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.Controls.Add(this.tbRessourcesOutPath, 1, 1);
+            this.tableLayoutPanel2.Controls.Add(this.label8, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.label9, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.tbRessourcesInPath, 1, 0);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(8, 8);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(289, 98);
+            this.tableLayoutPanel2.TabIndex = 3;
+            // 
+            // tbRessourcesOutPath
+            // 
+            this.tbRessourcesOutPath.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbRessourcesOutPath.Location = new System.Drawing.Point(33, 29);
+            this.tbRessourcesOutPath.Name = "tbRessourcesOutPath";
+            this.tbRessourcesOutPath.Size = new System.Drawing.Size(253, 20);
+            this.tbRessourcesOutPath.TabIndex = 6;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(3, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(16, 13);
+            this.label8.TabIndex = 0;
+            this.label8.Text = "In";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(3, 26);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(24, 13);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "Out";
+            // 
+            // tbRessourcesInPath
+            // 
+            this.tbRessourcesInPath.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbRessourcesInPath.Location = new System.Drawing.Point(33, 3);
+            this.tbRessourcesInPath.Name = "tbRessourcesInPath";
+            this.tbRessourcesInPath.Size = new System.Drawing.Size(253, 20);
+            this.tbRessourcesInPath.TabIndex = 5;
+            this.tbRessourcesInPath.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tbRessourcesInPath_MouseDoubleClick);
+            // 
+            // btnAddRessource
+            // 
+            this.btnAddRessource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAddRessource.Location = new System.Drawing.Point(159, 112);
+            this.btnAddRessource.Name = "btnAddRessource";
+            this.btnAddRessource.Size = new System.Drawing.Size(140, 23);
+            this.btnAddRessource.TabIndex = 2;
+            this.btnAddRessource.Text = "Add Ressource";
+            this.btnAddRessource.UseVisualStyleBackColor = true;
+            this.btnAddRessource.Click += new System.EventHandler(this.btnAddRessource_Click);
+            // 
+            // btnSetRessource
+            // 
+            this.btnSetRessource.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSetRessource.Enabled = false;
+            this.btnSetRessource.Location = new System.Drawing.Point(3, 112);
+            this.btnSetRessource.Name = "btnSetRessource";
+            this.btnSetRessource.Size = new System.Drawing.Size(150, 23);
+            this.btnSetRessource.TabIndex = 1;
+            this.btnSetRessource.Text = "Set Ressource";
+            this.btnSetRessource.UseVisualStyleBackColor = true;
+            this.btnSetRessource.Click += new System.EventHandler(this.btnSetRessource_Click);
+            // 
             // gbProjectInformations
             // 
             this.gbProjectInformations.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -107,7 +338,7 @@
             this.gbProjectInformations.Enabled = false;
             this.gbProjectInformations.Location = new System.Drawing.Point(11, 32);
             this.gbProjectInformations.Name = "gbProjectInformations";
-            this.gbProjectInformations.Size = new System.Drawing.Size(463, 170);
+            this.gbProjectInformations.Size = new System.Drawing.Size(463, 203);
             this.gbProjectInformations.TabIndex = 8;
             this.gbProjectInformations.TabStop = false;
             this.gbProjectInformations.Text = "Project Informations";
@@ -127,19 +358,22 @@
             this.tableLayoutPanel1.Controls.Add(this.label4, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.label5, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.tbProjectTitle, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.tbCompilerVersion, 1, 5);
+            this.tableLayoutPanel1.Controls.Add(this.tbProjectSrcFolder, 1, 5);
             this.tableLayoutPanel1.Controls.Add(this.label6, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.tbCompilerVersion, 1, 6);
+            this.tableLayoutPanel1.Controls.Add(this.label7, 0, 6);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 6;
+            this.tableLayoutPanel1.RowCount = 7;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(457, 151);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(457, 184);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tbProjectBuildFolder
@@ -227,6 +461,40 @@
             this.tbProjectTitle.Size = new System.Drawing.Size(360, 20);
             this.tbProjectTitle.TabIndex = 5;
             // 
+            // tbProjectSrcFolder
+            // 
+            this.tbProjectSrcFolder.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbProjectSrcFolder.Location = new System.Drawing.Point(94, 133);
+            this.tbProjectSrcFolder.Name = "tbProjectSrcFolder";
+            this.tbProjectSrcFolder.Size = new System.Drawing.Size(360, 20);
+            this.tbProjectSrcFolder.TabIndex = 11;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(3, 130);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(73, 13);
+            this.label6.TabIndex = 10;
+            this.label6.Text = "Source Folder";
+            // 
+            // tbCompilerVersion
+            // 
+            this.tbCompilerVersion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbCompilerVersion.Location = new System.Drawing.Point(94, 159);
+            this.tbCompilerVersion.Name = "tbCompilerVersion";
+            this.tbCompilerVersion.Size = new System.Drawing.Size(360, 20);
+            this.tbCompilerVersion.TabIndex = 13;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(3, 156);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(85, 13);
+            this.label7.TabIndex = 12;
+            this.label7.Text = "Compiler Version";
+            // 
             // btnSaveFile
             // 
             this.btnSaveFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -238,87 +506,6 @@
             this.btnSaveFile.Text = "Save file";
             this.btnSaveFile.UseVisualStyleBackColor = true;
             this.btnSaveFile.Click += new System.EventHandler(this.btnSaveFile_Click);
-            // 
-            // gbCompilerFlags
-            // 
-            this.gbCompilerFlags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gbCompilerFlags.Controls.Add(this.splitContainer1);
-            this.gbCompilerFlags.Enabled = false;
-            this.gbCompilerFlags.Location = new System.Drawing.Point(8, 208);
-            this.gbCompilerFlags.Name = "gbCompilerFlags";
-            this.gbCompilerFlags.Size = new System.Drawing.Size(472, 203);
-            this.gbCompilerFlags.TabIndex = 6;
-            this.gbCompilerFlags.TabStop = false;
-            this.gbCompilerFlags.Text = "Compiler flags";
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(3, 16);
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.lbCompilerFlags);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.btnCompilerFlagAdd);
-            this.splitContainer1.Panel2.Controls.Add(this.btnCompilerflagSet);
-            this.splitContainer1.Panel2.Controls.Add(this.tbDefineRealString);
-            this.splitContainer1.Size = new System.Drawing.Size(466, 184);
-            this.splitContainer1.SplitterDistance = 155;
-            this.splitContainer1.TabIndex = 0;
-            // 
-            // lbCompilerFlags
-            // 
-            this.lbCompilerFlags.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbCompilerFlags.FormattingEnabled = true;
-            this.lbCompilerFlags.Location = new System.Drawing.Point(0, 0);
-            this.lbCompilerFlags.Name = "lbCompilerFlags";
-            this.lbCompilerFlags.Size = new System.Drawing.Size(155, 184);
-            this.lbCompilerFlags.TabIndex = 0;
-            this.lbCompilerFlags.SelectedIndexChanged += new System.EventHandler(this.lbCompilerFlags_SelectedIndexChanged);
-            this.lbCompilerFlags.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbCompilerFlags_KeyDown);
-            // 
-            // btnCompilerFlagAdd
-            // 
-            this.btnCompilerFlagAdd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCompilerFlagAdd.Location = new System.Drawing.Point(159, 158);
-            this.btnCompilerFlagAdd.Name = "btnCompilerFlagAdd";
-            this.btnCompilerFlagAdd.Size = new System.Drawing.Size(145, 23);
-            this.btnCompilerFlagAdd.TabIndex = 2;
-            this.btnCompilerFlagAdd.Text = "Add Flag";
-            this.btnCompilerFlagAdd.UseVisualStyleBackColor = true;
-            this.btnCompilerFlagAdd.Click += new System.EventHandler(this.btnCompilerFlagAdd_Click);
-            // 
-            // btnCompilerflagSet
-            // 
-            this.btnCompilerflagSet.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCompilerflagSet.Enabled = false;
-            this.btnCompilerflagSet.Location = new System.Drawing.Point(3, 158);
-            this.btnCompilerflagSet.Name = "btnCompilerflagSet";
-            this.btnCompilerflagSet.Size = new System.Drawing.Size(150, 23);
-            this.btnCompilerflagSet.TabIndex = 1;
-            this.btnCompilerflagSet.Text = "Set Flag";
-            this.btnCompilerflagSet.UseVisualStyleBackColor = true;
-            this.btnCompilerflagSet.Click += new System.EventHandler(this.btnCompilerflagSet_Click);
-            // 
-            // tbDefineRealString
-            // 
-            this.tbDefineRealString.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbDefineRealString.Location = new System.Drawing.Point(3, 3);
-            this.tbDefineRealString.Multiline = true;
-            this.tbDefineRealString.Name = "tbDefineRealString";
-            this.tbDefineRealString.Size = new System.Drawing.Size(301, 149);
-            this.tbDefineRealString.TabIndex = 0;
             // 
             // btnDoCompile
             // 
@@ -403,23 +590,6 @@
             // 
             this.openFileDialog1.FileName = "project.oosproj";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(3, 130);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(85, 13);
-            this.label6.TabIndex = 10;
-            this.label6.Text = "Compiler Version";
-            // 
-            // tbCompilerVersion
-            // 
-            this.tbCompilerVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbCompilerVersion.Location = new System.Drawing.Point(94, 133);
-            this.tbCompilerVersion.Name = "tbCompilerVersion";
-            this.tbCompilerVersion.Size = new System.Drawing.Size(360, 20);
-            this.tbCompilerVersion.TabIndex = 11;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -432,15 +602,23 @@
             this.tabControl1.ResumeLayout(false);
             this.tabCompile.ResumeLayout(false);
             this.tabCompile.PerformLayout();
-            this.gbProjectInformations.ResumeLayout(false);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
-            this.gbCompilerFlags.ResumeLayout(false);
+            this.tcDefinesRessources.ResumeLayout(false);
+            this.tpDefines.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.tpRessources.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
+            this.gbProjectInformations.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.tabGenProject.ResumeLayout(false);
             this.tabGenProject.PerformLayout();
             this.ResumeLayout(false);
@@ -459,7 +637,6 @@
         private System.Windows.Forms.Button btnSetProjectPath;
         private System.Windows.Forms.Button btnGenProject;
         private System.Windows.Forms.Button btnSetGenPath;
-        private System.Windows.Forms.GroupBox gbCompilerFlags;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListBox lbCompilerFlags;
         private System.Windows.Forms.Button btnCompilerFlagAdd;
@@ -480,8 +657,22 @@
         private System.Windows.Forms.TextBox tbProjectMainFile;
         private System.Windows.Forms.TextBox tbProjectAuthor;
         private System.Windows.Forms.TextBox tbProjectTitle;
-        private System.Windows.Forms.TextBox tbCompilerVersion;
+        private System.Windows.Forms.TextBox tbProjectSrcFolder;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox tbCompilerVersion;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TabControl tcDefinesRessources;
+        private System.Windows.Forms.TabPage tpDefines;
+        private System.Windows.Forms.TabPage tpRessources;
+        private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.ListBox lbRessources;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TextBox tbRessourcesOutPath;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button btnAddRessource;
+        private System.Windows.Forms.Button btnSetRessource;
+        private System.Windows.Forms.TextBox tbRessourcesInPath;
     }
 }
 

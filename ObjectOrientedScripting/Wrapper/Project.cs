@@ -10,6 +10,37 @@ namespace Wrapper
 {
     public class Project
     {
+        public class Ressource
+        {
+            public string InPath { get; set; }
+            public string OutPath { get; set; }
+            public Ressource(string inPath, string outPath)
+            {
+                this.InPath = inPath;
+                this.OutPath = outPath;
+            }
+            public Ressource(XmlNode node)
+            {
+                this.InPath = "";
+                this.OutPath = "";
+
+                foreach (XmlAttribute att in node.Attributes)
+                {
+                    switch (att.Name.ToLower())
+                    {
+                        case "in":
+                            this.InPath = att.Value;
+                            break;
+                        case "out":
+                            this.OutPath = att.Value;
+                            break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(this.InPath) || string.IsNullOrEmpty(this.OutPath))
+                    throw new Exception();
+            }
+        }
         public class Define
         {
             public string Name { get; set; }
@@ -195,6 +226,20 @@ namespace Wrapper
             }
             get { return this._outputFolder; }
         }
+        private string _srcFolder;
+        public string SrcFolder
+        {
+            set
+            {
+                if (value.Length > 2 && value[1] == ':' && (value[2] == '/' || value[2] == '\\'))
+                    this._srcFolder = value.Replace('/', '\\');
+                else if (value.StartsWith("./") || value.StartsWith(".\\"))
+                    this._srcFolder = this.ProjectPath + value.Substring(2).Replace('/', '\\');
+                else
+                    throw new ArgumentException("FilePath needs to be either full path (D:/) or relative (./)");
+            }
+            get { return this._srcFolder; }
+        }
         private string _buildfolder;
         public string Buildfolder
         {
@@ -211,11 +256,13 @@ namespace Wrapper
         }
         public Version CompilerVersion { set; get; }
         public List<Define> Defines { get; set; }
+        public List<Ressource> Ressources { get; set; }
 
         private Project()
         {
             this.CompilerVersion = null;
             this.Defines = new List<Define>();
+            this.Ressources = new List<Ressource>();
         }
         static public Project openProject(string file)
         {
@@ -229,6 +276,7 @@ namespace Wrapper
             reader.Load(file);
             XmlNode projectNode = reader.SelectSingleNode("/root/project");
             XmlNode compilerNode = reader.SelectSingleNode("/root/compiler");
+            XmlNode ressourcesNode = reader.SelectSingleNode("/root/ressources");
             Project proj = new Project();
             proj.ProjectPath = file.Remove((file.Contains("\\") ? file.LastIndexOf('\\') : file.LastIndexOf('/')) + 1);
             foreach (XmlNode node in projectNode.ChildNodes)
@@ -243,6 +291,8 @@ namespace Wrapper
                     proj.OutputFolder = node.InnerText;
                 else if (node.Name.Equals("buildfolder", StringComparison.OrdinalIgnoreCase))
                     proj.Buildfolder = node.InnerText;
+                else if (node.Name.Equals("srcfolder", StringComparison.OrdinalIgnoreCase))
+                    proj.SrcFolder = node.InnerText;
             }
             foreach (XmlAttribute att in compilerNode.Attributes)
             {
@@ -251,12 +301,30 @@ namespace Wrapper
             }
             foreach (XmlNode node in compilerNode.ChildNodes)
             {
-                switch(node.Name.ToLower())
+                switch (node.Name.ToLower())
                 {
                     case "define":
-                            proj.Defines.Add(new Define(node));
+                        proj.Defines.Add(new Define(node));
                         break;
                 }
+            }
+            if (ressourcesNode != null)
+            {
+                foreach (XmlNode node in ressourcesNode.ChildNodes)
+                {
+                    switch (node.Name.ToLower())
+                    {
+                        case "res":
+                            proj.Ressources.Add(new Ressource(node));
+                            break;
+                    }
+                }
+            }
+
+            //Upgrade from < 0.7.0
+            if (string.IsNullOrEmpty(proj.SrcFolder))
+            {
+                proj.SrcFolder = proj.ProjectPath;
             }
             return proj;
         }
@@ -310,6 +378,17 @@ namespace Wrapper
                     s = ".\\" + s.Substring(this.ProjectPath.Length);
                 node.Value = s;
                 projectNode.Add(node);
+
+
+                //<srcfolder>this.SrcFolder</srcfolder>
+                node = new XElement("srcfolder");
+                s = this.Buildfolder;
+                if (filepath.StartsWith(this.ProjectPath))
+                    s = ".\\" + s.Substring(this.ProjectPath.Length);
+                node.Value = s;
+                projectNode.Add(node);
+
+
             }//</project>
             {//<compiler version="VERSION">
                 XElement node;

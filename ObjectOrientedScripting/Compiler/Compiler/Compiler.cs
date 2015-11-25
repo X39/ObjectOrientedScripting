@@ -140,11 +140,6 @@ namespace Wrapper
                 File.Delete(it);
             }
         }
-        private void updateTabcount(ref string s, ref int tabCount, int change)
-        {
-            tabCount += change;
-            s = new string('\t', tabCount);
-        }
 
         public static Stream toStream(byte[] barr)
         {
@@ -260,6 +255,10 @@ namespace Wrapper
             }
             SqfConfigFile configFile = new SqfConfigFile(configFileName);
             oosTreeBase.writeOut(null, configFile);
+            if (addFunctionsClass)
+            {
+                configFile.addParentalClass("CfgFunctions");
+            }
             configFile.writeOut(proj.OutputFolder);
         }
         public enum preprocessFile_IfDefModes
@@ -347,7 +346,7 @@ namespace Wrapper
                         }
                         else
                         {
-                            newFile = ProjectFile.ProjectPath + afterDefine.Trim(new char[] { '"', '\'', ' ' });
+                            newFile = ProjectFile.SrcFolder + afterDefine.Trim(new char[] { '"', '\'', ' ' });
                         }
                         //make sure we have no self reference here
                         if (newFile.Equals(filePath, StringComparison.OrdinalIgnoreCase))

@@ -1,7 +1,7 @@
-using <std::Config>
-using <std::Vehicle>
-using <std::Man>
-using <std::Context>
+using std::Config
+using std::Vehicle
+using std::Man
+using std::Context
 
 #include "test.def"
 #define SOMEDEF //testmore

@@ -133,15 +133,11 @@ namespace Wrapper
                     writer.WriteLine("		<mainfile>./main.oos</mainfile>");
                     writer.WriteLine("		<outputfolder>./output/</outputfolder>");
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
+                    writer.WriteLine("		<srcfolder>./src/</srcfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.6.2-ALPHA\" />");
+                    writer.WriteLine("	<compiler version=\"0.7.0-ALPHA\">");
                     writer.WriteLine("</root>");
                     writer.Close();
-                    if (!File.Exists(path + "Main.oos"))
-                    {
-                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating main file at '" + path + "Main.oos" + "'");
-                        File.Create(path + "Main.oos").Close();
-                    }
                     if (!Directory.Exists(path + "output"))
                     {
                         Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating output directory at '" + path + "output" + "'");
@@ -151,6 +147,16 @@ namespace Wrapper
                     {
                         Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating build directory at '" + path + "build" + "'");
                         Directory.CreateDirectory(path + "build");
+                    }
+                    if (!Directory.Exists(path + "src"))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating build directory at '" + path + "build" + "'");
+                        Directory.CreateDirectory(path + "src");
+                    }
+                    if (!File.Exists(path + "src\\Main.oos"))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.VERBOSE, "Creating main file at '" + path + "Main.oos" + "'");
+                        File.Create(path + "src\\Main.oos").Close();
                     }
                     Logger.Instance.log(Logger.LogLevel.INFO, "Created empty project for 0.5.3-ALPHA compiler");
                 }

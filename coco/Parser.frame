@@ -94,6 +94,9 @@ public class Parser {
 		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
 		errDist = 0;
 	}
+	void Warning (string msg) {
+		errors.Warning(la.line, la.col, msg);
+	}
 
 	public void SemErr (string msg) {
 		if (errDist >= minErrDist) errors.SemErr(t.line, t.col, msg);

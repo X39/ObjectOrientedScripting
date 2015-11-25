@@ -43,18 +43,110 @@ COMPILER OOS
 	IGNORE '\t' + '\r' + '\n'
 		
 	PRODUCTIONS
+		FNCARGLIST<pBaseLangObject obj> =
+			(.
+				pBaseLangObject blo;
+				VarTypeObject vto;
+			.)
+			T_ROUNDBRACKETOPEN
+			[
+				VARTYPE<out vto, obj>
+				NEWVARIABLE<out blo, obj, vto> (. obj.addChild(blo); .)
+				{
+					T_COMMA
+					VARTYPE<out vto, obj>
+					NEWVARIABLE<out blo, obj, vto> (. obj.addChild(blo); .)
+				}
+			]
+			T_ROUNDBRACKETCLOSE
+		.
+		SPECIAL_NEWVARIABLEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, bool fVFncOnly = false>
+		(.
+				outObj = null;
+				pBaseLangObject blo;
+				bool isAsync = false;
+				bool isVirtual = false;
+				VarTypeObject vto = null;
+		.) =			
+			(
+				VARTYPE<out vto, parent>
+				(
+					IF(peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN))
+					FUNCTION<out blo, parent, e, vto>
+					(.
+						outObj = blo;
+						if(!((Function)blo).IsVirtual && fVFncOnly)
+						{
+							SemErr("Non-Virtual function on VirtualOnly class");
+						} 
+					.)
+					|
+					NEWVARIABLE<out blo, parent, vto, e> (. outObj = blo; .)
+					TERMINATOR
+				)
+			)
+			|
+			(
+				"void" (. vto = new VarTypeObject(VarType.Void); .)
+				FUNCTION<out blo, parent, e, vto>
+				(.
+					outObj = blo;
+					if(!((Function)blo).IsVirtual && fVFncOnly)
+					{
+						SemErr("Non-Virtual function on VirtualOnly class");
+					}
+				.)
+			)
+			|
+			(
+				"async" (. isAsync = true; .)
+				[
+					"virtual" (. isVirtual = true; .)
+				]
+				(
+					VARTYPE<out vto, parent>
+					|
+					"void" (. vto = new VarTypeObject(VarType.Void); .)
+				)
+				FUNCTION<out blo, parent, e, vto, isAsync, isVirtual>
+				(.
+					outObj = blo;
+					if(!((Function)blo).IsVirtual && fVFncOnly)
+					{
+						SemErr("Non-Virtual function on VirtualOnly class");
+					}
+				.)
+			)
+			|
+			(
+				"virtual" (. isVirtual = true; .)
+				(
+					VARTYPE<out vto, parent>
+					|
+					"void" (. vto = new VarTypeObject(VarType.Void); .)
+				)
+				FUNCTION<out blo, parent, e, vto, isAsync, isVirtual>
+				(.
+					outObj = blo;
+					if(!((Function)blo).IsVirtual && fVFncOnly)
+					{
+						SemErr("Non-Virtual function on VirtualOnly class");
+					}
+				.)
+			)
+		.
 		TERMINATOR =
 			T_TERMINATOR
 			{
 				T_TERMINATOR
 			}
 		.
-        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col, this.file); pBaseLangObject blo; VarTypeObject vto; .) =
+        TEMPLATE<out Template obj, pBaseLangObject parent> (. obj = new Template(parent, t.line, t.col, this.file); VarTypeObject vto; .) =
             T_TEMPLATEOPEN
-			VARTYPE<out vto> (. obj.vtoList.Add(vto); .)
+			VARTYPE<out vto, obj> (. obj.vtoList.Add(vto); .)
             {
                 T_COMMA
-				VARTYPE<out vto> (. obj.vtoList.Add(vto); .)
+				VARTYPE<out vto, obj> (. obj.vtoList.Add(vto); .)
             }
             T_TEMPLATECLOSE
         .
@@ -85,9 +177,9 @@ COMPILER OOS
                 IDENTACCESS<out blo, ident, allowBody> (. ((Ident)ident).addChild(blo); .)
             ]
         .
-        CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarTypeObject vto; pBaseLangObject ident; .) =
+        CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarTypeObject vto; .) =
             T_TEMPLATEOPEN
-			VARTYPE<out vto> (. obj.varType = vto; .)
+			VARTYPE<out vto, obj> (. obj.varType = vto; .)
             T_TEMPLATECLOSE
         .
 		ENCAPSULATION<out Encapsulation e> (. e = Encapsulation.NA; .) =
@@ -97,7 +189,7 @@ COMPILER OOS
 			|
 			"protected" (. e = Encapsulation.Protected; .)
 		.
-		VARTYPE<out VarTypeObject e> =
+		VARTYPE<out VarTypeObject e, pBaseLangObject parent, bool identFlag = false> (. e = null; .) =
 			(
 				(
 					"scalar" (. e = new VarTypeObject(VarType.Scalar); .)
@@ -114,25 +206,25 @@ COMPILER OOS
 				)
 				[
 					T_SQUAREBRACKETOPEN
-					T_SQUAREBRACKETCLOSE(. switch(e)
+					T_SQUAREBRACKETCLOSE(. switch(e.varType)
 										   {
 												case VarType.Scalar:
-													e = VarType.ScalarArray;
+													e = new VarTypeObject(VarType.ScalarArray);
 													break;
 												case VarType.Bool:
-													e = VarType.BoolArray;
+													e = new VarTypeObject(VarType.BoolArray);
 													break;
 												default:
-													SemErr("Cannot Arrayify VarTypes which are not string/scalar/bool");
+													SemErr("Cannot Arrayify VarTypes which are not scalar/bool");
 													break;
 										   } .)
 				]
 			)
 			|
-            (
-                IDENTACCESS<out blo, obj, false> (. e = new VarTypeObject((Ident)blo); .)
+            ( (. pBaseLangObject blo; .)
+                IDENTACCESS<out blo, parent, identFlag> (. e = new VarTypeObject((Ident)blo); .)
                 [ (. Template te; .)
-                    TEMPLATE<out te, ((Ident)blo).LastIdent> (. obj.varType.TemplateObject = te; .)
+                    TEMPLATE<out te, ((Ident)blo).LastIdent> (. e.TemplateObject = te; .)
                 ]
             )
 		.
@@ -215,18 +307,11 @@ COMPILER OOS
 				|
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
-				(
-					"static"
-					(
-						IF( peekCompare(-1, -1, _T_TERMINATOR) )
-						NEWVARIABLE<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
-						|
-						FUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
-					)
-				)
+				"static"
+				SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
 			}
 		.
-		OP_USING (. List<string> identList = new List<string>(); bool isLocal = false; .) =
+		OP_USING (. List<string> identList = new List<string>(); .) =
 			"using"
 			[
 				T_NAMESPACEACCESS
@@ -367,18 +452,8 @@ COMPILER OOS
 				|
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
-				(
-					"static"
-					(
-						IF( peekCompare(-1, -1, _T_TERMINATOR) )
-						(
-                            NEWVARIABLE<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
-                            TERMINATOR
-                        )
-						|
-						FUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
-					)
-				)
+				"static"
+				SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
 			}
 			T_CODEBRACKETCLOSE
 		.
@@ -431,58 +506,57 @@ COMPILER OOS
 			.)
 			T_CODEBRACKETCLOSE
         .
-        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeAssign(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
-            (. obj.Name = new Ident(obj, ((Native)parent).Name.OriginalValue, ((Native)parent).Name.Line, ((Native)parent).Name.Pos, this.file); .)
+        NATIVEASSIGN<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			var obj = new NativeAssign(parent, t.line, t.col, this.file);
+			outObj = obj;
+			obj.Name = new Ident(obj, ((Native)parent).Name.OriginalValue, ((Native)parent).Name.Line, ((Native)parent).Name.Pos, this.file);
+		.) =
+			
             "assign"
             [
                 "simple" (. obj.IsSimple = true; .)
             ]
-			T_ROUNDBRACKETOPEN
-			[
-				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				{
-					T_COMMA
-					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				}
-			]
-			T_ROUNDBRACKETCLOSE
+			FNCARGLIST<obj>
 			{
 				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
 			}
 			"endAssign" (. obj.Code = obj.Code.Trim(); .)
         .
-        NATIVEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeFunction(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarTypeObject vto; .) =
+        NATIVEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			var obj = new NativeFunction(parent, t.line, t.col, this.file);
+			outObj = obj;
+			pBaseLangObject blo;
+			VarTypeObject vto;
+		.) =
+			
             "fnc"
             [
                 "simple" (. obj.IsSimple = true; .)
             ]
             (
-				VARTYPE<out vto> (. obj.VTO = vto; .)
+				VARTYPE<out vto, obj> (. obj.VTO = vto; .)
 				|
 				"void" (. obj.VTO = new VarTypeObject(VarType.Void); .)
             )
             IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
-			T_ROUNDBRACKETOPEN
-			[
-				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				{
-					T_COMMA
-					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				}
-			]
-			T_ROUNDBRACKETCLOSE
+			FNCARGLIST<obj>
 			{
 				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
 			}
 			"endFnc" (. obj.Code = obj.Code.Trim(); .)
         .
-        NATIVEOPERATOR<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NativeOperator(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; VarTypeObject vto; .) =
+        NATIVEOPERATOR<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			var obj = new NativeOperator(parent, t.line, t.col, this.file);
+			outObj = obj;
+			VarTypeObject vto;
+		.) =
+			
             "operator"
             [
                 "simple" (. obj.IsSimple = true; .)
             ]
             (
-				VARTYPE<out vto> (. obj.VTO = vto; .)
+				VARTYPE<out vto, obj> (. obj.VTO = vto; .)
 				|
 				"void" (. obj.VTO = new VarTypeObject(VarType.Void); .)
             )
@@ -519,15 +593,7 @@ COMPILER OOS
 					)
                 )
             )
-			T_ROUNDBRACKETOPEN
-			[
-				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				{
-					T_COMMA
-					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				}
-			]
-			T_ROUNDBRACKETCLOSE
+			FNCARGLIST<obj>
 			{
 				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
 			}
@@ -588,17 +654,11 @@ COMPILER OOS
 					"static" (. e = Encapsulation.Static; .)
 				]
 				(
-					IF( peekCompare(-1, -1, _T_TERMINATOR) )
-					(
-						NEWVARIABLE<out blo, obj, e> (. obj.addChild(blo); .)
-						TERMINATOR
-					)
+					ENUM<out blo, obj> (. obj.addChild(blo); .)
 					|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) )
 					CONSTRUCTOR<out blo, obj, e> (. obj.addChild(blo); hasConstructor = true; if(flag_disableConstructor)  { SemErr("Constructors are disabled in flags for this class"); } .)
 					|
-					FUNCTION<out blo, obj, e> (. obj.addChild(blo); if(!((Function)blo).IsVirtual && flag_virtualFunctionsOnly) { SemErr("Non-Virtual function on VirtualOnly class"); } .)
-					|
-					ENUM<out blo, obj> (. obj.addChild(blo); .)
+					SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, e, flag_virtualFunctionsOnly> (. obj.addChild(blo); .)
 				)
 			}
 			T_CODEBRACKETCLOSE (. if(!hasConstructor && !flag_disableConstructor) {
@@ -626,28 +686,17 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarTypeObject vto; .) =
-            [
-                "async" (. obj.IsAsync = true; .)
-            ]
-            [
-                "virtual" (. obj.IsVirtual = true; .)
-            ]
-			(
-				VARTYPE<out vto> (. obj.varType = vto; .)
-				|
-				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
-			)
+		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, VarTypeObject vto, bool isAsync = false, bool isVirtual = false> (.
+			var obj = new Function(parent); outObj = obj;
+			obj.encapsulation = e;
+			obj.IsAsync = isAsync;
+			obj.IsVirtual = isVirtual;
+			obj.varType = vto;
+			pBaseLangObject blo;
+		.) =
+			
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
-			T_ROUNDBRACKETOPEN
-			[
-				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				{
-					T_COMMA
-					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				}
-			]
-			T_ROUNDBRACKETCLOSE (. obj.markArgListEnd(); .)
+			FNCARGLIST<obj> (. obj.markArgListEnd(); .)
 			T_CODEBRACKETOPEN
 			{
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
@@ -655,17 +704,15 @@ COMPILER OOS
 			T_CODEBRACKETCLOSE
 			
 		.
-		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (. var obj = new Function(parent); obj.varType = new VarTypeObject(((oosClass)parent).Name); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .) =
+		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (.
+			var obj = new Function(parent);outObj = obj;
+			obj.varType = new VarTypeObject(((oosClass)parent).Name);
+			obj.encapsulation = e;
+			pBaseLangObject blo;
+		.) =
+			
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
-			T_ROUNDBRACKETOPEN
-			[
-				NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				{
-					T_COMMA
-					NEWVARIABLE<out blo, obj> (. obj.addChild(blo); .)
-				}
-			]
-			T_ROUNDBRACKETCLOSE (. obj.markArgListEnd(); .)
+			FNCARGLIST<obj> (. obj.markArgListEnd(); .)
 			[
 				':'
 				IDENTACCESS<out blo, obj> (. obj.addChild(blo); .)
@@ -686,24 +733,29 @@ COMPILER OOS
                 "async" (. obj.IsAsync = true; .)
             ]
 			(
-				VARTYPE<out vto> (. obj.varType = vto; .)
+				VARTYPE<out vto, obj> (. obj.varType = vto; .)
 				|
 				"void" (. obj.varType = new VarTypeObject(VarType.Void); .)
 			)
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			T_ROUNDBRACKETOPEN
 			[
-				VARTYPE<out vto> (. obj.argTypes.Add(vto); .)
+				VARTYPE<out vto, obj> (. obj.argTypes.Add(vto); .)
 				{
 					T_COMMA
-					VARTYPE<out vto> (. obj.argTypes.Add(vto); .)
+					VARTYPE<out vto, obj> (. obj.argTypes.Add(vto); .)
 				}
 			]
 			T_ROUNDBRACKETCLOSE
 			TERMINATOR
 		.
-		NEWVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.line, la.col, this.file); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; VarTypeObject vto; .) =
-			VARTYPE<out vto> (. obj.varType = vto; .)
+		NEWVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, VarTypeObject vto, Encapsulation e = Encapsulation.NA> (.
+			var obj = new Variable(parent, la.line, la.col, this.file);
+			obj.encapsulation = e;
+			outObj = obj;
+			pBaseLangObject blo;
+			obj.varType = vto;
+		.) =
 			IDENT<out blo, outObj> (. obj.Name = (Ident)blo; .)
             [
                 BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
@@ -717,27 +769,42 @@ COMPILER OOS
 			IDENT<out blo, outObj> (. obj.Name = (Ident)blo; .)
             BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
 		.
-		CODEINSTRUCTION_SC<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; pBaseLangObject blo; .) =
+		CODEINSTRUCTION_SC<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			outObj = null;
+			VarTypeObject vto;
+		.) =
+			
 			OP_THROW<out outObj, parent>
 			|
 			OP_RETURN<out outObj, parent>
-			|IF( (peekString(0, "scalar", "int", "double", "float", "bool", "string", "object") && peekCompare(-1, _T_IDENT)) || peekCompare(_T_IDENT, _T_IDENT) )
+			|
 			(
-				NEWVARIABLE<out outObj, parent>
+				VARTYPE<out vto, parent, true>
 				[
-					BODY_ASSIGNMENT<out blo, outObj> (. outObj.addChild(blo); .)
+					IF(vto.IsObject)
+					(
+						VARIABLEASSIGNMENT<out outObj, vto.ident, parent>
+						(. vto.ident.Parent = outObj; .)
+						|
+						NEWVARIABLE<out outObj, parent, vto>
+					)
+					|
+					NEWVARIABLE<out outObj, parent, vto>
 				]
+				(.
+					if(outObj == null && vto.IsObject)
+					{
+						outObj = vto.ident;
+						vto.ident.Parent = parent;
+						if(vto.ident.IsPureIdent)
+						{
+							Warning("Pure-Ident encountered during parsing, please add some use to it");
+						}
+					}
+				.)
 			)
 			|
 			AUTOVARIABLE<out outObj, parent>
-			|
-			(
-				IDENTACCESS<out blo, parent>
-				[
-					VARIABLEASSIGNMENT<out outObj, blo, parent>
-				]
-				(. if(outObj == null) outObj = blo; .)
-			)
 			|
 			OP_SQFCALL<out outObj, parent>
 		.
@@ -924,17 +991,24 @@ COMPILER OOS
 				)
 			]
 		.
-		OP_TRYCATCH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new TryCatch(parent); outObj = obj; pBaseLangObject blo; .) =
+		OP_TRYCATCH<out pBaseLangObject outObj, pBaseLangObject parent> (.
+			var obj = new TryCatch(parent);
+			outObj = obj;
+			pBaseLangObject blo;
+			VarTypeObject vto;
+		.) =
+			
 			"try"
 			T_CODEBRACKETOPEN
 			{
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			}
-			T_CODEBRACKETCLOSE
+			T_CODEBRACKETCLOSE(. obj.markEnd(); .)
 			"catch"
 			T_ROUNDBRACKETOPEN
-			NEWVARIABLE<out blo, obj> (. obj.variable = blo; .)
-			T_ROUNDBRACKETCLOSE (. obj.markEnd(); .)
+			VARTYPE<out vto, obj>
+			NEWVARIABLE<out blo, obj, vto> (. obj.variable = blo; .)
+			T_ROUNDBRACKETCLOSE
 			T_CODEBRACKETOPEN
 			{
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
@@ -1055,7 +1129,7 @@ COMPILER OOS
 			]
 			[ (. obj.HasAs = true; .)
 				"as"
-				VARTYPE<out vto> (. obj.ReferencedType = vto; .)
+				VARTYPE<out vto, obj> (. obj.ReferencedType = vto; .)
 			]
 		.
 END OOS.
