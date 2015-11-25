@@ -28,7 +28,7 @@ native array<T>
         count _this
     endFnc
     
-    fnc simple scalar join (array<T> arr)
+    fnc simple scalar join (::array<T> arr)
         _this append arr
     endFnc
     
