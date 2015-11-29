@@ -22,7 +22,7 @@ namespace Compiler
             LNK0030, LNK0031, LNK0032, LNK0033, LNK0034,
             LNK0035, LNK0036, LNK0037, LNK0038, LNK0039,
             LNK0040, LNK0041, LNK0042, LNK0043, LNK0044,
-            LNK0045, LNK0046, LNK0047, LNK0048
+            LNK0045, LNK0046, LNK0047, LNK0048, LNK0049
 
         }
 
@@ -83,6 +83,7 @@ namespace Compiler
                 case LinkerErrorCode.LNK0046: return "Resolving ident failed, path is unknown";
                 case LinkerErrorCode.LNK0047: return "Type Missmatch, enum types differ from each other";
                 case LinkerErrorCode.LNK0048: return "Invalid Operation, enum idents resolve to same value";
+                case LinkerErrorCode.LNK0049: return "Invalid Operation, static native function tries to access _this";
 
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";

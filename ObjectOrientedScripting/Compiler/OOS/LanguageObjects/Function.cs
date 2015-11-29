@@ -23,6 +23,8 @@ namespace Compiler.OOS_LanguageObjects
         public bool IsClassFunction { get { return this.encapsulation != Encapsulation.Static && this.encapsulation != Encapsulation.NA; } }
 
         public bool IsAsync { get; set; }
+        public bool IsVirtual { get; set; }
+        public bool IsExternal { get; set; }
         public string SqfSuffix { get; internal set; }
         public string SqfVariableName
         {
@@ -44,7 +46,9 @@ namespace Compiler.OOS_LanguageObjects
                 else
                 {
                     string fqn = this.Name.FullyQualifiedName;
-                    fqn = fqn.Insert(fqn.LastIndexOf("::"), "_fnc").Replace("::", "_");
+                    int index = fqn.LastIndexOf("::");
+                    if (index >= 0)
+                        fqn = fqn.Insert(index, "_fnc").Replace("::", "_");
                     return (fqn.StartsWith("fnc_") ? "Generic_" + fqn : fqn) + this.SqfSuffix;
                 }
             }
@@ -86,7 +90,6 @@ namespace Compiler.OOS_LanguageObjects
                 return retList;
             }
         }
-        public bool IsVirtual { get; set; }
 
         public Function(pBaseLangObject parent) : base(parent)
         {
@@ -185,6 +188,8 @@ namespace Compiler.OOS_LanguageObjects
 
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
+            if (this.IsExternal)
+                return;
             int index;
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             if (this.IsVirtual)

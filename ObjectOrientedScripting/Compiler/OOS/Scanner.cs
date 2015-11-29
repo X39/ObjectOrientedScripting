@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 77;
-	const int noSym = 77;
+	const int maxT = 78;
+	const int noSym = 78;
 
 
 	public Buffer buffer; // scanner buffer
@@ -411,54 +411,55 @@ public class Scanner {
 			case "void": t.kind = 23; break;
 			case "async": t.kind = 24; break;
 			case "virtual": t.kind = 25; break;
-			case "public": t.kind = 26; break;
-			case "private": t.kind = 27; break;
-			case "protected": t.kind = 28; break;
-			case "scalar": t.kind = 29; break;
-			case "int": t.kind = 30; break;
-			case "double": t.kind = 31; break;
-			case "float": t.kind = 32; break;
-			case "bool": t.kind = 33; break;
-			case "boolean": t.kind = 34; break;
-			case "true": t.kind = 35; break;
-			case "false": t.kind = 36; break;
-			case "static": t.kind = 38; break;
-			case "using": t.kind = 39; break;
-			case "enum": t.kind = 40; break;
-			case "namespace": t.kind = 41; break;
-			case "native": t.kind = 42; break;
-			case "flags": t.kind = 43; break;
-			case "disableConstructor": t.kind = 44; break;
-			case "noObjectExtends": t.kind = 45; break;
-			case "extends": t.kind = 46; break;
-			case "assign": t.kind = 47; break;
-			case "simple": t.kind = 48; break;
-			case "endAssign": t.kind = 49; break;
-			case "fnc": t.kind = 50; break;
-			case "endFnc": t.kind = 51; break;
-			case "operator": t.kind = 52; break;
-			case "endOperator": t.kind = 53; break;
-			case "class": t.kind = 54; break;
-			case "virtualFunctionsOnly": t.kind = 55; break;
-			case "implements": t.kind = 56; break;
-			case "interface": t.kind = 57; break;
-			case "auto": t.kind = 59; break;
-			case "for": t.kind = 60; break;
-			case "while": t.kind = 61; break;
-			case "new": t.kind = 62; break;
-			case "if": t.kind = 63; break;
-			case "else": t.kind = 64; break;
-			case "try": t.kind = 65; break;
-			case "catch": t.kind = 66; break;
-			case "break": t.kind = 67; break;
-			case "is": t.kind = 68; break;
-			case "throw": t.kind = 69; break;
-			case "return": t.kind = 70; break;
-			case "switch": t.kind = 71; break;
-			case "case": t.kind = 72; break;
-			case "default": t.kind = 73; break;
-			case "SQF": t.kind = 75; break;
-			case "as": t.kind = 76; break;
+			case "external": t.kind = 26; break;
+			case "public": t.kind = 27; break;
+			case "private": t.kind = 28; break;
+			case "protected": t.kind = 29; break;
+			case "scalar": t.kind = 30; break;
+			case "int": t.kind = 31; break;
+			case "double": t.kind = 32; break;
+			case "float": t.kind = 33; break;
+			case "bool": t.kind = 34; break;
+			case "boolean": t.kind = 35; break;
+			case "true": t.kind = 36; break;
+			case "false": t.kind = 37; break;
+			case "static": t.kind = 39; break;
+			case "using": t.kind = 40; break;
+			case "enum": t.kind = 41; break;
+			case "namespace": t.kind = 42; break;
+			case "native": t.kind = 43; break;
+			case "flags": t.kind = 44; break;
+			case "disableConstructor": t.kind = 45; break;
+			case "noObjectExtends": t.kind = 46; break;
+			case "extends": t.kind = 47; break;
+			case "assign": t.kind = 48; break;
+			case "simple": t.kind = 49; break;
+			case "endAssign": t.kind = 50; break;
+			case "fnc": t.kind = 51; break;
+			case "endFnc": t.kind = 52; break;
+			case "operator": t.kind = 53; break;
+			case "endOperator": t.kind = 54; break;
+			case "class": t.kind = 55; break;
+			case "virtualFunctionsOnly": t.kind = 56; break;
+			case "implements": t.kind = 57; break;
+			case "interface": t.kind = 58; break;
+			case "auto": t.kind = 60; break;
+			case "for": t.kind = 61; break;
+			case "while": t.kind = 62; break;
+			case "new": t.kind = 63; break;
+			case "if": t.kind = 64; break;
+			case "else": t.kind = 65; break;
+			case "try": t.kind = 66; break;
+			case "catch": t.kind = 67; break;
+			case "break": t.kind = 68; break;
+			case "is": t.kind = 69; break;
+			case "throw": t.kind = 70; break;
+			case "return": t.kind = 71; break;
+			case "switch": t.kind = 72; break;
+			case "case": t.kind = 73; break;
+			case "default": t.kind = 74; break;
+			case "SQF": t.kind = 76; break;
+			case "as": t.kind = 77; break;
 			default: break;
 		}
 	}
@@ -596,13 +597,13 @@ public class Scanner {
 				else if (ch == 92) {AddCh(); goto case 31;}
 				else {t.kind = 2; break;}
 			case 34:
-				{t.kind = 37; break;}
+				{t.kind = 38; break;}
 			case 35:
-				{t.kind = 74; break;}
+				{t.kind = 75; break;}
 			case 36:
-				recEnd = pos; recKind = 58;
+				recEnd = pos; recKind = 59;
 				if (ch == ':') {AddCh(); goto case 19;}
-				else {t.kind = 58; break;}
+				else {t.kind = 59; break;}
 			case 37:
 				recEnd = pos; recKind = 3;
 				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= 'a' && ch <= 'd' || ch >= 'f' && ch <= 'z') {AddCh(); goto case 6;}

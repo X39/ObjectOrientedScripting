@@ -63,6 +63,11 @@ namespace Compiler.OOS_LanguageObjects
             errCount += this.Name.finalize();
             if (VTO.ident != null)
                 errCount += VTO.ident.finalize();
+            if (Code.Contains("_this") && !(this.Parent is Native))
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0049, this.Line, this.Pos, this.File));
+                errCount++;
+            }
             return errCount;
         }
         public override string ToString()

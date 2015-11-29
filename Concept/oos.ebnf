@@ -134,6 +134,20 @@ COMPILER OOS
 					}
 				.)
 			)
+			|
+			(
+				"external"
+				[
+					"async" (. isAsync = true; .)
+				]
+				(
+					VARTYPE<out vto, parent>
+					|
+					"void" (. vto = new VarTypeObject(VarType.Void); .)
+				)
+				FUNCTION<out blo, parent, e, vto, isAsync, false, true> (. outObj = blo; .)
+				TERMINATOR
+			)
 		.
 		TERMINATOR =
 			T_TERMINATOR
@@ -308,7 +322,11 @@ COMPILER OOS
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
 				"static"
-				SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
+				(
+					SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
+					|
+					NATIVEFUNCTION<out blo, obj> (. obj.addChild(blo); .)
+				)
 			}
 		.
 		OP_USING (. List<string> identList = new List<string>(); .) =
@@ -453,7 +471,11 @@ COMPILER OOS
 				INTERFACE<out blo, obj> (. obj.addChild(blo); .)
 				|
 				"static"
-				SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
+				(
+					SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, Encapsulation.Static> (. obj.addChild(blo); .)
+					|
+					NATIVEFUNCTION<out blo, obj> (. obj.addChild(blo); .)
+				)
 			}
 			T_CODEBRACKETCLOSE
 		.
@@ -686,22 +708,27 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, VarTypeObject vto, bool isAsync = false, bool isVirtual = false> (.
+		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, VarTypeObject vto, bool isAsync = false, bool isVirtual = false, bool isExternal = false> (.
 			var obj = new Function(parent); outObj = obj;
 			obj.encapsulation = e;
 			obj.IsAsync = isAsync;
 			obj.IsVirtual = isVirtual;
 			obj.varType = vto;
+			obj.IsExternal = isExternal;
 			pBaseLangObject blo;
+			if(isExternal && isVirtual) SemErr("External function is marked as virtual");
+			if(e == Encapsulation.Static && isVirtual) SemErr("Static function is marked as virtual");
 		.) =
 			
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			FNCARGLIST<obj> (. obj.markArgListEnd(); .)
+			(. if(!isExternal) { .)
 			T_CODEBRACKETOPEN
 			{
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			}
 			T_CODEBRACKETCLOSE
+			(. } .)
 			
 		.
 		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (.
