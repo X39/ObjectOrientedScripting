@@ -1,3 +1,6 @@
+Version 0.7.1-ALPHA
+	|- Compiler:  fixed third for argument is printed at the very begining
+	
 Version 0.7.0-ALPHA
     |- Compiler:  fixed objects added using the using instruction where not
     |             touched by the PreProcessor

@@ -76,11 +76,6 @@ namespace Compiler.OOS_LanguageObjects
                     sw.Write("]");
                 sw.WriteLine(";");
             }
-            if (this.forArg3 != null)
-            {
-                this.forArg3.writeOut(sw, cfg);
-            }
-            sw.WriteLine(";");
             foreach (var it in this.CodeInstructions)
             {
                 if (it is Ident)
@@ -88,6 +83,11 @@ namespace Compiler.OOS_LanguageObjects
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }
+            if (this.forArg3 != null)
+            {
+                this.forArg3.writeOut(sw, cfg);
+            }
+            sw.WriteLine(";");
             sw.Write(tab + "}");
         }
 
