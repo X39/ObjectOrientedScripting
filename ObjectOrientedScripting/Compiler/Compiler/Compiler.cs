@@ -235,7 +235,15 @@ namespace Wrapper
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.vec3)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._string)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.functions)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();

@@ -10,4 +10,7 @@ namespace std
 			throw "InvalidOperation";
 		endAssign
     }
+	static fnc ::std::Man getPlayer ()
+		player
+	endFnc
 }

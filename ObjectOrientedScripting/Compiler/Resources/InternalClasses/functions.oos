@@ -1,0 +1,3 @@
+static fnc simple bool isServer ()			isServer		endFnc
+static fnc simple bool isDedicated ()		isDedicated		endFnc
+static fnc simple bool sleep (scalar t)		sleep t			endFnc

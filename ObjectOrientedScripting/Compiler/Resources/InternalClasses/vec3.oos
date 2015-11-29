@@ -1,0 +1,15 @@
+native vec3
+{
+    assign simple ()								[0, 0, 0]				endAssign
+    assign simple (scalar x, scalar y, scalar z)	[x, y, z]				endAssign
+    
+    fnc simple scalar getX ()						_this select 0			endFnc
+    fnc simple scalar getY ()						_this select 1			endFnc
+    fnc simple scalar getZ ()						_this select 2			endFnc
+	
+    fnc simple void setX (scalar val)				_this set [0, val]		endFnc
+    fnc simple void setY (scalar val)				_this set [1, val]		endFnc
+    fnc simple void setZ (scalar val)				_this set [2, val]		endFnc
+	
+    operator simple scalar [] (scalar index)		_this select index		endOperator
+}

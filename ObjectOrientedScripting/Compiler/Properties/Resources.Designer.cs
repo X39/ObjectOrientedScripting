@@ -91,6 +91,16 @@ namespace Compiler.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] functions {
+            get {
+                object obj = ResourceManager.GetObject("functions", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to t#nil#SCALAR
         ///t#nil#BOOL
         ///t#nil#ARRAY
@@ -130,6 +140,16 @@ namespace Compiler.Properties {
         internal static string SQF_SupportInfo {
             get {
                 return ResourceManager.GetString("SQF_SupportInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] vec3 {
+            get {
+                object obj = ResourceManager.GetObject("vec3", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }
