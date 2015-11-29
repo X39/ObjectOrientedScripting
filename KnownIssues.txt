@@ -1,8 +1,3 @@
-- Creating a new variable containing an object requires auto keyword.
-  Thus, the following is not possible:
-  
-  `::std::vehicle variable = new ::std::vehicle("foobar");`
-
 - Passing an object of the same class which you are in right now will result in
   the object getting assigned an invalid type
   ((Internally it will ref to the function which is for sure nonsense ...

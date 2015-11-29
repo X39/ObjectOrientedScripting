@@ -89,8 +89,8 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             if (this.varType != VarType.Object)
                 return true;
-            HelperClasses.NamespaceResolver nsrL = this.ident;
-            HelperClasses.NamespaceResolver nsrR = ((VarTypeObject)obj).ident;
+            HelperClasses.NamespaceResolver nsrL = this.ident.LastIdent;
+            HelperClasses.NamespaceResolver nsrR = ((VarTypeObject)obj).ident.LastIdent;
             if(nsrL != null && nsrR != null)
                 return nsrL.isSame(nsrR);
             else
