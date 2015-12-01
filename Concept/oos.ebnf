@@ -217,22 +217,19 @@ COMPILER OOS
 					"bool" (. e = new VarTypeObject(VarType.Bool); .)
 					|
 					"boolean" (. e = new VarTypeObject(VarType.Bool); .)
+					|
+					"scalar[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+					|
+					"int[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+					|
+					"double[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+					|
+					"float[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+					|
+					"bool[]" (. e = new VarTypeObject(VarType.BoolArray); .)
+					|
+					"boolean[]" (. e = new VarTypeObject(VarType.BoolArray); .)
 				)
-				[
-					T_SQUAREBRACKETOPEN
-					T_SQUAREBRACKETCLOSE(. switch(e.varType)
-										   {
-												case VarType.Scalar:
-													e = new VarTypeObject(VarType.ScalarArray);
-													break;
-												case VarType.Bool:
-													e = new VarTypeObject(VarType.BoolArray);
-													break;
-												default:
-													SemErr("Cannot Arrayify VarTypes which are not scalar/bool");
-													break;
-										   } .)
-				]
 			)
 			|
             ( (. pBaseLangObject blo; .)
@@ -792,7 +789,7 @@ COMPILER OOS
             BODY_ASSIGNMENT<out blo, outObj, true> (. obj.assign = (VariableAssignment)blo; .)
         .
 		AUTOVARIABLE<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e = Encapsulation.NA> (. var obj = new Variable(parent, la.line, la.col, this.file); obj.encapsulation = e; outObj = obj; pBaseLangObject blo; .) =
-			"auto"(. obj.varType = new VarTypeObject(VarType.Auto); .)
+			"auto" (. obj.varType = new VarTypeObject(VarType.Auto); .)
 			IDENT<out blo, outObj> (. obj.Name = (Ident)blo; .)
             BODY_ASSIGNMENT<out blo, outObj> (. obj.addChild(blo); .)
 		.
@@ -834,11 +831,15 @@ COMPILER OOS
 			AUTOVARIABLE<out outObj, parent>
 			|
 			OP_SQFCALL<out outObj, parent>
+			|IF(parent.getFirstOf<Compiler.OOS_LanguageObjects.Interfaces.iBreakable>() != null)
+			OP_BREAK<out outObj, parent>
 		.
 		CODEINSTRUCTION_NSC<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; .) =
 			OP_FOR<out outObj, parent>
 			|
 			OP_WHILE<out outObj, parent>
+			|
+			OP_FOREACH<out outObj, parent>
 			|
 			OP_IFELSE<out outObj, parent>
 			|
@@ -933,11 +934,30 @@ COMPILER OOS
 					T_CODEBRACKETOPEN
 					{
 						CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
-						|
-						(
-							OP_BREAK<out blo, obj> (. obj.addChild(blo); .)
-							TERMINATOR
-						)
+					}
+					T_CODEBRACKETCLOSE
+				)
+				|
+				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
+			)
+		.
+		OP_FOREACH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new ForEach(parent); outObj = obj; VarTypeObject vto = null; pBaseLangObject blo; .) =
+			"foreach"
+			T_ROUNDBRACKETOPEN
+			(
+				VARTYPE<out vto, obj>
+				|
+				"auto" (. vto = new VarTypeObject(VarType.Auto); .)
+			)
+			NEWVARIABLE<out blo, obj, vto> (. obj.Itterator = (Variable)blo; .)
+			"in"
+			IDENTACCESS<out blo, obj, false> (. obj.Variable = (Ident)blo; .)
+			T_ROUNDBRACKETCLOSE
+			(
+				(
+					T_CODEBRACKETOPEN
+					{
+						CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 					}
 					T_CODEBRACKETCLOSE
 				)
@@ -955,11 +975,6 @@ COMPILER OOS
 					T_CODEBRACKETOPEN
 					{
 						CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
-						|
-						(
-							OP_BREAK<out blo, obj> (. obj.addChild(blo); .)
-							TERMINATOR
-						)
 					}
 					T_CODEBRACKETCLOSE
 				)

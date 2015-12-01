@@ -1,4 +1,5 @@
 Version 0.7.1-ALPHA
+	|- Compiler:  fixed loops not printing scopeName instruction
 	|- Compiler:  fixed third for argument is printed at the very begining
 	|- Compiler:  fixed objects require auto keyword inside of code
 	|- Compiler:  added static native functions
@@ -10,6 +11,9 @@ Version 0.7.1-ALPHA
 	||-           sleep(scalar)
 	|\-           isDedicated()
 	|- stdLib:    added ::std::getPlayer static function to ::std::Man
+	|- stdLib:    added AiSection enum to ::std::Man
+	|- stdLib:    added enableAI function to ::std::Man
+	|- stdLib:    added disableAI function to ::std::Man
 	
 Version 0.7.0-ALPHA
     |- Compiler:  fixed objects added using the using instruction where not

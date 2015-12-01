@@ -43,6 +43,7 @@
     <Compile Include="Compiler\PostProcessFile.cs" />
     <Compile Include="OOS\ErrorStringResolver.cs" />
     <Compile Include="OOS\Exceptions\LinkerException.cs" />
+    <Compile Include="OOS\LanguageObjects\ForEach.cs" />
     <Compile Include="OOS\LanguageObjects\HelperClasses\NamespaceResolver.cs" />
     <Compile Include="OOS\LanguageObjects\HelperClasses\ArgList.cs" />
     <Compile Include="OOS\LanguageObjects\Interfaces\iArgList.cs" />

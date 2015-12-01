@@ -72,7 +72,7 @@ namespace Compiler.OOS_LanguageObjects
             int errCount = 0;
             var assignList = this.getAllChildrenOf<VariableAssignment>();
             //Make sure that we not got an auto without an assign here
-            if (this.varType.varType == VarType.Auto && assignList.Count == 0)
+            if (this.varType.varType == VarType.Auto && assignList.Count == 0 && !(this.Parent is ForEach))
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0007, this.Line, this.Pos, this.File));
                 errCount++;
@@ -98,6 +98,14 @@ namespace Compiler.OOS_LanguageObjects
                         errCount++;
                     }
                 }
+            }
+            else if (this.varType.varType == VarType.Auto && this.Parent is ForEach)
+            {
+                var obj = (ForEach)this.Parent;
+                var thisType = this.varType;
+                thisType.varType = obj.Variable.ReferencedType.varType;
+                thisType.ident = obj.Variable.ReferencedType.ident;
+                thisType.TemplateObject = obj.Variable.ReferencedType.TemplateObject;
             }
             //Check variable is not yet existing in above scopes
             switch (this.encapsulation)

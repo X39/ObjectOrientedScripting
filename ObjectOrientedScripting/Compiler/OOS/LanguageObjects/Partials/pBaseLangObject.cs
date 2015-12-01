@@ -144,7 +144,9 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (!nsr.IsValid)
                 throw new Exception();
-            return this.GetType().Equals(nsr.Reference.GetType());
+            var lType = this.GetType();
+            var rType = nsr.Reference.GetType();
+            return lType.Equals(rType);
         }
     }
 }
