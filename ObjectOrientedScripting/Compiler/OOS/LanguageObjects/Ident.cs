@@ -718,6 +718,8 @@ namespace Compiler.OOS_LanguageObjects
                                 return "_tmp";
                             if (s == "")
                                 s += variable.SqfVariableName;
+                            if(variable.Parent is Interfaces.iClass)
+                                s = '(' + s + " select " + variable.SqfVariableName + ')';
                         }
                         else if (this.ReferencedObject is oosEnum.EnumEntry)
                         {
