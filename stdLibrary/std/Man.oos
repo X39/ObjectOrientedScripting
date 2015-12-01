@@ -6,11 +6,22 @@ namespace std
 {
     native Man extends ::std::base::VehicleBase
     {
+		enum AiSection
+		{
+			Target = "TARGET",
+			Autotarget = "AUTOTARGET",
+			Move = "MOVE",
+			Anim = "ANIM",
+			Teamswitch = "TEAMSWITCH",
+			FSM = "FSM",
+			Aimingerror = "AIMINGERROR",
+			Suppression = "SUPPRESSION"
+		}
 		assign simple ()
 			throw "InvalidOperation";
 		endAssign
+		fnc simple void disableAI (AiSection section)	_this disableAI section	endFnc
+		fnc simple void enableAI (AiSection section)	_this enableAI section	endFnc
     }
-	static fnc ::std::Man getPlayer ()
-		player
-	endFnc
+	static fnc ::std::Man getPlayer () player endFnc
 }
