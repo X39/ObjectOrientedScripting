@@ -1,6 +1,8 @@
 Version 0.7.1-ALPHA
 	|- Compiler:  fixed loops not printing scopeName instruction
 	|- Compiler:  fixed third for argument is printed at the very begining
+	|- Compiler:  fixed passing <IDENT>.<IDENT> for a native function (and some
+	|             other things too ... kinda hard to explain ^^)
 	|- Compiler:  fixed objects require auto keyword inside of code
 	|- Compiler:  added static native functions
 	|- Compiler:  added external function references using the external keyword
