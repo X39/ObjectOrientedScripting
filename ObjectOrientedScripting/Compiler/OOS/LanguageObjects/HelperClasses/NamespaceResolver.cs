@@ -18,6 +18,10 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
         {
             return createNSR(input);
         }
+        public static implicit operator NamespaceResolver(string input)
+        {
+            return createNSR(input);
+        }
         private NamespaceResolver(string origString)
         {
             this.origString = origString;
