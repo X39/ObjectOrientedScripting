@@ -16,6 +16,8 @@ Version 0.7.1-ALPHA
 	|- stdLib:    added AiSection enum to ::std::Man
 	|- stdLib:    added enableAI function to ::std::Man
 	|- stdLib:    added disableAI function to ::std::Man
+	|- stdLib:    fixed invalid return type in getObject of ::std::Context
+	|- stdLib:    changed function arglists of ::std::Context
 	
 Version 0.7.0-ALPHA
     |- Compiler:  fixed objects added using the using instruction where not

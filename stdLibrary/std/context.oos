@@ -6,55 +6,68 @@ namespace std
             missionNamespace
         endAssign
         
-        fnc simple string getString (string ident, string defValue)
-			this getVariable [ident, defValue]
+        fnc simple string getString (string ident)
+			_this getVariable ident
 		endFnc
         fnc simple string getString (string ident, string defValue)
 			_this getVariable [ident, defValue]
 		endFnc
-        fnc simple void setString (string ident, string val, bool publish)
-			_this setVariable [ident, val, publish]
+        fnc simple void setString (string ident, string val)
+			_this setVariable [ident, val, false]
 		endFnc
         fnc simple void setString (string ident, string val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
-        fnc simple scalar getScalar (string ident, scalar defValue)
-			_this getVariable [ident, defValue]
-		endFnc
-        fnc simple void setScalar (string ident, scalar val, bool publish)
-			_this setVariable [ident, val, publish]
+        fnc simple scalar getScalar (string ident)
+			_this getVariable ident
 		endFnc
         fnc simple scalar getScalar (string ident, scalar defValue)
 			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setScalar (string ident, scalar val)
+			_this setVariable [ident, val, false]
 		endFnc
         fnc simple void setScalar (string ident, scalar val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
-        fnc simple bool getBool (string ident, bool defValue)
-			_this getVariable [ident, defValue]
-		endFnc
-        fnc simple void setBool (string ident, bool val, bool publish)
-			_this setVariable [ident, val, publish]
+        fnc simple bool getBool (string ident)
+			_this getVariable ident
 		endFnc
         fnc simple bool getBool (string ident, bool defValue)
 			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setBool (string ident, bool val)
+			_this setVariable [ident, val, false]
 		endFnc
         fnc simple void setBool (string ident, bool val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
+        fnc simple object getObject (string ident)
+			_this getVariable ident
+		endFnc
         fnc simple object getObject (string ident, object defValue)
 			_this getVariable [ident, defValue]
+		endFnc
+        fnc simple void setObject (string ident, object val)
+			_this setVariable [ident, val, false]
 		endFnc
         fnc simple void setObject (string ident, object val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
-        fnc simple object getObject (string ident, object defValue)
+        
+        fnc simple nobject getNativeObject (string ident)
+			_this getVariable ident
+		endFnc
+        fnc simple nobject getNativeObject (string ident, nobject defValue)
 			_this getVariable [ident, defValue]
 		endFnc
-        fnc simple void setObject (string ident, object val, bool publish)
+        fnc simple void setNativeObject (string ident, nobject val)
+			_this setVariable [ident, val, false]
+		endFnc
+        fnc simple void setNativeObject (string ident, nobject val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
         
