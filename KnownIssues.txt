@@ -10,3 +10,8 @@
   `(new foobar()).foo()`
   due to the fact that it is the following:
   `<EXPRESSION>.<IDENT><FUNCTIONCALL>`
+
+- Casts currently do not check if given object is kind of cast target thus you
+  can enforce invalid object types
+
+- Downcasting has to be done explicit

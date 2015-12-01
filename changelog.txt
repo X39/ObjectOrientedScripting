@@ -7,6 +7,8 @@ Version 0.7.1-ALPHA
 	|- Compiler:  added static native functions
 	|- Compiler:  added external function references using the external keyword
 	|             static external [ async ] <TYPE> <IDENT> ( <ARGLIST> );
+	|- Compiler:  added foreach operation
+	|             foreach( <VARTYPE> <IDENT> in <IDENT> )
 	|- Compiler:  added vec3 object to OOS
 	|v- Compiler: added native functions to OOS
 	||-           isServer()
