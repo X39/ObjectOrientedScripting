@@ -233,4 +233,4 @@ $RECYCLE.BIN/
 /TestProject/output
 /TestProject/build
 /Output
-*.old
+*.cs.old
