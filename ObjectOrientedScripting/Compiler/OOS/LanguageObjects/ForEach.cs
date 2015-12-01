@@ -25,6 +25,8 @@ namespace Compiler.OOS_LanguageObjects
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Currently only arrays are allowed in ForEach");
                 return 1;
             }
+            //ToDo: implement the type check
+            Logger.Instance.log(Logger.LogLevel.WARNING, "foreach currently is not able to fully validate type safety! Thus OOS cannot confirm types are considered as safe.");
             return 0;
         }
 
