@@ -73,6 +73,10 @@ namespace Compiler.OOS_LanguageObjects
                     sw.Write("]");
                 sw.WriteLine(";");
             }
+            if (this.getAllChildrenOf<Break>(true).Count > 0)
+            {
+                sw.WriteLine(tab + "scopeName \"" + this.BreakScope + "\";");
+            }
             foreach(var it in this.CodeInstructions)
             {
                 if (it is Ident)
