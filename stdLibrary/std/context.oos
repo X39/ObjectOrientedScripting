@@ -45,13 +45,13 @@ namespace std
 			_this setVariable [ident, val, publish]
 		endFnc
         
-        fnc simple bool getObject (string ident, object defValue)
+        fnc simple object getObject (string ident, object defValue)
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setObject (string ident, object val, bool publish)
 			_this setVariable [ident, val, publish]
 		endFnc
-        fnc simple bool getObject (string ident, object defValue)
+        fnc simple object getObject (string ident, object defValue)
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setObject (string ident, object val, bool publish)
