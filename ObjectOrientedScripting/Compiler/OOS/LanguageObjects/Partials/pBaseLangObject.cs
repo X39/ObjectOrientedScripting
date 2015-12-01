@@ -140,5 +140,11 @@ namespace Compiler.OOS_LanguageObjects
 
         public virtual int doFinalize() { return 0; }
         public abstract void writeOut(StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg);
+        public bool isType(HelperClasses.NamespaceResolver nsr)
+        {
+            if (!nsr.IsValid)
+                throw new Exception();
+            return this.GetType().Equals(nsr.Reference.GetType());
+        }
     }
 }
