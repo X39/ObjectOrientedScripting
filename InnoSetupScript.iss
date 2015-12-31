@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.7.0-ALPHA"
+#define MyAppVersion "0.7.1-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "WrapperUI.exe"
@@ -49,7 +49,41 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
-'Version 0.7.0-ALPHA                                                            ' + AnsiChar(#10) +
+'Version 0.7.1-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Compiler:  fixed member functions without arguments lacked params command' + AnsiChar(#10) +
+'    |- Compiler:  fixed callWrapper `___tmp___ = ___tmp___` printout            ' + AnsiChar(#10) +
+'    |- Compiler:  fixed breakout missed left args brackets                      ' + AnsiChar(#10) +
+'    |- Compiler:  fixed invalid LNKxxxx exception when function is not existing ' + AnsiChar(#10) +
+'    |- Compiler:  fixed ident call wrapper used ___tmp___ AND _tmp              ' + AnsiChar(#10) +
+'    |- Compiler:  fixed some other stuff (meh ... do not ask :) tiny things)    ' + AnsiChar(#10) +
+'    |- Compiler:  fixed loops not printing scopeName instruction                ' + AnsiChar(#10) +
+'    |- Compiler:  "using" files did not got preprocessed                        ' + AnsiChar(#10) +
+'    |- Compiler:  fixed third for argument is printed at the very begining      ' + AnsiChar(#10) +
+'    |- Compiler:  fixed native function calls do not process last argument      ' + AnsiChar(#10) +
+'    |- Compiler:  fixed passing <IDENT>.<IDENT> for a native function (and some ' + AnsiChar(#10) +
+'    |             other things too ... kinda hard to explain ^^)                ' + AnsiChar(#10) +
+'    |- Compiler:  fixed objects require auto keyword inside of code             ' + AnsiChar(#10) +
+'    |- Compiler:  added static native functions                                 ' + AnsiChar(#10) +
+'    |- Compiler:  added external function references using the external keyword ' + AnsiChar(#10) +
+'    |             static external [ async ] <TYPE> <IDENT> ( <ARGLIST> );       ' + AnsiChar(#10) +
+'    |- Compiler:  added foreach operation                                       ' + AnsiChar(#10) +
+'    |             foreach( <VARTYPE> <IDENT> in <IDENT> )                       ' + AnsiChar(#10) +
+'    |- Compiler:  added vec3 object to OOS                                      ' + AnsiChar(#10) +
+'    |v- Compiler: added native functions to OOS                                 ' + AnsiChar(#10) +
+'    ||-           isServer()                                                    ' + AnsiChar(#10) +
+'    ||-           sleep(scalar)                                                 ' + AnsiChar(#10) +
+'    |\-           isDedicated()                                                 ' + AnsiChar(#10) +
+'    |- stdLib:    added ::std::getPlayer static function to ::std::Man          ' + AnsiChar(#10) +
+'    |- stdLib:    added AiSection enum to ::std::Man                            ' + AnsiChar(#10) +
+'    |- stdLib:    added enableAI function to ::std::Man                         ' + AnsiChar(#10) +
+'    |- stdLib:    added disableAI function to ::std::Man                        ' + AnsiChar(#10) +
+'    |- stdLib:    fixed invalid return type in getObject of ::std::Context      ' + AnsiChar(#10) +
+'    |- stdLib:    fixed script issue on ::std::VehicleBase::setDamage(scalar)   ' + AnsiChar(#10) +
+'    |- stdLib:    fixed invalid string argument on ::std::Config::count()       ' + AnsiChar(#10) +
+'    |- stdLib:    fixed potential script issue in all native objects            ' + AnsiChar(#10) +
+'    \- stdLib:    changed function arglists of ::std::Context                   ' + AnsiChar(#10) +   
+'                                                                                ' + AnsiChar(#10) +
+'Version 0.7.0-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  fixed objects added using the using instruction where not     ' + AnsiChar(#10) +
 '    |             touched by the PreProcessor                                   ' + AnsiChar(#10) +
 '    |- Compiler:  printout syntax got altered slightly (missing tabs and invalid' + AnsiChar(#10) +
