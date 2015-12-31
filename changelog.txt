@@ -1,37 +1,37 @@
 Version 0.7.1-ALPHA
-	|- Compiler:  fixed member functions without arguments lacked params command
-	|- Compiler:  fixed callWrapper `___tmp___ = ___tmp___` printout
-	|- Compiler:  fixed breakout missed left args brackets
-	|- Compiler:  fixed invalid LNKxxxx exception when function is not existing
-	|- Compiler:  fixed ident call wrapper used ___tmp___ AND _tmp
-	|- Compiler:  fixed some other stuff (meh ... do not ask :) tiny things)
-	|- Compiler:  fixed loops not printing scopeName instruction
-	|- Compiler:  "using" files did not got preprocessed
-	|- Compiler:  fixed third for argument is printed at the very begining
-	|- Compiler:  fixed native function calls do not process last argument
-	|- Compiler:  fixed passing <IDENT>.<IDENT> for a native function (and some
-	|             other things too ... kinda hard to explain ^^)
-	|- Compiler:  fixed objects require auto keyword inside of code
-	|- Compiler:  added static native functions
-	|- Compiler:  added external function references using the external keyword
-	|             static external [ async ] <TYPE> <IDENT> ( <ARGLIST> );
-	|- Compiler:  added foreach operation
-	|             foreach( <VARTYPE> <IDENT> in <IDENT> )
-	|- Compiler:  added vec3 object to OOS
-	|v- Compiler: added native functions to OOS
-	||-           isServer()
-	||-           sleep(scalar)
-	|\-           isDedicated()
-	|- stdLib:    added ::std::getPlayer static function to ::std::Man
-	|- stdLib:    added AiSection enum to ::std::Man
-	|- stdLib:    added enableAI function to ::std::Man
-	|- stdLib:    added disableAI function to ::std::Man
-	|- stdLib:    fixed invalid return type in getObject of ::std::Context
-	|- stdLib:    fixed script issue on ::std::VehicleBase::setDamage(scalar)
-	|- stdLib:    fixed invalid string argument on ::std::Config::count()
-	|- stdLib:    fixed potential script issue in all native objects
-	|- stdLib:    changed function arglists of ::std::Context
-	
+    |- Compiler:  fixed member functions without arguments lacked params command
+    |- Compiler:  fixed callWrapper `___tmp___ = ___tmp___` printout
+    |- Compiler:  fixed breakout missed left args brackets
+    |- Compiler:  fixed invalid LNKxxxx exception when function is not existing
+    |- Compiler:  fixed ident call wrapper used ___tmp___ AND _tmp
+    |- Compiler:  fixed some other stuff (meh ... do not ask :) tiny things)
+    |- Compiler:  fixed loops not printing scopeName instruction
+    |- Compiler:  "using" files did not got preprocessed
+    |- Compiler:  fixed third for argument is printed at the very begining
+    |- Compiler:  fixed native function calls do not process last argument
+    |- Compiler:  fixed passing <IDENT>.<IDENT> for a native function (and some
+    |             other things too ... kinda hard to explain ^^)
+    |- Compiler:  fixed objects require auto keyword inside of code
+    |- Compiler:  added static native functions
+    |- Compiler:  added external function references using the external keyword
+    |             static external [ async ] <TYPE> <IDENT> ( <ARGLIST> );
+    |- Compiler:  added foreach operation
+    |             foreach( <VARTYPE> <IDENT> in <IDENT> )
+    |- Compiler:  added vec3 object to OOS
+    |v- Compiler: added native functions to OOS
+    ||-           isServer()
+    ||-           sleep(scalar)
+    |\-           isDedicated()
+    |- stdLib:    added ::std::getPlayer static function to ::std::Man
+    |- stdLib:    added AiSection enum to ::std::Man
+    |- stdLib:    added enableAI function to ::std::Man
+    |- stdLib:    added disableAI function to ::std::Man
+    |- stdLib:    fixed invalid return type in getObject of ::std::Context
+    |- stdLib:    fixed script issue on ::std::VehicleBase::setDamage(scalar)
+    |- stdLib:    fixed invalid string argument on ::std::Config::count()
+    |- stdLib:    fixed potential script issue in all native objects
+    \- stdLib:    changed function arglists of ::std::Context
+
 Version 0.7.0-ALPHA
     |- Compiler:  fixed objects added using the using instruction where not
     |             touched by the PreProcessor
