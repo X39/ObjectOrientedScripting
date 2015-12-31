@@ -56,13 +56,13 @@ namespace std
 			createMarker [name, [i, j, k]]
 		endAssign
 		
-		fnc simple void setDirection(scalar angle)					_this setMarkerDir angle		endFnc
+		fnc simple void setDirection(scalar angle)					_this setMarkerDir ( angle )	endFnc
 		fnc simple scalar getDirection()							markerDir _this					endFnc
-		fnc simple void setAlpha(scalar angle)						_this setMarkerAlpha angle		endFnc
+		fnc simple void setAlpha(scalar angle)						_this setMarkerAlpha ( angle )	endFnc
 		fnc simple scalar getAlpha()								markerAlpha _this				endFnc
-		fnc simple void setColor(Color c)							_this setMarkerColor c			endFnc
+		fnc simple void setColor(Color c)							_this setMarkerColor ( c )		endFnc
 		fnc simple Color getColor()									markerColor _this				endFnc
-		fnc simple void setBrush(Brush brush)						_this setMarkerBrush brush		endFnc
+		fnc simple void setBrush(Brush brush)						_this setMarkerBrush ( brush )	endFnc
 		fnc simple Brush getBrush()									markerBrush _this				endFnc
 		fnc simple void setSize(scalar x, scalar y)					_this setMarkerSize [x, y]		endFnc
 		fnc simple array<scalar> getSize()							markerSize _this				endFnc

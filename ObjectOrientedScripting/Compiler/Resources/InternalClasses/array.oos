@@ -5,19 +5,19 @@ native array<T>
     endAssign
     
     fnc simple scalar pushBack (T _val)
-        _this pushBack _val
+        _this pushBack ( _val )
     endFnc
     
     fnc simple scalar find (T _val)
-        _this find _val
+        _this find ( _val )
     endFnc
     
     fnc simple void resize (scalar _i)
-        _this resize _i
+        _this resize ( _i )
     endFnc
     
     fnc simple void deleteAt (scalar _i)
-        _this deleteAt _i
+        _this deleteAt ( _i )
     endFnc
     
     fnc simple void deleteRange (scalar _i, scalar _j)
@@ -29,10 +29,10 @@ native array<T>
     endFnc
     
     fnc simple scalar join (::array<T> arr)
-        _this append arr
+        _this append ( arr )
     endFnc
     
     operator simple T [] (scalar _i)
-        _this select _i
+        _this select ( _i )
     endOperator
 }

@@ -169,10 +169,10 @@ COMPILER OOS
 		.
 		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; .) =
             [
-                T_NAMESPACEACCESS (. isGlobalIdent = true; .)
+                CAST<out outObj, parent>
             ]
             [
-                CAST<out outObj, parent>
+                T_NAMESPACEACCESS (. isGlobalIdent = true; .)
             ]
             IDENT<out ident, (outObj == null ? parent : outObj)> (. try{ ((Ident)ident).IsGlobalIdentifier = isGlobalIdent; } catch (Exception ex) { SemErr(ex.Message); } if(outObj == null) outObj = ident; else outObj.addChild(ident); .)
 			(. if(allowBody) { .)
@@ -272,6 +272,8 @@ COMPILER OOS
                 )
 				|
                 OP_SQFCALL<out blo, obj> (. obj.lExpression = blo; .)
+				|
+				OP_NULL<out blo, obj> (. obj.lExpression = blo; .)
 			)
 			{
 				(
@@ -396,7 +398,9 @@ COMPILER OOS
 					if (!UsedFiles.Contains(currentFile))
 					{
 						UsedFiles.Add(currentFile);
-						Scanner scanner = new Scanner(currentFile);
+						var ppFiles = new List<Compiler.PostProcessFile>();
+						Wrapper.Compiler.Instance.preprocessFile(new List<Wrapper.Compiler.preprocessFile_IfDefModes>(), currentFile, currentFile, ppFiles);
+						Scanner scanner = new Scanner(ppFiles.First().FileStream);
 						Base baseObject = new Base();
 						Parser p = new Parser(scanner, currentFile);
 						p.BaseObject = this.BaseObject;
@@ -417,6 +421,9 @@ COMPILER OOS
 				}
 			}
 		.)
+			[
+				TERMINATOR
+			]
 		.
 		ENUM<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new oosEnum(parent); outObj = obj; pBaseLangObject blo; oosEnum.EnumEntry entry; .) =
 			"enum"
@@ -900,7 +907,7 @@ COMPILER OOS
 		.
 		BODY_ARRAYACCESS<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new ArrayAccess(parent); outObj = obj; pBaseLangObject blo; .) =
 			T_SQUAREBRACKETOPEN
-            VALUE<out blo, obj> (. obj.addChild(blo); .)
+            EXPRESSION<out blo, obj> (. obj.addChild(blo); .)
 			T_SQUAREBRACKETCLOSE
 		.
 		BODY_FUNCTIONCALL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new FunctionCall(parent); outObj = obj; pBaseLangObject blo; .) =
@@ -940,6 +947,9 @@ COMPILER OOS
 				|
 				CODEINSTRUCTION<out blo, obj> (. obj.addChild(blo); .)
 			)
+		.
+		OP_NULL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Null(parent, t.line, t.col, this.file); outObj = obj; .) =
+			"null"
 		.
 		OP_FOREACH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new ForEach(parent); outObj = obj; VarTypeObject vto = null; pBaseLangObject blo; .) =
 			"foreach"

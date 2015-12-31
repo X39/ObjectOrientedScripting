@@ -6,11 +6,11 @@ namespace std
             configFile
         endAssign
         
-        fnc simple ::std::Config extend (string _s)
-            _this >> _s
+        fnc simple ::std::Config extend (string s)
+            _this >> ( s )
         endFnc
         
-        fnc simple scalar count (string _s)
+        fnc simple scalar count ()
             count _this
         endFnc
         
@@ -32,12 +32,12 @@ namespace std
         
         fnc simple array<::std::Config> hierarchy () configHierarchy _this endFnc
         
-        fnc simple bool isClass ()             isClass _this       endFnc
-        fnc simple bool isText ()              isText _this        endFnc
-        fnc simple bool isNumber ()            isNumber _this      endFnc
+        fnc simple bool isClass () 				isClass _this       endFnc
+        fnc simple bool isText ()  				isText _this        endFnc
+        fnc simple bool isNumber ()				isNumber _this      endFnc
         
-        fnc simple scalar getNumber ()         getNumber _this     endFnc
-        fnc simple string getText ()    getText _this       endFnc
-        fnc simple string name ()       configName _this    endFnc
+        fnc simple scalar getNumber ()			getNumber _this     endFnc
+        fnc simple string getText ()   			getText _this       endFnc
+        fnc simple string name ()       		configName _this    endFnc
     }
 }

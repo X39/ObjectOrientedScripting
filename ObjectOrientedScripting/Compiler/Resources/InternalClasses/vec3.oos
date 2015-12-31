@@ -11,5 +11,5 @@ native vec3
     fnc simple void setY (scalar val)				_this set [1, val]		endFnc
     fnc simple void setZ (scalar val)				_this set [2, val]		endFnc
 	
-    operator simple scalar [] (scalar index)		_this select index		endOperator
+    operator simple scalar [] (scalar index)		_this select ( index )	endOperator
 }

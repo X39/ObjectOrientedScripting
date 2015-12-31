@@ -31,7 +31,7 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (this.children.Count == 0 && argList.Length == 0)
                 return Code;
-            if(argList.Length < this.children.Count)
+            if(argList.Length < this.children.Count - (this.Parent is Native ? 0 : 1))
             {
                 throw new Exception("Should never happen exception got raised. Please report to developer!");
             }
@@ -39,7 +39,8 @@ namespace Compiler.OOS_LanguageObjects
             if (this.IsSimple)
             {
                 outString = Code;
-                outString = Regex.Replace(outString, "\\b" + "_this" + "\\b", argList[0].Trim());
+                if (this.Parent is Native)
+                    outString = Regex.Replace(outString, "\\b" + "_this" + "\\b", argList[0].Trim());
                 if (this.children.Count > 0 && children[0] is Ident)
                 {
                     for (int i = 1; i < argList.Length; i++)
@@ -49,9 +50,9 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else
                 {
-                    for (int i = 1; i < argList.Length; i++)
+                    for (int i = 0; i < argList.Length; i++)
                     {
-                        outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i - 1]).Name.OriginalValue + "\\b", argList[i].Trim());
+                        outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", argList[i].Trim());
                     }
                 }
             }

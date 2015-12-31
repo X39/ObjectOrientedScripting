@@ -17,11 +17,11 @@ native string
     endFnc
 	
     fnc simple scalar indexOf (::string s)
-        _this find s
+        _this find ( s )
     endFnc
 	
     fnc simple bool contains (::string s)
-        (_this find s) >= 0
+        (_this find ( s ) ) >= 0
     endFnc
 	
 	fnc simple string toString ()
@@ -33,11 +33,11 @@ native string
 	endFnc
 	
 	fnc simple string append(::string s)
-		_this + s
+		_this + ( s )
 	endFnc
 	
 	fnc simple array<string> split(::string delimiter)
-		_this splitString delimiter
+		_this splitString ( delimiter )
 	endFnc
 	
 	fnc simple string toUpper()

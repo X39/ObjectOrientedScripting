@@ -174,53 +174,53 @@ namespace Wrapper
 
             int errCount = 0;
             //Check the syntax of all files in ppFiles
-            foreach (var it in ppFiles)
-            {
-                //if (!noPrintOut)
-                //{
-                //    var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
-                //    it.resetPosition();
-                //    it.FileStream.WriteTo(stream);
-                //    stream.Flush();
-                //    stream.Close();
-                //}
-                Scanner scanner = new Scanner(it.FileStream);
-                Base baseObject = new Base();
-                Parser p = new Parser(scanner, it.FilePath);
-                Parser.UsedFiles = new List<string>();
-                p.BaseObject = baseObject;
-                p.Parse();
-                if (p.errors.count > 0)
-                {
-                    errCount += p.errors.count;
-                    Logger.Instance.log(Logger.LogLevel.ERROR, "In file '" + it.Name + "'");
-                }
-                if (printOutMode > 0)
-                {
-                    if (printOutMode == 1 && it == ppMainFile)
-                    {
-                        var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
-                        it.resetPosition();
-                        it.FileStream.WriteTo(stream);
-                        stream.Flush();
-                        stream.Close();
-                    }
-                    if (printOutMode >= 2)
-                    {
-                        var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
-                        it.resetPosition();
-                        it.FileStream.WriteTo(stream);
-                        stream.Flush();
-                        stream.Close();
-                    }
-                }
-                it.resetPosition();
-            }
-            if (errCount > 0)
-            {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
-                return;
-            }
+            //foreach (var it in ppFiles)
+            //{
+            //    //if (!noPrintOut)
+            //    //{
+            //    //    var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
+            //    //    it.resetPosition();
+            //    //    it.FileStream.WriteTo(stream);
+            //    //    stream.Flush();
+            //    //    stream.Close();
+            //    //}
+            //    Scanner scanner = new Scanner(it.FileStream);
+            //    Base baseObject = new Base();
+            //    Parser p = new Parser(scanner, it.FilePath);
+            //    Parser.UsedFiles = new List<string>();
+            //    p.BaseObject = baseObject;
+            //    p.Parse();
+            //    if (p.errors.count > 0)
+            //    {
+            //        errCount += p.errors.count;
+            //        Logger.Instance.log(Logger.LogLevel.ERROR, "In file '" + it.Name + "'");
+            //    }
+            //    if (printOutMode > 0)
+            //    {
+            //        if (printOutMode == 1 && it == ppMainFile)
+            //        {
+            //            var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
+            //            it.resetPosition();
+            //            it.FileStream.WriteTo(stream);
+            //            stream.Flush();
+            //            stream.Close();
+            //        }
+            //        if (printOutMode >= 2)
+            //        {
+            //            var stream = File.Create(proj.Buildfolder + it.Name + ".obj");
+            //            it.resetPosition();
+            //            it.FileStream.WriteTo(stream);
+            //            stream.Flush();
+            //            stream.Close();
+            //        }
+            //    }
+            //    it.resetPosition();
+            //}
+            //if (errCount > 0)
+            //{
+            //    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Translating!");
+            //    return;
+            //}
 
             //Read in all internal objects
             Base oosTreeBase = new Base();
@@ -231,22 +231,34 @@ namespace Wrapper
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
+                errCount += p.errors.count;
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.array)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
+                errCount += p.errors.count;
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.vec3)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
+                errCount += p.errors.count;
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._string)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
+                errCount += p.errors.count;
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.functions)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
+                errCount += p.errors.count;
+
+
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS files (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
             }
 
             //process the actual file
@@ -255,10 +267,16 @@ namespace Wrapper
             parser.BaseObject = oosTreeBase;
             parser.Parse();
             
-            errCount = parser.errors.count + parser.BaseObject.finalize();
+            errCount = parser.errors.count;
             if (errCount > 0)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Comnpiling!");
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Compiling!");
+                return;
+            }
+            errCount = parser.BaseObject.finalize();
+            if (errCount > 0)
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Compiling!");
                 return;
             }
             SqfConfigFile configFile = new SqfConfigFile(configFileName);

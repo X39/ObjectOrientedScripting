@@ -229,7 +229,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             sw.WriteLine(tab + "scopeName \"" + Wrapper.Compiler.ScopeNames.function + "\";");
             var argList = this.ArgListObjects;
-            if (argList.Count > 0)
+            if (argList.Count > 0 || this.encapsulation != Encapsulation.Static)
             {
                 sw.Write(tab + "params [");
                 bool printComma = false;

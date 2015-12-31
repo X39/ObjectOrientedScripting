@@ -42,10 +42,11 @@ namespace Compiler.OOS_LanguageObjects
         {
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             sw.Write(tab);
-            foreach(var it in this.children)
+            foreach (var it in this.children)
             {
+                sw.Write('(');
                 it.writeOut(sw, cfg);
-                sw.Write(' ');
+                sw.Write(") ");
             }
             sw.Write("breakOut \"" + Wrapper.Compiler.ScopeNames.function + "\"");
         }

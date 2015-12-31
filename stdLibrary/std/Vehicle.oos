@@ -14,7 +14,7 @@ namespace std
             {
                 throw "VehicleNotLocalException";
             };
-            _this setFuel i;
+            _this setFuel ( i );
         endFnc
         
         fnc simple scalar getFuel() fuel _this endFnc

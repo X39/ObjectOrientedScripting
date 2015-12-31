@@ -11,7 +11,19 @@ namespace Compiler.OOS_LanguageObjects
     {
 
         public ArrayAccess(pBaseLangObject parent) : base(parent) { }
-        public override int doFinalize() { return 0; }
+        public override int doFinalize()
+        {
+            int errCount = 0;
+            foreach(var it in this.getAllChildrenOf<Expression>())
+            {
+                if(it.ReferencedType.varType != VarType.Scalar)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0050, it.Line, it.Pos, it.File));
+                    errCount++;
+                }
+            }
+            return errCount;
+        }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             if(this.Parent is Ident)
@@ -93,15 +105,20 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     if (printSelect)
                     {
+                        bool flag = false;
+                        if (this.getFirstOf<FunctionCall>(false, typeof(Ident)) != null)
+                            flag = true;
                         //if(((Ident)this.Parent).HasCallWrapper)
                         //{
-                        sw.Write(((Ident)this.Parent).WriteOutValue);
+                        sw.Write((flag ? "(" : "") + ((Ident)this.Parent).WriteOutValue);
                         //}
                         sw.Write(" select ");
                         foreach(var it in this.children)
                         {
                             it.writeOut(sw, cfg);
                         }
+                        if (flag)
+                            sw.Write(')');
                     }
                 }
             }

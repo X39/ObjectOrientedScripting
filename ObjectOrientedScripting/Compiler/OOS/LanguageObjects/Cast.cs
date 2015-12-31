@@ -15,7 +15,7 @@ namespace Compiler.OOS_LanguageObjects
             int errCount = 0;
             if (this.varType.ident != null)
                 errCount += this.varType.ident.doFinalize();
-            var childType = ((Ident)this.children[0]).ReferencedType;
+            var childType = ((Ident)this.children[0]).LastIdent.ReferencedType;
             if (this.varType.varType == VarType.Object && childType.varType != VarType.Object)
             {//Non-Object to object
                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0031, ((Ident)this.children[0]).Line, ((Ident)this.children[0]).Pos));
@@ -42,7 +42,7 @@ namespace Compiler.OOS_LanguageObjects
             if (this.children.Count != 1 || !(this.children[0] is Ident))
                 throw new Exception();
             Ident ident = (Ident)this.children[0];
-            switch (ident.ReferencedType.varType)
+            switch (ident.LastIdent.ReferencedType.varType)
             {
                 case VarType.Object:
                     ident.writeOut(sw, cfg);

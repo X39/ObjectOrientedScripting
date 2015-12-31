@@ -30,7 +30,7 @@ namespace Compiler.OOS_LanguageObjects
                     if (((Ident)lExpression).LastIdent.ReferencedObject is Interfaces.iHasType)
                     {
                         lType = ((Interfaces.iHasType)((Ident)lExpression).LastIdent.ReferencedObject).ReferencedType;
-                        if (!lType.IsObject && lType.IsArray && !((Ident)lExpression).LastIdent.ReferencedType.IsArray)
+                        if (!lType.IsObject && lType.IsArray && !((Ident)lExpression).LastIdent.ReferencedType.IsArray || lExpression.getAllChildrenOf<ArrayAccess>(true).Count > 0)
                         {
                             lType = ((Ident)lExpression).LastIdent.ReferencedType;
                         }

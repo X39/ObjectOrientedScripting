@@ -7,7 +7,7 @@ namespace std
         endAssign
         
         fnc simple string getString (string ident)
-			_this getVariable ident
+			_this getVariable ( ident )
 		endFnc
         fnc simple string getString (string ident, string defValue)
 			_this getVariable [ident, defValue]
@@ -20,7 +20,7 @@ namespace std
 		endFnc
         
         fnc simple scalar getScalar (string ident)
-			_this getVariable ident
+			_this getVariable ( ident )
 		endFnc
         fnc simple scalar getScalar (string ident, scalar defValue)
 			_this getVariable [ident, defValue]
@@ -33,7 +33,7 @@ namespace std
 		endFnc
         
         fnc simple bool getBool (string ident)
-			_this getVariable ident
+			_this getVariable ( ident )
 		endFnc
         fnc simple bool getBool (string ident, bool defValue)
 			_this getVariable [ident, defValue]
@@ -46,7 +46,7 @@ namespace std
 		endFnc
         
         fnc simple object getObject (string ident)
-			_this getVariable ident
+			_this getVariable ( ident )
 		endFnc
         fnc simple object getObject (string ident, object defValue)
 			_this getVariable [ident, defValue]
@@ -59,7 +59,7 @@ namespace std
 		endFnc
         
         fnc simple nobject getNativeObject (string ident)
-			_this getVariable ident
+			_this getVariable ( ident )
 		endFnc
         fnc simple nobject getNativeObject (string ident, nobject defValue)
 			_this getVariable [ident, defValue]
@@ -71,7 +71,7 @@ namespace std
 			_this setVariable [ident, val, publish]
 		endFnc
         
-        fnc simple void setContext (::std::Context n)	n						endFnc
+        fnc simple void setContext (::std::Context n)	( ident )				endFnc
         fnc simple ::std::Context toMissionContext ()	missionNamespace		endFnc
         fnc simple ::std::Context toUiContext ()		uiNamespace				endFnc
         fnc simple ::std::Context toParsingContext ()	parsingNamespace		endFnc

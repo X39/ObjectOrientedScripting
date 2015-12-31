@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Compiler.OOS_LanguageObjects
 {
@@ -475,7 +476,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             List<Interfaces.iFunction> fncList;
                             var fncCall = fncCalls[0];
-                            var newInstance = this.getFirstOf<NewInstance>();
+                            var newInstance = this.getFirstOf<NewInstance>(true, typeof(Ident));
                             var fqn = this.FullyQualifiedName;
                             if (parentIdent != null && parentIdent.ReferencedObject is Variable)
                             {
@@ -494,7 +495,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                             if (fncList.Count == 0)
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0001, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
                             else
@@ -632,27 +633,29 @@ namespace Compiler.OOS_LanguageObjects
         {
             get
             {
-                if (this.Parent is Ident)
+                if (this.Parent is Ident && ((Ident)this.Parent).Type != IdenType.NamespaceAccess)
                     return ((Ident)this.Parent).HasCallWrapper;
-                var functionCalls = this.getAllChildrenOf<FunctionCall>(true);
-                var arrayAccesss = this.getAllChildrenOf<ArrayAccess>(true);
+                if (this.Type == IdenType.NamespaceAccess)
+                    return false;
+                var functionCalls = this.getAllChildrenOf<FunctionCall>(true, null, -1, -1, new Type[] { typeof(Ident), typeof(FunctionCall)});
+                var arrayAccesss = this.getAllChildrenOf<ArrayAccess>(true, null, -1, -1, new Type[] { typeof(Ident), typeof(FunctionCall) });
                 return functionCalls.Count + arrayAccesss.Count > 1;
             }
         }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             bool assignToTmp = this.HasCallWrapper;
-            bool callWrapper = !(this.Parent is Ident) && assignToTmp;
+            bool callWrapper = !(this.Parent is Ident && ((Ident)this.Parent).Type != IdenType.NamespaceAccess) && assignToTmp;
             if (callWrapper)
             {
-                sw.Write("[] call {private \"_tmp\"; ");
+                sw.Write("[] call {private \"___tmp___\"; ");
                 if (this.ReferencedObject is Variable)
                 {
-                    sw.Write("_tmp = " + ((Variable)this.ReferencedObject).SqfVariableName + ';');
+                    sw.Write("___tmp___ = (" + ((Variable)this.ReferencedObject).SqfVariableName + ");");
                 }
                 else
                 {
-                    throw new Exception();
+                    sw.Write("___tmp___ = (" + this.WriteOutValue + ");");
                 }
             }
 
@@ -681,13 +684,28 @@ namespace Compiler.OOS_LanguageObjects
             {
                 foreach (var it in this.children)
                 {
+                    var ms = new MemoryStream();
+                    var sw2 = new StreamWriter(ms);
                     if (it is Ident)
                         continue;
+                    it.writeOut(sw2, cfg);
+                    sw2.Flush();
+                    ms.Seek(0, SeekOrigin.Begin);
+                    string output = new StreamReader(ms).ReadToEnd();
+                    ms.Close();
                     if (assignToTmp)
-                        sw.Write(" _tmp = ");
-                    it.writeOut(sw, cfg);
-                    if (assignToTmp)
-                        sw.Write(';');
+                    {
+                        if (output != "___tmp___")
+                        {
+                            sw.Write(" ___tmp___ = (");
+                            sw.Write(output);
+                            sw.Write(");");
+                        }
+                    }
+                    else
+                    {
+                        sw.Write(output);
+                    }
                 }
                 foreach (var it in this.children)
                 {
@@ -697,7 +715,7 @@ namespace Compiler.OOS_LanguageObjects
             }
 
             if (callWrapper)
-                sw.Write(" _tmp}");
+                sw.Write(" ___tmp___}");
 
         }
         public string WriteOutValue
@@ -715,7 +733,7 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             var variable = (Variable)this.ReferencedObject;
                             if (this.HasCallWrapper)
-                                return "_tmp";
+                                return "___tmp___";
                             if (s == "")
                                 s += variable.SqfVariableName;
                             if(variable.Parent is Interfaces.iClass)
@@ -728,6 +746,7 @@ namespace Compiler.OOS_LanguageObjects
                         }
                         else if (this.ReferencedObject is oosEnum)
                         {
+                            throw new Exception();
                         }
                         else
                         {

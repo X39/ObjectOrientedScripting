@@ -103,9 +103,20 @@ namespace Compiler.OOS_LanguageObjects
             {
                 var obj = (ForEach)this.Parent;
                 var thisType = this.varType;
-                thisType.varType = obj.Variable.ReferencedType.varType;
-                thisType.ident = obj.Variable.ReferencedType.ident;
-                thisType.TemplateObject = obj.Variable.ReferencedType.TemplateObject;
+                if (obj.Variable.LastIdent.ReferencedType.Equals(HelperClasses.NamespaceResolver.createNSR("::array")))
+                {
+                    thisType.varType = obj.Variable.LastIdent.ReferencedType.TemplateObject.vtoList[0].varType;
+                    thisType.ident = obj.Variable.LastIdent.ReferencedType.TemplateObject.vtoList[0].ident;
+                    thisType.TemplateObject = obj.Variable.LastIdent.ReferencedType.TemplateObject.vtoList[0].TemplateObject;
+                }
+                else
+                {
+                    thisType.varType = obj.Variable.LastIdent.ReferencedType.varType;
+                    thisType.ident = obj.Variable.LastIdent.ReferencedType.ident;
+                    thisType.TemplateObject = obj.Variable.LastIdent.ReferencedType.TemplateObject;
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Currently only the array object is allowed for foreach");
+                    errCount++;
+                }
             }
             //Check variable is not yet existing in above scopes
             switch (this.encapsulation)

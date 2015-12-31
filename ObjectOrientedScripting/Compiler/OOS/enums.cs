@@ -21,6 +21,7 @@ namespace Compiler.OOS_LanguageObjects
         Auto,
         Void,
         Object,
+        NullObject,
         Other,
         ScalarArray,
         BoolArray,
@@ -83,18 +84,32 @@ namespace Compiler.OOS_LanguageObjects
         public VarType varType;
         public override bool Equals(object obj)
         {
-            if (!(obj is VarTypeObject))
-                return false;
-            if (((VarTypeObject)obj).varType != this.varType)
-                return false;
-            if (this.varType != VarType.Object)
-                return true;
-            HelperClasses.NamespaceResolver nsrL = this.ident.LastIdent;
-            HelperClasses.NamespaceResolver nsrR = ((VarTypeObject)obj).ident.LastIdent;
-            if(nsrL != null && nsrR != null)
-                return nsrL.isSame(nsrR);
+            if (obj is HelperClasses.NamespaceResolver)
+            {
+                if (!this.IsObject)
+                    return false;
+                HelperClasses.NamespaceResolver nsrL = this.ident.LastIdent;
+                HelperClasses.NamespaceResolver nsrR = (HelperClasses.NamespaceResolver)obj;
+                if (nsrL != null && nsrR != null)
+                    return nsrL.isSame(nsrR);
+                else
+                    return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
+            }
             else
-                return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
+            {
+                if (!(obj is VarTypeObject))
+                    return false;
+                if (((VarTypeObject)obj).varType != this.varType)
+                    return false;
+                if (this.varType != VarType.Object)
+                    return true;
+                HelperClasses.NamespaceResolver nsrL = this.ident.LastIdent;
+                HelperClasses.NamespaceResolver nsrR = ((VarTypeObject)obj).ident.LastIdent;
+                if (nsrL != null && nsrR != null)
+                    return nsrL.isSame(nsrR);
+                else
+                    return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
+            }
         }
         public override int GetHashCode() { return base.GetHashCode(); }
     }

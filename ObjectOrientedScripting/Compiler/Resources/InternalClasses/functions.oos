@@ -1,4 +1,8 @@
-static fnc simple bool isServer ()			isServer		endFnc
-static fnc simple bool isDedicated ()		isDedicated		endFnc
-static fnc simple void sleep (scalar t)		sleep t			endFnc
+static fnc simple bool isServer ()					isServer		endFnc
+static fnc simple bool isDedicated ()				isDedicated		endFnc
+static fnc simple void sleep (scalar t)				sleep ( t )		endFnc
+static fnc simple scalar random (scalar max)		random ( t )	endFnc
+static fnc simple scalar mod (scalar i, scalar X)	( i ) mod ( X )	endFnc
+static fnc simple scalar time ()					time			endFnc
+
 

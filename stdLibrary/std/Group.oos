@@ -1,0 +1,19 @@
+using ::std::base::VehicleBase
+namespace std
+{
+	native Group flags disableConstructor
+	{
+//		fnc simple void setGroupIdGlobal ()						setGroupIdGlobal _this		endFnc
+//		fnc simple void setGroupId ()							setGroupId _this			endFnc
+		fnc simple string getGroupId ()							groupId _this				endFnc
+		fnc simple string getNetId ()							netId _this					endFnc
+		fnc simple void delete ()								deleteGroup _this			endFnc
+		fnc simple array<::std::base::VehicleBase> getUnits ()	units _this					endFnc
+	}
+	static fnc simple ::std::Group createGroupWest ()				createGroup WEST		endFnc
+	static fnc simple ::std::Group createGroupEast ()				createGroup EAST		endFnc
+	static fnc simple ::std::Group createGroupGuer ()				createGroup GUER		endFnc
+	static fnc simple ::std::Group createGroupCiv ()				createGroup CIV			endFnc
+	static fnc simple ::std::Group createGroupFromNetId (string s)	groupFromNetId ( s )	endFnc
+	static fnc simple array<::std::Group> getAllGroups ()			allGroups				endFnc
+}

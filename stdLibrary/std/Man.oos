@@ -1,6 +1,7 @@
 using std::Config
 using std::Context
 using std::base::VehicleBase
+using std::Group
 
 namespace std
 {
@@ -17,11 +18,23 @@ namespace std
 			Aimingerror = "AIMINGERROR",
 			Suppression = "SUPPRESSION"
 		}
-		assign simple ()
-			throw "InvalidOperation";
-		endAssign
-		fnc simple void disableAI (AiSection section)	_this disableAI section	endFnc
-		fnc simple void enableAI (AiSection section)	_this enableAI section	endFnc
+		enum Rank
+		{
+			Private = "PRIVATE",
+			Corporal = "CORPORAL",
+			Sergeant = "SERGEANT",
+			Lieutenant = "LIEUTENANT",
+			Captain = "CAPTAIN",
+			Major = "MAJOR",
+			Colonel = "COLONEL"
+		}
+		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)							( type ) createUnit [[i, j, k], group, "", 0.5, "PRIVATE"]	endAssign
+		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k, scalar skill, Rank rank)	( type ) createUnit [[i, j, k], group, "", skill, rank]		endAssign
+		assign simple (::std::Group group, string type, vec3 position)											( type ) createUnit [position, group, "", 0.5, "PRIVATE"]	endAssign
+		assign simple (::std::Group group, string type, vec3 position, scalar skill, Rank rank)					( type ) createUnit [position, group, "", skill, rank]		endAssign
+		
+		fnc simple void disableAI (AiSection section)	_this disableAI ( section )	endFnc
+		fnc simple void enableAI (AiSection section)	_this enableAI ( section )	endFnc
     }
 	static fnc ::std::Man getPlayer () player endFnc
 }

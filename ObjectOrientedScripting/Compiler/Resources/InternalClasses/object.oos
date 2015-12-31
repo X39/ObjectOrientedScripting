@@ -15,6 +15,6 @@ native nobject flags disableConstructor noObjectExtends
 		str _this
 	endFnc
 	fnc bool equals(nobject obj)
-		_this isEqualTo obj
+		_this isEqualTo ( obj )
 	endFnc
 }

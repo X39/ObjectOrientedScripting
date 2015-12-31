@@ -51,7 +51,7 @@ namespace Compiler.OOS_LanguageObjects
             this.IsFinalized = true;
             return errCount;
         }
-        public T getFirstOf<T>(bool allowThis = true)
+        public T getFirstOf<T>(bool allowThis = true, Type t = null)
         {
             if (allowThis && this is T)
             {
@@ -59,8 +59,12 @@ namespace Compiler.OOS_LanguageObjects
             }
             else
             {
+                if (t != null && this.GetType() != t)
+                {
+                    return default(T);
+                }
                 if (this.parent != null)
-                    return this.parent.getFirstOf<T>();
+                    return this.parent.getFirstOf<T>(true, t);
                 else
                     return default(T);
             }
@@ -101,13 +105,13 @@ namespace Compiler.OOS_LanguageObjects
                 return (T)(object)this;
             return default(T);
         }
-        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int deepness = -1, int scopeIndex = -1)
+        public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int deepness = -1, int scopeIndex = -1, Type[] tArr = null)
         {
             List<T> l = new List<T>();
-            private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness, scopeIndex);
+            private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness, scopeIndex, tArr);
             return l;
         }
-        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int deepness, int scopeIndex)
+        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int deepness, int scopeIndex, Type[] tArr)
         {
             if (deepness == 0)
                 return false;
@@ -120,8 +124,24 @@ namespace Compiler.OOS_LanguageObjects
                 if (obj is T)
                     l.Add((T)(object)obj);
                 if (fullSearch)
-                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness - 1, scopeIndex))
+                {
+                    if (tArr != null)
+                    {
+                        bool flag = true;
+                        foreach (var t in tArr)
+                        {
+                            if(obj.GetType().IsEquivalentTo(t))
+                            {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if (flag)
+                            continue;
+                    }
+                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness - 1, scopeIndex, tArr))
                         return true;
+                }
             }
             return false;
         }

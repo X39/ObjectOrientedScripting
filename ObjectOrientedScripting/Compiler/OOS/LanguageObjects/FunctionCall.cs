@@ -10,7 +10,7 @@ namespace Compiler.OOS_LanguageObjects
     public class FunctionCall : pBaseLangObject, Interfaces.iName, Interfaces.iHasType, Interfaces.iHasObject, Interfaces.iArgList
     {
         public Ident Name { get { return (Ident)Parent; } set { throw new Exception(); } }
-        public string FullyQualifiedName { get { return ((Interfaces.iName)Parent).Name.FullyQualifiedName; } }
+        public string FullyQualifiedName { get { return ((Ident)Parent).FullyQualifiedName; } }
 
         public pBaseLangObject ReferencedObject { get { return ((Ident)this.Parent).ReferencedObject; } }
         public VarTypeObject ReferencedType { get { return ((Ident)this.Parent).ReferencedType; } }
@@ -55,7 +55,8 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     var nIns = (NativeInstruction)fnc;
                     List<string> stringList = new List<string>();
-                    stringList.Add(variableName);
+                    if (!string.IsNullOrEmpty(variableName))
+                        stringList.Add(variableName);
                     foreach (var it in this.children)
                     {
                         using (MemoryStream memStream = new MemoryStream())

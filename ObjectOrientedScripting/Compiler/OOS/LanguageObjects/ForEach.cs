@@ -18,6 +18,7 @@ namespace Compiler.OOS_LanguageObjects
             this.children.Add(null);
             this.children.Add(null);
         }
+        private static bool warningSurpression = false;
         public override int doFinalize()
         {
             if (!Variable.LastIdent.ReferencedType.IsObject && !Variable.LastIdent.ReferencedType.ident.LastIdent.ReferencedObject.isType("::array"))
@@ -26,7 +27,11 @@ namespace Compiler.OOS_LanguageObjects
                 return 1;
             }
             //ToDo: implement the type check
-            Logger.Instance.log(Logger.LogLevel.WARNING, "foreach currently is not able to fully validate type safety! Thus OOS cannot confirm types are considered as safe.");
+            if (!warningSurpression)
+            {
+                warningSurpression = true;
+                Logger.Instance.log(Logger.LogLevel.WARNING, "foreach currently is not able to fully validate type safety! Thus OOS cannot confirm types are considered as safe.");
+            }
             return 0;
         }
 
@@ -81,9 +86,8 @@ namespace Compiler.OOS_LanguageObjects
                     it.writeOut(sw, cfg);
                     sw.WriteLine(";");
                 }
-                sw.Write(tab + "} foreach (");
+                sw.Write(tab + "} foreach ");
                 Variable.writeOut(sw, cfg);
-                sw.WriteLine(");");
             }
             else
             {
