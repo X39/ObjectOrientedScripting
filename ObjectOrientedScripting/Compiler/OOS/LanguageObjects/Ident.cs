@@ -736,8 +736,12 @@ namespace Compiler.OOS_LanguageObjects
                                 return "___tmp___";
                             if (s == "")
                                 s += variable.SqfVariableName;
-                            if(variable.Parent is Interfaces.iClass)
-                                s = '(' + s + " select " + variable.SqfVariableName + ')';
+                            if (variable.Parent is Interfaces.iClass)
+                            {
+                                AssignContainer ac = this.getFirstOf<AssignContainer>();
+                                if(ac == null || (ac.Name != this && !ac.Name.getAllChildrenOf<Ident>(true).Contains(this)))
+                                    s = '(' + s + " select " + variable.SqfVariableName + ')';
+                            }
                         }
                         else if (this.ReferencedObject is oosEnum.EnumEntry)
                         {
