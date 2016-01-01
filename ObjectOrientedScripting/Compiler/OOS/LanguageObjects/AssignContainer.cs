@@ -24,18 +24,18 @@ namespace Compiler.OOS_LanguageObjects
         {
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             sw.Write(tab);
-            if (!this.Name.IsSimpleIdentifier && this.Name.LastIdent.ReferencedType.IsObject && !(this.Name.LastIdent.ReferencedType.ident.ReferencedObject is Native))
+            if (((Variable)this.Name.LastIdent.ReferencedObject).encapsulation == Encapsulation.NA || ((Variable)this.Name.LastIdent.ReferencedObject).encapsulation == Encapsulation.Static)
+            {
+                this.Name.writeOut(sw, cfg);
+                sw.Write(" = ");
+                this.assign.writeOut(sw, cfg);
+            }
+            else
             {
                 this.Name.writeOut(sw, cfg);
                 sw.Write(" set [" + ((Variable)this.Name.LastIdent.ReferencedObject).SqfVariableName + ", ");
                 this.assign.writeOut(sw, cfg);
                 sw.Write("]");
-            }
-            else
-            {
-                this.Name.writeOut(sw, cfg);
-                sw.Write(" = ");
-                this.assign.writeOut(sw, cfg);
             }
         }
     }
