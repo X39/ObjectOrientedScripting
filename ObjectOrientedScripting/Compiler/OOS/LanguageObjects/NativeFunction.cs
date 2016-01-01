@@ -24,7 +24,7 @@ namespace Compiler.OOS_LanguageObjects
         /// <summary>
         /// Returns functions encapsulation
         /// </summary>
-        public Encapsulation FunctionEncapsulation { get { return Encapsulation.Public; } }
+        public Encapsulation FunctionEncapsulation { get { return this.Parent is Native ? Encapsulation.Public : Encapsulation.Static; } }
         /// <summary>
         /// Returns the Arglist required for this iFunction
         /// </summary>
