@@ -245,6 +245,7 @@ namespace Compiler.OOS_LanguageObjects
                     if (it is Variable)
                     {
                         sw.Write('"' + ((Variable)it).SqfVariableName + '"');
+                        printComma = true;
                     }
                     else
                     {
