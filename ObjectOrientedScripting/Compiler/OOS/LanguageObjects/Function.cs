@@ -300,10 +300,13 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         if (it is Interfaces.iFunction && !((Interfaces.iFunction)it).IsVirtual)
                             continue;
-                        if (index > 0)
-                            sw.Write(", ");
-                        sw.Write("\"" + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix : "") + "\"");
-                        index++;
+                        if (!(it is Variable) || ((Variable)it).Value != null)
+                        {
+                            if (index > 0)
+                                sw.Write(", ");
+                            sw.Write("\"" + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix : "") + "\"");
+                            index++;
+                        }
                     }
                     sw.WriteLine("];");
                 }
@@ -313,20 +316,21 @@ namespace Compiler.OOS_LanguageObjects
                         continue;
                     if (it is Interfaces.iFunction && !((Interfaces.iFunction)it).IsVirtual)
                         continue;
-                    sw.Write(tab + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix + " = {\r\n" : " = "));
                     if (it is Function)
                     {
+                        sw.Write(tab + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix + " = {\r\n" : " = "));
                         it.writeOut(sw, cfg);
                         sw.WriteLine(tab + "};");
                     }
                     else
                     {
                         var val = ((Variable)it).Value;
-                        if (val == null)
-                            sw.Write("nil");
-                        else
+                        if (val != null)
+                        {
+                            sw.Write(tab + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix + " = {\r\n" : " = "));
                             val.writeOut(sw, cfg);
-                        sw.WriteLine(";");
+                            sw.WriteLine(";");
+                        }
                     }
                 }
                 sw.Write(tab + Wrapper.Compiler.thisVariableName + " = [");
@@ -403,7 +407,10 @@ namespace Compiler.OOS_LanguageObjects
                         if (variable.IsClassVariable)
                         {
                             sw.Write(", ");
-                            sw.Write(Wrapper.Compiler.thisVariableName + "var" + ((Variable)child).Name.OriginalValue.Replace("::", "_"));
+                            if (variable.Value == null)
+                                sw.Write("nil");
+                            else
+                                sw.Write(Wrapper.Compiler.thisVariableName + "var" + ((Variable)child).Name.OriginalValue.Replace("::", "_"));
                         }
                     }
                     else
