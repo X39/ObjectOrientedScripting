@@ -43,9 +43,19 @@ namespace Compiler.OOS_LanguageObjects
                     outString = Regex.Replace(outString, "\\b" + "_this" + "\\b", argList[0].Trim());
                 if (this.children.Count > 0 && children[0] is Ident)
                 {
-                    for (int i = 1; i < argList.Length; i++)
+                    if (this.Parent is Native)
                     {
-                        outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", argList[i].Trim());
+                        for (int i = 1; i < argList.Length; i++)
+                        {
+                            outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", argList[i].Trim());
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < argList.Length; i++)
+                        {
+                            outString = Regex.Replace(outString, "\\b" + ((Variable)this.children[i + 1]).Name.OriginalValue + "\\b", argList[i].Trim());
+                        }
                     }
                 }
                 else
