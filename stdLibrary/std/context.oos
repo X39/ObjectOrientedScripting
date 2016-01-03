@@ -13,7 +13,7 @@ namespace std
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setString (string ident, string val)
-			_this setVariable [ident, val, false]
+			_this setVariable [ident, val]
 		endFnc
         fnc simple void setString (string ident, string val, bool publish)
 			_this setVariable [ident, val, publish]
@@ -26,7 +26,7 @@ namespace std
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setScalar (string ident, scalar val)
-			_this setVariable [ident, val, false]
+			_this setVariable [ident, val]
 		endFnc
         fnc simple void setScalar (string ident, scalar val, bool publish)
 			_this setVariable [ident, val, publish]
@@ -39,7 +39,7 @@ namespace std
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setBool (string ident, bool val)
-			_this setVariable [ident, val, false]
+			_this setVariable [ident, val]
 		endFnc
         fnc simple void setBool (string ident, bool val, bool publish)
 			_this setVariable [ident, val, publish]
@@ -52,7 +52,7 @@ namespace std
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setObject (string ident, object val)
-			_this setVariable [ident, val, false]
+			_this setVariable [ident, val]
 		endFnc
         fnc simple void setObject (string ident, object val, bool publish)
 			_this setVariable [ident, val, publish]
@@ -65,7 +65,7 @@ namespace std
 			_this getVariable [ident, defValue]
 		endFnc
         fnc simple void setNativeObject (string ident, nobject val)
-			_this setVariable [ident, val, false]
+			_this setVariable [ident, val]
 		endFnc
         fnc simple void setNativeObject (string ident, nobject val, bool publish)
 			_this setVariable [ident, val, publish]
