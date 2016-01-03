@@ -712,7 +712,12 @@ namespace Compiler.OOS_LanguageObjects
             }
 
             if (callWrapper)
-                sw.Write(" ___tmp___}");
+            {
+                if(this.LastIdent.ReferencedType.varType == VarType.Void)
+                    sw.Write('}');
+                else
+                    sw.Write(" ___tmp___}");
+            }
 
         }
         public string WriteOutValue
