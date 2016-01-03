@@ -7,6 +7,12 @@ namespace std
 {
     native Marker
     {
+		enum Shape
+		{
+			Icon = "ICON",
+			Rectangle = "RECTANGLE",
+			Ellipse = "ELLIPSE"
+		}
 		enum Brush
 		{
 			Solid = "Solid",
@@ -64,6 +70,10 @@ namespace std
 		fnc simple Color getColor()									markerColor _this				endFnc
 		fnc simple void setBrush(Brush brush)						_this setMarkerBrush ( brush )	endFnc
 		fnc simple Brush getBrush()									markerBrush _this				endFnc
+		fnc simple void setType(string t)							_this setMarkerType ( t )		endFnc
+		fnc simple string getType()									markerType _this				endFnc
+		fnc simple void setShape(Shape shape)						_this setMarkerShape ( shape )	endFnc
+		fnc simple Shape getShape()									markerShape _this				endFnc
 		fnc simple void setSize(scalar x, scalar y)					_this setMarkerSize [x, y]		endFnc
 		fnc simple array<scalar> getSize()							markerSize _this				endFnc
 		fnc simple void setPosition(scalar x, scalar y)				_this setMarkerPos [x, y, 0]	endFnc
