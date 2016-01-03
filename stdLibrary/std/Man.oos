@@ -36,5 +36,5 @@ namespace std
 		fnc simple void disableAI (AiSection section)	_this disableAI ( section )	endFnc
 		fnc simple void enableAI (AiSection section)	_this enableAI ( section )	endFnc
     }
-	static fnc ::std::Man getPlayer () player endFnc
+	static fnc simple ::std::Man getPlayer () player endFnc
 }
