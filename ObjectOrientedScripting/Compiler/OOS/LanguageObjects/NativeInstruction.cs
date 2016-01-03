@@ -78,9 +78,10 @@ namespace Compiler.OOS_LanguageObjects
                 outString += "] call {";
                 string tmp = Code;
                 tmp = Regex.Replace(tmp, "\\b" + "_this" + "\\b", "(_this select 0)");
-                for (int i = (this.children.Count > 0 && children[0] is Ident ? 1 : 0); i < this.children.Count; i++)
+                int offset = (this.children.Count > 0 && children[0] is Ident ? 1 : 0);
+                for (int i = offset; i < this.children.Count; i++)
                 {
-                    tmp = Regex.Replace(tmp, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", "(_this select " + (i + 1) + ")");
+                    tmp = Regex.Replace(tmp, "\\b" + ((Variable)this.children[i]).Name.OriginalValue + "\\b", "(_this select " + (i - offset) + ")");
                 }
                 outString += tmp + "}";
             }
