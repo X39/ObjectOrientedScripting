@@ -695,12 +695,9 @@ namespace Compiler.OOS_LanguageObjects
                     ms.Close();
                     if (assignToTmp)
                     {
-                        if (output != "___tmp___")
-                        {
-                            sw.Write(" ___tmp___ = (");
-                            sw.Write(output);
-                            sw.Write(");");
-                        }
+                        sw.Write(" ___tmp___ = (");
+                        sw.Write(output);
+                        sw.Write(");");
                     }
                     else
                     {
@@ -726,14 +723,24 @@ namespace Compiler.OOS_LanguageObjects
                 switch (this.Type)
                 {
                     case IdenType.FunctionCall:
-                        break;
                     case IdenType.ArrayAccess:
                     case IdenType.VariableAccess:
-                        if(this.ReferencedObject is Variable)
+                        var refObj = this.ReferencedObject;
+                        if (this.type == IdenType.FunctionCall)
                         {
-                            var variable = (Variable)this.ReferencedObject;
+                            if (((Interfaces.iFunction)refObj).FunctionEncapsulation == Encapsulation.Static || ((Interfaces.iFunction)refObj).IsConstructor || !this.HasCallWrapper)
+                                break;
+                            refObj = ((Ident)this.Parent).ReferencedObject;
+                        }
+                        if(refObj is Variable)
+                        {
+                            var variable = (Variable)refObj;
                             if (this.HasCallWrapper)
-                                return "___tmp___";
+                            {
+                                if (this.type == IdenType.FunctionCall)
+                                    break;
+                                s = "___tmp___";
+                            }
                             if (s == "")
                                 s += variable.SqfVariableName;
                             if (variable.Parent is Interfaces.iClass)
@@ -743,23 +750,19 @@ namespace Compiler.OOS_LanguageObjects
                                     s = '(' + s + " select " + variable.SqfVariableName + ')';
                             }
                         }
-                        else if (this.ReferencedObject is oosEnum.EnumEntry)
+                        else if (refObj is oosEnum.EnumEntry)
                         {
-                            var entry = this.ReferencedObject as oosEnum.EnumEntry;
+                            var entry = refObj as oosEnum.EnumEntry;
                             s += entry.Value.value;
                         }
-                        else if (this.ReferencedObject is oosEnum)
+                        else if (refObj is Interfaces.iFunction)
                         {
-                            throw new Exception();
-                        }
-                        else
-                        {
-                            throw new Exception();
+                            if (s.Contains("___tmp___"))
+                                s = "___tmp___";
                         }
                         break;
                     case IdenType.ThisVar:
-                        s += Wrapper.Compiler.thisVariableName;
-                        break;
+                        return Wrapper.Compiler.thisVariableName;
                 }
                 return s;
             }
