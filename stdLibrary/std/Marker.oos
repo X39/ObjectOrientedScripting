@@ -78,5 +78,7 @@ namespace std
 		fnc simple array<scalar> getSize()							markerSize _this				endFnc
 		fnc simple void setPosition(scalar x, scalar y)				_this setMarkerPos [x, y, 0]	endFnc
 		fnc simple array<scalar> getPosition()						markerPos _this					endFnc
+		
+		fnc simple void delete()									deleteMarker _this				endFnc
     }
 }
