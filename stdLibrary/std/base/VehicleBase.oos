@@ -35,6 +35,9 @@ namespace std
             fnc simple bool                            isKindOf        (string type)                   _this isKindOf ( type )                     endFnc
             fnc simple bool                            isAlive         ()                              alive _this                                 endFnc
             fnc simple bool                            isAttachedTo    (::std::base::VehicleBase vehicle)        attachedTo _this == ( vehicle )   endFnc
+			
+			
+            fnc simple void delete () deleteVehicle _this endFnc
         }
     }
 }
