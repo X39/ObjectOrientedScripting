@@ -695,9 +695,12 @@ namespace Compiler.OOS_LanguageObjects
                     ms.Close();
                     if (assignToTmp)
                     {
-                        sw.Write(" ___tmp___ = (");
-                        sw.Write(output);
-                        sw.Write(");");
+                        if (output != "___tmp___")
+                        {
+                            sw.Write(" ___tmp___ = (");
+                            sw.Write(output);
+                            sw.Write(");");
+                        }
                     }
                     else
                     {
