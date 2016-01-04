@@ -23,7 +23,7 @@ namespace Compiler
             LNK0035, LNK0036, LNK0037, LNK0038, LNK0039,
             LNK0040, LNK0041, LNK0042, LNK0043, LNK0044,
             LNK0045, LNK0046, LNK0047, LNK0048, LNK0049,
-            LNK0050
+            LNK0050, LNK0051
 
         }
 
@@ -86,6 +86,7 @@ namespace Compiler
                 case LinkerErrorCode.LNK0048: return "Invalid Operation, enum idents resolve to same value";
                 case LinkerErrorCode.LNK0049: return "Invalid Operation, static native function tries to access _this";
                 case LinkerErrorCode.LNK0050: return "Type Missmatch, Expression has to return scalar";
+                case LinkerErrorCode.LNK0051: return "Invalid Operation, variable name collides with object variable";
 
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";

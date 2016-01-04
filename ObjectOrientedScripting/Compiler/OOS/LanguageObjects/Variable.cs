@@ -141,6 +141,24 @@ namespace Compiler.OOS_LanguageObjects
                                 errCount++;
                             }
                         }
+                        var cls = this.getFirstOf<Interfaces.iClass>();
+                        if (cls != null)
+                        {
+                            bool flag = false;
+                            foreach (var it in ((pBaseLangObject)cls).getAllChildrenOf<Variable>())
+                            {
+                                if (it.Name.FullyQualifiedName == this.Name.FullyQualifiedName)
+                                {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                            if (flag)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0051, this.Line, this.Pos, this.File));
+                                errCount++;
+                            }
+                        }
                     }
                     break;
                 default:
