@@ -134,6 +134,7 @@
     <None Include="Resources\InternalClasses\array.oos" />
     <None Include="Resources\InternalClasses\functions.oos" />
     <None Include="Resources\InternalClasses\object.oos" />
+    <None Include="Resources\InternalClasses\script.oos" />
     <None Include="Resources\InternalClasses\string.oos" />
     <None Include="Resources\InternalClasses\vec3.oos" />
     <None Include="Resources\SQF_SupportInfo.txt" />

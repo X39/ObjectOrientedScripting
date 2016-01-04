@@ -136,4 +136,7 @@
   <data name="vec3" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\InternalClasses\vec3.oos;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="script" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\internalclasses\script.oos;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

@@ -247,6 +247,11 @@ namespace Wrapper
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.script)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                errCount += p.errors.count;
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.functions)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
