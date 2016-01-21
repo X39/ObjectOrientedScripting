@@ -121,7 +121,7 @@ namespace WrapperUI
                 proj.OutputFolder = tbProjectOutFolder.Text;
                 proj.Buildfolder = tbProjectBuildFolder.Text;
                 proj.SrcFolder = tbProjectSrcFolder.Text;
-                proj.CompilerVersion = tbProjectSrcFolder.Text;
+                proj.CompilerVersion = tbCompilerVersion.Text;
 
                 proj.writeToFile(tbProjPath.Text);
             }

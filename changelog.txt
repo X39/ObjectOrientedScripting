@@ -18,7 +18,8 @@ Version 0.7.2-ALPHA
 	|\- stdLib:   new function: Shape getType()
 	|- stdLib:    Added floor(scalar) function
 	|- stdLib:    Added delete() function to ::std::Marker
-	\- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
+	|- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
+	|- WrapperUI: fixed saving exception which prevented saving changes
 
 Version 0.7.1-ALPHA
     |- Compiler:  fixed member functions without arguments lacked params command
