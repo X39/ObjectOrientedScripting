@@ -1,3 +1,25 @@
+Version 0.7.2-ALPHA
+    |- Compiler:  fixed issue where assignment type is not chosen correctly
+    |- Compiler:  fixed member variables are "directly assigned"
+    |- Compiler:  fixed member variables w/o def val being initialized using nil
+    |- Compiler:  fixed missing comma printing on params for multi-arg fncs
+    |- Compiler:  fixed static native functions args get messed up with printout
+    |- Compiler:  fixed native functions wrappers wrong select index
+    |- Compiler:  fixed void function wrappers tried to return something
+    |- Compiler:  added internal script object (currently unused)
+    |- Compiler:  added internal floor(<scalar>) function
+    |- Compiler:  added LNK0051 exception for variable defined twice in class
+    |-            and function
+    |v- stdLib:   Updated ::std::Marker functions
+	||- stdLib:   new enum: Shape
+	||- stdLib:   new function: void setType(string)
+	||- stdLib:   new function: string getType()
+	||- stdLib:   new function: void setShape(Shape)
+	|\- stdLib:   new function: Shape getType()
+	|- stdLib:    Added floor(scalar) function
+	|- stdLib:    Added delete() function to ::std::Marker
+	\- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
+
 Version 0.7.1-ALPHA
     |- Compiler:  fixed member functions without arguments lacked params command
     |- Compiler:  fixed callWrapper `___tmp___ = ___tmp___` printout
@@ -20,7 +42,10 @@ Version 0.7.1-ALPHA
     |- Compiler:  added vec3 object to OOS
     |v- Compiler: added native functions to OOS
     ||-           isServer()
-    ||-           sleep(scalar)
+    ||-           sleep(<scalar>)
+    ||-           random(<scalar>)
+    ||-           mod(<scalar>, <scalar>)
+    ||-           time()
     |\-           isDedicated()
     |- stdLib:    added ::std::getPlayer static function to ::std::Man
     |- stdLib:    added AiSection enum to ::std::Man
