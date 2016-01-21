@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.7.1-ALPHA"
+#define MyAppVersion "0.7.2-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "WrapperUI.exe"
@@ -49,6 +49,28 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
+'Version 0.7.2-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Compiler:  fixed issue where assignment type is not chosen correctly     ' + AnsiChar(#10) +
+'    |- Compiler:  fixed member variables are "directly assigned"                ' + AnsiChar(#10) +
+'    |- Compiler:  fixed member variables w/o def val being initialized using nil' + AnsiChar(#10) +
+'    |- Compiler:  fixed missing comma printing on params for multi-arg fncs     ' + AnsiChar(#10) +
+'    |- Compiler:  fixed static native functions args get messed up with printout' + AnsiChar(#10) +
+'    |- Compiler:  fixed native functions wrappers wrong select index            ' + AnsiChar(#10) +
+'    |- Compiler:  fixed void function wrappers tried to return something        ' + AnsiChar(#10) +
+'    |- Compiler:  added internal script object (currently unused)               ' + AnsiChar(#10) +
+'    |- Compiler:  added internal floor(<scalar>) function                       ' + AnsiChar(#10) +
+'    |- Compiler:  added LNK0051 exception for variable defined twice in class   ' + AnsiChar(#10) +
+'    |-            and function                                                  ' + AnsiChar(#10) +
+'    |v- stdLib:   Updated ::std::Marker functions                               ' + AnsiChar(#10) +
+'    ||- stdLib:   new enum: Shape                                               ' + AnsiChar(#10) +
+'    ||- stdLib:   new function: void setType(string)                            ' + AnsiChar(#10) +
+'    ||- stdLib:   new function: string getType()                                ' + AnsiChar(#10) +
+'    ||- stdLib:   new function: void setShape(Shape)                            ' + AnsiChar(#10) +
+'    |\- stdLib:   new function: Shape getType()                                 ' + AnsiChar(#10) +
+'    |- stdLib:    Added floor(scalar) function                                  ' + AnsiChar(#10) +
+'    |- stdLib:    Added delete() function to ::std::Marker                      ' + AnsiChar(#10) +
+'    \- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase    ' + AnsiChar(#10) +
+'                                                                                ' + AnsiChar(#10) +
 'Version 0.7.1-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  fixed member functions without arguments lacked params command' + AnsiChar(#10) +
 '    |- Compiler:  fixed callWrapper `___tmp___ = ___tmp___` printout            ' + AnsiChar(#10) +
