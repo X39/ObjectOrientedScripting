@@ -383,6 +383,7 @@
             this.tbProjectBuildFolder.Name = "tbProjectBuildFolder";
             this.tbProjectBuildFolder.Size = new System.Drawing.Size(360, 20);
             this.tbProjectBuildFolder.TabIndex = 9;
+            this.tbProjectBuildFolder.TextChanged += new System.EventHandler(this.tbProjectBuildFolder_TextChanged);
             // 
             // tbProjectOutFolder
             // 
@@ -391,6 +392,7 @@
             this.tbProjectOutFolder.Name = "tbProjectOutFolder";
             this.tbProjectOutFolder.Size = new System.Drawing.Size(360, 20);
             this.tbProjectOutFolder.TabIndex = 8;
+            this.tbProjectOutFolder.TextChanged += new System.EventHandler(this.tbProjectOutFolder_TextChanged);
             // 
             // tbProjectMainFile
             // 
@@ -399,6 +401,7 @@
             this.tbProjectMainFile.Name = "tbProjectMainFile";
             this.tbProjectMainFile.Size = new System.Drawing.Size(360, 20);
             this.tbProjectMainFile.TabIndex = 7;
+            this.tbProjectMainFile.TextChanged += new System.EventHandler(this.tbProjectMainFile_TextChanged);
             // 
             // tbProjectAuthor
             // 
@@ -407,6 +410,7 @@
             this.tbProjectAuthor.Name = "tbProjectAuthor";
             this.tbProjectAuthor.Size = new System.Drawing.Size(360, 20);
             this.tbProjectAuthor.TabIndex = 6;
+            this.tbProjectAuthor.TextChanged += new System.EventHandler(this.tbProjectAuthor_TextChanged);
             // 
             // label1
             // 
@@ -460,6 +464,7 @@
             this.tbProjectTitle.Name = "tbProjectTitle";
             this.tbProjectTitle.Size = new System.Drawing.Size(360, 20);
             this.tbProjectTitle.TabIndex = 5;
+            this.tbProjectTitle.TextChanged += new System.EventHandler(this.tbProjectTitle_TextChanged);
             // 
             // tbProjectSrcFolder
             // 
@@ -468,6 +473,7 @@
             this.tbProjectSrcFolder.Name = "tbProjectSrcFolder";
             this.tbProjectSrcFolder.Size = new System.Drawing.Size(360, 20);
             this.tbProjectSrcFolder.TabIndex = 11;
+            this.tbProjectSrcFolder.TextChanged += new System.EventHandler(this.tbProjectSrcFolder_TextChanged);
             // 
             // label6
             // 
@@ -485,6 +491,7 @@
             this.tbCompilerVersion.Name = "tbCompilerVersion";
             this.tbCompilerVersion.Size = new System.Drawing.Size(360, 20);
             this.tbCompilerVersion.TabIndex = 13;
+            this.tbCompilerVersion.TextChanged += new System.EventHandler(this.tbCompilerVersion_TextChanged);
             // 
             // label7
             // 
@@ -599,6 +606,7 @@
             this.MinimumSize = new System.Drawing.Size(512, 512);
             this.Name = "Form1";
             this.Text = "WrapperUI";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.tabControl1.ResumeLayout(false);
             this.tabCompile.ResumeLayout(false);
             this.tabCompile.PerformLayout();

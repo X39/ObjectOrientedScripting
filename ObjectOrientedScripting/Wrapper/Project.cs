@@ -14,10 +14,28 @@ namespace Wrapper
         {
             public string InPath { get; set; }
             public string OutPath { get; set; }
-            public Ressource(string inPath, string outPath)
+            public Ressource(string inPath, string outPath, Project proj = null)
             {
-                this.InPath = inPath;
-                this.OutPath = outPath;
+                if (inPath.StartsWith("./") || inPath.StartsWith(".\\"))
+                {
+                    if (proj == null)
+                        throw new Exception("Dot path found but no Project argument provided");
+                    this.InPath = proj.ProjectPath + inPath.Substring(2).Replace('/', '\\');
+                }
+                else
+                {
+                    this.InPath = inPath;
+                }
+                if (outPath.StartsWith("./") || outPath.StartsWith(".\\"))
+                {
+                    if (proj == null)
+                        throw new Exception("Dot path found but no Project argument provided");
+                    this.OutPath = proj.ProjectPath + outPath.Substring(2).Replace('/', '\\');
+                }
+                else
+                {
+                    this.OutPath = outPath;
+                }
             }
             public Ressource(XmlNode node)
             {
@@ -39,6 +57,10 @@ namespace Wrapper
 
                 if (string.IsNullOrEmpty(this.InPath) || string.IsNullOrEmpty(this.OutPath))
                     throw new Exception();
+            }
+            public override string ToString()
+            {
+                return this.OutPath;
             }
         }
         public class Define
@@ -223,6 +245,10 @@ namespace Wrapper
                     this._outputFolder = this.ProjectPath + value.Substring(2).Replace('/', '\\');
                 else
                     throw new ArgumentException("FilePath needs to be either full path (D:/) or relative (./)");
+                if (!this._outputFolder.EndsWith("\\"))
+                {
+                    this._outputFolder += '\\';
+                }
             }
             get { return this._outputFolder; }
         }
@@ -237,6 +263,10 @@ namespace Wrapper
                     this._srcFolder = this.ProjectPath + value.Substring(2).Replace('/', '\\');
                 else
                     throw new ArgumentException("FilePath needs to be either full path (D:/) or relative (./)");
+                if(!this._srcFolder.EndsWith("\\"))
+                {
+                    this._srcFolder += '\\';
+                }
             }
             get { return this._srcFolder; }
         }
@@ -251,6 +281,10 @@ namespace Wrapper
                     this._buildfolder = this.ProjectPath + value.Substring(2).Replace('/', '\\');
                 else
                     throw new ArgumentException("FilePath needs to be either full path (D:/) or relative (./)");
+                if (!this._buildfolder.EndsWith("\\"))
+                {
+                    this._buildfolder += '\\';
+                }
             }
             get { return this._buildfolder; }
         }
@@ -356,7 +390,7 @@ namespace Wrapper
                 //<mainfile>this.Mainfile</mainfile>
                 node = new XElement("mainfile");
                 s = this.Mainfile;
-                if (filepath.StartsWith(this.ProjectPath))
+                if (s.StartsWith(this.ProjectPath))
                     s = ".\\" + s.Substring(this.ProjectPath.Length);
                 node.Value = s;
                 projectNode.Add(node);
@@ -365,7 +399,7 @@ namespace Wrapper
                 //<outputfolder>this.OutputFolder</outputfolder>
                 node = new XElement("outputfolder");
                 s = this.OutputFolder;
-                if (filepath.StartsWith(this.ProjectPath))
+                if (s.StartsWith(this.ProjectPath))
                     s = ".\\" + s.Substring(this.ProjectPath.Length);
                 node.Value = s;
                 projectNode.Add(node);
@@ -374,7 +408,7 @@ namespace Wrapper
                 //<buildfolder>this.Buildfolder</buildfolder>
                 node = new XElement("buildfolder");
                 s = this.Buildfolder;
-                if (filepath.StartsWith(this.ProjectPath))
+                if (s.StartsWith(this.ProjectPath))
                     s = ".\\" + s.Substring(this.ProjectPath.Length);
                 node.Value = s;
                 projectNode.Add(node);
@@ -382,8 +416,8 @@ namespace Wrapper
 
                 //<srcfolder>this.SrcFolder</srcfolder>
                 node = new XElement("srcfolder");
-                s = this.Buildfolder;
-                if (filepath.StartsWith(this.ProjectPath))
+                s = this.SrcFolder;
+                if (s.StartsWith(this.ProjectPath))
                     s = ".\\" + s.Substring(this.ProjectPath.Length);
                 node.Value = s;
                 projectNode.Add(node);
@@ -396,7 +430,7 @@ namespace Wrapper
                 root.Add(compilerNode);
                 compilerNode.Add(new XAttribute("version", this.CompilerVersion.ToString()));
 
-                foreach(var it in this.Defines)
+                foreach (var it in this.Defines)
                 {
                     //<define name="DEFINENAME">
                     var defineNode = new XElement("define");
@@ -408,7 +442,7 @@ namespace Wrapper
                     node.Value = it.ReplaceText;
                     defineNode.Add(node);
 
-                    foreach(var arg in it.ArgList)
+                    foreach (var arg in it.ArgList)
                     {
                         //<argument name="NAME" />
                         node = new XElement("argument");
@@ -420,6 +454,32 @@ namespace Wrapper
 
 
             }///<compiler>
+            {//<ressources>
+                string s;
+                var ressourcesNode = new XElement("ressources");
+                root.Add(ressourcesNode);
+
+                foreach (var it in this.Ressources)
+                {
+                    //<res in="PATH" out="PATH" />
+                    var resNode = new XElement("res");
+                    ressourcesNode.Add(resNode);
+                    s = it.InPath;
+                    if (s.StartsWith(this.ProjectPath))
+                        s = ".\\" + s.Substring(this.ProjectPath.Length);
+                    else if (s.Length > 2 && s[1] != ':' && !s.StartsWith(".\\"))
+                        s = ".\\" + s;
+                    resNode.Add(new XAttribute("in", s));
+                    s = it.OutPath;
+                    if (s.StartsWith(this.ProjectPath))
+                        s = ".\\" + s.Substring(this.ProjectPath.Length);
+                    else if (s.Length > 2 && s[1] != ':' && !s.StartsWith(".\\"))
+                        s = ".\\" + s;
+                    resNode.Add(new XAttribute("out", s));
+                }
+
+
+            }///<ressources>
 
             doc.Save(filepath);
         }

@@ -1,4 +1,8 @@
 Version 0.7.2-ALPHA
+	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
+	|             srcfolder
+	|- WrapperUI: fixed saving exception which prevented saving changes
+	|- WrapperUI: fixed set buttons not getting disabled when loading files
     |- Compiler:  fixed issue where assignment type is not chosen correctly
     |- Compiler:  fixed member variables are "directly assigned"
     |- Compiler:  fixed member variables w/o def val being initialized using nil
@@ -16,10 +20,12 @@ Version 0.7.2-ALPHA
 	||- stdLib:   new function: string getType()
 	||- stdLib:   new function: void setShape(Shape)
 	|\- stdLib:   new function: Shape getType()
-	|- stdLib:    Added floor(scalar) function
 	|- stdLib:    Added delete() function to ::std::Marker
 	|- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
-	|- WrapperUI: fixed saving exception which prevented saving changes
+	|- WrapperUI: WrapperUI will inform you about unsaved changes you have
+	|             made to current file upon load/close
+	|- WrapperUI: Implemented Ressources
+	|- Compiler:  Implemented Ressources
 
 Version 0.7.1-ALPHA
     |- Compiler:  fixed member functions without arguments lacked params command

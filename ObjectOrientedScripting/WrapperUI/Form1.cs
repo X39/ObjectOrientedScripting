@@ -17,8 +17,10 @@ namespace WrapperUI
     public partial class Form1 : Form
     {
         private Project proj;
+        private bool changesMade;
         public Form1(string projectPath)
         {
+            changesMade = false;
             InitializeComponent();
             if (!string.IsNullOrEmpty(projectPath))
                 if (File.Exists(projectPath))
@@ -63,10 +65,18 @@ namespace WrapperUI
             {
                 this.lbCompilerFlags.Items.Add(it);
             }
+            lbRessources.Items.Clear();
+            foreach (var it in proj.Ressources)
+            {
+                this.lbRessources.Items.Add(it);
+            }
+            btnSetRessource.Enabled = false;
+            btnCompilerflagSet.Enabled = false;
             this.btnSaveFile.Enabled = true;
             tcDefinesRessources.Enabled = true;
             gbProjectInformations.Enabled = true;
             btnDoCompile.Enabled = true;
+            changesMade = false;
         }
 
         private void lbCompilerFlags_SelectedIndexChanged(object sender, EventArgs e)
@@ -81,6 +91,7 @@ namespace WrapperUI
         {
             try
             {
+                changesMade = true;
                 var define = ((Project.Define)lbCompilerFlags.SelectedItem);
                 Project.Define.fromReal(tbDefineRealString.Text, (Project.Define)lbCompilerFlags.SelectedItem);
                 int index = lbCompilerFlags.Items.IndexOf(define);
@@ -98,6 +109,7 @@ namespace WrapperUI
         {
             try
             {
+                changesMade = true;
                 var define = Project.Define.fromReal(tbDefineRealString.Text);
                 proj.Defines.Add(define);
                 lbCompilerFlags.Items.Add(define);
@@ -122,8 +134,9 @@ namespace WrapperUI
                 proj.Buildfolder = tbProjectBuildFolder.Text;
                 proj.SrcFolder = tbProjectSrcFolder.Text;
                 proj.CompilerVersion = tbCompilerVersion.Text;
-
+                
                 proj.writeToFile(tbProjPath.Text);
+                changesMade = false;
             }
             catch (Exception ex)
             {
@@ -133,7 +146,19 @@ namespace WrapperUI
 
         private void btnSetProjectPath_Click(object sender, EventArgs e)
         {
-            if(openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (changesMade)
+            {
+                var dlgRes = MessageBox.Show("There are unsaved changes.\nDo you want to save them now?", "You might forgot something?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Information);
+                switch (dlgRes)
+                {
+                    case DialogResult.Yes:
+                        this.btnSaveFile_Click(sender, null);
+                        break;
+                    case DialogResult.Cancel:
+                        return;
+                }
+            }
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 tbProjPath.Text = openFileDialog1.FileName;
                 this.LoadFile(false);
@@ -154,6 +179,7 @@ namespace WrapperUI
                 return;
             if(e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
+                changesMade = true;
                 proj.Defines.Remove((Project.Define)lbCompilerFlags.SelectedItem);
                 lbCompilerFlags.Items.Remove(lbCompilerFlags.SelectedItem);
             }
@@ -200,7 +226,8 @@ namespace WrapperUI
         {
             try
             {
-                var res = new Project.Ressource(tbRessourcesInPath.Text, tbRessourcesOutPath.Text);
+                changesMade = true;
+                var res = new Project.Ressource(tbRessourcesInPath.Text, tbRessourcesOutPath.Text, proj);
                 proj.Ressources.Add(res);
                 lbRessources.Items.Add(res);
                 lbRessources.SelectedItem = res;
@@ -215,13 +242,15 @@ namespace WrapperUI
         {
             try
             {
-                //ToDo: Finish Ressource rebinding
-                var res = ((Project.Ressource)lbCompilerFlags.SelectedItem);
-                Project.Define.fromReal(tbDefineRealString.Text, (Project.Define)lbCompilerFlags.SelectedItem);
-                int index = lbCompilerFlags.Items.IndexOf(res);
-                lbCompilerFlags.Items.RemoveAt(index);
-                lbCompilerFlags.Items.Insert(index, res);
-                lbCompilerFlags.SelectedItem = res;
+                changesMade = true;
+                var res = ((Project.Ressource)lbRessources.SelectedItem);
+                proj.Ressources.Remove(res);
+                int index = lbRessources.Items.IndexOf(res);
+                lbRessources.Items.RemoveAt(index);
+                res = new Project.Ressource(tbRessourcesInPath.Text, tbRessourcesOutPath.Text, proj);
+                proj.Ressources.Add(res);
+                lbRessources.Items.Insert(index, res);
+                lbRessources.SelectedItem = res;
             }
             catch (Exception ex)
             {
@@ -244,9 +273,62 @@ namespace WrapperUI
                 return;
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
+                changesMade = true;
                 proj.Ressources.Remove((Project.Ressource)lbRessources.SelectedItem);
                 lbRessources.Items.Remove(lbRessources.SelectedItem);
             }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if(changesMade)
+            {
+                var dlgRes = MessageBox.Show("There are unsaved changes.\nDo you want to save them now?", "You might forgot something?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Information);
+                switch(dlgRes)
+                {
+                    case DialogResult.Yes:
+                        this.btnSaveFile_Click(sender, null);
+                        break;
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                }
+            }
+        }
+
+        private void tbProjectTitle_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
+        }
+
+        private void tbProjectAuthor_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
+        }
+
+        private void tbProjectMainFile_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
+        }
+
+        private void tbProjectOutFolder_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
+        }
+
+        private void tbProjectBuildFolder_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
+        }
+
+        private void tbProjectSrcFolder_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
+        }
+
+        private void tbCompilerVersion_TextChanged(object sender, EventArgs e)
+        {
+            changesMade = true;
         }
     }
 }

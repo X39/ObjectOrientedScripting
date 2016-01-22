@@ -291,6 +291,7 @@ namespace Wrapper
                 configFile.addParentalClass("CfgFunctions");
             }
             configFile.writeOut(proj.OutputFolder);
+            handleRessources();
         }
         public enum preprocessFile_IfDefModes
         {
@@ -482,6 +483,25 @@ namespace Wrapper
             writer.Flush();
             ppFile.resetPosition();
             return true;
+        }
+        private void handleRessources()
+        {
+            Logger.Instance.log(Logger.LogLevel.INFO, "Handling Ressources...");
+            foreach (var it in ProjectFile.Ressources)
+            {
+                string outPath = it.OutPath;
+                if (outPath.StartsWith(".\\") || outPath.StartsWith("\\"))
+                {
+                    outPath = ProjectFile.OutputFolder + outPath.TrimStart(new char[] { '.', '\\' });
+                }
+                string inPath = it.InPath;
+                if (inPath.StartsWith(".\\") || inPath.StartsWith("\\"))
+                {
+                    inPath = ProjectFile.ProjectPath + inPath.TrimStart(new char[] { '.', '\\' });
+                }
+                Logger.Instance.log(Logger.LogLevel.VERBOSE, '\'' + inPath + "' copied to '" + outPath + '\'');
+                File.Copy(inPath, outPath);
+            }
         }
     }
 }
