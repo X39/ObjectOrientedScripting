@@ -25,7 +25,7 @@ Version 0.7.2-ALPHA
 	|- WrapperUI: WrapperUI will inform you about unsaved changes you have
 	|             made to current file upon load/close
 	|- WrapperUI: Implemented Ressources
-	|- Compiler:  Implemented Ressources
+	\- Compiler:  Implemented Ressources
 
 Version 0.7.1-ALPHA
     |- Compiler:  fixed member functions without arguments lacked params command

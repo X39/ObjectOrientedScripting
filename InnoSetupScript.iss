@@ -50,6 +50,10 @@ procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'Feel free to fully ignore this changelog anytime :)',
 'Version 0.7.2-ALPHA                                                             ' + AnsiChar(#10) +
+'    |- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to        ' + AnsiChar(#10) +
+'    |             srcfolder                                                     ' + AnsiChar(#10) +
+'    |- WrapperUI: fixed saving exception which prevented saving changes         ' + AnsiChar(#10) +
+'    |- WrapperUI: fixed set buttons not getting disabled when loading files     ' + AnsiChar(#10) +
 '    |- Compiler:  fixed issue where assignment type is not chosen correctly     ' + AnsiChar(#10) +
 '    |- Compiler:  fixed member variables are "directly assigned"                ' + AnsiChar(#10) +
 '    |- Compiler:  fixed member variables w/o def val being initialized using nil' + AnsiChar(#10) +
@@ -67,11 +71,13 @@ begin
 '    ||- stdLib:   new function: string getType()                                ' + AnsiChar(#10) +
 '    ||- stdLib:   new function: void setShape(Shape)                            ' + AnsiChar(#10) +
 '    |\- stdLib:   new function: Shape getType()                                 ' + AnsiChar(#10) +
-'    |- stdLib:    Added floor(scalar) function                                  ' + AnsiChar(#10) +
 '    |- stdLib:    Added delete() function to ::std::Marker                      ' + AnsiChar(#10) +
-'    \- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase    ' + AnsiChar(#10) +
+'    |- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase    ' + AnsiChar(#10) +
+'    |- WrapperUI: WrapperUI will inform you about unsaved changes you have      ' + AnsiChar(#10) +
+'    |             made to current file upon load/close                          ' + AnsiChar(#10) +
+'    |- WrapperUI: Implemented Ressources                                        ' + AnsiChar(#10) +
+'    \- Compiler:  Implemented Ressources                                        ' + AnsiChar(#10) +
 '                                                                                ' + AnsiChar(#10) +
-'Version 0.7.1-ALPHA                                                             ' + AnsiChar(#10) +
 '    |- Compiler:  fixed member functions without arguments lacked params command' + AnsiChar(#10) +
 '    |- Compiler:  fixed callWrapper `___tmp___ = ___tmp___` printout            ' + AnsiChar(#10) +
 '    |- Compiler:  fixed breakout missed left args brackets                      ' + AnsiChar(#10) +
