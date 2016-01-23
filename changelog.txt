@@ -1,8 +1,5 @@
 Version 0.7.3-ALPHA
 	|- Compiler:  added `bool array<T>::contains(T)` function
-	|- stdLib:    Fixed ::std::Man constructor not returning objects
-	|             due to that however, the `scalar skill` part of em got
-	|             thrown out of em
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
 	|             srcfolder
