@@ -28,10 +28,22 @@ namespace std
 			Major = "MAJOR",
 			Colonel = "COLONEL"
 		}
-		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)							( type ) createUnit [[i, j, k], group, "", 0.5, "PRIVATE"]	endAssign
-		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k, scalar skill, Rank rank)	( type ) createUnit [[i, j, k], group, "", skill, rank]		endAssign
-		assign simple (::std::Group group, string type, vec3 position)											( type ) createUnit [position, group, "", 0.5, "PRIVATE"]	endAssign
-		assign simple (::std::Group group, string type, vec3 position, scalar skill, Rank rank)					( type ) createUnit [position, group, "", skill, rank]		endAssign
+		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)							( group ) createUnit [[i, j, k], type, [], 0, "FORM"]	endAssign
+		assign (::std::Group group, string type, scalar i, scalar j, scalar k, scalar skill, Rank rank)
+			private "_unit";
+			_unit = ( group ) createUnit [[i, j, k], type, [], 0, "FORM"];
+			_unit setRank rank;
+			_unit setSkill skill;
+			_unit
+		endAssign
+		assign simple (::std::Group group, string type, vec3 position)											( group ) createUnit [position, type, [], 0, "FORM"]	endAssign
+		assign (::std::Group group, string type, vec3 position, scalar skill, Rank rank)
+			private "_unit";
+			_unit = ( group ) createUnit [position, type, [], 0, "FORM"];
+			_unit setRank rank;
+			_unit setSkill skill;
+			_unit
+		endAssign
 		
 		fnc simple void disableAI (AiSection section)	_this disableAI ( section )	endFnc
 		fnc simple void enableAI (AiSection section)	_this enableAI ( section )	endFnc
