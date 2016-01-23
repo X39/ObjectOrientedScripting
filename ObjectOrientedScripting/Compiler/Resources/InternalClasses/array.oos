@@ -11,6 +11,10 @@ native array<T>
     fnc simple scalar find (T _val)
         _this find ( _val )
     endFnc
+
+    fnc simple bool contains (T _val)
+        _this find ( _val ) >= 0
+    endFnc
     
     fnc simple void resize (scalar _i)
         _this resize ( _i )
