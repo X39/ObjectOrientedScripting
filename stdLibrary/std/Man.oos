@@ -28,18 +28,18 @@ namespace std
 			Major = "MAJOR",
 			Colonel = "COLONEL"
 		}
-		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)							( group ) createUnit [[i, j, k], type, [], 0, "FORM"]	endAssign
+		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)							( group ) createUnit [type, [i, j, k], [], 0, "FORM"]	endAssign
 		assign (::std::Group group, string type, scalar i, scalar j, scalar k, scalar skill, Rank rank)
 			private "_unit";
-			_unit = ( group ) createUnit [[i, j, k], type, [], 0, "FORM"];
+			_unit = ( group ) createUnit [type, [i, j, k], [], 0, "FORM"];
 			_unit setRank rank;
 			_unit setSkill skill;
 			_unit
 		endAssign
-		assign simple (::std::Group group, string type, vec3 position)											( group ) createUnit [position, type, [], 0, "FORM"]	endAssign
+		assign simple (::std::Group group, string type, vec3 position)											( group ) createUnit [type, position, [], 0, "FORM"]	endAssign
 		assign (::std::Group group, string type, vec3 position, scalar skill, Rank rank)
 			private "_unit";
-			_unit = ( group ) createUnit [position, type, [], 0, "FORM"];
+			_unit = ( group ) createUnit [type, position, [], 0, "FORM"];
 			_unit setRank rank;
 			_unit setSkill skill;
 			_unit
