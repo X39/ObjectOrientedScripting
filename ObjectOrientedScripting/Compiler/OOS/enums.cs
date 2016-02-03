@@ -60,7 +60,7 @@ namespace Compiler.OOS_LanguageObjects
             this.varType = VarType.Object;
             this.template = template;
 
-            if(this.template == null && (this.ident.ReferencedObject is Interfaces.iTemplate))
+            if (this.template == null && (this.ident.ReferencedObject is Interfaces.iTemplate))
             {
                 this.template = ((Interfaces.iTemplate)this.ident.ReferencedObject).TemplateObject;
             }
@@ -75,6 +75,12 @@ namespace Compiler.OOS_LanguageObjects
             //TODO: Allow anonymous objects
         }
         public VarTypeObject(VarTypeObject vto)
+        {
+            this.ident = vto.ident;
+            this.varType = vto.varType;
+            template = vto.template;
+        }
+        public void copyFrom(VarTypeObject vto)
         {
             this.ident = vto.ident;
             this.varType = vto.varType;

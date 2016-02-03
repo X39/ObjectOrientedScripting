@@ -8,162 +8,176 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Expression : pBaseLangObject, Interfaces.iHasType
     {
-        public pBaseLangObject lExpression { get { return this.children[0]; } set { this.children[0] = value; } }
-        public pBaseLangObject rExpression { get { return this.children[1]; } set { this.children[1] = value; } }
-        public VarTypeObject ReferencedType
-        {
-            get
-            {
-                VarTypeObject lType = null;
-                VarTypeObject rType = null;
-                VarTypeObject oType = null;
-                if (lExpression is Expression)
-                {
-                    lType = ((Expression)lExpression).ReferencedType;
-                }
-                else if (lExpression is Variable)
-                {
-                    lType = ((Variable)lExpression).varType;
-                }
-                else if (lExpression is Ident)
-                {
-                    if (((Ident)lExpression).LastIdent.ReferencedObject is Interfaces.iHasType)
-                    {
-                        lType = ((Interfaces.iHasType)((Ident)lExpression).LastIdent.ReferencedObject).ReferencedType;
-                        if (!lType.IsObject && lType.IsArray && !((Ident)lExpression).LastIdent.ReferencedType.IsArray || lExpression.getAllChildrenOf<ArrayAccess>(true).Count > 0)
-                        {
-                            lType = ((Ident)lExpression).LastIdent.ReferencedType;
-                        }
-                    }
-                    else
-                    {
-                        lType = ((Ident)lExpression).LastIdent.ReferencedType;
-                    }
-                    
-                }
-                else if (lExpression is Cast)
-                {
-                    lType = ((Cast)lExpression).ReferencedType;
-                }
-                else if (lExpression is NewInstance)
-                {
-                    lType = ((NewInstance)lExpression).ReferencedType;
-                }
-                else if (lExpression is SqfCall)
-                {
-                    lType = ((SqfCall)lExpression).ReferencedType;
-                }
-                else if (lExpression is Value)
-                {
-                    lType = new VarTypeObject(((Value)lExpression).varType);
-                }
-                else if (lExpression is InstanceOf)
-                {
-                    lType = ((InstanceOf)lExpression).ReferencedType;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-                if (rExpression != null)
-                {
-                    if (rExpression is Expression)
-                    {
-                        rType = ((Expression)rExpression).ReferencedType;
-                    }
-                    else if (rExpression is Variable)
-                    {
-                        rType = ((Variable)rExpression).varType;
-                    }
-                    else if (rExpression is Ident)
-                    {
-                        rType = ((Ident)rExpression).LastIdent.ReferencedType;
-                    }
-                    else if (rExpression is Cast)
-                    {
-                        rType = ((Cast)rExpression).ReferencedType;
-                    }
-                    else if (rExpression is NewInstance)
-                    {
-                        rType = ((NewInstance)rExpression).ReferencedType;
-                    }
-                    else if (rExpression is SqfCall)
-                    {
-                        rType = ((SqfCall)rExpression).ReferencedType;
-                    }
-                    else if (rExpression is Value)
-                    {
-                        rType = new VarTypeObject(((Value)rExpression).varType);
-                    }
-                    else if (rExpression is InstanceOf)
-                    {
-                        rType = ((InstanceOf)rExpression).ReferencedType;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-                switch (expOperator)
-                {
-                    case "&": case "&&": case "|": case "||":
-                        if (lType.varType != VarType.Bool || rType.varType != VarType.Bool)
-                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
-                        oType = new VarTypeObject(VarType.Bool);
-                        break;
-                    case "==": case "===":
-                        oType = new VarTypeObject(VarType.Bool);
-                        break;
-                    case "+": case "-": case "*": case "/":
-                        if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
-                        oType = new VarTypeObject(VarType.Scalar);
-                        break;
-                    case ">": case ">=": case "<": case "<=":
-                        if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
-                            throw new Ex.LinkerException(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File);
-                        oType = new VarTypeObject(VarType.Bool);
-                        break;
-                    case "":
-                        return lType;
-                    default:
-                        throw new NotImplementedException();
-                }
-                return oType;
-            }
-        }
-        public string expOperator;
+        public VarTypeObject ReferencedType { get; internal set; }
         public bool negate;
+        public bool hasBrackets;
+
 
         public int Line { get; internal set; }
         public int Pos { get; internal set; }
         public string File { get; internal set; }
 
-        public Expression(pBaseLangObject parent, int line, int pos, string file) : base(parent)
+        public List<string> expressionOperators;
+        public List<pBaseLangObject> expressionObjects { get { return this.children; } }
+
+        public Expression(pBaseLangObject parent, bool negate, bool hasBrackets, int line, int pos, string file) : base(parent)
         {
-            this.children.Add(null);
-            this.children.Add(null);
-            negate = false;
-            expOperator = "";
+            this.negate = negate;
+            this.hasBrackets = hasBrackets;
             this.Line = line;
             this.Pos = pos;
             this.File = file;
+            this.ReferencedType = null;
+            this.expressionOperators = new List<string>();
         }
-        public override int doFinalize() { return 0; }
+        public override int doFinalize()
+        {
+            int errCount = 0;
+            this.ReferencedType = new VarTypeObject(VarType.Void);
+            VarTypeObject vto = this.ReferencedType;
+            if(this.expressionObjects.Count == 1)
+            {
+                var obj = this.expressionObjects[0];
+                if(obj is Interfaces.iHasType)
+                {
+                    if (obj is Ident)
+                    {
+                        vto.copyFrom(((Ident)obj).LastIdent.ReferencedType);
+                    }
+                    else
+                    {
+                        vto.copyFrom(((Interfaces.iHasType)obj).ReferencedType);
+                    }
+                }
+                else if(obj is Value)
+                {
+                    vto.copyFrom(((Value)obj).varType);
+                }
+                else
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
+                    errCount++;
+                }
+            }
+            else
+            {
+                int i = 0;
+                foreach(var op in this.expressionOperators)
+                {
+                    var lArg = this.expressionObjects[i];
+                    var rArg = this.expressionObjects[++i];
+                    VarTypeObject lType;
+                    VarTypeObject rType;
+                    if (lArg is Interfaces.iHasType)
+                    {
+                        lType = ((Interfaces.iHasType)lArg).ReferencedType;
+                        if(lArg is Ident)
+                        {
+                            lType = ((Ident)lArg).LastIdent.ReferencedType;
+                        }
+                    }
+                    else if (lArg is Value)
+                    {
+                        lType = ((Value)lArg).varType;
+                    }
+                    else
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
+                        errCount++;
+                        continue;
+                    }
+                    if (rArg is Interfaces.iHasType)
+                    {
+                        rType = ((Interfaces.iHasType)rArg).ReferencedType;
+                        if (rArg is Ident)
+                        {
+                            rType = ((Ident)rArg).LastIdent.ReferencedType;
+                        }
+                    }
+                    else if (rArg is Value)
+                    {
+                        rType = ((Value)rArg).varType;
+                    }
+                    else
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
+                        errCount++;
+                        continue;
+                    }
+
+                    switch (op)
+                    {
+                        case "&": case "&&": case "|": case "||":
+                            if (lType.varType != VarType.Bool || rType.varType != VarType.Bool)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File));
+                                errCount++;
+                                break;
+                            }
+                            vto.copyFrom(new VarTypeObject(VarType.Bool));
+                            break;
+                        case "==":
+                            vto.copyFrom(new VarTypeObject(VarType.Bool));
+                            break;
+                        case "+": case "-": case "*": case "/":
+                            if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File));
+                                errCount++;
+                                break;
+                            }
+                            vto.copyFrom(new VarTypeObject(VarType.Scalar));
+                            break;
+                        case ">": case ">=": case "<":  case "<=":
+                            if (lType.varType != VarType.Scalar || rType.varType != VarType.Scalar)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0014, this.Line, this.Pos, this.File));
+                                errCount++;
+                                break;
+                            }
+                            vto.copyFrom(new VarTypeObject(VarType.Bool));
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+            }
+            if(vto.IsObject)
+            {
+                errCount += vto.ident.finalize();
+            }
+            return errCount;
+        }
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
-            bool doBrackets = this.negate || this.rExpression != null;
             if (this.negate)
                 sw.Write('!');
-            if (doBrackets)
+            if (this.negate || this.hasBrackets || this.expressionOperators.Count > 0)
                 sw.Write('(');
-            this.lExpression.writeOut(sw, cfg);
-            if(this.rExpression != null)
+            int i = 0;
+            this.expressionObjects[0].writeOut(sw, cfg);
+            foreach (var op in this.expressionOperators)
             {
-                sw.Write(") " + this.expOperator + " (");
-                this.rExpression.writeOut(sw, cfg);
+                var lArg = this.expressionObjects[i];
+                var rArg = this.expressionObjects[++i];
+                if (op == "==")
+                {
+                    sw.Write(' ' + "isEqualTo" + ' ');
+                    rArg.writeOut(sw, cfg);
+                }
+                else if (op == "&&" || op == "||")
+                {
+                    sw.Write(' ' + op + " {");
+                    rArg.writeOut(sw, cfg);
+                    sw.Write('}');
+                }
+                else
+                {
+                    sw.Write(' ' + op + ' ');
+                    rArg.writeOut(sw, cfg);
+                }
             }
-            if (doBrackets)
+            if (this.negate || this.hasBrackets || this.expressionOperators.Count > 0)
                 sw.Write(')');
         }
     }

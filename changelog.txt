@@ -1,7 +1,22 @@
 Version 0.7.3-ALPHA
+	|v- Compiler: Added `deref <ident>` operation, returns SQF name of given
+	||            Non-Native function (virtual functions are also non-valid)
+	||-           Added new Linker exception LNK0052
+    ||            "Invalid Operation, Native functions are not derefable"
+	||-           Added new Linker exception LNK0053
+    |\            "Invalid Operation, Virtual Functions are not derefable"
+	|v- Compiler: rewrote Expression code & EBNF
+	||v- Compiler: Expressions now get parsed according to following precedence
+	|||-           First:  '+' | '-' | '*' | '/'
+	|||-           Second: ">=" | "<=" | "==" | '<' | '>'
+	||\-           Third:  "&&" | "||"
+	||-           EXPOP `==` is now using isEqualTo
+	||-           removed EXPOP `===`
+	||-           removed EXPOP `&`
+	|\-           removed EXPOP `|`
 	|- Compiler:  added `bool array<T>::contains(T)` function
 	|- stdLib:    Fixed ::std::Man constructor not returning objects
-	|- stdLib:    Fixed ::std::Group::createGroupGuer() script issue
+	\- stdLib:    Fixed ::std::Group::createGroupGuer() script issue
 
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
@@ -20,11 +35,11 @@ Version 0.7.2-ALPHA
     |- Compiler:  added LNK0051 exception for variable defined twice in class
     |-            and function
     |v- stdLib:   Updated ::std::Marker functions
-	||- stdLib:   new enum: Shape
-	||- stdLib:   new function: void setType(string)
-	||- stdLib:   new function: string getType()
-	||- stdLib:   new function: void setShape(Shape)
-	|\- stdLib:   new function: Shape getType()
+	||-           new enum: Shape
+	||-           new function: void setType(string)
+	||-           new function: string getType()
+	||-           new function: void setShape(Shape)
+	|\-           new function: Shape getType()
 	|- stdLib:    Added delete() function to ::std::Marker
 	|- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
 	|- WrapperUI: WrapperUI will inform you about unsaved changes you have

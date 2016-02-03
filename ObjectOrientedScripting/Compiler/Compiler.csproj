@@ -42,7 +42,7 @@
     <Compile Include="Compiler\Compiler.cs" />
     <Compile Include="Compiler\PostProcessFile.cs" />
     <Compile Include="OOS\ErrorStringResolver.cs" />
-    <Compile Include="OOS\Exceptions\LinkerException.cs" />
+    <Compile Include="OOS\LanguageObjects\Deref.cs" />
     <Compile Include="OOS\LanguageObjects\Null.cs" />
     <Compile Include="OOS\LanguageObjects\ForEach.cs" />
     <Compile Include="OOS\LanguageObjects\HelperClasses\NamespaceResolver.cs" />
@@ -123,7 +123,9 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="OOS\Exceptions\" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

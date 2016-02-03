@@ -483,6 +483,7 @@ namespace Compiler.OOS_LanguageObjects
                                 //if (((Variable)parentIdent.ReferencedObject).ReferencedType.IsObject)
                                 //    fqn = ((Interfaces.iClass)((Variable)parentIdent.ReferencedObject).ReferencedType.ident.LastIdent.ReferencedObject).Name.LastIdent.FullyQualifiedName + "." + this.originalValue;
                                 //else
+                                parentIdent.ReferencedObject.finalize();
                                 fqn = parentIdent.ReferencedType.ident.LastIdent.ReferencedType.ident.LastIdent.FullyQualifiedName + "." + this.originalValue;
                             }
                             if (newInstance == null)
@@ -670,6 +671,11 @@ namespace Compiler.OOS_LanguageObjects
                 else if(this.ReferencedObject is oosClass && this.IsSelfReference)
                 {
                     sw.Write(Wrapper.Compiler.thisVariableName);
+                }
+                else if(this.ReferencedObject is Function)
+                {
+                    var fnc = (Function)this.ReferencedObject;
+                    sw.Write(fnc.SqfVariableName);
                 }
                 else
                 {

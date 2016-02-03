@@ -18,7 +18,9 @@ COMPILER OOS
 		T_STRING = '"' { STRINGCHARS | "\\\""} '"'.
 		T_IDENT = ( CHARACTER | '_' ) { CHARACTER | '_' | DIGIT }.
 		T_TERMINATOR = ';'.
-		T_EXPOP = '&' | "&&" | '|' | "||" | "==" | "===" | '+' | '-' | '*' | ">=" | "<=".
+		T_EXPOP1 = '+' | '-' | '*'.
+		T_EXPOP2 = ">=" | "<=" | "==".
+		T_EXPOP3 = "&&" | "||".
         T_OTHEROP = ">>" | "<<".
 		T_ASSIGNMENTCHAR = '='.
 		T_EXTENDEDASSIGNMENTCHARS = "+=" | "-=" | "*=" | "/=".
@@ -253,54 +255,106 @@ COMPILER OOS
 			|
 			BOOLEAN<out flag> (. /*fix for weirdo coco bug ... */ .)
 		.
-		EXPRESSION_HELPER<out pBaseLangObject outObj, pBaseLangObject parent, bool flag> (. var obj = new Expression(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; obj.negate = flag; .) =
-			[
-				'!' (. obj.negate = true; .)
-			]
-			(
-				OP_NEWINSTANCE<out blo, obj> (. obj.lExpression = blo; .)
-				|IF( la.val == "true" || la.val == "false" )
-				VALUE<out blo, obj> (. obj.lExpression = blo; .)
-				|
-				VALUE<out blo, obj> (. obj.lExpression = blo; .)
-				|
-                (
-                    IDENTACCESS<out blo, obj> (. obj.lExpression = blo; .)
-                    [
-                        OP_INSTANCEOF<out blo, obj, blo> (. obj.lExpression = blo; .)
-                    ]
-                )
-				|
-                OP_SQFCALL<out blo, obj> (. obj.lExpression = blo; .)
-				|
-				OP_NULL<out blo, obj> (. obj.lExpression = blo; .)
-			)
+		EXPRESSION<out pBaseLangObject outObj, pBaseLangObject parent, bool negate = false, bool hasBrackets = false> (. var obj = new Expression(parent, negate, hasBrackets, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
+			EXPRESSION_HELPER<obj, out blo>
+			(.
+				int lastOpType = 3;
+				var opList = new List<string>();
+				var objList = new List<pBaseLangObject>();
+				objList.Add(blo);
+				List<Expression> previousExpressions = new List<Expression>();
+				previousExpressions.Add(obj);
+				if(!negate) {
+			.)
 			{
+				(. string op = ""; int thisOpType = -1; .)
 				(
-                    T_EXPOP (. obj.expOperator = t.val; .)
+                    T_EXPOP1 (. op = t.val; thisOpType = 1; .)
                     |
-                    T_SLASH (. obj.expOperator = t.val; .)
+                    T_SLASH (. op = t.val; thisOpType = 1; .)
                     |
-                    T_TEMPLATEOPEN (. obj.expOperator = t.val; .)
+                    T_TEMPLATEOPEN (. op = t.val; thisOpType = 2; .)
                     |
-                    T_TEMPLATECLOSE (. obj.expOperator = t.val; .)
-                )
-				EXPRESSION<out blo, obj> (. obj.rExpression = blo; .)
+                    T_TEMPLATECLOSE (. op = t.val; thisOpType = 2; .)
+                    |
+                    T_EXPOP2 (. op = t.val; thisOpType = 2; .)
+                    |
+                    T_EXPOP3 (. op = t.val; thisOpType = 3; .)
+				)
+				EXPRESSION_HELPER<obj, out blo>
+				(.
+					if(thisOpType != lastOpType)
+					{
+							if(thisOpType < lastOpType)
+							{
+								var expList = new Expression(previousExpressions.Last(), negate, hasBrackets, t.line, t.col, this.file);
+								if (opList.Count > 0)
+								{
+									if (opList.Count > 1)
+									{
+										expList.expressionOperators.AddRange(opList.GetRange(0, opList.Count - 1));
+									}
+									previousExpressions.Last().expressionOperators.Add(opList[opList.Count - 1]);
+								}
+								previousExpressions.Last().expressionObjects.AddRange(objList.GetRange(0, objList.Count - 1));
+								previousExpressions.Last().expressionObjects.Add(expList);
+								previousExpressions.Add(expList);
+								previousExpressions.Last().expressionObjects.Add(objList[objList.Count - 1]);
+								opList.Clear();
+								objList.Clear();
+							}
+							else
+							{
+								var expList = previousExpressions.Last();
+								expList.expressionOperators.AddRange(opList);
+								expList.expressionObjects.AddRange(objList);
+								previousExpressions.RemoveAt(previousExpressions.Count - 1);
+								opList.Clear();
+								objList.Clear();
+							}
+					}
+					opList.Add(op);
+					objList.Add(blo);
+					lastOpType = thisOpType;
+				.)
 			}
+			(.
+				}
+				previousExpressions.Last().expressionOperators.AddRange(opList);
+				previousExpressions.Last().expressionObjects.AddRange(objList);
+			.)
 		.
-		EXPRESSION<out pBaseLangObject outObj, pBaseLangObject parent> (. outObj = null; bool negate = false; .) =
-            [
-                '!' (. negate = true; .)
-            ]
-            (
-                (
-                    T_ROUNDBRACKETOPEN
-                    EXPRESSION_HELPER<out outObj, parent, negate>
-                    T_ROUNDBRACKETCLOSE
-                )
-                |
-                EXPRESSION_HELPER<out outObj, parent, negate>
-            )
+		EXPRESSION_HELPER<Expression obj, out pBaseLangObject blo> (. blo = null; .) =
+			(
+				'('
+					EXPRESSION<out blo, obj, false>
+				')'
+			)
+			|
+			(
+				'!'
+				EXPRESSION<out blo, obj, true>
+			)
+			|
+			OP_NEWINSTANCE<out blo, obj>
+			|IF( la.val == "true" || la.val == "false" )
+			VALUE<out blo, obj>
+			|
+			VALUE<out blo, obj>
+			|
+			(
+				IDENTACCESS<out blo, obj>
+				[
+					OP_INSTANCEOF<out blo, obj, blo>
+				]
+			)
+			|
+			OP_SQFCALL<out blo, obj>
+			|
+			OP_NULL<out blo, obj>
+			|
+			OP_DEREF<out blo, obj>
+			
 		.
 		OOS (. if(this.BaseObject == null) throw new Exception("BaseObject was never set"); var obj = this.BaseObject; pBaseLangObject blo; .) =
 			[
@@ -594,8 +648,30 @@ COMPILER OOS
                 |
                 (
                     (
-						T_EXPOP (. switch(t.val) {
-							case "===":
+						T_EXPOP1 (. switch(t.val) {
+							case "==":
+								obj.OperatorType = OverridableOperator.ExplicitEquals;
+								break;
+							default:
+								SemErr("The operator '" + t.val + "' is not supported for override");
+								break;
+						}.)
+					)
+                    |
+                    (
+						T_EXPOP2 (. switch(t.val) {
+							case "==":
+								obj.OperatorType = OverridableOperator.ExplicitEquals;
+								break;
+							default:
+								SemErr("The operator '" + t.val + "' is not supported for override");
+								break;
+						}.)
+					)
+                    |
+                    (
+						T_EXPOP3 (. switch(t.val) {
+							case "==":
 								obj.OperatorType = OverridableOperator.ExplicitEquals;
 								break;
 							default:
@@ -950,6 +1026,10 @@ COMPILER OOS
 		.
 		OP_NULL<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Null(parent, t.line, t.col, this.file); outObj = obj; .) =
 			"null"
+		.
+		OP_DEREF<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Deref(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
+			"deref"
+			IDENTACCESS<out blo, obj, false> (. obj.addChild((Ident)blo); .)
 		.
 		OP_FOREACH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new ForEach(parent); outObj = obj; VarTypeObject vto = null; pBaseLangObject blo; .) =
 			"foreach"
