@@ -6,7 +6,7 @@ Version 0.7.3-ALPHA
 	||-           Added new Linker exception LNK0053
     |\            "Invalid Operation, Virtual Functions are not derefable"
 	|v- Compiler: rewrote Expression code & EBNF
-	||v- Compiler: Expressions now get parsed according to following precedence
+	||v- Compiler: Expressions get parsed according to following precedence
 	|||-           First:  '+' | '-' | '*' | '/'
 	|||-           Second: ">=" | "<=" | "==" | '<' | '>'
 	||\-           Third:  "&&" | "||"
@@ -16,7 +16,18 @@ Version 0.7.3-ALPHA
 	|\-           removed EXPOP `|`
 	|- Compiler:  added `bool array<T>::contains(T)` function
 	|- stdLib:    Fixed ::std::Man constructor not returning objects
-	\- stdLib:    Fixed ::std::Group::createGroupGuer() script issue
+	|v- stdLib:   Altered how ::std::Group is working
+	||-            Removed ::std::Group::createGroup*() functions
+	||v- stdLib:   Added ::std::Side class 
+	|||-            Member Function: ::std::Side asEast()
+	|||-            Member Function: ::std::Side asWest()
+	|||-            Member Function: ::std::Side asResistance()
+	|||-            Member Function: ::std::Side asCivilian()
+	|||-            Member Function: ::std::Side asLogic()
+	|||-            Member Function: ::std::Side asEnemy()
+	|||-            Member Function: ::std::Side asFriendly()
+	||\-            Member Function: ::std::Side asUnknown()
+	|\-            Added constructor ::std::Group::Group(::std::Side)
 
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
