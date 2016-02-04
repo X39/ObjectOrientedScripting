@@ -155,15 +155,33 @@ namespace Compiler.OOS_LanguageObjects
             if (this.negate || this.hasBrackets || this.expressionOperators.Count > 0)
                 sw.Write('(');
             int i = 0;
-            this.expressionObjects[0].writeOut(sw, cfg);
+            if (!(this.expressionObjects[0] is Expression || this.expressionObjects[0] is Value))
+            {
+                sw.Write('(');
+                this.expressionObjects[0].writeOut(sw, cfg);
+                sw.Write(')');
+            }
+            else
+            {
+                this.expressionObjects[0].writeOut(sw, cfg);
+            }
             foreach (var op in this.expressionOperators)
             {
                 var lArg = this.expressionObjects[i];
                 var rArg = this.expressionObjects[++i];
                 if (op == "==")
                 {
-                    sw.Write(' ' + "isEqualTo" + ' ');
-                    rArg.writeOut(sw, cfg);
+                    if (!(rArg is Expression || rArg is Value))
+                    {
+                        sw.Write(" isEqualTo (");
+                        rArg.writeOut(sw, cfg);
+                        sw.Write(')');
+                    }
+                    else
+                    {
+                        sw.Write(' ' + "isEqualTo" + ' ');
+                        rArg.writeOut(sw, cfg);
+                    }
                 }
                 else if (op == "&&" || op == "||")
                 {
@@ -173,8 +191,17 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 else
                 {
-                    sw.Write(' ' + op + ' ');
-                    rArg.writeOut(sw, cfg);
+                    if (!(rArg is Expression || rArg is Value))
+                    {
+                        sw.Write(' ' + op + " (");
+                        rArg.writeOut(sw, cfg);
+                        sw.Write(')');
+                    }
+                    else
+                    {
+                        sw.Write(' ' + op + ' ');
+                        rArg.writeOut(sw, cfg);
+                    }
                 }
             }
             if (this.negate || this.hasBrackets || this.expressionOperators.Count > 0)
