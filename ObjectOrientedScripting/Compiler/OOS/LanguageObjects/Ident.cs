@@ -406,65 +406,68 @@ namespace Compiler.OOS_LanguageObjects
                                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0012, this.Line, this.Pos, this.File));
                                 errCount++;
                             }
-                            this.ReferencedObject = variable;
-                            //Set type to variable type
-                            this.ReferencedType = variable.varType;
-
-                            if (type == IdenType.ArrayAccess)
+                            else
                             {
-                                if (variable.ReferencedType.IsObject)
+                                this.ReferencedObject = variable;
+                                //Set type to variable type
+                                this.ReferencedType = variable.varType;
+
+                                if (type == IdenType.ArrayAccess)
                                 {
-                                    //Check if given object is implementing the ArrayAccess operator
-                                    if (variable.ReferencedType.ident.LastIdent.ReferencedObject is Interfaces.iClass)
+                                    if (variable.ReferencedType.IsObject)
                                     {
-                                        Interfaces.iClass classRef = (Interfaces.iClass)variable.ReferencedType.ident.LastIdent.ReferencedObject;
-                                        Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OverridableOperator.ArrayAccess);
-                                        if (opFnc == null)
+                                        //Check if given object is implementing the ArrayAccess operator
+                                        if (variable.ReferencedType.ident.LastIdent.ReferencedObject is Interfaces.iClass)
                                         {
-                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0005, this.Line, this.Pos, this.File));
-                                            errCount++;
-                                        }
-                                        else
-                                        {
-                                            this.ReferencedType = opFnc.ReturnType;
-                                            if (variable.TemplateObject != null)
+                                            Interfaces.iClass classRef = (Interfaces.iClass)variable.ReferencedType.ident.LastIdent.ReferencedObject;
+                                            Interfaces.iOperatorFunction opFnc = classRef.getOperatorFunction(OverridableOperator.ArrayAccess);
+                                            if (opFnc == null)
                                             {
-                                                var templateList = ((pBaseLangObject)opFnc).getAllParentsOf<Interfaces.iTemplate>();
-                                                foreach (var it in templateList)
+                                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0005, this.Line, this.Pos, this.File));
+                                                errCount++;
+                                            }
+                                            else
+                                            {
+                                                this.ReferencedType = opFnc.ReturnType;
+                                                if (variable.TemplateObject != null)
                                                 {
-                                                    var tmp = HelperClasses.ArgList.resolveVarTypeObject(opFnc.ReturnType, it.TemplateObject, variable.TemplateObject);
-                                                    if (tmp != opFnc.ReturnType)
+                                                    var templateList = ((pBaseLangObject)opFnc).getAllParentsOf<Interfaces.iTemplate>();
+                                                    foreach (var it in templateList)
                                                     {
-                                                        this.ReferencedType = tmp;
-                                                        break;
+                                                        var tmp = HelperClasses.ArgList.resolveVarTypeObject(opFnc.ReturnType, it.TemplateObject, variable.TemplateObject);
+                                                        if (tmp != opFnc.ReturnType)
+                                                        {
+                                                            this.ReferencedType = tmp;
+                                                            break;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+                                        else
+                                        {
+                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
+                                            errCount++;
+                                        }
                                     }
                                     else
                                     {
-                                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.UNKNOWN, this.Line, this.Pos, this.File));
-                                        errCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    //just check if this is an array type
-                                    switch (this.ReferencedType.varType)
-                                    {
-                                        case VarType.BoolArray:
-                                            this.ReferencedType = new VarTypeObject(this.ReferencedType);
-                                            this.ReferencedType.varType = VarType.Bool;
-                                            break;
-                                        case VarType.ScalarArray:
-                                            this.ReferencedType = new VarTypeObject(this.ReferencedType);
-                                            this.ReferencedType.varType = VarType.Scalar;
-                                            break;
-                                        default:
-                                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos, this.File));
-                                            errCount++;
-                                            break;
+                                        //just check if this is an array type
+                                        switch (this.ReferencedType.varType)
+                                        {
+                                            case VarType.BoolArray:
+                                                this.ReferencedType = new VarTypeObject(this.ReferencedType);
+                                                this.ReferencedType.varType = VarType.Bool;
+                                                break;
+                                            case VarType.ScalarArray:
+                                                this.ReferencedType = new VarTypeObject(this.ReferencedType);
+                                                this.ReferencedType.varType = VarType.Scalar;
+                                                break;
+                                            default:
+                                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0006, this.Line, this.Pos, this.File));
+                                                errCount++;
+                                                break;
+                                        }
                                     }
                                 }
                             }
