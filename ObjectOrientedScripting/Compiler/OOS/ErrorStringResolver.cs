@@ -23,7 +23,7 @@ namespace Compiler
             LNK0035, LNK0036, LNK0037, LNK0038, LNK0039,
             LNK0040, LNK0041, LNK0042, LNK0043, LNK0044,
             LNK0045, LNK0046, LNK0047, LNK0048, LNK0049,
-            LNK0050, LNK0051, LNK0052, LNK0053
+            LNK0050, LNK0051, LNK0052, LNK0053, LNK0054
 
         }
 
@@ -89,6 +89,7 @@ namespace Compiler
                 case LinkerErrorCode.LNK0051: return "Invalid Operation, variable name collides with object variable";
                 case LinkerErrorCode.LNK0052: return "Invalid Operation, Native functions are not derefable";
                 case LinkerErrorCode.LNK0053: return "Invalid Operation, Virtual Functions are not derefable";
+                case LinkerErrorCode.LNK0054: return "Invalid Operation, Non-Static Variables are not derefable";
 
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
