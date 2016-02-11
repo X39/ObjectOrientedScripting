@@ -41,6 +41,15 @@ namespace Compiler.OOS_LanguageObjects
                             errCount++;
                         }
                     }
+                    else if(refObj is Variable)
+                    {
+                        Variable obj = (Variable)refObj;
+                        if(obj.encapsulation != Encapsulation.Static)
+                        {
+                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0054, this.Line, this.Pos, this.File));
+                            errCount++;
+                        }
+                    }
                     else
                     {
                         Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0052, this.Line, this.Pos, this.File));
