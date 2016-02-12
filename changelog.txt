@@ -1,33 +1,41 @@
 Version 0.7.3-ALPHA
-	|v- Compiler: Added `deref <ident>` operation, returns SQF name of given
-	||            Non-Native function (virtual functions are also non-valid)
-	||-           Added new Linker exception LNK0052
+    |v- Compiler: Added `deref <ident>` operation, returns SQF name of given
+    ||            Non-Native function (virtual functions are not allowed too)
+    ||            or of given static variable
+    ||-           Added new Linker exception LNK0052
     ||            "Invalid Operation, Native functions are not derefable"
-	||-           Added new Linker exception LNK0053
-    |\            "Invalid Operation, Virtual Functions are not derefable"
-	|v- Compiler: rewrote Expression code & EBNF
-	||v- Compiler: Expressions get parsed according to following precedence
-	|||-           First:  '+' | '-' | '*' | '/'
-	|||-           Second: ">=" | "<=" | "==" | '<' | '>'
-	||\-           Third:  "&&" | "||"
-	||-           EXPOP `==` is now using isEqualTo
-	||-           removed EXPOP `===`
-	||-           removed EXPOP `&`
-	|\-           removed EXPOP `|`
-	|- Compiler:  added `bool array<T>::contains(T)` function
-	|- stdLib:    Fixed ::std::Man constructor not returning objects
-	|v- stdLib:   Altered how ::std::Group is working
-	||-            Removed ::std::Group::createGroup*() functions
-	||v- stdLib:   Added ::std::Side class 
-	|||-            Member Function: ::std::Side asEast()
-	|||-            Member Function: ::std::Side asWest()
-	|||-            Member Function: ::std::Side asResistance()
-	|||-            Member Function: ::std::Side asCivilian()
-	|||-            Member Function: ::std::Side asLogic()
-	|||-            Member Function: ::std::Side asEnemy()
-	|||-            Member Function: ::std::Side asFriendly()
-	||\-            Member Function: ::std::Side asUnknown()
-	|\-            Added constructor ::std::Group::Group(::std::Side)
+    ||-           Added new Linker exception LNK0053
+    ||            "Invalid Operation, Virtual Functions are not derefable"
+    ||-           Added new Linker exception LNK0054
+    |\            "Invalid Operation, Non-Static Variables are not derefable"
+    |v- Compiler: rewrote Expression code & EBNF
+    ||v- Compiler: Expressions get parsed according to following precedence
+    |||-           First:  '+' | '-' | '*' | '/'
+    |||-           Second: ">=" | "<=" | "==" | '<' | '>'
+    ||\-           Third:  "&&" | "||"
+    ||-           EXPOP `==` is now using isEqualTo
+    ||-           removed EXPOP `===`
+    ||-           removed EXPOP `&`
+    |\-           removed EXPOP `|`
+    |- Compiler:  added `bool array<T>::contains(T)` function
+    |v- stdLib:   Added missing functions to ::std::Marker
+    ||-            string getText()
+    |\-            void setText(string)
+    |- stdLib:    Fixed ::std::Man constructor not returning objects
+    |v- stdLib:   Altered how ::std::Group is working
+    ||-            Removed ::std::Group::createGroup*() functions
+    ||v- stdLib:   Added ::std::Side class 
+    |||-            Member Function: ::std::Side asEast()
+    |||-            Member Function: ::std::Side asWest()
+    |||-            Member Function: ::std::Side asResistance()
+    |||-            Member Function: ::std::Side asCivilian()
+    |||-            Member Function: ::std::Side asLogic()
+    |||-            Member Function: ::std::Side asEnemy()
+    |||-            Member Function: ::std::Side asFriendly()
+    ||\-            Member Function: ::std::Side asUnknown()
+    |\-            Added constructor ::std::Group::Group(::std::Side)
+    |- Compiler:  Fixed exception when LNK0012 happens 
+    |- Compiler:  Fixed external functions had to return
 
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
