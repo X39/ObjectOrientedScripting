@@ -72,6 +72,8 @@ namespace std
 		fnc simple Brush getBrush()									markerBrush _this				endFnc
 		fnc simple void setType(string t)							_this setMarkerType ( t )		endFnc
 		fnc simple string getType()									markerType _this				endFnc
+		fnc simple void setText(string t)							_this setMarkerText ( t )		endFnc
+		fnc simple string getType()									markerText _this				endFnc
 		fnc simple void setShape(Shape shape)						_this setMarkerShape ( shape )	endFnc
 		fnc simple Shape getShape()									markerShape _this				endFnc
 		fnc simple void setSize(scalar x, scalar y)					_this setMarkerSize [x, y]		endFnc
