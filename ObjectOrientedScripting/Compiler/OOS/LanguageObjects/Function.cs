@@ -101,9 +101,9 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            if (this.ReturnType.varType != VarType.Void && !this.AlwaysReturns && !this.IsConstructor)
+            if (this.ReturnType.varType != VarType.Void && !this.AlwaysReturns && !this.IsConstructor && !this.IsExternal)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0021, this.Name.Line));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0021, this.Name.Line, this.Name.Pos, this.Name.File));
                 errCount++;
             }
             if(this.IsConstructor)
