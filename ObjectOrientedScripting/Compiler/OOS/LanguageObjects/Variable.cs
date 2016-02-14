@@ -195,10 +195,10 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (sw == null)
                 return;
-            if (this.children.Count == 0)
+            var assignList = this.getAllChildrenOf<VariableAssignment>();
+            if (assignList.Count == 0)
                 return;
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
-            var assignList = this.getAllChildrenOf<VariableAssignment>();
             sw.Write(tab + this.SqfVariableName);
             if (assignList.Count > 0)
             {
