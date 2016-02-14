@@ -142,7 +142,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                         }
                         var cls = this.getFirstOf<Interfaces.iClass>();
-                        if (cls != null)
+                        if (cls != null && (fnc == null || fnc.FunctionEncapsulation != Encapsulation.Static))
                         {
                             bool flag = false;
                             foreach (var it in ((pBaseLangObject)cls).getAllChildrenOf<Variable>())
