@@ -8,6 +8,8 @@ Version 0.7.3-ALPHA
     ||            "Invalid Operation, Virtual Functions are not derefable"
     ||-           Added new Linker exception LNK0054
     |\            "Invalid Operation, Non-Static Variables are not derefable"
+    ||-           Added new Linker exception LNK0055
+    |\            "Invalid Operation, using this in static functions"
     |v- Compiler: rewrote Expression code & EBNF
     ||v- Compiler: Expressions get parsed according to following precedence
     |||-           First:  '+' | '-' | '*' | '/'
@@ -36,6 +38,10 @@ Version 0.7.3-ALPHA
     |\-            Added constructor ::std::Group::Group(::std::Side)
     |- Compiler:  Fixed exception when LNK0012 happens 
     |- Compiler:  Fixed external functions had to return
+    |- Compiler:  Fixed variables without value get printed in function
+    |- Compiler:  Fixed Fixed static functions throw LNK0051
+    |- Compiler:  Fixed encapsulation call check (on private/protected)
+    |- Compiler:  Fixed private functions 
 
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
