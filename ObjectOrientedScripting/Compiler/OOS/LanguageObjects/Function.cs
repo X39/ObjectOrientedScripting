@@ -204,8 +204,8 @@ namespace Compiler.OOS_LanguageObjects
                     Directory.CreateDirectory(fileFolderPath);
                 sw = new System.IO.StreamWriter(filePath + ".sqf");
 
+                int lIndex = fqn.LastIndexOf("::") - fqn.Count(c => c == ':') / 2 + 1;
                 fqn = fqn.Replace("::", "_") + this.SqfSuffix;
-                int lIndex = fqn.LastIndexOf('_');
                 string lPath;
                 string rPath;
                 if (lIndex <= 0)
