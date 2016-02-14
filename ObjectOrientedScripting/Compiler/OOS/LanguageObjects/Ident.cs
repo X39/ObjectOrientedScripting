@@ -355,6 +355,12 @@ namespace Compiler.OOS_LanguageObjects
                             Interfaces.iClass curObject = this.getFirstOf<Interfaces.iClass>();
                             this.ReferencedObject = (pBaseLangObject)curObject;
                             this.ReferencedType = curObject.VTO;
+                            var fnc = this.getFirstOf<Interfaces.iFunction>();
+                            if(fnc.FunctionEncapsulation == Encapsulation.Static)
+                            {
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0055, this.Line, this.Pos, this.File));
+                                errCount++;
+                            }
                         }
                         break;
                     #endregion
@@ -541,7 +547,7 @@ namespace Compiler.OOS_LanguageObjects
                                         if (enc == Encapsulation.Private)
                                         {
                                             //Private encapsulation just requires checking the current class we are operating in
-                                            if (!fncNsr.isInNamespace(parentClass.Name))
+                                            if (!fncNsr.isInNamespace(parentClass == null ? null : parentClass.Name))
                                             {
                                                 Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0003, this.Line, this.Pos, this.File));
                                                 errCount++;

@@ -16,6 +16,8 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
         public static Base BaseClass { get; set; }
         public static implicit operator NamespaceResolver(Ident input)
         {
+            if (input == null)
+                return null;
             return createNSR(input);
         }
         public static implicit operator NamespaceResolver(string input)
@@ -55,7 +57,14 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
 
         public bool isInNamespace(NamespaceResolver nsr)
         {
-            throw new NotImplementedException();
+            if (nsr == null)
+                return false;
+            foreach (var it in this.objectTree)
+            {
+                if (nsr.Reference == it)
+                    return true;
+            }
+            return false;
         }
         public bool isSame(NamespaceResolver nsr)
         {
