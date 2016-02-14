@@ -42,6 +42,7 @@ Version 0.7.3-ALPHA
     |- Compiler:  Fixed Fixed static functions throw LNK0051
     |- Compiler:  Fixed encapsulation call check (on private/protected)
     |- Compiler:  Fixed private functions 
+    |- Compiler:  Fixed '_' in fnc name fucks up config.cpp 
 
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
