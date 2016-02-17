@@ -12,8 +12,8 @@ Version 0.7.3-ALPHA
     |\            "Invalid Operation, using this in static functions"
     |v- Compiler: rewrote Expression code & EBNF
     ||v- Compiler: Expressions get parsed according to following precedence
-    |||-           First:  '+' | '-' | '*' | '/'
-    |||-           Second: ">=" | "<=" | "==" | '<' | '>'
+    |||-           First:  "+" | "-" | "*" | "/"
+    |||-           Second: ">=" | "<=" | "==" | "<" | ">"
     ||\-           Third:  "&&" | "||"
     ||-           EXPOP `==` is now using isEqualTo
     ||-           removed EXPOP `===`
@@ -43,7 +43,7 @@ Version 0.7.3-ALPHA
     |- Compiler:  Fixed encapsulation call check (on private/protected)
     |- Compiler:  Fixed for loop arg1 variable not private in parents scope
     |- Compiler:  Fixed private functions 
-    |- Compiler:  Fixed '_' in fnc name fucks up config.cpp 
+    \- Compiler:  Fixed "_" in fnc name fucks up config.cpp 
 
 Version 0.7.2-ALPHA
 	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
