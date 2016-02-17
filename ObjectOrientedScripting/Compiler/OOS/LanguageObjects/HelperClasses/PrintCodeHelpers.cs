@@ -14,6 +14,8 @@ namespace Compiler.OOS_LanguageObjects.HelperClasses
             {
                 if (it is Ident)
                     sw.Write(tab + '\t');
+                if (it is Variable && ((Variable)it).getAllChildrenOf<VariableAssignment>().Count == 0)
+                    continue;
                 it.writeOut(sw, cfg);
                 sw.WriteLine(";");
             }
