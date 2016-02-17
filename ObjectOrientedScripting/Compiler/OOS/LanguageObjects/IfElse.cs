@@ -60,13 +60,7 @@ namespace Compiler.OOS_LanguageObjects
                     sw.Write("]");
                 sw.WriteLine(";");
             }
-            foreach (var it in this.IfInstructions)
-            {
-                if (it is Ident)
-                    sw.Write(tab + '\t');
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.IfInstructions, tab, sw, cfg);
             sw.Write(tab + "}");
             if (this.ElseInstructions.Count > 0)
             {
@@ -100,11 +94,7 @@ namespace Compiler.OOS_LanguageObjects
                         sw.Write("]");
                     sw.WriteLine(";");
                 }
-                foreach (var it in this.ElseInstructions)
-                {
-                    it.writeOut(sw, cfg);
-                    sw.WriteLine(";");
-                }
+                HelperClasses.PrintCodeHelpers.printCodeLines(this.ElseInstructions, tab, sw, cfg);
                 sw.Write(tab + "}");
             }
         }

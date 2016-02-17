@@ -78,15 +78,9 @@ namespace Compiler.OOS_LanguageObjects
             }
             if(this.getAllChildrenOf<Break>(true).Count > 0)
             {
-                sw.WriteLine(tab + "scopeName \"" + this.BreakScope + "\";");
+                sw.WriteLine(tab + '\t' + "scopeName \"" + this.BreakScope + "\";");
             }
-            foreach (var it in this.CodeInstructions)
-            {
-                if (it is Ident)
-                    sw.Write(tab + '\t');
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.CodeInstructions, tab, sw, cfg);
             if (this.forArg3 != null)
             {
                 this.forArg3.writeOut(sw, cfg);

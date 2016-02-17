@@ -71,13 +71,7 @@ namespace Compiler.OOS_LanguageObjects
                     sw.Write("]");
                 sw.WriteLine(";");
             }
-            foreach(var it in this.TryInstructions)
-            {
-                if (it is Ident)
-                    sw.Write(tab + '\t');
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.TryInstructions, tab, sw, cfg);
             sw.WriteLine(tab + "}");
             sw.WriteLine(tab + "catch");
             sw.WriteLine(tab + "{");
@@ -112,13 +106,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             this.variable.writeOut(sw, cfg);
             sw.WriteLine(" = _exception;");
-            foreach (var it in this.CatchInstructions)
-            {
-                if (it is Ident)
-                    sw.Write(tab + '\t');
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.CatchInstructions, tab, sw, cfg);
             sw.Write(tab + "}");
         }
         public bool AlwaysReturns

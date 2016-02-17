@@ -427,13 +427,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             #endregion
             Logger.Instance.log(Logger.LogLevel.DEBUG, "Printing out function '" + this.Name.FullyQualifiedName + this.SqfSuffix + "'s body");
-            foreach (var it in this.CodeInstructions)
-            {
-                if (it is Ident)
-                    sw.Write(tab);
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.CodeInstructions, tab, sw, cfg);
             if (this.IsConstructor)
             {
                 sw.Write(tab + Wrapper.Compiler.thisVariableName);

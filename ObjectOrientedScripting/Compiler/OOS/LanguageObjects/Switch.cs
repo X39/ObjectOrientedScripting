@@ -66,13 +66,7 @@ namespace Compiler.OOS_LanguageObjects
             this.expression.writeOut(sw, cfg);
             sw.WriteLine(") do");
             sw.WriteLine(tab + "{");
-            foreach (var it in this.CodeInstructions)
-            {
-                if (it is Ident)
-                    sw.Write(tab + '\t');
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.CodeInstructions, tab, sw, cfg);
             sw.Write(tab + "}");
         }
     }
