@@ -254,34 +254,6 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 sw.WriteLine("];");
             }
-            var localVarList = this.getAllChildrenOf<Variable>(false, null, -1, 1);
-            if (localVarList.Count > 0)
-            {
-                if (localVarList.Count == 1)
-                    sw.Write(tab + "private ");
-                else
-                    sw.Write(tab + "private [");
-
-                for (int i = 0; i < localVarList.Count; i++)
-                {
-                    var it = localVarList[i];
-                    if (i != 0)
-                    {
-                        sw.Write(", ");
-                    }
-                    if (it is Variable)
-                    {
-                        sw.Write('"' + ((Variable)it).SqfVariableName + '"');
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                if (localVarList.Count > 1)
-                    sw.Write("]");
-                sw.WriteLine(";");
-            }
             #region constructor printing
             if (this.IsConstructor)
             {
@@ -427,6 +399,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             #endregion
             Logger.Instance.log(Logger.LogLevel.DEBUG, "Printing out function '" + this.Name.FullyQualifiedName + this.SqfSuffix + "'s body");
+            HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg);
             HelperClasses.PrintCodeHelpers.printCodeLines(this.CodeInstructions, tab, sw, cfg);
             if (this.IsConstructor)
             {

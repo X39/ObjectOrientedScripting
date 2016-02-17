@@ -41,6 +41,7 @@ Version 0.7.3-ALPHA
     |- Compiler:  Fixed variables without value get printed in function
     |- Compiler:  Fixed Fixed static functions throw LNK0051
     |- Compiler:  Fixed encapsulation call check (on private/protected)
+    |- Compiler:  Fixed for loop arg1 variable not private in parents scope
     |- Compiler:  Fixed private functions 
     |- Compiler:  Fixed '_' in fnc name fucks up config.cpp 
 
