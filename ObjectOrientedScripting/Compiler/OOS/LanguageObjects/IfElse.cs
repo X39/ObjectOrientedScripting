@@ -32,68 +32,14 @@ namespace Compiler.OOS_LanguageObjects
             this.expression.writeOut(sw, cfg);
             sw.WriteLine(") then");
             sw.WriteLine(tab + "{");
-            var varListFirstScope = this.getAllChildrenOf<Variable>(false, null, -1, 1);
-            if (varListFirstScope.Count > 0)
-            {
-                if (varListFirstScope.Count == 1)
-                    sw.Write(tab + '\t' + "private ");
-                else
-                    sw.Write(tab + '\t' + "private [");
-
-                for (int i = 0; i < varListFirstScope.Count; i++)
-                {
-                    var it = varListFirstScope[i];
-                    if (i != 0)
-                    {
-                        sw.Write(", ");
-                    }
-                    if (it is Variable)
-                    {
-                        sw.Write('"' + ((Variable)it).SqfVariableName + '"');
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                if (varListFirstScope.Count > 1)
-                    sw.Write("]");
-                sw.WriteLine(";");
-            }
+            HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg, 1);
             HelperClasses.PrintCodeHelpers.printCodeLines(this.IfInstructions, tab, sw, cfg);
             sw.Write(tab + "}");
             if (this.ElseInstructions.Count > 0)
             {
                 sw.WriteLine("\n" + tab + "else");
                 sw.WriteLine(tab + "{");
-                var varListSecondScope = this.getAllChildrenOf<Variable>(false, null, -1, 2);
-                if (varListSecondScope.Count > 0)
-                {
-                    if (varListSecondScope.Count == 1)
-                        sw.Write(tab + '\t' + "private ");
-                    else
-                        sw.Write(tab + '\t' + "private [");
-
-                    for (int i = 0; i < varListSecondScope.Count; i++)
-                    {
-                        var it = varListSecondScope[i];
-                        if (i != 0)
-                        {
-                            sw.Write(", ");
-                        }
-                        if (it is Variable)
-                        {
-                            sw.Write('"' + ((Variable)it).SqfVariableName + '"');
-                        }
-                        else
-                        {
-                            throw new Exception();
-                        }
-                    }
-                    if (varListSecondScope.Count > 1)
-                        sw.Write("]");
-                    sw.WriteLine(";");
-                }
+                HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg, 2);
                 HelperClasses.PrintCodeHelpers.printCodeLines(this.ElseInstructions, tab, sw, cfg);
                 sw.Write(tab + "}");
             }

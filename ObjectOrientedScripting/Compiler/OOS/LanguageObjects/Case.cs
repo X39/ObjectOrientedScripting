@@ -62,6 +62,7 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 sw.WriteLine("{");
             }
+            HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg);
             HelperClasses.PrintCodeHelpers.printCodeLines(this.CodeInstructions.GetRange(0, this.CodeInstructions.Count - 1), tab, sw, cfg);
             var lastInstruction = CodeInstructions.Last();
             if (!(lastInstruction is Break))

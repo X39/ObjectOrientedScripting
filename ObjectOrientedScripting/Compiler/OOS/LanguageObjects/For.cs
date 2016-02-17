@@ -48,35 +48,8 @@ namespace Compiler.OOS_LanguageObjects
             }
             sw.WriteLine("} do");
             sw.WriteLine(tab + "{");
-            var varList = this.getAllChildrenOf<Variable>();
-            if (varList.Count > 0)
-            {
-                if (varList.Count == 1)
-                    sw.Write(tab + '\t' + "private ");
-                else
-                    sw.Write(tab + '\t' + "private [");
-
-                for (int i = 0; i < varList.Count; i++)
-                {
-                    var it = varList[i];
-                    if (i != 0)
-                    {
-                        sw.Write(", ");
-                    }
-                    if (it is Variable)
-                    {
-                        sw.Write('"' + ((Variable)it).SqfVariableName + '"');
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                if (varList.Count > 1)
-                    sw.Write("]");
-                sw.WriteLine(";");
-            }
-            if(this.getAllChildrenOf<Break>(true).Count > 0)
+            HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg);
+            if (this.getAllChildrenOf<Break>(true).Count > 0)
             {
                 sw.WriteLine(tab + '\t' + "scopeName \"" + this.BreakScope + "\";");
             }
