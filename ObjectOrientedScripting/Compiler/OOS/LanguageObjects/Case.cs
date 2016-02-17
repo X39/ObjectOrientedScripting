@@ -62,16 +62,8 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 sw.WriteLine("{");
             }
+            HelperClasses.PrintCodeHelpers.printCodeLines(this.CodeInstructions.GetRange(0, this.CodeInstructions.Count - 1), tab, sw, cfg);
             var lastInstruction = CodeInstructions.Last();
-            foreach(var it in this.CodeInstructions)
-            {
-                if (it == lastInstruction)
-                    continue;
-                if (it is Ident)
-                    sw.Write(tab + '\t');
-                it.writeOut(sw, cfg);
-                sw.WriteLine(";");
-            }
             if (!(lastInstruction is Break))
             {
                 lastInstruction.writeOut(sw, cfg);
