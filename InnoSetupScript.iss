@@ -63,8 +63,8 @@ begin
   '    |\            "Invalid Operation, using this in static functions"           ' + AnsiChar(#10) +
   '    |v- Compiler: rewrote Expression code & EBNF                                ' + AnsiChar(#10) +
   '    ||v- Compiler: Expressions get parsed according to following precedence     ' + AnsiChar(#10) +
-  '    |||-           First:  '+' | '-' | '*' | '/'                                ' + AnsiChar(#10) +
-  '    |||-           Second: ">=" | "<=" | "==" | '<' | '>'                       ' + AnsiChar(#10) +
+  '    |||-           First:  "+" | "-" | "*" | "/"                                ' + AnsiChar(#10) +
+  '    |||-           Second: ">=" | "<=" | "==" | "<" | ">"                       ' + AnsiChar(#10) +
   '    ||\-           Third:  "&&" | "||"                                          ' + AnsiChar(#10) +
   '    ||-           EXPOP `==` is now using isEqualTo                             ' + AnsiChar(#10) +
   '    ||-           removed EXPOP `===`                                           ' + AnsiChar(#10) +
@@ -94,7 +94,7 @@ begin
   '    |- Compiler:  Fixed encapsulation call check (on private/protected)         ' + AnsiChar(#10) +
   '    |- Compiler:  Fixed for loop arg1 variable not private in parents scope     ' + AnsiChar(#10) +
   '    |- Compiler:  Fixed private functions                                       ' + AnsiChar(#10) +
-  '    \- Compiler:  Fixed '_' in fnc name fucks up config.cpp                     ' + AnsiChar(#10) +
+  '    \- Compiler:  Fixed "_" in fnc name fucks up config.cpp                     ' + AnsiChar(#10) +
   '                                                                                ' + AnsiChar(#10) +
   'Version 0.7.2-ALPHA                                                             ' + AnsiChar(#10) +
   '    |- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to        ' + AnsiChar(#10) +
