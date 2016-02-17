@@ -13,7 +13,7 @@ native array<T>
     endFnc
 
     fnc simple bool contains (T _val)
-        _this find ( _val ) >= 0
+		_val in _this
     endFnc
     
     fnc simple void resize (scalar _i)
