@@ -48,7 +48,7 @@ namespace Compiler.OOS_LanguageObjects
             }
             sw.WriteLine("} do");
             sw.WriteLine(tab + "{");
-            HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg);
+            HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg, 0);
             if (this.getAllChildrenOf<Break>(true).Count > 0)
             {
                 sw.WriteLine(tab + '\t' + "scopeName \"" + this.BreakScope + "\";");
@@ -62,6 +62,16 @@ namespace Compiler.OOS_LanguageObjects
             sw.Write(tab + "}");
         }
 
+        public override List<pBaseLangObject> getScopeItems(int scopeIndex)
+        {
+            switch (scopeIndex)
+            {
+                case 0:
+                    return this.CodeInstructions;
+                default:
+                    return this.children;
+            }
+        }
 
         public bool AlwaysReturns
         {
