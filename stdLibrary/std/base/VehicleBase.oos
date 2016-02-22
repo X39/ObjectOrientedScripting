@@ -32,7 +32,6 @@ namespace std
             fnc simple array<::std::base::VehicleBase> getAttachedObjects()                            attachedObjects _this                       endFnc
             
             fnc simple bool                            isKindOf        (string type)                   _this isKindOf ( type )                     endFnc
-            fnc simple bool                            isKindOf        (string type)                   _this isKindOf ( type )                     endFnc
             fnc simple bool                            isAlive         ()                              alive _this                                 endFnc
             fnc simple bool                            isAttachedTo    (::std::base::VehicleBase vehicle)        attachedTo _this == ( vehicle )   endFnc
 			
