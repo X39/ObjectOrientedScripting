@@ -16,7 +16,10 @@ namespace std
 			Teamswitch = "TEAMSWITCH",
 			FSM = "FSM",
 			Aimingerror = "AIMINGERROR",
-			Suppression = "SUPPRESSION"
+			Suppression = "SUPPRESSION",
+            Checkvisible = "CHECKVISIBLE",
+            Cover = "COVER",
+            Autocombat = "AUTOCOMBAT"
 		}
 		enum Rank
 		{
