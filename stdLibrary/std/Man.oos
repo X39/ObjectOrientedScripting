@@ -54,8 +54,20 @@ namespace std
 			_unit
 		endAssign
 		
-		fnc void disableAI (AiSection section)	_this disableAI ( section )	endFnc
-		fnc void enableAI (AiSection section)	_this enableAI ( section )	endFnc
+		fnc void disableAI (AiSection section)
+            if(!local _this) exitWith
+            {
+                throw "UnitNotLocalException";
+            };
+            _this disableAI ( section )	
+        endFnc
+		fnc void enableAI (AiSection section)
+            if(!local _this) exitWith
+            {
+                throw "UnitNotLocalException";
+            };
+            _this enableAI ( section )	
+        endFnc
         fnc simple VisionMode getVisionMode ()          currentVisionMode _this     endFnc
     }
 	static fnc simple ::std::Man getPlayer () player endFnc
