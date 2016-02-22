@@ -31,6 +31,12 @@ namespace std
 			Major = "MAJOR",
 			Colonel = "COLONEL"
 		}
+        enum VisionMode
+        {
+            DayTime = 0,
+            NightVision = 1,
+            FLIR = 2
+        }
 		assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)							( group ) createUnit [type, [i, j, k], [], 0, "FORM"]	endAssign
 		assign (::std::Group group, string type, scalar i, scalar j, scalar k, scalar skill, Rank rank)
 			private "_unit";
@@ -48,8 +54,9 @@ namespace std
 			_unit
 		endAssign
 		
-		fnc simple void disableAI (AiSection section)	_this disableAI ( section )	endFnc
-		fnc simple void enableAI (AiSection section)	_this enableAI ( section )	endFnc
+		fnc void disableAI (AiSection section)	_this disableAI ( section )	endFnc
+		fnc void enableAI (AiSection section)	_this enableAI ( section )	endFnc
+        fnc simple VisionMode getVisionMode ()          currentVisionMode _this     endFnc
     }
 	static fnc simple ::std::Man getPlayer () player endFnc
 }
