@@ -26,7 +26,7 @@ namespace std
             fnc simple array<scalar>                   getVelocity     ()                              velocity _this                              endFnc
             fnc simple scalar                          getSpeed        ()                              speed _this                                 endFnc
             fnc simple string                          getType         ()                              typeOf _this                                endFnc
-            fnc simple ::std::Config                   getConfigEntry  ()                              configBin >> "CfgVehicles" >> typeOf _this  endFnc
+            fnc simple ::std::Config                   getConfigEntry  ()                              configFile >> "CfgVehicles" >> typeOf _this endFnc
             fnc simple ::std::Context                  getContext      ()                              _this                                       endFnc
             fnc simple ::std::base::VehicleBase        getAttachedToObject ()                          attachedTo _this                            endFnc
             fnc simple array<::std::base::VehicleBase> getAttachedObjects()                            attachedObjects _this                       endFnc
