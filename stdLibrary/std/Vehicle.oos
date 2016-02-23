@@ -7,7 +7,7 @@ namespace std
 {
     native Vehicle extends ::std::base::VehicleBase
     {
-		assign simple (string name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
+        assign simple (string name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
 
         fnc void setFuel (scalar i)
             if(!local _this) exitWith

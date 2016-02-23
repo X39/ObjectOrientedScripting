@@ -2,26 +2,26 @@ using ::std::base::VehicleBase
 using ::std::Side
 namespace std
 {
-	native Group
-	{
-		assign simple (::std::Side side)
-			createGroup side
-		endAssign
-//		fnc simple void setGroupIdGlobal ()							setGroupIdGlobal _this		                endFnc
-//		fnc simple void setGroupId ()								setGroupId _this			                endFnc
-		fnc simple string getGroupId ()								groupId _this				                endFnc
-		fnc simple string getNetId ()								netId _this					                endFnc
-		fnc void delete ()	
+    native Group
+    {
+        assign simple (::std::Side side)
+            createGroup side
+        endAssign
+//      fnc simple void setGroupIdGlobal ()                          setGroupIdGlobal _this                      endFnc
+//      fnc simple void setGroupId ()                                setGroupId _this                            endFnc
+        fnc simple string getGroupId ()                              groupId _this                               endFnc
+        fnc simple string getNetId ()                                netId _this                                 endFnc
+        fnc void delete ()    
             if(!local _this) exitWith
             {
                 throw "GroupNotLocalException";
             };
             deleteGroup _this;
         endFnc
-		fnc simple array<::std::Man> getUnits ()		            units _this					                endFnc
+        fnc simple array<::std::Man> getUnits ()                    units _this                                 endFnc
         fnc simple void join (array<::std::Man> u)                  u join _this                                endFnc
         fnc simple void joinSilent (array<::std::Man> u)            u joinSilent _this                          endFnc
         fnc simple ::std::Man getLeader ()                          leader _this                                endFnc
-	}
-	static fnc simple array<::std::Group> getAllGroups ()			allGroups					                endFnc
+    }
+    static fnc simple array<::std::Group> getAllGroups ()            allGroups                                  endFnc
 }
