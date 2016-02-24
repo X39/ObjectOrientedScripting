@@ -19,14 +19,14 @@ namespace std
 
             fnc simple scalar                          getDamage       ()                              damage _this                                endFnc
             fnc simple scalar                          getDirection    ()                              direction _this                             endFnc
-            fnc simple array<scalar>                   getPosition     ()                              position _this                              endFnc
-            fnc simple array<scalar>                   getPositionASL  ()                              getPosASL _this                             endFnc
-            fnc simple array<scalar>                   getVectorDir    ()                              vectorDir _this                             endFnc
-            fnc simple array<scalar>                   getVectorUp     ()                              vectorUp _this                              endFnc
-            fnc simple array<scalar>                   getVelocity     ()                              velocity _this                              endFnc
+            fnc simple vec3                            getPosition     ()                              position _this                              endFnc
+            fnc simple vec3                            getPositionASL  ()                              getPosASL _this                             endFnc
+            fnc simple vec3                            getVectorDir    ()                              vectorDir _this                             endFnc
+            fnc simple vec3                            getVectorUp     ()                              vectorUp _this                              endFnc
+            fnc simple vec3                            getVelocity     ()                              velocity _this                              endFnc
             fnc simple scalar                          getSpeed        ()                              speed _this                                 endFnc
             fnc simple string                          getType         ()                              typeOf _this                                endFnc
-            fnc simple ::std::Config                   getConfigEntry  ()                              configBin >> "CfgVehicles" >> typeOf _this  endFnc
+            fnc simple ::std::Config                   getConfigEntry  ()                              configFile >> "CfgVehicles" >> typeOf _this endFnc
             fnc simple ::std::Context                  getContext      ()                              _this                                       endFnc
             fnc simple ::std::base::VehicleBase        getAttachedToObject ()                          attachedTo _this                            endFnc
             fnc simple array<::std::base::VehicleBase> getAttachedObjects()                            attachedObjects _this                       endFnc
@@ -34,8 +34,8 @@ namespace std
             fnc simple bool                            isKindOf        (string type)                   _this isKindOf ( type )                     endFnc
             fnc simple bool                            isAlive         ()                              alive _this                                 endFnc
             fnc simple bool                            isAttachedTo    (::std::base::VehicleBase vehicle)        attachedTo _this == ( vehicle )   endFnc
-			
-			
+
+
             fnc simple void delete () deleteVehicle _this endFnc
         }
     }

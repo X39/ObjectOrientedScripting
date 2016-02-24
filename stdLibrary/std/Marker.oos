@@ -2,6 +2,7 @@ using std::Config
 using std::Context
 using std::base::VehicleBase
 using std::Man
+using std::Vector
 
 namespace std
 {
@@ -79,7 +80,7 @@ namespace std
 		fnc simple void setSize(scalar x, scalar y)					_this setMarkerSize [x, y]		endFnc
 		fnc simple array<scalar> getSize()							markerSize _this				endFnc
 		fnc simple void setPosition(scalar x, scalar y)				_this setMarkerPos [x, y, 0]	endFnc
-		fnc simple array<scalar> getPosition()						markerPos _this					endFnc
+		fnc simple vec3 getPosition()					         	markerPos _this					endFnc
 		
 		fnc simple void delete()									deleteMarker _this				endFnc
     }
