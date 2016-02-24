@@ -1,17 +1,23 @@
 native vec3
 {
-    assign simple ()								[0, 0, 0]				endAssign
-    assign simple (scalar x, scalar y, scalar z)	[x, y, z]				endAssign
-    assign simple (array<scalar> xyz) [xyz select 0, xyz select 1, xyz select 2]    endAssign
-    
-    fnc simple scalar getX ()						_this select 0			endFnc
-    fnc simple scalar getY ()						_this select 1			endFnc
-    fnc simple scalar getZ ()						_this select 2			endFnc
-	
-    fnc simple void setX (scalar val)				_this set [0, val]		endFnc
-    fnc simple void setY (scalar val)				_this set [1, val]		endFnc
-    fnc simple void setZ (scalar val)				_this set [2, val]		endFnc
-    
+    assign simple ()                                [0, 0, 0]                endAssign
+    assign simple (scalar x, scalar y, scalar z)    [x, y, z]                endAssign
+    assign (array<scalar> xyz)
+        if(count xyz != 3) exitWith
+        {
+            throw "InvalidArgumentException";
+        };
+        [xyz select 0, xyz select 1, xyz select 2];
+    endAssign
+
+    fnc simple scalar getX ()                        _this select 0         endFnc
+    fnc simple scalar getY ()                        _this select 1         endFnc
+    fnc simple scalar getZ ()                        _this select 2         endFnc
+
+    fnc simple void setX (scalar val)                _this set [0, val]     endFnc
+    fnc simple void setY (scalar val)                _this set [1, val]     endFnc
+    fnc simple void setZ (scalar val)                _this set [2, val]     endFnc
+
     fnc simple vec3 add(vec3 other) _this vectorAdd other                   endFnc
     fnc simple vec3 diff(vec3 other) _this vectorDiff other                 endFnc
     fnc simple vec3 dot(vec3 other) _this vectorDotProduct other            endFnc
@@ -23,6 +29,6 @@ native vec3
     fnc simple scalar distance(vec3 other) _this vectorDistance other       endFnc
     fnc simple scalar distanceSqr(vec3 other) _this vectorDistanceSqr other endFnc
     fnc simple vec3 normalized() vectorNormalized _this                     endFnc
-	
-    operator simple scalar [] (scalar index)		_this select ( index )	endOperator
+
+    operator simple scalar [] (scalar index)        _this select ( index )    endOperator
 }
