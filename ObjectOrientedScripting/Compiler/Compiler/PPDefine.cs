@@ -96,7 +96,7 @@ namespace Compiler
                                 continue;
                             }
                         }
-                        else
+                        else if(!char.IsLetterOrDigit(c))
                         {
                             continue;
                         }
