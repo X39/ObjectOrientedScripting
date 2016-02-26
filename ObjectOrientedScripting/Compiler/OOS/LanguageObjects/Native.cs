@@ -71,7 +71,7 @@ namespace Compiler.OOS_LanguageObjects
 
         public List<Ident> ExtendedClasses
         {
-            get { return new List<Ident>(); }
+            get { return parentIdents; }
         }
 
         public VarTypeObject VTO { get; set; }
