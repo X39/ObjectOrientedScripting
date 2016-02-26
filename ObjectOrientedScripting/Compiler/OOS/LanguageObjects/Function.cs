@@ -111,12 +111,23 @@ namespace Compiler.OOS_LanguageObjects
         public override int doFinalize()
         {
             int errCount = 0;
-            if (this.ReturnType.varType != VarType.Void && !this.AlwaysReturns && !this.IsConstructor && !this.IsExternal)
+            if (this.IsAsync)
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0021, this.Name.Line, this.Name.Pos, this.Name.File));
-                errCount++;
+                if (!this.varType.Equals(Wrapper.Compiler.InternalObjectVarTypes.VT_script))
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0021, this.Name.Line, this.Name.Pos, this.Name.File));
+                    errCount++;
+                }
             }
-            if(this.IsConstructor)
+            else
+            {
+                if (this.ReturnType.varType != VarType.Void && !this.AlwaysReturns && !this.IsConstructor && !this.IsExternal)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0021, this.Name.Line, this.Name.Pos, this.Name.File));
+                    errCount++;
+                }
+            }
+            if (this.IsConstructor)
             {
                 var retList = this.getAllChildrenOf<Return>(true);
                 if(!retList.TrueForAll(it => it.children.Count == 0))

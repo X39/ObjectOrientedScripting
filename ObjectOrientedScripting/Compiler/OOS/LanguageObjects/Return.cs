@@ -24,10 +24,21 @@ namespace Compiler.OOS_LanguageObjects
             if(this.children.Count > 0)
             {
                 var returnExpression = (Expression)this.children[0];
-                if(!returnExpression.ReferencedType.Equals(fnc.varType))
+                if (fnc.IsAsync)
                 {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0022, this.Line, this.Pos, this.File));
-                    errCount++;
+                    if (!returnExpression.ReferencedType.Equals(new VarTypeObject(VarType.Void)))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0022, this.Line, this.Pos, this.File));
+                        errCount++;
+                    }
+                }
+                else
+                {
+                    if (!returnExpression.ReferencedType.Equals(fnc.varType))
+                    {
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0022, this.Line, this.Pos, this.File));
+                        errCount++;
+                    }
                 }
             }
             else if(fnc.varType.varType != VarType.Void)
