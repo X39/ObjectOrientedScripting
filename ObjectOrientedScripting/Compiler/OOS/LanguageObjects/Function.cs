@@ -25,6 +25,7 @@ namespace Compiler.OOS_LanguageObjects
         public bool IsAsync { get; set; }
         public bool IsVirtual { get; set; }
         public bool IsExternal { get; set; }
+        public bool IsInline { get; set; }
         public string SqfSuffix { get; internal set; }
         public string SqfVariableName
         {
@@ -42,6 +43,15 @@ namespace Compiler.OOS_LanguageObjects
                     var casted = (Interfaces.iGetIndex)this.Parent;
 
                     return " select " + (casted.getIndex(this.Name) + Function.ObjectValueOffset);
+                }
+                else if(this.IsInline)
+                {
+                    var memStream = new MemoryStream();
+                    this.writeOut(new StreamWriter(memStream), null);
+                    memStream.Seek(0, SeekOrigin.Begin);
+                    var result = '{' + new StreamReader(memStream).ReadToEnd() + '}';
+                    memStream.Close();
+                    return result;
                 }
                 else
                 {
@@ -190,6 +200,15 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (this.IsExternal)
                 return;
+            if (this.IsInline)
+            {
+                if (cfg == null)
+                    cfg = new SqfConfigObjects.SqfConfigFile("inline");
+                else
+                    return;
+            }
+
+
             int index;
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             if (this.IsVirtual)

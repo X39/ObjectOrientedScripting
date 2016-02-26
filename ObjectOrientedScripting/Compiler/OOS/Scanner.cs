@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 90;
-	const int noSym = 90;
+	const int maxT = 91;
+	const int noSym = 91;
 
 
 	public Buffer buffer; // scanner buffer
@@ -450,28 +450,29 @@ public class Scanner {
 			case "class": t.kind = 63; break;
 			case "virtualFunctionsOnly": t.kind = 64; break;
 			case "implements": t.kind = 65; break;
-			case "interface": t.kind = 66; break;
-			case "auto": t.kind = 68; break;
-			case "for": t.kind = 69; break;
-			case "null": t.kind = 70; break;
-			case "deref": t.kind = 71; break;
-			case "foreach": t.kind = 72; break;
-			case "in": t.kind = 73; break;
-			case "while": t.kind = 74; break;
-			case "new": t.kind = 75; break;
-			case "if": t.kind = 76; break;
-			case "else": t.kind = 77; break;
-			case "try": t.kind = 78; break;
-			case "catch": t.kind = 79; break;
-			case "break": t.kind = 80; break;
-			case "is": t.kind = 81; break;
-			case "throw": t.kind = 82; break;
-			case "return": t.kind = 83; break;
-			case "switch": t.kind = 84; break;
-			case "case": t.kind = 85; break;
-			case "default": t.kind = 86; break;
-			case "SQF": t.kind = 88; break;
-			case "as": t.kind = 89; break;
+			case "inline": t.kind = 66; break;
+			case "interface": t.kind = 67; break;
+			case "auto": t.kind = 69; break;
+			case "for": t.kind = 70; break;
+			case "null": t.kind = 71; break;
+			case "deref": t.kind = 72; break;
+			case "foreach": t.kind = 73; break;
+			case "in": t.kind = 74; break;
+			case "while": t.kind = 75; break;
+			case "new": t.kind = 76; break;
+			case "if": t.kind = 77; break;
+			case "else": t.kind = 78; break;
+			case "try": t.kind = 79; break;
+			case "catch": t.kind = 80; break;
+			case "break": t.kind = 81; break;
+			case "is": t.kind = 82; break;
+			case "throw": t.kind = 83; break;
+			case "return": t.kind = 84; break;
+			case "switch": t.kind = 85; break;
+			case "case": t.kind = 86; break;
+			case "default": t.kind = 87; break;
+			case "SQF": t.kind = 89; break;
+			case "as": t.kind = 90; break;
 			default: break;
 		}
 	}
@@ -637,11 +638,11 @@ public class Scanner {
 			case 46:
 				{t.kind = 46; break;}
 			case 47:
-				{t.kind = 87; break;}
+				{t.kind = 88; break;}
 			case 48:
-				recEnd = pos; recKind = 67;
+				recEnd = pos; recKind = 68;
 				if (ch == ':') {AddCh(); goto case 22;}
-				else {t.kind = 67; break;}
+				else {t.kind = 68; break;}
 			case 49:
 				recEnd = pos; recKind = 3;
 				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= 'a' && ch <= 'b' || ch >= 'd' && ch <= 'z') {AddCh(); goto case 6;}
