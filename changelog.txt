@@ -1,5 +1,19 @@
 Version 0.7.4-ALPHA
-	|- Compiler:  Added "inline" attribute to functions
+	|v- Compiler: Added internal defines:
+	||-            __VERSION <-- Contains current compiler version
+	||-            __NEXCEPT(MSG) <-- Wrapper for Exception Object
+	|\                                Only working in Native Functions
+	|- Compiler:  `async` attribute functions now have to be of type script
+	|- Compiler:  Added `inline` attribute to functions
+    |             static inline [ async ]
+	|                    <TYPE> <IDENT> ( <ARGLIST> ) [ throwing ] {...}
+	|- Compiler:  Added `throwing` attribute to functions
+	|             throwing is required when using the "throw" operation.
+	|             functions that call such a function but do not catch the
+	|             potential exception will generate a warning
+	|             Syntax:
+    |             static [ inline | external ] [ async ] [ virtual ]
+	|                    <TYPE> <IDENT> ( <ARGLIST> ) throwing {...}
 	|v- Compiler: Added internal object Exception (extendable for custom)
 	||-            catch now has to use Exception type
 	|\-            throw now has to use Exception type
