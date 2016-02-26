@@ -99,6 +99,11 @@ namespace Compiler.OOS_LanguageObjects
                         {
                             sw.Write(']' + (!fnc.IsAsync ? " call " : " spawn ") + ((Function)fnc).SqfVariableName);
                         }
+                        if(((Function)fnc).IsThrowing && this.getFirstOf<TryCatch>() == null)
+                        {
+                            Ident ident = this.getFirstOf<Ident>();
+                            Logger.Instance.log(Logger.LogLevel.WARNING, "Function '" + fnc.Name.FullyQualifiedName + "' is throwing but not catched. line " + ident.Line + ", pos " + ident.Pos + ", file '" + ident.File + '\'');
+                        }
                     }
                     else
                     {

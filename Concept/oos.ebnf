@@ -823,6 +823,7 @@ COMPILER OOS
 			obj.varType = vto;
 			obj.IsExternal = isExternal;
 			obj.IsInline = isInline;
+			obj.IsThrowing = false;
 			pBaseLangObject blo;
 			if(isExternal && isVirtual) SemErr("External function is marked as virtual");
 			if(e == Encapsulation.Static && isVirtual) SemErr("Static function is marked as virtual");
@@ -830,6 +831,9 @@ COMPILER OOS
 			
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			FNCARGLIST<obj> (. obj.markArgListEnd(); .)
+			[
+				"throwing" (. obj.IsThrowing = true; .)
+			]
 			(. if(!isExternal) { .)
 			T_CODEBRACKETOPEN
 			{

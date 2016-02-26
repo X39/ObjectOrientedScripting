@@ -26,6 +26,7 @@ namespace Compiler.OOS_LanguageObjects
         public bool IsVirtual { get; set; }
         public bool IsExternal { get; set; }
         public bool IsInline { get; set; }
+        public bool IsThrowing { get; set; }
         public string SqfSuffix { get; internal set; }
         public string SqfVariableName
         {

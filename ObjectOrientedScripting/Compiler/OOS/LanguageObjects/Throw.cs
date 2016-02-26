@@ -13,7 +13,13 @@ namespace Compiler.OOS_LanguageObjects
         {
             if (!((Expression)this.children[0]).ReferencedType.IsKindOf(Wrapper.Compiler.InternalObjectVarTypes.VT_Exception))
             {
-                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0057, ((Expression)this.children[0]).Line, ((Expression)this.children[0]).Pos));
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0057, ((Expression)this.children[0]).Line, ((Expression)this.children[0]).Pos, ((Expression)this.children[0]).File));
+                return 1;
+            }
+            if (!this.getFirstOf<Function>().IsThrowing)
+            {
+                var fnc = this.getFirstOf<Function>();
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0059, fnc.Name.Line, fnc.Name.Pos, fnc.Name.File));
                 return 1;
             }
             return 0;
