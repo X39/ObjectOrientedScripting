@@ -1,3 +1,5 @@
+//Changes in here have to be reflected in Compiler.cs __NEXCEPT
+
 class Exception
 {
 	public string Message;

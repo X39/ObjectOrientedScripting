@@ -12,7 +12,7 @@ namespace std
         fnc void setFuel (scalar i)
             if(!local _this) exitWith
             {
-                throw "VehicleNotLocalException";
+                throw __NEXCEPT("VehicleNotLocalException");
             };
             _this setFuel ( i );
         endFnc

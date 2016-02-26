@@ -14,7 +14,7 @@ namespace std
         fnc void delete ()    
             if(!local _this) exitWith
             {
-                throw "GroupNotLocalException";
+                throw __NEXCEPT("GroupNotLocalException");
             };
             deleteGroup _this;
         endFnc
