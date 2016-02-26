@@ -62,19 +62,19 @@ COMPILER OOS
 			]
 			T_ROUNDBRACKETCLOSE
 		.
-		SPECIAL_NEWVARIABLEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, bool fVFncOnly = false>
+		SPECIAL_NEWVARIABLEFUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, bool fVFncOnly = false, bool isInline = false>
 		(.
 				outObj = null;
 				pBaseLangObject blo;
 				bool isAsync = false;
 				bool isVirtual = false;
 				VarTypeObject vto = null;
-		.) =			
+		.) =
 			(
 				VARTYPE<out vto, parent>
 				(
 					IF(peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN))
-					FUNCTION<out blo, parent, e, vto>
+					FUNCTION<out blo, parent, e, vto, false, false, false, isInline>
 					(.
 						outObj = blo;
 						if(!((Function)blo).IsVirtual && fVFncOnly)
@@ -90,7 +90,7 @@ COMPILER OOS
 			|
 			(
 				"void" (. vto = new VarTypeObject(VarType.Void); .)
-				FUNCTION<out blo, parent, e, vto>
+				FUNCTION<out blo, parent, e, vto, false, false, false, isInline>
 				(.
 					outObj = blo;
 					if(!((Function)blo).IsVirtual && fVFncOnly)
@@ -103,6 +103,12 @@ COMPILER OOS
 			(
 				"async" (. isAsync = true; .)
 				[
+					(.
+						if(isInline)
+						{
+							SemErr("virtual functions can't be inline");
+						}
+					.)
 					"virtual" (. isVirtual = true; .)
 				]
 				(
@@ -110,7 +116,7 @@ COMPILER OOS
 					|
 					"void" (. vto = new VarTypeObject(VarType.Void); .)
 				)
-				FUNCTION<out blo, parent, e, vto, isAsync, isVirtual>
+				FUNCTION<out blo, parent, e, vto, isAsync, isVirtual, false, isInline>
 				(.
 					outObj = blo;
 					if(!((Function)blo).IsVirtual && fVFncOnly)
@@ -121,6 +127,12 @@ COMPILER OOS
 			)
 			|
 			(
+				(.
+					if(isInline)
+					{
+						SemErr("virtual functions can't be inline");
+					}
+				.)
 				"virtual" (. isVirtual = true; .)
 				(
 					VARTYPE<out vto, parent>
@@ -138,6 +150,12 @@ COMPILER OOS
 			)
 			|
 			(
+				(.
+					if(isInline)
+					{
+						SemErr("external functions can't be inline");
+					}
+				.)
 				"external"
 				[
 					"async" (. isAsync = true; .)
@@ -757,10 +775,19 @@ COMPILER OOS
 				]
 				(
 					ENUM<out blo, obj> (. obj.addChild(blo); .)
-					|IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) )
-					CONSTRUCTOR<out blo, obj, e> (. obj.addChild(blo); hasConstructor = true; if(flag_disableConstructor)  { SemErr("Constructors are disabled in flags for this class"); } .)
 					|
-					SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, e, flag_virtualFunctionsOnly> (. obj.addChild(blo); .)
+					(
+						(. bool isInline = false; .)
+						[
+							"inline" (. isInline = true; .)
+						]
+						(
+							IF( peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN) && la.val.Equals(obj.Name.OriginalValue) )
+							CONSTRUCTOR<out blo, obj, e, isInline> (. obj.addChild(blo); hasConstructor = true; if(flag_disableConstructor)  { SemErr("Constructors are disabled in flags for this class"); } .)
+							|
+							SPECIAL_NEWVARIABLEFUNCTION<out blo, obj, e, flag_virtualFunctionsOnly, isInline> (. obj.addChild(blo); .)
+						)
+					)
 				)
 			}
 			T_CODEBRACKETCLOSE (. if(!hasConstructor && !flag_disableConstructor) {
@@ -788,13 +815,14 @@ COMPILER OOS
 			}
 			T_CODEBRACKETCLOSE
 		.
-		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, VarTypeObject vto, bool isAsync = false, bool isVirtual = false, bool isExternal = false> (.
+		FUNCTION<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, VarTypeObject vto, bool isAsync = false, bool isVirtual = false, bool isExternal = false, bool isInline = false> (.
 			var obj = new Function(parent); outObj = obj;
 			obj.encapsulation = e;
 			obj.IsAsync = isAsync;
 			obj.IsVirtual = isVirtual;
 			obj.varType = vto;
 			obj.IsExternal = isExternal;
+			obj.IsInline = isInline;
 			pBaseLangObject blo;
 			if(isExternal && isVirtual) SemErr("External function is marked as virtual");
 			if(e == Encapsulation.Static && isVirtual) SemErr("Static function is marked as virtual");
@@ -811,13 +839,13 @@ COMPILER OOS
 			(. } .)
 			
 		.
-		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e> (.
+		CONSTRUCTOR<out pBaseLangObject outObj, pBaseLangObject parent, Encapsulation e, bool isInline> (.
 			var obj = new Function(parent);outObj = obj;
 			obj.varType = new VarTypeObject(((oosClass)parent).Name);
 			obj.encapsulation = e;
 			pBaseLangObject blo;
+			obj.IsInline = isInline;
 		.) =
-			
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			FNCARGLIST<obj> (. obj.markArgListEnd(); .)
 			[
