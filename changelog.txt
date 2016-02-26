@@ -1,51 +1,51 @@
 Version 0.7.4-ALPHA
-	|v- Compiler: Fixed error in PreProcessor preventing some macros to work
-	|v- Compiler: Fixed define compiler flag
-	|v- Compiler: Added internal defines:
-	||-            __VERSION <-- Contains current compiler version
-	||-            __NEXCEPT(MSG) <-- Wrapper for Exception Object
-	|\                                Only working in Native Functions
-	|- Compiler:  `async` attribute functions now have to be of type script
-	|- Compiler:  Added `inline` attribute to functions
+    |v- Compiler: Fixed error in PreProcessor preventing some macros to work
+    |v- Compiler: Fixed define compiler flag
+    |v- Compiler: Added internal defines:
+    ||-            __VERSION <-- Contains current compiler version
+    ||-            __NEXCEPT(MSG) <-- Wrapper for Exception Object
+    |\                                Only working in Native Functions
+    |- Compiler:  `async` attribute functions now have to be of type script
+    |- Compiler:  Added `inline` attribute to functions
     |             static inline [ async ]
-	|                    <TYPE> <IDENT> ( <ARGLIST> ) [ throwing ] {...}
-	|- Compiler:  Added `throwing` attribute to functions
-	|             throwing is required when using the "throw" operation.
-	|             functions that call such a function but do not catch the
-	|             potential exception will generate a warning
-	|             Syntax:
+    |                    <TYPE> <IDENT> ( <ARGLIST> ) [ throwing ] {...}
+    |- Compiler:  Added `throwing` attribute to functions
+    |             throwing is required when using the "throw" operation.
+    |             functions that call such a function but do not catch the
+    |             potential exception will generate a warning
+    |             Syntax:
     |             static [ inline | external ] [ async ] [ virtual ]
-	|                    <TYPE> <IDENT> ( <ARGLIST> ) throwing {...}
-	|v- Compiler: Added internal object Exception (extendable for custom)
-	||-            catch now has to use Exception type
-	|\-            throw now has to use Exception type
-    |v- Compiler: updated vec3 (thx to Zeven90's PR #48)
-	||-            new constructor `vec3(array<scalar>)`
-	||-            new member function `vec3 add(vec3 other)`
-	||-            new member function `vec3 diff(vec3 other)`
-	||-            new member function `vec3 dot(vec3 other)`
-	||-            new member function `vec3 cross(vec3 other)`
-	||-            new member function `scalar cos(vec3 other)`
-	||-            new member function `scalar magnitude()`
-	||-            new member function `scalar magnitudeSqr()`
-	||-            new member function `vec3 multiply(scalar n)`
-	||-            new member function `scalar distance(vec3 other)`
-	||-            new member function `scalar distanceSqr(vec3 other)`
-	|\-            new member function `vec3 normalized()`
-	|- stdLib:    Updated ::std::Marker to use vec3
-	|- stdLib:    Updated ::std::base::VehicleBase to use vec3
-	|v- stdLib:   ::std::base::VehicleBase (thx to Zeven90's PR #48)
-	|\-            Fixed error in `::std::Config getConfigEntry()`
-	|v- stdLib:   ::std::Man (thx to Zeven90's PR #47)
-	||-            Added enum ::std::Man::VisionMode
-	||-            Fixed locality on `void disableAI(AiSection)` (throws now)
-	||-            Fixed locality on `void enableAI(AiSection)` (throws now)
-	|\-            Updated enum ::std::Man::AiSection to 1.56
-	\v- stdLib:   ::std::Group (thx to Zeven90's PR #47)
-	 |             Fixed locality on `void delete()` (throws now)
-	 |             Added `void join()`
-	 \             Added `::std::Man getLeader()`
-	
+    |                    <TYPE> <IDENT> ( <ARGLIST> ) throwing {...}
+    |v- Compiler: Added internal object Exception (extendable for custom)
+    ||-            catch now has to use Exception type
+    |\-            throw now has to use Exception type
+    |v- Compiler: updated vec3 (thx to Zeven90`s PR #48)
+    ||-            new constructor `vec3(array<scalar>)`
+    ||-            new member function `vec3 add(vec3 other)`
+    ||-            new member function `vec3 diff(vec3 other)`
+    ||-            new member function `vec3 dot(vec3 other)`
+    ||-            new member function `vec3 cross(vec3 other)`
+    ||-            new member function `scalar cos(vec3 other)`
+    ||-            new member function `scalar magnitude()`
+    ||-            new member function `scalar magnitudeSqr()`
+    ||-            new member function `vec3 multiply(scalar n)`
+    ||-            new member function `scalar distance(vec3 other)`
+    ||-            new member function `scalar distanceSqr(vec3 other)`
+    |\-            new member function `vec3 normalized()`
+    |- stdLib:    Updated ::std::Marker to use vec3
+    |- stdLib:    Updated ::std::base::VehicleBase to use vec3
+    |v- stdLib:   ::std::base::VehicleBase (thx to Zeven90` PR #48)
+    |\-            Fixed error in `::std::Config getConfigEntry()`
+    |v- stdLib:   ::std::Man (thx to Zeven90` PR #47)
+    ||-            Added enum ::std::Man::VisionMode
+    ||-            Fixed locality on `void disableAI(AiSection)` (throws now)
+    ||-            Fixed locality on `void enableAI(AiSection)` (throws now)
+    |\-            Updated enum ::std::Man::AiSection to 1.56
+    \v- stdLib:   ::std::Group (thx to Zeven90` PR #47)
+     |             Fixed locality on `void delete()` (throws now)
+     |             Added `void join()`
+     \             Added `::std::Man getLeader()`
+    
 Version 0.7.3-ALPHA
     |v- Compiler: Added `deref <ident>` operation, returns SQF name of given
     ||             Non-Native function (virtual functions are not allowed too)
@@ -94,10 +94,10 @@ Version 0.7.3-ALPHA
     \- Compiler:  Fixed "_" in fnc name fucks up config.cpp 
 
 Version 0.7.2-ALPHA
-	|- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
-	|             srcfolder
-	|- WrapperUI: fixed saving exception which prevented saving changes
-	|- WrapperUI: fixed set buttons not getting disabled when loading files
+    |- Wrapper:   fixed Project.writeToFile(string) wrote buildfolder to
+    |             srcfolder
+    |- WrapperUI: fixed saving exception which prevented saving changes
+    |- WrapperUI: fixed set buttons not getting disabled when loading files
     |- Compiler:  fixed issue where assignment type is not chosen correctly
     |- Compiler:  fixed member variables are "directly assigned"
     |- Compiler:  fixed member variables w/o def val being initialized using nil
@@ -110,17 +110,17 @@ Version 0.7.2-ALPHA
     |- Compiler:  added LNK0051 exception for variable defined twice in class
     |-            and function
     |v- stdLib:   Updated ::std::Marker functions
-	||-           new enum: Shape
-	||-           new function: void setType(string)
-	||-           new function: string getType()
-	||-           new function: void setShape(Shape)
-	|\-           new function: Shape getType()
-	|- stdLib:    Added delete() function to ::std::Marker
-	|- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
-	|- WrapperUI: WrapperUI will inform you about unsaved changes you have
-	|             made to current file upon load/close
-	|- WrapperUI: Implemented Ressources
-	\- Compiler:  Implemented Ressources
+    ||-           new enum: Shape
+    ||-           new function: void setType(string)
+    ||-           new function: string getType()
+    ||-           new function: void setShape(Shape)
+    |\-           new function: Shape getType()
+    |- stdLib:    Added delete() function to ::std::Marker
+    |- stdLib:    Added deleteVehicle() function to ::std::base::VehicleBase
+    |- WrapperUI: WrapperUI will inform you about unsaved changes you have
+    |             made to current file upon load/close
+    |- WrapperUI: Implemented Ressources
+    \- Compiler:  Implemented Ressources
 
 Version 0.7.1-ALPHA
     |- Compiler:  fixed member functions without arguments lacked params command

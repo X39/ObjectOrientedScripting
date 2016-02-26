@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.7.3-ALPHA"
+#define MyAppVersion "0.7.4-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "WrapperUI.exe"
@@ -49,6 +49,54 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'You might want to check this out from time to time :)',
+  'Version 0.7.4-ALPHA                                                             ' + AnsiChar(#10) +
+  '    |v- Compiler: Fixed error in PreProcessor preventing some macros to work    ' + AnsiChar(#10) +
+  '    |v- Compiler: Fixed define compiler flag                                    ' + AnsiChar(#10) +
+  '    |v- Compiler: Added internal defines:                                       ' + AnsiChar(#10) +
+  '    ||-            __VERSION <-- Contains current compiler version              ' + AnsiChar(#10) +
+  '    ||-            __NEXCEPT(MSG) <-- Wrapper for Exception Object              ' + AnsiChar(#10) +
+  '    |\                                Only working in Native Functions          ' + AnsiChar(#10) +
+  '    |- Compiler:  `async` attribute functions now have to be of type script     ' + AnsiChar(#10) +
+  '    |- Compiler:  Added `inline` attribute to functions                         ' + AnsiChar(#10) +
+  '    |             static inline [ async ]                                       ' + AnsiChar(#10) +
+  '    |                    <TYPE> <IDENT> ( <ARGLIST> ) [ throwing ] {...}        ' + AnsiChar(#10) +
+  '    |- Compiler:  Added `throwing` attribute to functions                       ' + AnsiChar(#10) +
+  '    |             throwing is required when using the "throw" operation.        ' + AnsiChar(#10) +
+  '    |             functions that call such a function but do not catch the      ' + AnsiChar(#10) +
+  '    |             potential exception will generate a warning                   ' + AnsiChar(#10) +
+  '    |             Syntax:                                                       ' + AnsiChar(#10) +
+  '    |             static [ inline | external ] [ async ] [ virtual ]            ' + AnsiChar(#10) +
+  '    |                    <TYPE> <IDENT> ( <ARGLIST> ) throwing {...}            ' + AnsiChar(#10) +
+  '    |v- Compiler: Added internal object Exception (extendable for custom)       ' + AnsiChar(#10) +
+  '    ||-            catch now has to use Exception type                          ' + AnsiChar(#10) +
+  '    |\-            throw now has to use Exception type                          ' + AnsiChar(#10) +
+  '    |v- Compiler: updated vec3 (thx to Zeven90`s PR #48)                        ' + AnsiChar(#10) +
+  '    ||-            new constructor `vec3(array<scalar>)`                        ' + AnsiChar(#10) +
+  '    ||-            new member function `vec3 add(vec3 other)`                   ' + AnsiChar(#10) +
+  '    ||-            new member function `vec3 diff(vec3 other)`                  ' + AnsiChar(#10) +
+  '    ||-            new member function `vec3 dot(vec3 other)`                   ' + AnsiChar(#10) +
+  '    ||-            new member function `vec3 cross(vec3 other)`                 ' + AnsiChar(#10) +
+  '    ||-            new member function `scalar cos(vec3 other)`                 ' + AnsiChar(#10) +
+  '    ||-            new member function `scalar magnitude()`                     ' + AnsiChar(#10) +
+  '    ||-            new member function `scalar magnitudeSqr()`                  ' + AnsiChar(#10) +
+  '    ||-            new member function `vec3 multiply(scalar n)`                ' + AnsiChar(#10) +
+  '    ||-            new member function `scalar distance(vec3 other)`            ' + AnsiChar(#10) +
+  '    ||-            new member function `scalar distanceSqr(vec3 other)`         ' + AnsiChar(#10) +
+  '    |\-            new member function `vec3 normalized()`                      ' + AnsiChar(#10) +
+  '    |- stdLib:    Updated ::std::Marker to use vec3                             ' + AnsiChar(#10) +
+  '    |- stdLib:    Updated ::std::base::VehicleBase to use vec3                  ' + AnsiChar(#10) +
+  '    |v- stdLib:   ::std::base::VehicleBase (thx to Zeven90`s PR #48)            ' + AnsiChar(#10) +
+  '    |\-            Fixed error in `::std::Config getConfigEntry()`              ' + AnsiChar(#10) +
+  '    |v- stdLib:   ::std::Man (thx to Zeven90`s PR #47)                          ' + AnsiChar(#10) +
+  '    ||-            Added enum ::std::Man::VisionMode                            ' + AnsiChar(#10) +
+  '    ||-            Fixed locality on `void disableAI(AiSection)` (throws now)   ' + AnsiChar(#10) +
+  '    ||-            Fixed locality on `void enableAI(AiSection)` (throws now)    ' + AnsiChar(#10) +
+  '    |\-            Updated enum ::std::Man::AiSection to 1.56                   ' + AnsiChar(#10) +
+  '    \v- stdLib:   ::std::Group (thx to Zeven90`s PR #47)                        ' + AnsiChar(#10) +
+  '     |             Fixed locality on `void delete()` (throws now)               ' + AnsiChar(#10) +
+  '     |             Added `void join()`                                          ' + AnsiChar(#10) +
+  '     \             Added `::std::Man getLeader()`                               ' + AnsiChar(#10) +
+  '                                                                                ' + AnsiChar(#10) +
   'Version 0.7.3-ALPHA                                                             ' + AnsiChar(#10) +
   '    |v- Compiler: Added `deref <ident>` operation, returns SQF name of given    ' + AnsiChar(#10) +
   '    ||            Non-Native function (virtual functions are not allowed too)   ' + AnsiChar(#10) +
