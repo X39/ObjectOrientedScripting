@@ -93,6 +93,16 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Exception {
+            get {
+                object obj = ResourceManager.GetObject("Exception", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] functions {
             get {
                 object obj = ResourceManager.GetObject("functions", resourceCulture);

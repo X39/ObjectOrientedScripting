@@ -44,6 +44,16 @@ namespace Wrapper
             public static readonly string loop = "_LOOPSCOPE_";
             public static readonly string oosCase = "_CASE_";
         }
+        public struct InternalObjectVarTypes
+        {
+            //array cannot be typed due to template arg
+            public static readonly VarTypeObject VT_Exception = new VarTypeObject(new Ident(null, "Exception", -1, -1, ""));
+            public static readonly VarTypeObject VT_object = new VarTypeObject(new Ident(null, "object", -1, -1, ""));
+            public static readonly VarTypeObject VT_nobject = new VarTypeObject(new Ident(null, "nobject", -1, -1, ""));
+            public static readonly VarTypeObject VT_script = new VarTypeObject(new Ident(null, "script", -1, -1, ""));
+            public static readonly VarTypeObject VT_string = new VarTypeObject(new Ident(null, "string", -1, -1, ""));
+            public static readonly VarTypeObject VT_vec3 = new VarTypeObject(new Ident(null, "vec3", -1, -1, ""));
+        }
         public static Compiler Instance { get; internal set; }
         public Compiler()
         {
@@ -232,31 +242,54 @@ namespace Wrapper
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                InternalObjectVarTypes.VT_object.ident.finalize();
+                InternalObjectVarTypes.VT_nobject.ident.finalize();
+
+
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.array)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+
+
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.vec3)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                InternalObjectVarTypes.VT_vec3.ident.finalize();
+
+
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._string)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                InternalObjectVarTypes.VT_string.ident.finalize();
+
+
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.script)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                InternalObjectVarTypes.VT_script.ident.finalize();
+
+
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.functions)), "");
                 Parser.UsedFiles = new List<string>();
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+
+
+                p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.Exception)), "");
+                Parser.UsedFiles = new List<string>();
+                p.BaseObject = oosTreeBase;
+                p.Parse();
+                errCount += p.errors.count;
+                InternalObjectVarTypes.VT_Exception.ident.finalize();
 
 
                 if (errCount > 0)

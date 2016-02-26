@@ -1,0 +1,12 @@
+class Exception
+{
+	public string Message;
+    public inline Exception()
+	{
+		this.Message = "";
+	}
+	public inline Exception(string message)
+	{
+		this.Message = message;
+	}
+}
