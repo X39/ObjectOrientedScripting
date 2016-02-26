@@ -1,4 +1,6 @@
 Version 0.7.4-ALPHA
+	|v- Compiler: Fixed error in PreProcessor preventing some macros to work
+	|v- Compiler: Fixed define compiler flag
 	|v- Compiler: Added internal defines:
 	||-            __VERSION <-- Contains current compiler version
 	||-            __NEXCEPT(MSG) <-- Wrapper for Exception Object
