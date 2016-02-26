@@ -30,11 +30,11 @@ namespace Compiler.OOS_LanguageObjects
         }
         public override int doFinalize()
         {
-            //if (((Variable)variable).ReferencedType.varType != VarType.String)
-            //{
-            //    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.ErrorCodeEnum.C0042, ((Variable)variable).Line, ((Variable)variable).Pos));
-            //    return 1;
-            //}
+            if (!((Variable)variable).ReferencedType.IsKindOf(Wrapper.Compiler.InternalObjectVarTypes.VT_Exception))
+            {
+                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0056, ((Variable)variable).Line, ((Variable)variable).Pos));
+                return 1;
+            }
             return 0;
         }
         public void markEnd()
