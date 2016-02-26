@@ -1,15 +1,47 @@
+Version 0.7.4-ALPHA
+	|- Compiler:  Added "inline" attribute to functions
+	|v- Compiler: Added internal object Exception (extendable for custom)
+	||-            catch now has to use Exception type
+	|\-            throw now has to use Exception type
+    |v- Compiler: updated vec3 (thx to Zeven90's PR #48)
+	||-            new constructor `vec3(array<scalar>)`
+	||-            new member function `vec3 add(vec3 other)`
+	||-            new member function `vec3 diff(vec3 other)`
+	||-            new member function `vec3 dot(vec3 other)`
+	||-            new member function `vec3 cross(vec3 other)`
+	||-            new member function `scalar cos(vec3 other)`
+	||-            new member function `scalar magnitude()`
+	||-            new member function `scalar magnitudeSqr()`
+	||-            new member function `vec3 multiply(scalar n)`
+	||-            new member function `scalar distance(vec3 other)`
+	||-            new member function `scalar distanceSqr(vec3 other)`
+	|\-            new member function `vec3 normalized()`
+	|- stdLib:    Updated ::std::Marker to use vec3
+	|- stdLib:    Updated ::std::base::VehicleBase to use vec3
+	|v- stdLib:   ::std::base::VehicleBase (thx to Zeven90's PR #48)
+	|\-            Fixed error in `::std::Config getConfigEntry()`
+	|v- stdLib:   ::std::Man (thx to Zeven90's PR #47)
+	||-            Added enum ::std::Man::VisionMode
+	||-            Fixed locality on `void disableAI(AiSection)` (throws now)
+	||-            Fixed locality on `void enableAI(AiSection)` (throws now)
+	|\-            Updated enum ::std::Man::AiSection to 1.56
+	\v- stdLib:   ::std::Group (thx to Zeven90's PR #47)
+	 |             Fixed locality on `void delete()` (throws now)
+	 |             Added `void join()`
+	 \             Added `::std::Man getLeader()`
+	
 Version 0.7.3-ALPHA
     |v- Compiler: Added `deref <ident>` operation, returns SQF name of given
-    ||            Non-Native function (virtual functions are not allowed too)
-    ||            or of given static variable
-    ||-           Added new Linker exception LNK0052
-    ||            "Invalid Operation, Native functions are not derefable"
-    ||-           Added new Linker exception LNK0053
-    ||            "Invalid Operation, Virtual Functions are not derefable"
-    ||-           Added new Linker exception LNK0054
-    |\            "Invalid Operation, Non-Static Variables are not derefable"
-    ||-           Added new Linker exception LNK0055
-    |\            "Invalid Operation, using this in static functions"
+    ||             Non-Native function (virtual functions are not allowed too)
+    ||             or of given static variable
+    ||-            Added new Linker exception LNK0052
+    ||             "Invalid Operation, Native functions are not derefable"
+    ||-            Added new Linker exception LNK0053
+    ||             "Invalid Operation, Virtual Functions are not derefable"
+    ||-            Added new Linker exception LNK0054
+    ||             "Invalid Operation, Non-Static Variables are not derefable"
+    ||-            Added new Linker exception LNK0055
+    |\             "Invalid Operation, using this in static functions"
     |v- Compiler: rewrote Expression code & EBNF
     ||v- Compiler: Expressions get parsed according to following precedence
     |||-           First:  "+" | "-" | "*" | "/"
