@@ -221,7 +221,8 @@ namespace Compiler.OOS_LanguageObjects
                 var fileFolderPath = filePath.Substring(0, filePath.LastIndexOf('\\'));
                 if (!Directory.Exists(fileFolderPath))
                     Directory.CreateDirectory(fileFolderPath);
-                sw = new System.IO.StreamWriter(filePath + ".sqf");
+                if(sw == null)
+                    sw = new System.IO.StreamWriter(filePath + ".sqf");
 
                 int lIndex = fqn.LastIndexOf("::") - fqn.Count(c => c == ':') / 2 + 1;
                 fqn = fqn.Replace("::", "_") + this.SqfSuffix;
@@ -427,7 +428,8 @@ namespace Compiler.OOS_LanguageObjects
             if (!this.IsVirtual)
             {
                 sw.Flush();
-                sw.Close();
+                if (!this.IsInline)
+                    sw.Close();
             }
         }
         public override List<pBaseLangObject> getScopeItems(int scopeIndex)
