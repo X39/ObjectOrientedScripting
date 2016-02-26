@@ -5,9 +5,9 @@ native vec3
     assign (array<scalar> xyz)
         if(count xyz != 3) exitWith
         {
-            throw "InvalidArgumentException";
+            throw __NEXCEPT("InvalidArgumentException");
         };
-        [xyz select 0, xyz select 1, xyz select 2];
+        xyz
     endAssign
 
     fnc simple scalar getX ()                        _this select 0         endFnc
