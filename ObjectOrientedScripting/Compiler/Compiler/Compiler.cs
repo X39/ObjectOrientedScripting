@@ -65,6 +65,8 @@ namespace Wrapper
             outputFolderCleanup = true;
             printOutMode = 0;
             defines = new Dictionary<string, PPDefine>();
+            defines.Add("__VERSION", new PPDefine("#__VERSION " + this.getVersion().ToString()));
+            defines.Add("__NEXCEPT", new PPDefine("#__NEXCEPT(MSG) [[\"object\", \"Exception\"], [\"toString\", \"equals\", \"Message\"], {scopeName \"_FNCSCOPE_\";params [\"___obj___\"];(str ((___obj___))) breakOut \"_FNCSCOPE_\";}, {scopeName \"_FNCSCOPE_\";params [\"___obj___\", \"_obj\"];(((___obj___)) isEqualTo ((_obj))) breakOut \"_FNCSCOPE_\";}, MSG]"));
             SqfCall.readSupportInfoList();
             includedFiles = new List<string>();
         }
