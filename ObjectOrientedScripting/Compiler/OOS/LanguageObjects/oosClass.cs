@@ -147,19 +147,21 @@ namespace Compiler.OOS_LanguageObjects
             foreach (var it in allFunctions)
             {
                 var origVal = it.Name.OriginalValue;
+                if (it.IsConstructor)
+                    continue;
                 if (functionNameList.FirstOrDefault(checkString => checkString.Equals(origVal)) != null)
                 {
                     var parentFnc = inheritanceFunctions.FirstOrDefault(checkValue => checkValue.Name.OriginalValue == origVal);
                     if (parentFnc == null)
                     {
-                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0039, it.Name.Line, it.Name.Pos));
+                        Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0039, it.Name.Line, it.Name.Pos, it.Name.File));
                         errCount++;
                     }
                     else
                     {
                         if (!it.IsVirtual)
                         {
-                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0040, it.Name.Line, it.Name.Pos));
+                            Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0040, it.Name.Line, it.Name.Pos, it.Name.File));
                             errCount++;
                         }
                         else
@@ -170,12 +172,12 @@ namespace Compiler.OOS_LanguageObjects
                             {
                                 if (argList.Count > itArgList.Count)
                                 {
-                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0041, it.Name.Line, it.Name.Pos));
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0041, it.Name.Line, it.Name.Pos, it.Name.File));
                                     errCount++;
                                 }
                                 else
                                 {
-                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0042, it.Name.Line, it.Name.Pos));
+                                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0042, it.Name.Line, it.Name.Pos, it.Name.File));
                                     errCount++;
                                 }
                             }
@@ -193,7 +195,7 @@ namespace Compiler.OOS_LanguageObjects
                             }
                             if (!it.varType.Equals(parentFnc.varType))
                             {
-                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0044, it.Name.Line, it.Name.Pos));
+                                Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0044, it.Name.Line, it.Name.Pos, it.Name.File));
                                 errCount++;
                             }
                         }
