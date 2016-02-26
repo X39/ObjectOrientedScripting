@@ -49,7 +49,7 @@ namespace Compiler.OOS_LanguageObjects
                     var memStream = new MemoryStream();
                     this.writeOut(new StreamWriter(memStream), null);
                     memStream.Seek(0, SeekOrigin.Begin);
-                    var result = '{' + new StreamReader(memStream).ReadToEnd() + '}';
+                    var result = "{\n" + new StreamReader(memStream).ReadToEnd() + "\n}";
                     memStream.Close();
                     return result;
                 }
@@ -222,7 +222,7 @@ namespace Compiler.OOS_LanguageObjects
 
             int index;
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
-            if (this.IsVirtual)
+            if (this.IsVirtual || this.IsInline)
                 tab += '\t';
             if (!this.IsVirtual)
             {
@@ -291,9 +291,6 @@ namespace Compiler.OOS_LanguageObjects
                 /////////////////////////////////
                 // OBJECT CONSTRUCTOR PRINTING //
                 /////////////////////////////////
-                sw.WriteLine(tab + "///////////////////////");
-                sw.WriteLine(tab + "// START CONSTRUCTOR //");
-                sw.WriteLine(tab + "///////////////////////");
                 var classObject = this.getFirstOf<oosClass>();
                 var objects = classObject.AllObjects;
                 if (objects.Count > 0)
@@ -424,9 +421,6 @@ namespace Compiler.OOS_LanguageObjects
                 }
                 sw.WriteLine("];");
                 //ToDo: add baseconstructor calls
-                sw.WriteLine(tab + "///////////////////////");
-                sw.WriteLine(tab + "// END   CONSTRUCTOR //");
-                sw.WriteLine(tab + "///////////////////////");
             }
             #endregion
             Logger.Instance.log(Logger.LogLevel.DEBUG, "Printing out function '" + this.Name.FullyQualifiedName + this.SqfSuffix + "'s body");
