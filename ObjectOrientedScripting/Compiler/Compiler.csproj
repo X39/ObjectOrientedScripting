@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\InternalClasses\array.oos" />
+    <None Include="Resources\InternalClasses\Exception.oos" />
     <None Include="Resources\InternalClasses\functions.oos" />
     <None Include="Resources\InternalClasses\object.oos" />
     <None Include="Resources\InternalClasses\script.oos" />
