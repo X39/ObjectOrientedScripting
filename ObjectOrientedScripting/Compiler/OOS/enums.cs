@@ -47,6 +47,8 @@ namespace Compiler.OOS_LanguageObjects
     public class VarTypeObject : Interfaces.iTemplate
     {
         private Template template;
+
+
         public Template TemplateObject
         {
             get { return this.template; }
@@ -116,6 +118,27 @@ namespace Compiler.OOS_LanguageObjects
                 else
                     return ((VarTypeObject)obj).ident.FullyQualifiedName.Equals(this.ident.FullyQualifiedName);
             }
+        }
+        public bool IsKindOf(VarTypeObject vto)
+        {
+            if (this.varType != VarType.Object)
+                return false;
+            HelperClasses.NamespaceResolver nsrL = this.ident.LastIdent;
+            HelperClasses.NamespaceResolver nsrR = vto.ident.LastIdent;
+            if (!(nsrL.Reference is Interfaces.iClass))
+                return false;
+            if (!(nsrR.Reference is Interfaces.iClass))
+                return false;
+            var list = new List<Ident>();
+            list.AddRange(((Interfaces.iClass)nsrL.Reference).ExtendedClasses);
+            list.Add(((Interfaces.iClass)nsrL.Reference).Name);
+            foreach(var it in list)
+            {
+                HelperClasses.NamespaceResolver nsrTmp = it.LastIdent;
+                if (nsrTmp.isSame(nsrR))
+                    return true;
+            }
+            return false;
         }
         public override int GetHashCode() { return base.GetHashCode(); }
     }
