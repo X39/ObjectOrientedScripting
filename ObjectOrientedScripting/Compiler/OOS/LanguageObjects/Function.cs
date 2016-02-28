@@ -231,7 +231,8 @@ namespace Compiler.OOS_LanguageObjects
 
                 var filePath = Wrapper.Compiler.ProjectFile.OutputFolder + fqn.Replace("::", "\\") + this.SqfSuffix;
                 var fileFolderPath = filePath.Substring(0, filePath.LastIndexOf('\\'));
-                if (!Directory.Exists(fileFolderPath))
+                
+                if (!Directory.Exists(fileFolderPath) && !this.IsInline)
                     Directory.CreateDirectory(fileFolderPath);
                 if(sw == null)
                     sw = new System.IO.StreamWriter(filePath + ".sqf");
