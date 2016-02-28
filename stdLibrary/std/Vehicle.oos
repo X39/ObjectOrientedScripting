@@ -7,7 +7,15 @@ namespace std
 {
     native Vehicle extends ::std::base::VehicleBase
     {
-        assign simple (string name, scalar i, scalar j, scalar k)                   name createVehicle [i, j, k]                endAssign
+        assign simple (string name, scalar i, scalar j, scalar k)
+            name createVehicle [i, j, k]
+        endAssign
+        
+        assign simple (string name, vec3 pos)
+            name createVehicle pos
+        endAssign
+
+
 
         fnc void setFuel (scalar i)
             if(!local _this) exitWith
@@ -16,9 +24,13 @@ namespace std
             };
             _this setFuel ( i );
         endFnc
-        
-        fnc simple scalar getFuel() fuel _this endFnc
-        
-        fnc simple bool inVehicle(::std::Man man) unit in _this endFnc
+
+        fnc simple scalar getFuel()
+            fuel _this
+        endFnc
+
+        fnc simple bool inVehicle(::std::Man man)
+            unit in _this
+        endFnc
     }
 }
