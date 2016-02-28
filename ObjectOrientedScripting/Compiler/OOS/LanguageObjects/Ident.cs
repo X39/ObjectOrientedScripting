@@ -749,6 +749,8 @@ namespace Compiler.OOS_LanguageObjects
                     case IdenType.ArrayAccess:
                     case IdenType.VariableAccess:
                         var refObj = this.ReferencedObject;
+                        if (refObj == null)
+                            return "";
                         if (this.type == IdenType.FunctionCall)
                         {
                             if (((Interfaces.iFunction)refObj).FunctionEncapsulation == Encapsulation.Static || ((Interfaces.iFunction)refObj).IsConstructor || !this.HasCallWrapper)
