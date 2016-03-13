@@ -2,42 +2,32 @@ namespace std
 {
     native Config
     {
-        assign simple ()
-            configFile
-        endAssign
-        
-        fnc simple ::std::Config extend (string s)
-            _this >> ( s )
-        endFnc
-        
-        fnc simple scalar count ()
-            count _this
-        endFnc
-        
-        operator simple ::std::Config [] (scalar _i)
-            _this select _i
-        endOperator
-        
-		fnc simple bool isValid ()
-			(configName _this) == ""
-        endFnc
-        
-        fnc string parent ()
+        assign simple()                                 configFile                  endAssign
+
+        fnc simple ::std::Config extend(string s)       _this >> ( s )              endFnc
+
+        fnc simple scalar count()                       count _this                 endFnc
+
+        operator simple ::std::Config [] (scalar _i)    _this select _i             endOperator
+
+        fnc simple bool isValid()                       (configName _this) == ""    endFnc
+
+        fnc string parent()
             private ["_var", "_index"];
             _var = configHierarchy _this;
-			_index = ((_var pushBack 1) - 1);
-			if(_index < 0) exitWith {_this};
+            _index = ((_var pushBack 1) - 1);
+            if(_index < 0) exitWith {_this};
             (_var select _index)
         endFnc
-        
-        fnc simple array<::std::Config> hierarchy () configHierarchy _this endFnc
-        
-        fnc simple bool isClass () 				isClass _this       endFnc
-        fnc simple bool isText ()  				isText _this        endFnc
-        fnc simple bool isNumber ()				isNumber _this      endFnc
-        
-        fnc simple scalar getNumber ()			getNumber _this     endFnc
-        fnc simple string getText ()   			getText _this       endFnc
-        fnc simple string name ()       		configName _this    endFnc
+
+        fnc simple array<::std::Config> hierarchy()     configHierarchy _this       endFnc
+
+        fnc simple bool isClass()                       isClass _this               endFnc
+        fnc simple bool isText()                        isText _this                endFnc
+        fnc simple bool isNumber()                      isNumber _this              endFnc
+
+        fnc simple scalar getNumber()                   getNumber _this             endFnc
+        fnc simple string getText()                     getText _this               endFnc
+        fnc simple string name()                        configName _this            endFnc
     }
 }

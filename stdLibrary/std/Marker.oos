@@ -7,80 +7,83 @@ namespace std
 {
     native Marker
     {
-		enum Shape
-		{
-			Icon = "ICON",
-			Rectangle = "RECTANGLE",
-			Ellipse = "ELLIPSE"
-		}
-		enum Brush
-		{
-			Solid = "Solid",
-			SolidFull = "SolidFull",
-			Horizontal = "Horizontal",
-			Vertical = "Vertical",
-			Grid = "Grid",
-			FDiagonal = "FDiagonal",
-			BDiagonal = "BDiagonal",
-			DiagGrid = "DiagGrid",
-			Cross = "Cross",
-			Border = "Border",
-			SolidBorder = "SolidBorder"
-		}
-		enum Color
-		{
-			Default = "Default",
-			ColorBlack = "ColorBlack",
-			ColorGrey = "ColorGrey",
-			ColorRed = "ColorRed",
-			ColorGreen = "ColorGreen",
-			ColorBlue = "ColorBlue",
-			ColorYellow = "ColorYellow",
-			ColorOrange = "ColorOrange",
-			ColorWhite = "ColorWhite",
-			ColorPink = "ColorPink",
-			ColorBrown = "ColorBrown",
-			ColorKhaki = "ColorKhaki",
-			ColorWEST = "ColorWEST",
-			ColorEAST = "ColorEAST",
-			ColorGUER = "ColorGUER",
-			ColorCIV = "ColorCIV",
-			ColorUNKNOWN = "ColorUNKNOWN",
-			LightRed = "Color1_FD_F",
-			LightKhaki = "Color2_FD_F",
-			LightOrange = "Color3_FD_F",
-			LightBlue = "Color4_FD_F",
-			ColorBLUFOR = "ColorBLUFOR",
-			ColorCivilian = "ColorCivilian",
-			ColorIndependent = "ColorIndependent",
-			ColorOPFOR = "ColorOPFOR"
-		}
-		assign simple (string name)
-			createMarker [name, [0, 0, 0]]
-		endAssign
-		assign simple (string name, scalar i, scalar j, scalar k)
-			createMarker [name, [i, j, k]]
-		endAssign
-		
-		fnc simple void setDirection(scalar angle)					_this setMarkerDir ( angle )	endFnc
-		fnc simple scalar getDirection()							markerDir _this					endFnc
-		fnc simple void setAlpha(scalar angle)						_this setMarkerAlpha ( angle )	endFnc
-		fnc simple scalar getAlpha()								markerAlpha _this				endFnc
-		fnc simple void setColor(Color c)							_this setMarkerColor ( c )		endFnc
-		fnc simple Color getColor()									markerColor _this				endFnc
-		fnc simple void setBrush(Brush brush)						_this setMarkerBrush ( brush )	endFnc
-		fnc simple Brush getBrush()									markerBrush _this				endFnc
-		fnc simple void setType(string t)							_this setMarkerType ( t )		endFnc
-		fnc simple string getType()									markerType _this				endFnc
-		fnc simple void setText(string t)							_this setMarkerText ( t )		endFnc
-		fnc simple string getType()									markerText _this				endFnc
-		fnc simple void setShape(Shape shape)						_this setMarkerShape ( shape )	endFnc
-		fnc simple Shape getShape()									markerShape _this				endFnc
-		fnc simple void setSize(scalar x, scalar y)					_this setMarkerSize [x, y]		endFnc
-		fnc simple array<scalar> getSize()							markerSize _this				endFnc
-		fnc simple void setPosition(scalar x, scalar y)				_this setMarkerPos [x, y, 0]	endFnc
-		fnc simple vec3 getPosition()					         	markerPos _this					endFnc
-		
-		fnc simple void delete()									deleteMarker _this				endFnc
+        enum Shape
+        {
+            Icon = "ICON",
+            Rectangle = "RECTANGLE",
+            Ellipse = "ELLIPSE"
+        }
+
+        enum Brush
+        {
+            Solid = "Solid",
+            SolidFull = "SolidFull",
+            Horizontal = "Horizontal",
+            Vertical = "Vertical",
+            Grid = "Grid",
+            FDiagonal = "FDiagonal",
+            BDiagonal = "BDiagonal",
+            DiagGrid = "DiagGrid",
+            Cross = "Cross",
+            Border = "Border",
+            SolidBorder = "SolidBorder"
+        }
+
+        enum Color
+        {
+            Default = "Default",
+            ColorBlack = "ColorBlack",
+            ColorGrey = "ColorGrey",
+            ColorRed = "ColorRed",
+            ColorGreen = "ColorGreen",
+            ColorBlue = "ColorBlue",
+            ColorYellow = "ColorYellow",
+            ColorOrange = "ColorOrange",
+            ColorWhite = "ColorWhite",
+            ColorPink = "ColorPink",
+            ColorBrown = "ColorBrown",
+            ColorKhaki = "ColorKhaki",
+            ColorWEST = "ColorWEST",
+            ColorEAST = "ColorEAST",
+            ColorGUER = "ColorGUER",
+            ColorCIV = "ColorCIV",
+            ColorUNKNOWN = "ColorUNKNOWN",
+            LightRed = "Color1_FD_F",
+            LightKhaki = "Color2_FD_F",
+            LightOrange = "Color3_FD_F",
+            LightBlue = "Color4_FD_F",
+            ColorBLUFOR = "ColorBLUFOR",
+            ColorCivilian = "ColorCivilian",
+            ColorIndependent = "ColorIndependent",
+            ColorOPFOR = "ColorOPFOR"
+        }
+
+        assign simple (string name)
+            createMarker [name, [0, 0, 0]]
+        endAssign
+        assign simple (string name, scalar i, scalar j, scalar k)
+            createMarker [name, [i, j, k]]
+        endAssign
+
+        fnc simple void setDirection(scalar angle)                      _this setMarkerDir ( angle )    endFnc
+        fnc simple scalar getDirection()                                markerDir _this                 endFnc
+        fnc simple void setAlpha(scalar angle)                          _this setMarkerAlpha ( angle )  endFnc
+        fnc simple scalar getAlpha()                                    markerAlpha _this               endFnc
+        fnc simple void setColor(Color c)                               _this setMarkerColor ( c )      endFnc
+        fnc simple Color getColor()                                     markerColor _this               endFnc
+        fnc simple void setBrush(Brush brush)                           _this setMarkerBrush ( brush )  endFnc
+        fnc simple Brush getBrush()                                     markerBrush _this               endFnc
+        fnc simple void setType(string t)                               _this setMarkerType ( t )       endFnc
+        fnc simple string getType()                                     markerType _this                endFnc
+        fnc simple void setText(string t)                               _this setMarkerText ( t )       endFnc
+        fnc simple string getType()                                     markerText _this                endFnc
+        fnc simple void setShape(Shape shape)                           _this setMarkerShape ( shape )  endFnc
+        fnc simple Shape getShape()                                     markerShape _this               endFnc
+        fnc simple void setSize(scalar x, scalar y)                    _this setMarkerSize [x, y]       endFnc
+        fnc simple array<scalar> getSize()                              markerSize _this                endFnc
+        fnc simple void setPosition(scalar x, scalar y)                 _this setMarkerPos [x, y, 0]    endFnc
+        fnc simple vec3 getPosition()                                   markerPos _this                 endFnc
+
+        fnc simple void delete()                                        deleteMarker _this              endFnc
     }
 }

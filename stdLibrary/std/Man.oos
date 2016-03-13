@@ -21,6 +21,7 @@ namespace std
             Cover = "COVER",
             Autocombat = "AUTOCOMBAT"
         }
+
         enum Rank
         {
             Private = "PRIVATE",
@@ -31,13 +32,18 @@ namespace std
             Major = "MAJOR",
             Colonel = "COLONEL"
         }
+
         enum VisionMode
         {
             DayTime = 0,
             NightVision = 1,
             FLIR = 2
         }
-        assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)                            ( group ) createUnit [type, [i, j, k], [], 0, "FORM"]    endAssign
+
+        assign simple (::std::Group group, string type, scalar i, scalar j, scalar k)
+            ( group ) createUnit [type, [i, j, k], [], 0, "FORM"]
+        endAssign
+
         assign (::std::Group group, string type, scalar i, scalar j, scalar k, scalar skill, Rank rank)
             private "_unit";
             _unit = ( group ) createUnit [type, [i, j, k], [], 0, "FORM"];
@@ -45,7 +51,11 @@ namespace std
             _unit setSkill skill;
             _unit
         endAssign
-        assign simple (::std::Group group, string type, vec3 position)                                            ( group ) createUnit [type, position, [], 0, "FORM"]    endAssign
+
+        assign simple (::std::Group group, string type, vec3 position)
+            ( group ) createUnit [type, position, [], 0, "FORM"]
+        endAssign
+
         assign (::std::Group group, string type, vec3 position, scalar skill, Rank rank)
             private "_unit";
             _unit = ( group ) createUnit [type, position, [], 0, "FORM"];
@@ -53,23 +63,25 @@ namespace std
             _unit setSkill skill;
             _unit
         endAssign
-        
-        fnc void disableAI (AiSection section)
+
+        fnc void disableAI(AiSection section)
             if(!local _this) exitWith
             {
-			
+
                 __NEXCEPT("UnitNotLocalException");
             };
-            _this disableAI ( section )    
+            _this disableAI ( section )
         endFnc
-        fnc void enableAI (AiSection section)
+
+        fnc void enableAI(AiSection section)
             if(!local _this) exitWith
             {
                 throw __NEXCEPT("UnitNotLocalException");
             };
-            _this enableAI ( section )    
+            _this enableAI ( section )
         endFnc
-        fnc simple VisionMode getVisionMode ()          currentVisionMode _this     endFnc
+
+        fnc simple VisionMode getVisionMode()   currentVisionMode _this endFnc
     }
-    static fnc simple ::std::Man getPlayer () player endFnc
+    static fnc simple ::std::Man getPlayer()    player                  endFnc
 }

@@ -1,17 +1,17 @@
 namespace std
 {
-	namespace UI
-	{
-		native Display
-		{
-			assign (string className, string varName)
-				uiNamespace setVariable [varName, findDisplay 46 createDisplay className];
-				varName
-			endAssign
-			
-			fnc simple void close ()
-				_this closeDisplay 1
-			endFnc
-		}
+    namespace UI
+    {
+        native Display
+        {
+            assign (string className, string varName)
+                uiNamespace setVariable [varName, findDisplay 46 createDisplay className];
+                varName
+            endAssign
+
+            fnc simple void close()
+                _this closeDisplay 1
+            endFnc
+        }
     }
 }
