@@ -3,10 +3,12 @@ native script
     assign simple ()
         scriptNull
     endAssign
-	fnc simple bool done()
-		scriptDone _this
-	endFnc
-	fnc simple void terminate()
-		terminate _this
-	endFnc
+
+    fnc simple bool done()
+        scriptDone _this
+    endFnc
+
+    fnc simple void terminate()
+        terminate _this
+    endFnc
 }

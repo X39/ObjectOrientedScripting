@@ -3,48 +3,48 @@ native string
     assign simple ()
         ""
     endAssign
-	
+
     assign simple (::string s)
         s
     endAssign
-    
+
     fnc simple scalar length ()
         count _this
     endFnc
-    
+
     fnc simple string subString (scalar off, scalar len)
         _this select [off, len]
     endFnc
-	
+
     fnc simple scalar indexOf (::string s)
         _this find ( s )
     endFnc
-	
+
     fnc simple bool contains (::string s)
         (_this find ( s ) ) >= 0
     endFnc
-	
-	fnc simple string toString ()
-		_this
-	endFnc
-	
-	fnc simple array<scalar> toArray()
-		toArray _this
-	endFnc
-	
-	fnc simple string append(::string s)
-		_this + ( s )
-	endFnc
-	
-	fnc simple array<string> split(::string delimiter)
-		_this splitString ( delimiter )
-	endFnc
-	
-	fnc simple string toUpper()
-		toUpper _this
-	endFnc
-	
-	fnc simple string toLower()
-		toLower _this
-	endFnc
+
+    fnc simple string toString ()
+        _this
+    endFnc
+
+    fnc simple array<scalar> toArray()
+        toArray _this
+    endFnc
+
+    fnc simple string append(::string s)
+        _this + ( s )
+    endFnc
+
+    fnc simple array<string> split(::string delimiter)
+        _this splitString ( delimiter )
+    endFnc
+
+    fnc simple string toUpper()
+        toUpper _this
+    endFnc
+
+    fnc simple string toLower()
+        toLower _this
+    endFnc
 }

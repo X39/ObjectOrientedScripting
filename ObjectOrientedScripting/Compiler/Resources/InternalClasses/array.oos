@@ -3,39 +3,39 @@ native array<T>
     assign simple ()
         []
     endAssign
-    
+
     fnc simple scalar pushBack (T _val)
         _this pushBack ( _val )
     endFnc
-    
+
     fnc simple scalar find (T _val)
         _this find ( _val )
     endFnc
 
     fnc simple bool contains (T _val)
-		_val in _this
+        _val in _this
     endFnc
-    
+
     fnc simple void resize (scalar _i)
         _this resize ( _i )
     endFnc
-    
+
     fnc simple void deleteAt (scalar _i)
         _this deleteAt ( _i )
     endFnc
-    
+
     fnc simple void deleteRange (scalar _i, scalar _j)
         _this deleteRange [_i, _j]
     endFnc
-    
+
     fnc simple scalar length ()
         count _this
     endFnc
-    
+
     fnc simple scalar join (::array<T> arr)
         _this append ( arr )
     endFnc
-    
+
     operator simple T [] (scalar _i)
         _this select ( _i )
     endOperator
