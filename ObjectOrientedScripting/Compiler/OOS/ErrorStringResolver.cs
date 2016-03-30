@@ -24,7 +24,8 @@ namespace Compiler
             LNK0040, LNK0041, LNK0042, LNK0043, LNK0044,
             LNK0045, LNK0046, LNK0047, LNK0048, LNK0049,
             LNK0050, LNK0051, LNK0052, LNK0053, LNK0054,
-            LNK0055, LNK0056, LNK0057, LNK0058, LNK0059
+            LNK0055, LNK0056, LNK0057, LNK0058, LNK0059,
+            LNK0060
 
         }
 
@@ -96,6 +97,7 @@ namespace Compiler
                 case LinkerErrorCode.LNK0057: return "Type Missmatch, Expression has to be type Exception";
                 case LinkerErrorCode.LNK0058: return "Type Missmatch, Async functions have be of type script";
                 case LinkerErrorCode.LNK0059: return "Missing Attribute, throwing functions have to use the throwing attribute";
+                case LinkerErrorCode.LNK0060: return "Invalid Operation, more then one PreInit function detected";
 
 
                 default: return "Unknown Error, report to dev with reproduction code (fix other issues first).";
