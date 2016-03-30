@@ -14,19 +14,6 @@ namespace Wrapper
 {
     public class Compiler : ICompiler_1
     {
-        private class ContainerClass
-        {
-            public ContainerClass(object value, int purpose, pBaseLangObject sender)
-            {
-                this.Value = value;
-                this.Purpose = purpose;
-                this.Sender = sender;
-            }
-            public object Value { get; set; }
-            public int Purpose { get; set; }
-            public pBaseLangObject Sender { get; set; }
-        }
-
         private string configFileName;
         private bool addFunctionsClass;
         private bool outputFolderCleanup;
