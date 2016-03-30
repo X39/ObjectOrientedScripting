@@ -313,7 +313,17 @@ namespace Wrapper
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Compiling!");
                 return;
             }
-            errCount = parser.BaseObject.finalize();
+            var preInitFunction = parser.BaseObject.getAllChildrenOf<Function>(true, null, -1, -1, new Type[] { typeof(Namespace), typeof(oosClass) }, (obj) => obj.Name.OriginalValue.Equals("preInit"));
+            errCount = 0;
+            if(preInitFunction.Count > 0)
+            {
+                foreach(var it in preInitFunction)
+                {
+                    errCount++;
+                    Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0060, it.Name.Line, it.Name.Pos, it.Name.File));
+                }
+            }
+            errCount += parser.BaseObject.finalize();
             if (errCount > 0)
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found (" + errCount + "), cannot continue with Compiling!");
