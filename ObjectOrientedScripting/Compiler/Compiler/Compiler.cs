@@ -306,7 +306,7 @@ namespace Wrapper
             Parser.UsedFiles = new List<string>();
             parser.BaseObject = oosTreeBase;
             parser.Parse();
-            
+
             errCount = parser.errors.count;
             if (errCount > 0)
             {
@@ -315,13 +315,31 @@ namespace Wrapper
             }
             var preInitFunction = parser.BaseObject.getAllChildrenOf<Function>(true, null, -1, -1, new Type[] { typeof(Namespace), typeof(oosClass) }, (obj) => obj.Name.OriginalValue.Equals("preInit"));
             errCount = 0;
-            if(preInitFunction.Count > 0)
+            if (preInitFunction.Count > 1)
             {
-                foreach(var it in preInitFunction)
+                foreach (var it in preInitFunction)
                 {
                     errCount++;
                     Logger.Instance.log(Logger.LogLevel.ERROR, ErrorStringResolver.resolve(ErrorStringResolver.LinkerErrorCode.LNK0060, it.Name.Line, it.Name.Pos, it.Name.File));
                 }
+            }
+            else if (preInitFunction.Count == 0)
+            {
+                var n = new Namespace(parser.BaseObject);
+                parser.BaseObject.addChild(parser.BaseObject);
+                n.Name = new Ident(n, ProjectFile.Author + "ComGenPreInitNS", 0, 0, "");
+
+                var fnc = new Function(n);
+                n.addChild(fnc);
+                fnc.Name = new Ident(fnc, "preInit", 0, 0, "");
+                preInitFunction.Add(fnc);
+            }
+            int id = 0;
+            parser.BaseObject.getAllChildrenOf<oosClass>(true, null, -1, -1, new Type[] { typeof(Namespace) }, (obj) => { obj.ID = ++id; return false; });
+            parser.BaseObject.getAllChildrenOf<oosInterface>(true, null, -1, -1, new Type[] { typeof(Namespace) }, (obj) => { obj.ID = ++id; return false; });
+            if (preInitFunction.Count == 1)
+            {
+
             }
             errCount += parser.BaseObject.finalize();
             if (errCount > 0)

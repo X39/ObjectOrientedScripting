@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class oosClass : pBaseLangObject, Interfaces.iGetIndex, Interfaces.iClass
+    public class oosClass : pBaseLangObject, Interfaces.iGetIndex, Interfaces.iClass, Interfaces.iHasId
     {
         private int endMarker;
         private int endMarkerParents;
         private VarTypeObject vto;
         private List<oosClass> parentClasses;
         private List<oosInterface> parentInterfaces;
+        public int ID { get; set; }
 
 
         public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; vto = new VarTypeObject(value, null); } }
