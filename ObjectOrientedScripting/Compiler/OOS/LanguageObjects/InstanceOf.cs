@@ -50,8 +50,10 @@ namespace Compiler.OOS_LanguageObjects
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             sw.Write("((");
+            sw.Write(oosClass.GlobalClassRegisterVariable.SqfVariableName);
+            sw.Write(" select (");
             this.LIdent.writeOut(sw, cfg);
-            sw.Write(" select 0) find (");
+            sw.Write(" select 0)) find (");
             sw.Write('"' + this.RIdent.LastIdent.FullyQualifiedName + '"');
             sw.Write(") != -1)");
         }

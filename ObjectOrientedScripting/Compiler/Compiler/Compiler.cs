@@ -322,11 +322,24 @@ namespace Wrapper
                 preInitFunction.Add(fnc);
             }
             int id = 0;
-            parser.BaseObject.getAllChildrenOf<oosClass>(true, null, -1, -1, new Type[] { typeof(Namespace) }, (obj) => { obj.ID = ++id; return false; });
-            parser.BaseObject.getAllChildrenOf<oosInterface>(true, null, -1, -1, new Type[] { typeof(Namespace) }, (obj) => { obj.ID = ++id; return false; });
+            var allClasses = parser.BaseObject.getAllChildrenOf<oosClass>(true, null, -1, -1, new Type[] { typeof(Namespace) }, (obj) => { obj.ID = id++; return true; });
+            id = 0;
+            var allInterfaces = parser.BaseObject.getAllChildrenOf<oosInterface>(true, null, -1, -1, new Type[] { typeof(Namespace) }, (obj) => { obj.ID = id++; return true; });
             if (preInitFunction.Count == 1)
             {
+                var template = new Template(null, -1, -1, "");
+                template.vtoList.Add(Compiler.InternalObjectVarTypes.VT_object);
+                var arrayVto = new VarTypeObject(new Ident(null, "array", -1, -1, ""), template);
 
+                oosClass.GlobalClassRegisterVariable = new Variable(preInitFunction[0].Parent, -1, -1, "");
+                oosClass.GlobalClassRegisterVariable.Name = new Ident(oosClass.GlobalClassRegisterVariable, "ClassRegisterVariable_____", -1, -1, "");
+                oosClass.GlobalClassRegisterVariable.varType = arrayVto;
+                oosClass.GlobalClassRegisterVariable.encapsulation = Encapsulation.Static;
+
+                oosInterface.GlobalInterfaceRegisterVariable = new Variable(preInitFunction[0].Parent, -1, -1, "");
+                oosInterface.GlobalInterfaceRegisterVariable.Name = new Ident(oosInterface.GlobalInterfaceRegisterVariable, "InterfaceRegisterVariable_____", -1, -1, "");
+                oosInterface.GlobalInterfaceRegisterVariable.varType = arrayVto;
+                oosInterface.GlobalInterfaceRegisterVariable.encapsulation = Encapsulation.Static;
             }
             errCount += parser.BaseObject.finalize();
             if (errCount > 0)

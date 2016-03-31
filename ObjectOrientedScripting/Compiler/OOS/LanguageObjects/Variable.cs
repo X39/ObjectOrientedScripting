@@ -8,6 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class Variable : pBaseLangObject, Interfaces.iName, Interfaces.iHasType, Interfaces.iTemplate
     {
+        public static int ObjectValueOffset { get { return 1; } }
         public Ident Name { get { return ((Ident)this.children[0]); } set { this.children[0] = value; } }
         public VarTypeObject varType;
         public VarTypeObject ReferencedType { get { return this.varType; } }
@@ -34,7 +35,7 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     var casted = (Interfaces.iGetIndex)this.Parent;
                     var res = casted.getIndex(this.Name);
-                    return (res + Function.ObjectValueOffset).ToString();
+                    return (res + Variable.ObjectValueOffset).ToString();
                 }
             }
         }
@@ -196,7 +197,7 @@ namespace Compiler.OOS_LanguageObjects
             if (sw == null)
                 return;
             var assignList = this.getAllChildrenOf<VariableAssignment>();
-            if (assignList.Count == 0)
+            if (assignList.Count == 0 && !(this.Parent is TryCatch))
                 return;
             string tab = new string('\t', this.getAllParentsOf<Interfaces.iCodeBlock>().Count);
             sw.Write(tab + this.SqfVariableName);

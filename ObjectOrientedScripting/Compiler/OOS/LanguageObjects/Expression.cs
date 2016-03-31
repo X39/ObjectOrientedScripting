@@ -16,6 +16,27 @@ namespace Compiler.OOS_LanguageObjects
         public int Line { get; internal set; }
         public int Pos { get; internal set; }
         public string File { get; internal set; }
+        public bool IsVarType
+        {
+            get
+            {
+                if (this.expressionOperators.Count > 1)
+                    return false;
+                foreach(var it in this.children)
+                {
+                    if(it is Expression)
+                    {
+                        return ((Expression)it).IsVarType;
+                    }
+                    else if(it is Ident)
+                    {
+                        var ident = (Ident)it;
+                        return ident.LastIdent.ReferencedObject is oosClass;
+                    }
+                }
+                return false;
+            }
+        }
 
         public List<string> expressionOperators;
         public List<pBaseLangObject> expressionObjects { get { return this.children; } }

@@ -8,6 +8,10 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class oosClass : pBaseLangObject, Interfaces.iGetIndex, Interfaces.iClass, Interfaces.iHasId
     {
+        //Is set in Compiler.cs before finalize is callen
+        public static Variable GlobalClassRegisterVariable;
+
+
         private int endMarker;
         private int endMarkerParents;
         private VarTypeObject vto;
@@ -219,8 +223,9 @@ namespace Compiler.OOS_LanguageObjects
 
         public int getIndex(Ident ident)
         {
+            int index = 0;
             var refObj = ident.ReferencedObject;
-            if (refObj is Function || refObj is Variable)
+            if (refObj is Function)
             {
                 var obj = (Interfaces.iName)refObj;
                 for (int i = 0; i < this.AllObjects.Count; i++)
@@ -230,13 +235,28 @@ namespace Compiler.OOS_LanguageObjects
                     {
                         if (it is Function && obj is Function && HelperClasses.ArgList.matchesArglist(((Function)it).ArgList, ((Function)obj).ArgList))
                         {
-                            return i;
-                        }
-                        else if(it is Variable)
-                        {
-                            return i;
+                            return index;
                         }
                     }
+                    if (it is Function && ((Function)it).IsVirtual)
+                        index++;
+                }
+            }
+            else if(refObj is Variable)
+            {
+                var obj = (Interfaces.iName)refObj;
+                for (int i = 0; i < this.AllObjects.Count; i++)
+                {
+                    var it = this.AllObjects[i];
+                    if (it is Interfaces.iName && ((Interfaces.iName)it).Name.OriginalValue == obj.Name.OriginalValue)
+                    {
+                        if (it is Variable)
+                        {
+                            return index;
+                        }
+                    }
+                    if (it is Variable)
+                        index++;
                 }
             }
             throw new Exception();

@@ -108,10 +108,10 @@ namespace Compiler.OOS_LanguageObjects
         public List<T> getAllChildrenOf<T>(bool fullSearch = false, object stopObject = null, int deepness = -1, int scopeIndex = -1, Type[] tArr = null, Func<T, bool> func = null)
         {
             List<T> l = new List<T>();
-            private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness, scopeIndex, tArr);
+            private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness, scopeIndex, tArr, func);
             return l;
         }
-        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int deepness, int scopeIndex, Type[] tArr, Func<T, bool> func = null)
+        private bool private_getAllChildrenOf<T>(List<T> l, bool fullSearch, object stopObject, int deepness, int scopeIndex, Type[] tArr, Func<T, bool> func)
         {
             if (deepness == 0)
                 return false;
@@ -139,7 +139,7 @@ namespace Compiler.OOS_LanguageObjects
                         if (flag)
                             continue;
                     }
-                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness - 1, scopeIndex, tArr))
+                    if (obj.private_getAllChildrenOf<T>(l, fullSearch, stopObject, deepness - 1, scopeIndex, tArr, func))
                         return true;
                 }
             }

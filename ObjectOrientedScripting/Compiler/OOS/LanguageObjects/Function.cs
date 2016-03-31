@@ -43,7 +43,8 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     var casted = (Interfaces.iGetIndex)this.Parent;
 
-                    return " select " + (casted.getIndex(this.Name) + Function.ObjectValueOffset);
+
+                    return "{0} select ({1} select 0) select " + (casted.getIndex(this.Name) + Function.ObjectValueOffset);
                 }
                 else if(this.IsInline)
                 {
@@ -153,16 +154,6 @@ namespace Compiler.OOS_LanguageObjects
                     }
                     break;
             }
-            //ToDo: Find a way to reallow interfaces as arguments (then remove the following foreach
-            foreach(var it in this.ArgListObjects)
-            {
-                if (it is Variable && ((Variable)it).ReferencedType.IsObject && ((Variable)it).ReferencedType.ident.LastIdent.ReferencedObject is oosInterface)
-                {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, "Interfaces for function arguments are temporary disabled. Line: " + this.Name.Line);
-                    errCount++;
-                }
-            }
-            //up to here)
             var fncList = this.Parent.getAllChildrenOf<Function>();
             int index = 0;
             foreach(var it in fncList)
@@ -260,6 +251,144 @@ namespace Compiler.OOS_LanguageObjects
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "ext", '"' + ".sqf" + '"');
                 cfg.setValue(lPath + '/' + "All" + '/' + rPath + '/' + "headerType", "-1");
             }
+            #region Print Class/Interface global registers
+            if (this.Name.OriginalValue == "preInit")
+            {
+                Base b = this.getFirstOf<Base>();
+                var classes = b.getAllChildrenOf<oosClass>(true, null, -1, -1, new Type[] { typeof(Namespace) });
+                classes.Sort(Comparer<oosClass>.Create((obj, obj2) => obj.ID - obj2.ID));
+                var interfaces = b.getAllChildrenOf<oosInterface>(true, null, -1, -1, new Type[] { typeof(Namespace) });
+                interfaces.Sort(Comparer<oosInterface>.Create((obj, obj2) => obj.ID - obj2.ID));
+
+
+                //Classes Global Register
+                sw.Write(tab + oosClass.GlobalClassRegisterVariable.SqfVariableName);
+                sw.Write(" = [");
+                int index2 = 0;
+                foreach (var cl in classes)
+                {
+                    if (index2 > 0)
+                        sw.Write(',');
+                    index2++;
+                    sw.Write('[');
+                    var classIdents = cl.ParentClassesIdents;
+                    classIdents.Add(cl.Name);
+                    var objects = cl.AllObjects;
+                    index = 0;
+                    sw.Write('[');
+                    foreach (var it in classIdents)
+                    {
+                        if (index > 0)
+                            sw.Write(", ");
+                        if (it is Ident)
+                        {
+                            index++;
+                            sw.Write('"' + ((Interfaces.iClass)((Ident)it).ReferencedObject).Name.FullyQualifiedName + '"');
+                        }
+                        else
+                        {
+                            throw new Exception("please report to developer, unknown exception happened in function object creation");
+                        }
+                    }
+                    sw.Write("], [");
+                    index = 0;
+                    foreach (var child in objects)
+                    {
+                        if (child is Interfaces.iFunction && !((Interfaces.iFunction)child).IsVirtual)
+                            continue;
+                        if (child is Variable)
+                        {
+                            var variable = (Variable)child;
+                            if (variable.IsClassVariable)
+                            {
+                                if (index > 0)
+                                    sw.Write(", ");
+                                sw.Write('"' + ((Variable)child).Name.OriginalValue + '"');
+                                index++;
+                            }
+                        }
+                        else if (child is Interfaces.iFunction)
+                        {
+                            if (index > 0)
+                                sw.Write(", ");
+                            var fnc = (Interfaces.iFunction)child;
+                            sw.Write('"' + ((Interfaces.iFunction)child).Name.OriginalValue + '"');
+                            index++;
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    sw.Write("]");
+                    foreach (var child in objects)
+                    {
+                        if (child is Interfaces.iFunction && ((Interfaces.iFunction)child).IsVirtual)
+                        {
+                            sw.Write(", {");
+                            child.writeOut(sw, cfg);
+                            sw.WriteLine("}");
+                        }
+                    }
+                    sw.Write("]");
+                }
+                sw.WriteLine("];");
+
+                //Interfaces Global Register
+                sw.Write(tab + oosInterface.GlobalInterfaceRegisterVariable.SqfVariableName);
+                sw.Write(" = [");
+                index = 0;
+                foreach (var it in interfaces)
+                {
+                    if (index > 0)
+                        sw.Write(", ");
+                    sw.Write("[]");
+                    index++;
+                }
+                sw.WriteLine("];");
+                foreach (var cl in classes)
+                {
+                    List<oosInterface> infcList = new List<oosInterface>();
+                    foreach (var ext in cl.ExtendedClasses)
+                    {
+                        if (ext.ReferencedObject is oosInterface)
+                        {
+                            infcList.Add((oosInterface)ext.ReferencedObject);
+                        }
+                    }
+                    foreach (var infc in infcList)
+                    {
+                        var infcFncList = infc.getAllChildrenOf<VirtualFunction>();
+                        List<string> fncNameList = new List<string>();
+                        foreach(var it in infcFncList)
+                        {
+                            fncNameList.Add(it.Name.OriginalValue);
+                        }
+                        sw.Write(tab);
+                        sw.Write('(');
+                        sw.Write(oosInterface.GlobalInterfaceRegisterVariable.SqfVariableName);
+                        sw.Write(" select ");
+                        sw.Write(infc.ID);
+                        sw.Write(')');
+                        sw.Write(" set [");
+                        sw.Write(cl.ID);
+                        sw.Write(", [");
+                        var fncList = cl.getAllChildrenOf<Function>(false, null, -1, -1, null, (obj) => fncNameList.Contains(obj.Name.OriginalValue));
+                        index = 0;
+                        foreach(var it in fncList)
+                        {
+                            if (index > 0)
+                                sw.Write(", ");
+                            sw.Write('{');
+                            it.writeOut(sw, cfg);
+                            sw.Write('}');
+                            index++;
+                        }
+                        sw.WriteLine("]];");
+                    }
+                }
+            }
+            #endregion
             sw.WriteLine(tab + "scopeName \"" + Wrapper.Compiler.ScopeNames.function + "\";");
             var argList = this.ArgListObjects;
             if (argList.Count > 0 || this.encapsulation != Encapsulation.Static)
@@ -301,7 +430,7 @@ namespace Compiler.OOS_LanguageObjects
                     index = 0;
                     foreach (var it in objects)
                     {
-                        if (it is Interfaces.iFunction && !((Interfaces.iFunction)it).IsVirtual)
+                        if (it is Interfaces.iFunction)
                             continue;
                         if (!(it is Variable) || ((Variable)it).Value != null)
                         {
@@ -317,94 +446,26 @@ namespace Compiler.OOS_LanguageObjects
                 {
                     if (it == this)
                         continue;
-                    if (it is Interfaces.iFunction && !((Interfaces.iFunction)it).IsVirtual)
+                    if (it is Interfaces.iFunction)
                         continue;
-                    if (it is Function)
+                    var val = ((Variable)it).Value;
+                    if (val != null)
                     {
                         sw.Write(tab + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix + " = {\r\n" : " = "));
-                        it.writeOut(sw, cfg);
-                        sw.WriteLine(tab + "};");
-                    }
-                    else
-                    {
-                        var val = ((Variable)it).Value;
-                        if (val != null)
-                        {
-                            sw.Write(tab + Wrapper.Compiler.thisVariableName + (it is Function ? "fnc" : "var") + ((Interfaces.iName)it).Name.OriginalValue.Replace("::", "_") + (it is Function ? this.SqfSuffix + " = {\r\n" : " = "));
-                            val.writeOut(sw, cfg);
-                            sw.WriteLine(";");
-                        }
+                        val.writeOut(sw, cfg);
+                        sw.WriteLine(";");
                     }
                 }
                 sw.Write(tab + Wrapper.Compiler.thisVariableName + " = [");
 
                 
-                var classIdents = classObject.ParentClassesIdents;
-                classIdents.Add(classObject.Name);
 
                 //Representing classes (InstanceOf reference)
-                sw.Write("[");
-                index = 0;
-                foreach (var it in classIdents)
-                {
-                    if (index > 0)
-                        sw.Write(", ");
-                    if (it is Ident)
-                    {
-                        index++;
-                        sw.Write('"' + ((Interfaces.iClass)((Ident)it).ReferencedObject).Name.FullyQualifiedName + '"');
-                    }
-                    else
-                    {
-                        throw new Exception("please report to developer, unknown exception happened in function object creation");
-                    }
-                }
-                sw.Write("], [");
-                //Lookup register
-                index = 0;
+                sw.Write(classObject.ID);
+                
                 foreach (var child in objects)
                 {
-                    if (child is Interfaces.iFunction && !((Interfaces.iFunction)child).IsVirtual)
-                        continue;
                     if (child is Variable)
-                    {
-                        var variable = (Variable)child;
-                        if (variable.IsClassVariable)
-                        {
-                            if (index > 0)
-                                sw.Write(", ");
-                            sw.Write('"' + ((Variable)child).Name.OriginalValue + '"');
-                            index++;
-                        }
-                    }
-                    else if (child is Interfaces.iFunction)
-                    {
-                        if (index > 0)
-                            sw.Write(", ");
-                        var fnc = (Interfaces.iFunction)child;
-                        sw.Write('"' + ((Interfaces.iFunction)child).Name.OriginalValue + '"');
-                        index++;
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-                sw.Write("]");
-                foreach (var child in objects)
-                {
-                    if (child is Interfaces.iFunction)
-                    {
-                        var fnc = (Interfaces.iFunction)child;
-                        if (fnc.IsVirtual)
-                        {
-                            if(index > 0)
-                                sw.Write(", ");
-                            sw.Write(Wrapper.Compiler.thisVariableName + "fnc" + ((Function)child).Name.OriginalValue.Replace("::", "_") + this.SqfSuffix);
-                            index ++;
-                        }
-                    }
-                    else if (child is Variable)
                     {
                         var variable = (Variable)child;
                         if (variable.IsClassVariable)
@@ -415,6 +476,10 @@ namespace Compiler.OOS_LanguageObjects
                             else
                                 sw.Write(Wrapper.Compiler.thisVariableName + "var" + ((Variable)child).Name.OriginalValue.Replace("::", "_"));
                         }
+                    }
+                    else if(child is Function)
+                    {
+                        continue;
                     }
                     else
                     {

@@ -48,6 +48,16 @@ namespace Compiler.OOS_LanguageObjects
         public bool AlwaysReturns { get { return true; } }
 
 
-        public bool IsVirtual { get { return false; } }
+        public bool IsVirtual { get { return true; } }
+
+
+        public string SqfVariableName
+        {
+            get
+            {
+                var casted = (Interfaces.iGetIndex)this.Parent;
+                return "{0} select ({1} select 0) select " + (casted.getIndex(this.Name));
+            }
+        }
     }
 }

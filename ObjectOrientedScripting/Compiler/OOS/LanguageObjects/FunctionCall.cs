@@ -89,17 +89,33 @@ namespace Compiler.OOS_LanguageObjects
                             flag = true;
                         it.writeOut(sw, cfg);
                     }
-                    if (fnc is Function)
+                    if (fnc is Interfaces.iFunction)
                     {
                         if (fnc.IsVirtual)
                         {
-                            sw.Write(']' + (!fnc.IsAsync ? " call (" : " spawn (") + '(' + variableName + ')' + ((Function)fnc).SqfVariableName + ')');
+                            var pClass = this.getFirstOf<Ident>().ReferencedObject.getFirstOf<Interfaces.iClass>();
+                            if(pClass is oosClass)
+                            {
+                                if(fnc is Function)
+                                    sw.Write(']' + (!fnc.IsAsync ? " call (" : " spawn (") + string.Format(((Function)fnc).SqfVariableName, oosClass.GlobalClassRegisterVariable.SqfVariableName, variableName) + ')');
+                                else if(fnc is VirtualFunction)
+                                    sw.Write(']' + (!fnc.IsAsync ? " call (" : " spawn (") + string.Format(((VirtualFunction)fnc).SqfVariableName, oosClass.GlobalClassRegisterVariable.SqfVariableName, variableName) + ')');
+                            }
+                            else
+                            {
+                                if (fnc is Function)
+                                    sw.Write(']' + (!fnc.IsAsync ? " call (" : " spawn (") + string.Format(((Function)fnc).SqfVariableName, oosInterface.GlobalInterfaceRegisterVariable.SqfVariableName + " select " + ((oosInterface)pClass).ID, variableName) + ')');
+                                else if (fnc is VirtualFunction)
+                                    sw.Write(']' + (!fnc.IsAsync ? " call (" : " spawn (") + string.Format(((VirtualFunction)fnc).SqfVariableName, oosInterface.GlobalInterfaceRegisterVariable.SqfVariableName + " select " + ((oosInterface)pClass).ID, variableName) + ')');
+                            }
                         }
                         else
                         {
                             sw.Write(']' + (!fnc.IsAsync ? " call " : " spawn ") + ((Function)fnc).SqfVariableName);
                         }
-                        if(((Function)fnc).IsThrowing && this.getFirstOf<TryCatch>() == null)
+
+                        //ToDo: Make sure Interface functions cannot be marked as "throwing" unless the interface explicitly marks its function as throwing
+                        if(fnc is Function && ((Function)fnc).IsThrowing && this.getFirstOf<TryCatch>() == null)
                         {
                             Ident ident = this.getFirstOf<Ident>();
                             Logger.Instance.log(Logger.LogLevel.WARNING, "Function '" + fnc.Name.FullyQualifiedName + "' is throwing but not catched. line " + ident.Line + ", pos " + ident.Pos + ", file '" + ident.File + '\'');
@@ -119,3 +135,4 @@ namespace Compiler.OOS_LanguageObjects
         }
     }
 }
+

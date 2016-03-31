@@ -1632,36 +1632,44 @@ public class Parser {
 		Expect(13);
 		Expect(16);
 		while (la.kind == 87 || la.kind == 88 || la.kind == 89) {
-			if (la.kind == 87) {
-				Get();
-				caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); 
-				EXPRESSION(out blo, caseObj);
-				caseObj.addChild(blo); 
-				Expect(69);
-				while (la.kind == 87) {
-					Get();
-					EXPRESSION(out blo, caseObj);
-					caseObj.addChild(blo); 
-					Expect(69);
-				}
-				caseObj.markEnd(); 
-				while (StartOf(3)) {
-					CODEINSTRUCTION(out blo, caseObj);
-					caseObj.addChild(blo); 
-				}
-				if (la.kind == 82) {
-					OP_BREAK(out blo, caseObj);
-					caseObj.addChild(blo); 
-					TERMINATOR();
-				} else if (la.kind == 84) {
-					OP_THROW(out blo, caseObj);
-					caseObj.addChild(blo); 
-					TERMINATOR();
-				} else if (la.kind == 85) {
-					OP_RETURN(out blo, caseObj);
-					caseObj.addChild(blo); 
-					TERMINATOR();
-				} else SynErr(129);
+            if (la.kind == 87) {
+                Get();
+                caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj);
+                EXPRESSION(out blo, caseObj);
+                caseObj.addChild(blo);
+                Expect(69);
+                while (la.kind == 87) {
+                    Get();
+                    EXPRESSION(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    Expect(69);
+                }
+                caseObj.markEnd();
+                if (la.kind == 82)
+                {
+                    OP_BREAK(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    TERMINATOR();
+                }
+                else if (la.kind == 84)
+                {
+                    OP_THROW(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    TERMINATOR();
+                }
+                else if (la.kind == 85)
+                {
+                    OP_RETURN(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    TERMINATOR();
+                }
+                else if (StartOf(3))
+                    while (StartOf(3))
+                    {
+                        CODEINSTRUCTION(out blo, caseObj);
+                        caseObj.addChild(blo);
+                    }
+                else SynErr(129);
 			} else {
 				if (la.kind == 88) {
 					Get();
@@ -1671,24 +1679,32 @@ public class Parser {
 					Get();
 					caseObj = new Case(obj, t.line, t.col, this.file); obj.addChild(caseObj); 
 				}
-				while (StartOf(3)) {
-					CODEINSTRUCTION(out blo, caseObj);
-					caseObj.addChild(blo); 
-				}
-				if (la.kind == 82) {
-					OP_BREAK(out blo, caseObj);
-					caseObj.addChild(blo); 
-					TERMINATOR();
-				} else if (la.kind == 84) {
-					OP_THROW(out blo, caseObj);
-					caseObj.addChild(blo); 
-					TERMINATOR();
-				} else if (la.kind == 85) {
-					OP_RETURN(out blo, caseObj);
-					caseObj.addChild(blo); 
-					TERMINATOR();
-				} else SynErr(130);
-			}
+                if (la.kind == 82)
+                {
+                    OP_BREAK(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    TERMINATOR();
+                }
+                else if (la.kind == 84)
+                {
+                    OP_THROW(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    TERMINATOR();
+                }
+                else if (la.kind == 85)
+                {
+                    OP_RETURN(out blo, caseObj);
+                    caseObj.addChild(blo);
+                    TERMINATOR();
+                }
+                else if (StartOf(3))
+                    while (StartOf(3))
+                    {
+                        CODEINSTRUCTION(out blo, caseObj);
+                        caseObj.addChild(blo);
+                    }
+                else SynErr(129);
+                }
 		}
 		Expect(17);
 	}
