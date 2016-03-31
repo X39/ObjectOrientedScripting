@@ -1,0 +1,8 @@
+namespace std
+{
+    interface ISerializable
+    {
+        array<string> GetObjectData();
+        void SetObjectData(array<string>);
+    }
+}
