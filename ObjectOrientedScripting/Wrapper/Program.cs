@@ -135,7 +135,7 @@ namespace Wrapper
                     writer.WriteLine("		<buildfolder>./build/</buildfolder>");
                     writer.WriteLine("		<srcfolder>./src/</srcfolder>");
                     writer.WriteLine("	</project>");
-                    writer.WriteLine("	<compiler version=\"0.7.4-ALPHA\">");
+                    writer.WriteLine("	<compiler version=\"0.8.0-ALPHA\">");
                     writer.WriteLine("</root>");
                     writer.Close();
                     if (!Directory.Exists(path + "output"))

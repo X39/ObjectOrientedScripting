@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OOS"
-#define MyAppVersion "0.7.4-ALPHA"
+#define MyAppVersion "0.8.0-ALPHA"
 #define MyAppPublisher "X39"
 #define MyAppURL "http://x39.io/?page=projects&project=ObjectOrientedScripting"
 #define MyAppExeName "WrapperUI.exe"
@@ -49,6 +49,23 @@ var
 procedure InitializeWizard;
 begin
   ChangelogPage := CreateOutputMsgMemoPage(wpWelcome, 'Changelog', 'The change history', 'You might want to check this out from time to time :)',
+  'Version 0.8.0-ALPHA                                                             ' + AnsiChar(#10) +
+  '    |- stdLib:    Added interface ::std::ISerializable                          ' + AnsiChar(#10) +
+  '    |- stdLib:    Added ::std::Vehicle(string, vec3) constructor                ' + AnsiChar(#10) +
+  '    |v- stdLib:   Added `using ::std::Tupel`                                    ' + AnsiChar(#10) +
+  '    ||-            Added Tupel2<T1, T2>                                         ' + AnsiChar(#10) +
+  '    ||-            Added Tupel3<T1, T2, T3>                                     ' + AnsiChar(#10) +
+  '    ||-            Added Tupel4<T1, T2, T3, T4>                                 ' + AnsiChar(#10) +
+  '    |\-            Added Tupel5<T1, T2, T3, T4, T5>                             ' + AnsiChar(#10) +
+  '    |- Compiler:  ReEnabled (& implemented) interfaces                          ' + AnsiChar(#10) +
+  '    |- Compiler:  Fixed TryCatch variable is not getting printed                ' + AnsiChar(#10) +
+  '    |- Compiler:  Changed how virtual functions are adressed                    ' + AnsiChar(#10) +
+  '    |- Compiler:  Changed where object meta data is located                     ' + AnsiChar(#10) +
+  '    |- Compiler:  Fixed issue in switch                                         ' + AnsiChar(#10) +
+  '    |- Compiler:  Fixed NPE in Idents on LNK errors                             ' + AnsiChar(#10) +
+  '    \v- Compiler: Only one PreInit function is allowed now                      ' + AnsiChar(#10) +
+  '     \-            Added new Linker exception LNK0060                           ' + AnsiChar(#10) +
+  '                                                                                ' + AnsiChar(#10) +
   'Version 0.7.4-ALPHA                                                             ' + AnsiChar(#10) +
   '    |v- Compiler: Fixed error in PreProcessor preventing some macros to work    ' + AnsiChar(#10) +
   '    |v- Compiler: Fixed define compiler flag                                    ' + AnsiChar(#10) +
