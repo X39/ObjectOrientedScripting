@@ -1,0 +1,74 @@
+using ::std::base::VehicleBase
+namespace std
+{
+    native Tupel2<T1, T2>
+    {
+        assign simple (T1 item1, T2 item2)
+            [item1, item2]
+        endAssign
+
+        fnc simple T1 getItem1 ()
+            _this select 0
+        endFnc
+        fnc simple T2 getItem2 ()
+            _this select 1
+        endFnc
+    }
+    native Tupel3<T1, T2, T3>
+    {
+        assign simple (T1 item1, T2 item2, T3 item3)
+            [item1, item2, item3]
+        endAssign
+
+        fnc simple T1 getItem1 ()
+            _this select 0
+        endFnc
+        fnc simple T2 getItem2 ()
+            _this select 1
+        endFnc
+        fnc simple T3 getItem3 ()
+            _this select 2
+        endFnc
+    }
+    native Tupel4<T1, T2, T3, T4>
+    {
+        assign simple (T1 item1, T2 item2, T3 item3, T4 item4)
+            [item1, item2, item3, item4]
+        endAssign
+
+        fnc simple T1 getItem1 ()
+            _this select 0
+        endFnc
+        fnc simple T2 getItem2 ()
+            _this select 1
+        endFnc
+        fnc simple T3 getItem3 ()
+            _this select 2
+        endFnc
+        fnc simple T4 getItem4 ()
+            _this select 3
+        endFnc
+    }
+    native Tupel5<T1, T2, T3, T4, T5>
+    {
+        assign simple (T1 item1, T2 item2, T3 item3, T4 item4, T5 item5)
+            [item1, item2, item3, item4, item5]
+        endAssign
+
+        fnc simple T1 getItem1 ()
+            _this select 0
+        endFnc
+        fnc simple T2 getItem2 ()
+            _this select 1
+        endFnc
+        fnc simple T3 getItem3 ()
+            _this select 2
+        endFnc
+        fnc simple T4 getItem4 ()
+            _this select 3
+        endFnc
+        fnc simple T5 getItem5 ()
+            _this select 4
+        endFnc
+    }
+}
