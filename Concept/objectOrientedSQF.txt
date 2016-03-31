@@ -5,13 +5,13 @@ allowed characters for function/non-local variable names (REGEX validation: ^[a-
 	- A-Z			-	Everywhere
 	- a-z			-	Everywhere
 	- 0-9			-	Not at the very begining (0arr is not allowed, arr0 is)
-	- _				-	Not at the very begining (_arr is not allowed, arr_ is)
+	- _			-	Not at the very begining (_arr is not allowed, arr_ is)
 
 allowed characters for local variable names (REGEX validation: ^_[_a-zA-Z0-9]+$:
-	- A-Z			-	Not at the very begining (_arr is not allowed, arr_ is)
-	- a-z			-	Not at the very begining (_arr is not allowed, arr_ is)
-	- 0-9			-	Not at the very begining (0arr is not allowed, arr0 is)
-	- _				-	Everywhere
+	- A-Z			-	Everywhere
+	- a-z			-	
+	- 0-9			-	Everywhere at the very begining (0arr is not allowed, arr0 is)
+	- _			-	Not at the very begining (_arr is not allowed, arr_ is)
 
 reserved instructions:
 	- static
@@ -46,11 +46,11 @@ reserved characters:
 	- []					-	Array markers
 	- ()					-	ExecuteFirst brackets OR function parameter section
 	- {}					-	Scope range
-	- = += -= /= *= ++ --	- 	"Assign" operator (left takes value of right, in case of arrays left will get a reference only (use new for a copy))
+	- = += -= /= *= ++ --			- 	"Assign" operator (left takes value of right, in case of arrays left will get a reference only (use new for a copy))
 	- +-*/%					-	Arithmetical operators
-	- & | == && || !		-	logical operators (&& and || are lazy evaluation operators)
+	- & | == && || !			-	logical operators (&& and || are lazy evaluation operators)
 	- ?:					-	Short hand if (<condition> ? <returnWhenTrue> : <returnWhenFalse>)
-	- #						-	Preprocessor directive (if not first char besides tabs and whitespace then it is considered as error)
+	- #					-	Preprocessor directive (if not first char besides tabs and whitespace then it is considered as error)
 	- //					-	Line comment
 	- /* */					-	Block comment
 	- /** */				-	Function/Variable/Class/Namespace comment (used for documentation, follows the JavaDocs syntax)
@@ -59,13 +59,13 @@ reserved namespaces:
 	- SQF					-	Contains ALL native SQF functions (all SQF stuff is considered as function! Also, no validation is performed if it is correct)
 
 preprocessor directives:
-	- include "<relativeFilepath>"							-	Includes a files content to this spot
-	- define <sequence> <replace>							-	Sets specific character sequence to be the following value
+	- include "<relativeFilepath>"		-	Includes a files content to this spot
+	- define <sequence> <replace>		-	Sets specific character sequence to be the following value
 	- define <sequence>(<arg1>,  <arg2>, <argN>)  <replace>	-	Sets specific character sequence to be the following value
-	- undefine <sequence>									-	Unsets given character sequence and thus preventing further replacement
-	- ifdef <define>										-	following code will only be processed if given define exists
-	- ifndef <define>										-	following code will only be processed if given define not exists
-	- else													-	part of if
+	- undefine <sequence>			-	Unsets given character sequence and thus preventing further replacement
+	- ifdef <define>			-	following code will only be processed if given define exists
+	- ifndef <define>			-	following code will only be processed if given define not exists
+	- else					-	part of if
 
 Entry Points:
 	function preInit()
@@ -76,13 +76,8 @@ Control Structures:
 		namespace <namespacename>
 		{
 			[...]
-			class
-			namespace
-			static function
-			static variable
-			[...]
 		}
-	Classes:
+	Classes (implementing / extending parentclasses):
 		class <classname> : <parentclass1>, <parentclass2>, <parentclassN>
 		{
 			constructor(arg1, arg2, argn)
@@ -92,27 +87,30 @@ Control Structures:
 				[...]
 			}
 			[...]
-			class function
-			class variable
-			static functions
-			static variables
+			classmembers (static, final, dynamic)
 			[...]
 		}
 		
-	class/static function syntax:
-		<static|public|private> function <functionname>(<arg1name>, <arg2name>, <argNname>)
+	Classes (without implementation / extension):
+		class <classname>
 		{
+			constructor(arg1, arg2, argn)
+			{
+				[...]
+				codeinstructions
+				[...]
+			}
 			[...]
-			codeinstructions
+			classmembers (static, final, dynamic)
 			[...]
 		}
 	
-	class/static variable syntax:
+	static Class variable syntax:
 		<static|public|private> auto <variableName>;
 	
 	CodeInstructions:	
 		for (supports single instruction):
-			for(<beforeLoop>;<exitCondition>;<endOfCycle>)
+			for(<initiator>;<exitCondition>;<iterator>)
 			{
 				[...]
 				codeinstructions
@@ -132,7 +130,6 @@ Control Structures:
 			break;
 		
 		if else (supports single instruction):
-			//full
 			if(<condition>)
 			{
 				[...]
@@ -145,7 +142,7 @@ Control Structures:
 				codeinstructions
 				[...]
 			}
-			//only if
+		if (supports single instruction):
 			if(<condition>)
 			{
 				[...]
@@ -188,7 +185,7 @@ Control Structures:
 			native <anything MultiLine is supported> endnative
 		
 		return:
-			return <value/identifier>;
+			return <value|identifier>;
 			
 		isset:
 			isset(<identifier>);
