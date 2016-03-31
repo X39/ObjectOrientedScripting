@@ -1,3 +1,20 @@
+Version 0.8.0-ALPHA
+    |- stdLib:    Added interface ::std::ISerializable
+    |- stdLib:    Added ::std::Vehicle(string, vec3) constructor
+    |v- stdLib:   Added `using ::std::Tupel`
+    ||-            Added Tupel2<T1, T2>
+    ||-            Added Tupel3<T1, T2, T3>
+    ||-            Added Tupel4<T1, T2, T3, T4>
+    |\-            Added Tupel5<T1, T2, T3, T4, T5>
+    |- Compiler:  ReEnabled (& implemented) interfaces
+    |- Compiler:  Fixed TryCatch variable is not getting printed
+    |- Compiler:  Changed how virtual functions are adressed
+    |- Compiler:  Changed where object meta data is located
+    |- Compiler:  Fixed issue in switch
+    |- Compiler:  Fixed NPE in Idents on LNK errors
+    \v- Compiler: Only one PreInit function is allowed now
+     \-            Added new Linker exception LNK0060
+    
 Version 0.7.4-ALPHA
     |v- Compiler: Fixed error in PreProcessor preventing some macros to work
     |v- Compiler: Fixed define compiler flag
