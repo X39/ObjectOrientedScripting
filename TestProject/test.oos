@@ -115,10 +115,11 @@ namespace X39
             return;
         }
     }
-	//static void testfnc(::X39::testInterface obj)
-	//{
-	//	return;
-	//}
+	static void testfnc(::X39::testInterface obj)
+	{
+        obj.interfaceFnc("foo", 1, 2);
+		return;
+	}
     static string testVarStatic2;
     static void castStaticTest(::X39::testNamespace::cBar testVar)
     {
@@ -147,7 +148,7 @@ namespace X39
 		SQF diag_log("string different casing");
 		return;
 	}
-    static void preInit()
+    static void preInit() throwing
     {
 		overloaded("foo");
 		overloaded(1);
@@ -213,9 +214,9 @@ namespace X39
             case true:
                 try
                 {
-                    throw "foobar";
+                    throw new Exception();
                 }
-                catch(string test)
+                catch(Exception test)
                 {
                     SQF diag_log(test);
                 }
