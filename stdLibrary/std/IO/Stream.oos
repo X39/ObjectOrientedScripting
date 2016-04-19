@@ -1,0 +1,54 @@
+using ::std::IO::EndOfStreamException;
+
+namespace std
+{
+    namespace IO
+    {
+        class Stream
+		{
+            private array<scalar> Buffer;
+            
+			public void Stream()
+			{
+                this.Buffer = new array<scalar>();
+			}
+            public scalar read()
+            {
+                if(this.Buffer.length() == 0)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return this.Buffer.deleteAt(0);
+                }
+            }
+            public array<scalar> read(scalar i, scalar len) throwing
+            {
+                if(this.Buffer.length() <= i + len)
+                {
+                    throw new EndOfStreamException("Index + Length is larger then the available number of elements in Stream");
+                }
+                auto tmp = this.Buffer.getRange(i, len);
+                this.Buffer.deleteRange(i, len);
+                return tmp;
+            }
+            public void write(scalar i)
+            {
+                this.Buffer.pushBack(i);
+            }
+            public void write(array<scalar> range)
+            {
+                this.Buffer.append(range);
+            }
+            public boolean hasNext()
+            {
+                return this.Buffer.length() > 0;
+            }
+            public boolean elementCount()
+            {
+                return this.Buffer.length();
+            }
+		}
+    }
+}
