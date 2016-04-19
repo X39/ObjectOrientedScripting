@@ -7,6 +7,10 @@ native array<T>
     fnc simple scalar pushBack (T _val)
         _this pushBack ( _val )
     endFnc
+    
+    fnc simple scalar popBack ()
+        _this deleteAt ( (count _this) - 1)
+    endFnc
 
     fnc simple scalar find (T _val)
         _this find ( _val )
@@ -20,19 +24,24 @@ native array<T>
         _this resize ( _i )
     endFnc
 
-    fnc simple void deleteAt (scalar _i)
+    fnc simple T deleteAt (scalar _i)
         _this deleteAt ( _i )
     endFnc
+    
+    fnc simple ::array<T> getRange(scalar index, scalar len)
+    {
+        _this select [index, len]
+    }
 
-    fnc simple void deleteRange (scalar _i, scalar _j)
-        _this deleteRange [_i, _j]
+    fnc simple void deleteRange (scalar index, scalar len)
+        _this deleteRange [index, len]
     endFnc
 
     fnc simple scalar length ()
         count _this
     endFnc
 
-    fnc simple scalar join (::array<T> arr)
+    fnc simple scalar append (::array<T> arr)
         _this append ( arr )
     endFnc
 
