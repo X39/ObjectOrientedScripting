@@ -22,7 +22,7 @@ namespace Compiler.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Compiler.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Compiler.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Compiler.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] _object {
+        public static byte[] _object {
             get {
                 object obj = ResourceManager.GetObject("_object", resourceCulture);
                 return ((byte[])(obj));
@@ -73,7 +73,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] _string {
+        public static byte[] _string {
             get {
                 object obj = ResourceManager.GetObject("_string", resourceCulture);
                 return ((byte[])(obj));
@@ -83,7 +83,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] array {
+        public static byte[] array {
             get {
                 object obj = ResourceManager.GetObject("array", resourceCulture);
                 return ((byte[])(obj));
@@ -93,7 +93,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] Exception {
+        public static byte[] Exception {
             get {
                 object obj = ResourceManager.GetObject("Exception", resourceCulture);
                 return ((byte[])(obj));
@@ -103,7 +103,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] functions {
+        public static byte[] functions {
             get {
                 object obj = ResourceManager.GetObject("functions", resourceCulture);
                 return ((byte[])(obj));
@@ -113,7 +113,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] script {
+        public static byte[] script {
             get {
                 object obj = ResourceManager.GetObject("script", resourceCulture);
                 return ((byte[])(obj));
@@ -157,7 +157,7 @@ namespace Compiler.Properties {
         ///t#nil#LOCATION
         ///b#nil#ARRAY waypointattachobject SCALA [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string SQF_SupportInfo {
+        public static string SQF_SupportInfo {
             get {
                 return ResourceManager.GetString("SQF_SupportInfo", resourceCulture);
             }
@@ -166,7 +166,7 @@ namespace Compiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] vec3 {
+        public static byte[] vec3 {
             get {
                 object obj = ResourceManager.GetObject("vec3", resourceCulture);
                 return ((byte[])(obj));
