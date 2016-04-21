@@ -17,7 +17,6 @@ namespace Wrapper
         private string configFileName;
         private bool addFunctionsClass;
         private bool outputFolderCleanup;
-        private int printOutMode;
         Dictionary<string, PPDefine> defines;
         public static readonly string endl = "\r\n";
         public static string thisVariableName = "___obj___";
@@ -50,7 +49,6 @@ namespace Wrapper
             stdLibPath = stdLibPath.Substring(0, stdLibPath.LastIndexOf('\\')) + "\\stdLibrary\\";
             addFunctionsClass = true;
             outputFolderCleanup = true;
-            printOutMode = 0;
             defines = new Dictionary<string, PPDefine>();
             defines.Add("__VERSION", new PPDefine("__VERSION " + this.getVersion().ToString()));
             defines.Add("__NEXCEPT", new PPDefine("__NEXCEPT(MSG) [[\"object\", \"Exception\"], [\"toString\", \"equals\", \"Message\"], {scopeName \"_FNCSCOPE_\";params [\"___obj___\"];(str ((___obj___))) breakOut \"_FNCSCOPE_\";}, {scopeName \"_FNCSCOPE_\";params [\"___obj___\", \"_obj\"];(((___obj___)) isEqualTo ((_obj))) breakOut \"_FNCSCOPE_\";}, MSG]"));
@@ -93,22 +91,6 @@ namespace Wrapper
                         stdLibPath = s.Substring(count + 1).Replace('/', '\\');
                         if (!stdLibPath.EndsWith("\\"))
                             stdLibPath += '\\';
-                        break;
-                    case "PRINTMODE":
-                        switch(s.Substring(count + 1))
-                        {
-                            case "NONE": case "0":
-                                printOutMode = 0;
-                                break;
-                            case "NEEDED": case "1":
-                                printOutMode = 1;
-                                break;
-                            case "ALL": case "2":
-                                printOutMode = 3;
-                                break;
-                            default:
-                                throw new Exception("Unknown PRINTMODE, valid ones are: NONE|0  NEEDED|1  PARTIAL|2  ALL|3");
-                        }
                         break;
                     default:
                         Logger.Instance.log(Logger.LogLevel.WARNING, "Unknown flag '" + s + "' for compiler version '" + this.getVersion().ToString() + "'");
@@ -233,6 +215,11 @@ namespace Wrapper
                 errCount += p.errors.count;
                 InternalObjectVarTypes.VT_object.ident.finalize();
                 InternalObjectVarTypes.VT_nobject.ident.finalize();
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file '_object' (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
 
 
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.array)), "");
@@ -240,6 +227,11 @@ namespace Wrapper
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file 'array' (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
 
 
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.vec3)), "");
@@ -248,6 +240,11 @@ namespace Wrapper
                 p.Parse();
                 errCount += p.errors.count;
                 InternalObjectVarTypes.VT_vec3.ident.finalize();
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file 'vec3' (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
 
 
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources._string)), "");
@@ -256,6 +253,11 @@ namespace Wrapper
                 p.Parse();
                 errCount += p.errors.count;
                 InternalObjectVarTypes.VT_string.ident.finalize();
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file '_string' (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
 
 
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.script)), "");
@@ -264,6 +266,11 @@ namespace Wrapper
                 p.Parse();
                 errCount += p.errors.count;
                 InternalObjectVarTypes.VT_script.ident.finalize();
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file 'script' (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
 
 
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.functions)), "");
@@ -271,6 +278,11 @@ namespace Wrapper
                 p.BaseObject = oosTreeBase;
                 p.Parse();
                 errCount += p.errors.count;
+                if (errCount > 0)
+                {
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file 'functions' (" + errCount + "), cannot continue with Compiling!");
+                    return;
+                }
 
 
                 p = new Parser(new Scanner(toStream(global::Compiler.Properties.Resources.Exception)), "");
@@ -279,13 +291,13 @@ namespace Wrapper
                 p.Parse();
                 errCount += p.errors.count;
                 InternalObjectVarTypes.VT_Exception.ident.finalize();
-
-
                 if (errCount > 0)
                 {
-                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS files (" + errCount + "), cannot continue with Compiling!");
+                    Logger.Instance.log(Logger.LogLevel.ERROR, "Errors found in ressource OOS file 'Exception' (" + errCount + "), cannot continue with Compiling!");
                     return;
                 }
+
+
             }
 
             //process the actual file
