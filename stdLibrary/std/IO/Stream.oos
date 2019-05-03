@@ -5,13 +5,13 @@ namespace std
     namespace IO
     {
         class Stream
-		{
+        {
             private array<scalar> Buffer;
             
-			public void Stream()
-			{
+            public void Stream()
+            {
                 this.Buffer = new array<scalar>();
-			}
+            }
             public scalar read()
             {
                 if(this.Buffer.length() == 0)
@@ -49,6 +49,6 @@ namespace std
             {
                 return this.Buffer.length();
             }
-		}
+        }
     }
 }
