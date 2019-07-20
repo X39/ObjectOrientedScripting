@@ -15,9 +15,3 @@
   can enforce invalid object types
 
 - Downcasting has to be done explicit
-
-- casting to an object having a template requires you to write it like so (example shows array<scalar> cast):
-  < array<scalar> >yourVariable
-  
-- creating a new template object which gets another template object as kind requires you to write it like so (example shows array<scalar> in another array):
-  new array< array<scalar> >()

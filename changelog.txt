@@ -1,3 +1,18 @@
+Version 0.9.0-ALPHA
+    |- Compiler:  Removed flag `PRINTMODE`
+    |- Compiler:  Fixed need of space inbetween two < / > template brackets
+    |- Compiler:  Casting no longer uses < & > but instead ( & )
+    |             old way: <SomeClass>SomeVar
+    |             new way: (SomeClass)SomeVar
+    |- Compiler:  Removed non-implemented base constructor call using `:`
+    |v- Compiler: Updated array<T>
+    ||-            renamed "join" to "append" as join could
+    |              confuse about the direction
+    |\-            deleteAt now returns the deleted element
+    |- stdLib:    Added ::std::IO::Stream class
+    |- stdLib:    Added ::std::IO::IOException class
+    |- stdLib:    Added ::std::IO::EndOfStreamException class
+    
 Version 0.8.0-ALPHA
     |- stdLib:    Added interface ::std::ISerializable
     |- stdLib:    Added ::std::Vehicle(string, vec3) constructor

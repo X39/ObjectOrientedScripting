@@ -1,0 +1,6 @@
+- Implement "base()" call
+- Implement new "using" system
+- Implement "dot" operator
+    <EXPRESSION> '.' <IDENT> [ <CALL> | <ASSIGNMENT> ]
+- Join native and non-native classes
+- Reimplement "CAST" so that it only uses expressions

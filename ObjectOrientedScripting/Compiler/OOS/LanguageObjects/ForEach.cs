@@ -8,7 +8,7 @@ namespace Compiler.OOS_LanguageObjects
 {
     public class ForEach : pBaseLangObject, Interfaces.iCodeBlock, Interfaces.iBreakable
     {
-        public Ident Variable { get { return (Ident)this.children[0]; } set { this.children[0] = value; } }
+        public Expression Variable { get { return (Expression)this.children[0]; } set { this.children[0] = value; if (!value.HasIdent) throw new Exception("INVALID OPERATION"); } }
         public Variable Itterator { get { return (Variable)this.children[1]; } set { this.children[1] = value; } }
         public List<pBaseLangObject> CodeInstructions { get { return this.children.GetRange(2, this.children.Count - 2); } }
         public string BreakScope { get { return Wrapper.Compiler.ScopeNames.loop; } }
@@ -21,7 +21,7 @@ namespace Compiler.OOS_LanguageObjects
         private static bool warningSurpression = false;
         public override int doFinalize()
         {
-            if (!Variable.LastIdent.ReferencedType.IsObject && !Variable.LastIdent.ReferencedType.ident.LastIdent.ReferencedObject.isType("::array"))
+            if (!Variable.Ident.LastIdent.ReferencedType.IsObject && !Variable.Ident.LastIdent.ReferencedType.ident.LastIdent.ReferencedObject.isType("::array"))
             {
                 Logger.Instance.log(Logger.LogLevel.ERROR, "Currently only arrays are allowed in ForEach");
                 return 1;
@@ -43,7 +43,7 @@ namespace Compiler.OOS_LanguageObjects
         public override void writeOut(System.IO.StreamWriter sw, SqfConfigObjects.SqfConfigFile cfg)
         {
             string tab = new string('\t', this.Parent.getAllParentsOf<Interfaces.iCodeBlock>().Count);
-            if ((Variable.LastIdent.ReferencedType.IsObject && Variable.LastIdent.ReferencedType.ident.LastIdent.ReferencedObject.isType("::array")) || (Variable is Interfaces.iHasType && ((Interfaces.iHasType)Variable).ReferencedType.IsArray))
+            if ((Variable.Ident.LastIdent.ReferencedType.IsObject && Variable.Ident.LastIdent.ReferencedType.ident.LastIdent.ReferencedObject.isType("::array")) || (Variable is Interfaces.iHasType && ((Interfaces.iHasType)Variable).ReferencedType.IsArray))
             {
                 sw.WriteLine(tab + '{');
                 HelperClasses.PrintCodeHelpers.printPrivateArray(this, tab, sw, cfg);

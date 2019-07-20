@@ -21,7 +21,6 @@ COMPILER OOS
 		T_EXPOP1 = '+' | '-' | '*'.
 		T_EXPOP2 = ">=" | "<=" | "==".
 		T_EXPOP3 = "&&" | "||".
-        T_OTHEROP = ">>" | "<<".
 		T_ASSIGNMENTCHAR = '='.
 		T_EXTENDEDASSIGNMENTCHARS = "+=" | "-=" | "*=" | "/=".
 		T_FASTASSIGNMENTCHARS = "++" | "--".
@@ -31,13 +30,13 @@ COMPILER OOS
 		T_SQUAREBRACKETCLOSE = ']'.
 		T_CODEBRACKETOPEN = '{'.
 		T_CODEBRACKETCLOSE = '}'.
-		T_INSTANCEACCESS = '.'.
 		T_NAMESPACEACCESS = "::".
 		T_COMMA = ','.
 		T_TEMPLATEOPEN = '<'.
 		T_TEMPLATECLOSE = '>'.
 		T_SLASH = '/'.
 		T_BACKSLASH = '\\'.
+        T_DOT = '.'.
 		
 	COMMENTS FROM "/*" TO "*/" NESTED
 	COMMENTS FROM "//" TO '\n'
@@ -72,6 +71,7 @@ COMPILER OOS
 		.) =
 			(
 				VARTYPE<out vto, parent>
+ToDo: Add Expression -> IdentVartype
 				(
 					IF(peekCompare(_T_IDENT, _T_ROUNDBRACKETOPEN))
 					FUNCTION<out blo, parent, e, vto, false, false, false, isInline>
@@ -187,35 +187,14 @@ COMPILER OOS
 		IDENT<out pBaseLangObject outObj, pBaseLangObject parent> =
             T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col, this.file); .)
 		.
-		IDENTACCESS<out pBaseLangObject outObj, pBaseLangObject parent, bool allowBody = true> (. pBaseLangObject blo; pBaseLangObject ident; outObj = null; bool isGlobalIdent = false; .) =
-            [
-                CAST<out outObj, parent>
-            ]
-            [
-                T_NAMESPACEACCESS (. isGlobalIdent = true; .)
-            ]
-            IDENT<out ident, (outObj == null ? parent : outObj)> (. try{ ((Ident)ident).IsGlobalIdentifier = isGlobalIdent; } catch (Exception ex) { SemErr(ex.Message); } if(outObj == null) outObj = ident; else outObj.addChild(ident); .)
-			(. if(allowBody) { .)
-            [
-                BODY_FUNCTIONCALL<out blo, ident> (. ((Ident)ident).addChild(blo); .)
-                |
-                BODY_ARRAYACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
-            ]
-			(. } .)
-            [
-                (
-                    T_INSTANCEACCESS (. ((Ident)ident).Access = Ident.AccessType.Instance; .)
-                    |
-                    T_NAMESPACEACCESS (. ((Ident)ident).Access = Ident.AccessType.Namespace; .)
-                )
-                IDENTACCESS<out blo, ident, allowBody> (. ((Ident)ident).addChild(blo); .)
-            ]
-        .
-        CAST<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Cast(parent); outObj = obj; VarTypeObject vto; .) =
-            T_TEMPLATEOPEN
-			VARTYPE<out vto, obj> (. obj.varType = vto; .)
-            T_TEMPLATECLOSE
-        .
+		IDENTNAMESPACE<out pBaseLangObject outObj, pBaseLangObject parent> = (. pBaseLangObject blo; .)
+            T_NAMESPACEACCESS
+            T_IDENT (. outObj = new Ident(parent, t.val, t.line, t.col, this.file); blo = outObj;.)
+            {
+                T_NAMESPACEACCESS
+                T_IDENT (. var tmp = new Ident(parent, t.val, t.line, t.col, this.file); blo.addChild(tmp); blo = tmp; .)
+            }
+		.
 		ENCAPSULATION<out Encapsulation e> (. e = Encapsulation.NA; .) =
 			"public" (. e = Encapsulation.Public; .)
 			|
@@ -223,46 +202,43 @@ COMPILER OOS
 			|
 			"protected" (. e = Encapsulation.Protected; .)
 		.
-		VARTYPE<out VarTypeObject e, pBaseLangObject parent, bool identFlag = false> (. e = null; .) =
-			(
-				(
-					"scalar" (. e = new VarTypeObject(VarType.Scalar); .)
-					|
-					"int" (. e = new VarTypeObject(VarType.Scalar); .)
-					|
-					"double" (. e = new VarTypeObject(VarType.Scalar); .)
-					|
-					"float" (. e = new VarTypeObject(VarType.Scalar); .)
-					|
-					"bool" (. e = new VarTypeObject(VarType.Bool); .)
-					|
-					"boolean" (. e = new VarTypeObject(VarType.Bool); .)
-					|
-					"scalar[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
-					|
-					"int[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
-					|
-					"double[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
-					|
-					"float[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
-					|
-					"bool[]" (. e = new VarTypeObject(VarType.BoolArray); .)
-					|
-					"boolean[]" (. e = new VarTypeObject(VarType.BoolArray); .)
-				)
-			)
+		VARTYPE<out VarTypeObject e, pBaseLangObject parent> (. e = null; .) =
+			"scalar" (. e = new VarTypeObject(VarType.Scalar); .)
 			|
-            ( (. pBaseLangObject blo; .)
-                IDENTACCESS<out blo, parent, identFlag> (. e = new VarTypeObject((Ident)blo); .)
-                [ (. Template te; .)
-                    TEMPLATE<out te, ((Ident)blo).LastIdent> (. e.TemplateObject = te; .)
-                ]
-            )
+			"int" (. e = new VarTypeObject(VarType.Scalar); .)
+			|
+			"double" (. e = new VarTypeObject(VarType.Scalar); .)
+			|
+			"float" (. e = new VarTypeObject(VarType.Scalar); .)
+			|
+			"bool" (. e = new VarTypeObject(VarType.Bool); .)
+			|
+			"boolean" (. e = new VarTypeObject(VarType.Bool); .)
+			|
+			"scalar[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+			|
+			"int[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+			|
+			"double[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+			|
+			"float[]" (. e = new VarTypeObject(VarType.ScalarArray); .)
+			|
+			"bool[]" (. e = new VarTypeObject(VarType.BoolArray); .)
+			|
+			"boolean[]" (. e = new VarTypeObject(VarType.BoolArray); .)
+		.
+		IDENTVARTYPE<out VarTypeObject e, Ident ident> (. e = null; .) =
+			(. e = new VarTypeObject(ident); .)
+            [ (. Template te; .)
+                TEMPLATE<out te, ident.LastIdent> (. e.TemplateObject = te; .)
+            ]
 		.
 		BOOLEAN<out bool flag> (. flag = la.val == "true"; Get(); return; /*fix for weirdo coco bug ...*/ .) =
-			"true" (. flag = true; .)
+			(. /* .)
+            "true" (. flag = true; .)
 			|
 			"false" (. flag = false; .)
+            (. */ .)
 		.
 		VALUE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Value(parent); outObj = obj; outObj = obj; bool flag; .) =
 			T_STRING (. obj.varType.varType = VarType.Object; obj.value = t.val; obj.varType.ident = new Ident(obj, "string", t.line, t.col, this.file); obj.varType.ident.IsGlobalIdentifier = true; .)
@@ -287,6 +263,16 @@ COMPILER OOS
 			{
 				(. string op = ""; int thisOpType = -1; .)
 				(
+                    (.
+                        /*another weird coco/r bug ... T_NAMESPACEACCESS is seen as duplicate in here*/
+                        if(la.kind == _T_NAMESPACEACCESS && (blo as Expression).IsPureIdent)
+                        {
+                            Get();
+                            op = t.val; thisOpType = 1; 
+                        } else
+                    .)
+                    T_DOT (. op = t.val; thisOpType = 0; .)
+                    |
                     T_EXPOP1 (. op = t.val; thisOpType = 1; .)
                     |
                     T_SLASH (. op = t.val; thisOpType = 1; .)
@@ -299,7 +285,15 @@ COMPILER OOS
                     |
                     T_EXPOP3 (. op = t.val; thisOpType = 3; .)
 				)
-				EXPRESSION_HELPER<obj, out blo>
+                (. if(thisOpType == 0) {.)
+                    (. if(op == ".") { .)
+                        DOTOPERATOR<blo, out blo>
+                    (. } else { .)
+                        IDENT<out blo, blo>
+                    (. } .)
+                (. } else { .)
+                    EXPRESSION_HELPER<obj, out blo>
+                (. } .)
 				(.
 					if(thisOpType != lastOpType)
 					{
@@ -361,7 +355,7 @@ COMPILER OOS
 			VALUE<out blo, obj>
 			|
 			(
-				IDENTACCESS<out blo, obj>
+				IDENT<out blo, obj>
 				[
 					OP_INSTANCEOF<out blo, obj, blo>
 				]
@@ -372,8 +366,15 @@ COMPILER OOS
 			OP_NULL<out blo, obj>
 			|
 			OP_DEREF<out blo, obj>
-			
 		.
+        DOTOPERATOR<pBaseLangObject parent, out pBaseLangObject outObj> (. outObj = new DotOperator(parent, t.line, t.col, this.file); pBaseLangObject blo; pBaseLangObject ident; .) =
+            IDENT<out ident, outObj> (. outObj.addChild(ident); .)
+            [
+                BODY_FUNCTIONCALL<out blo, ident> (. ((Ident)ident).addChild(blo); .)
+                |
+                BODY_ARRAYACCESS<out blo, ident> (. ((Ident)ident).addChild(blo); .)
+            ]
+        .
 		OOS (. if(this.BaseObject == null) throw new Exception("BaseObject was never set"); var obj = this.BaseObject; pBaseLangObject blo; .) =
 			[
 				OP_USING
@@ -579,7 +580,7 @@ COMPILER OOS
 			]
 			[
 				"extends"
-				IDENTACCESS<out blo, obj, false> (. obj.addParent((Ident)blo); .)
+				IDENTNAMESPACE<out blo, obj> (. obj.addParent((Ident)blo); .)
 			]
 			(. if(obj.parentIdents.Count == 0 && !flag_noObjectExtends) { var ident = new Ident(obj, "nobject", obj.Name.Line, obj.Name.Pos, obj.Name.File); ident.IsGlobalIdentifier = true; obj.addParent(ident); } .)
 			(. if(!flag) obj.VTO = new VarTypeObject(obj.Name); .)
@@ -639,7 +640,7 @@ COMPILER OOS
             IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			FNCARGLIST<obj>
 			{
-				ANY (. obj.Code += t.val + (la.val == ";" ? "" : " "); .)
+				ANY (. obj.Code += (t.val == ">" && la.val == ">" ? ">>" : (t.val + (la.val == ";" ? "" : " "))); .)
 			}
 			"endFnc" (. obj.Code = obj.Code.Trim(); .)
         .
@@ -743,7 +744,7 @@ COMPILER OOS
 			]
 			[
 				"extends"
-				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
+				IDENTNAMESPACE<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 			]
 			(. 
 				obj.markEnd();
@@ -757,10 +758,10 @@ COMPILER OOS
 			.)
 			[
 				"implements"
-				IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
+				IDENTNAMESPACE<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				{
 					T_COMMA
-					IDENTACCESS<out blo, obj, false> (. obj.addParentClass((Ident)blo); .)
+					IDENTNAMESPACE<out blo, obj> (. obj.addParentClass((Ident)blo); .)
 				}
 			]
 			
@@ -852,13 +853,6 @@ COMPILER OOS
 		.) =
 			IDENT<out blo, obj> (. obj.Name = (Ident)blo; .)
 			FNCARGLIST<obj> (. obj.markArgListEnd(); .)
-			[
-				':'
-				IDENTACCESS<out blo, obj> (. obj.addChild(blo); .)
-				{
-					IDENTACCESS<out blo, obj> (. obj.addChild(blo); .)
-				}
-			]
 			(. obj.markBaseCallEnd(); .)
 			T_CODEBRACKETOPEN
 			{
@@ -910,6 +904,7 @@ COMPILER OOS
 		.
 		CODEINSTRUCTION_SC<out pBaseLangObject outObj, pBaseLangObject parent> (.
 			outObj = null;
+            pBaseLangObject tmp = null;
 			VarTypeObject vto;
 		.) =
 			
@@ -918,34 +913,34 @@ COMPILER OOS
 			OP_RETURN<out outObj, parent>
 			|
 			(
-				VARTYPE<out vto, parent, true>
-				[
-					IF(vto.IsObject)
-					(
-						VARIABLEASSIGNMENT<out outObj, vto.ident, parent>
-						(. vto.ident.Parent = outObj; .)
-						|
-						NEWVARIABLE<out outObj, parent, vto>
-					)
-					|
-					NEWVARIABLE<out outObj, parent, vto>
-				]
-				(.
-					if(outObj == null && vto.IsObject)
-					{
-						outObj = vto.ident;
-						vto.ident.Parent = parent;
-						if(vto.ident.IsPureIdent)
-						{
-							Warning("Pure-Ident encountered during parsing, please add some use to it");
-						}
-					}
-				.)
+                (
+                    VARTYPE<out vto, parent>
+                    |
+                    IDENTNAMESPACE<out tmp, parent>
+                    IDENTVARTYPE<out vto, tmp as Ident>
+                )
+                NEWVARIABLE<out outObj, parent, vto>
+                (. if(tmp != null) tmp.Parent = outObj; .)
 			)
+            |
+            EXPRESSION<out outObj, parent>
+            [
+                (. if(!(outObj as Expression).HasIdent) { .)
+                (.      SemErr("LVALUE is not valid"); .)
+                (.      tmp = new Ident(null, "", 0, 0, ""); .)
+                (. } else { .)
+                (. tmp = (outObj as Expression).Ident; .)
+                (. }.)
+                (
+                    VARIABLEASSIGNMENT<out outObj, tmp as Ident, parent>
+                    |
+                    IDENTVARTYPE<out vto, tmp as Ident>
+                    EXPRESSION<out outObj, parent>
+                    NEWVARIABLE<out outObj, parent, vto>
+                )
+            ]
 			|
 			AUTOVARIABLE<out outObj, parent>
-			|
-			OP_SQFCALL<out outObj, parent>
 			|IF(parent.getFirstOf<Compiler.OOS_LanguageObjects.Interfaces.iBreakable>() != null)
 			OP_BREAK<out outObj, parent>
 		.
@@ -1061,7 +1056,7 @@ COMPILER OOS
 		.
 		OP_DEREF<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Deref(parent, t.line, t.col, this.file); outObj = obj; pBaseLangObject blo; .) =
 			"deref"
-			IDENTACCESS<out blo, obj, false> (. obj.addChild((Ident)blo); .)
+			IDENTNAMESPACE<out blo, obj> (. obj.addChild((Ident)blo); .)
 		.
 		OP_FOREACH<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new ForEach(parent); outObj = obj; VarTypeObject vto = null; pBaseLangObject blo; .) =
 			"foreach"
@@ -1073,7 +1068,7 @@ COMPILER OOS
 			)
 			NEWVARIABLE<out blo, obj, vto> (. obj.Itterator = (Variable)blo; .)
 			"in"
-			IDENTACCESS<out blo, obj, false> (. obj.Variable = (Ident)blo; .)
+			EXPRESSION<out blo, obj> (. obj.Variable = (Expression)blo; .)
 			T_ROUNDBRACKETCLOSE
 			(
 				(
@@ -1106,7 +1101,7 @@ COMPILER OOS
 		.
 		OP_NEWINSTANCE<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new NewInstance(parent); outObj = obj; pBaseLangObject blo; pBaseLangObject blo2; .) =
 			"new"
-			IDENTACCESS<out blo, obj, false> (. obj.Name = (Ident)blo; .)
+			IDENTNAMESPACE<out blo, obj> (. obj.Name = (Ident)blo; .)
             [ (. Template te; .)
                 TEMPLATE<out te, ((Ident)blo).LastIdent> (. obj.TemplateObject = te; .)
             ]
@@ -1184,7 +1179,7 @@ COMPILER OOS
 		.
 		OP_INSTANCEOF<out pBaseLangObject outObj, pBaseLangObject parent, pBaseLangObject identAccess> (. var obj = new InstanceOf(parent); outObj = obj; pBaseLangObject blo; obj.LIdent = identAccess; identAccess.Parent = obj; .) =
             "is"
-            IDENTACCESS<out blo, obj> (. obj.RIdent = (Ident)blo; .)
+            IDENTNAMESPACE<out blo, obj> (. obj.RIdent = (Ident)blo; .)
 		.
 		OP_THROW<out pBaseLangObject outObj, pBaseLangObject parent> (. var obj = new Throw(parent); outObj = obj; pBaseLangObject blo; .) =
 			"throw"

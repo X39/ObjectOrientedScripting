@@ -37,6 +37,54 @@ namespace Compiler.OOS_LanguageObjects
                 return false;
             }
         }
+        public Ident Ident
+        {
+            get
+            {
+                if (this.children.Count == 0)
+                    return null;
+                if (this.children.Count > 1)
+                {
+                    if (this.expressionOperators.TrueForAll((obj) => obj == "."))
+                        return (this.children.Last() as DotOperator).getAllChildrenOf<Ident>().Last();
+                    else if (this.expressionOperators.TrueForAll((obj) => obj == "::"))
+                        return (this.children.Last() as Ident);
+                    else
+                        return null;
+                }
+
+                if (this.children[0] is Expression)
+                    return (this.children[0] as Expression).Ident;
+                else if (this.children[0] is Ident)
+                    return (this.children[0] as Ident);
+                else
+                    return null;
+            }
+        }
+        public bool HasIdent
+        {
+            get
+            {
+                return this.Ident != null;
+            }
+        }
+        public bool IsPureIdent
+        {
+            get
+            {
+                if (this.children.Count == 0)
+                    return false;
+                if (this.children.Count > 0)
+                    return false;
+
+                if (this.children[0] is Expression)
+                    return (this.children[0] as Expression).IsPureIdent;
+                else if (this.children[0] is Ident)
+                    return true;
+                else
+                    return false;
+            }
+        }
 
         public List<string> expressionOperators;
         public List<pBaseLangObject> expressionObjects { get { return this.children; } }

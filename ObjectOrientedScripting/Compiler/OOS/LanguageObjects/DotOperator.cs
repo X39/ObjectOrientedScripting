@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Compiler.OOS_LanguageObjects
 {
-    public class DotOperator : pBaseLangObject
+    public class DotOperator : pBaseLangObject, Interfaces.iHasType
     {
 
         public DotOperator(pBaseLangObject parent, int line, int pos, string file) : base(parent)

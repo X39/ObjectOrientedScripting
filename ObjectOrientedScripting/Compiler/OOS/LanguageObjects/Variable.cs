@@ -104,17 +104,17 @@ namespace Compiler.OOS_LanguageObjects
             {
                 var obj = (ForEach)this.Parent;
                 var thisType = this.varType;
-                if (obj.Variable.LastIdent.ReferencedType.Equals(HelperClasses.NamespaceResolver.createNSR("::array")))
+                if (obj.Variable.Ident.LastIdent.ReferencedType.Equals(HelperClasses.NamespaceResolver.createNSR("::array")))
                 {
-                    thisType.varType = obj.Variable.LastIdent.ReferencedType.TemplateObject.vtoList[0].varType;
-                    thisType.ident = obj.Variable.LastIdent.ReferencedType.TemplateObject.vtoList[0].ident;
-                    thisType.TemplateObject = obj.Variable.LastIdent.ReferencedType.TemplateObject.vtoList[0].TemplateObject;
+                    thisType.varType = obj.Variable.Ident.LastIdent.ReferencedType.TemplateObject.vtoList[0].varType;
+                    thisType.ident = obj.Variable.Ident.LastIdent.ReferencedType.TemplateObject.vtoList[0].ident;
+                    thisType.TemplateObject = obj.Variable.Ident.LastIdent.ReferencedType.TemplateObject.vtoList[0].TemplateObject;
                 }
                 else
                 {
-                    thisType.varType = obj.Variable.LastIdent.ReferencedType.varType;
-                    thisType.ident = obj.Variable.LastIdent.ReferencedType.ident;
-                    thisType.TemplateObject = obj.Variable.LastIdent.ReferencedType.TemplateObject;
+                    thisType.varType = obj.Variable.Ident.LastIdent.ReferencedType.varType;
+                    thisType.ident = obj.Variable.Ident.LastIdent.ReferencedType.ident;
+                    thisType.TemplateObject = obj.Variable.Ident.LastIdent.ReferencedType.TemplateObject;
                     Logger.Instance.log(Logger.LogLevel.ERROR, "Currently only the array object is allowed for foreach");
                     errCount++;
                 }
