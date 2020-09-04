@@ -1,0 +1,6460 @@
+Zustand 33 Konflikte: 1 Schiebe/Reduziere
+Zustand 51 Konflikte: 1 Schiebe/Reduziere
+Zustand 62 Konflikte: 1 Schiebe/Reduziere
+Zustand 174 Konflikte: 1 Schiebe/Reduziere
+Zustand 175 Konflikte: 1 Schiebe/Reduziere
+Zustand 176 Konflikte: 1 Schiebe/Reduziere
+Zustand 177 Konflikte: 2 Schiebe/Reduziere
+Zustand 178 Konflikte: 4 Schiebe/Reduziere
+Zustand 179 Konflikte: 2 Schiebe/Reduziere
+Zustand 180 Konflikte: 3 Schiebe/Reduziere
+Zustand 181 Konflikte: 4 Schiebe/Reduziere
+Zustand 182 Konflikte: 3 Schiebe/Reduziere
+Zustand 183 Konflikte: 3 Schiebe/Reduziere
+Zustand 238 Konflikte: 3 Schiebe/Reduziere
+Zustand 239 Konflikte: 3 Schiebe/Reduziere
+Zustand 262 Konflikte: 1 Schiebe/Reduziere
+Zustand 263 Konflikte: 1 Schiebe/Reduziere
+Zustand 385 Konflikte: 1 Schiebe/Reduziere
+
+
+Grammatik
+
+    0 $accept: start $end
+
+    1 start: %empty
+    2      | filestmnts
+
+    3 using: using_low
+    4      | using_low "=" IDENT
+
+    5 using_low: "using" "namespace" type ";"
+    6          | "using" "enum" type ";"
+    7          | "using" "class" type ";"
+
+    8 filestmnt: class
+    9          | namespace
+   10          | mthd
+   11          | using
+   12          | enum
+
+   13 filestmnts: filestmnt
+   14           | filestmnts filestmnt
+
+   15 classstmnt: mthd
+   16           | mthdop
+   17           | mthdcnst
+   18           | class
+   19           | prop
+   20           | using
+   21           | enum
+
+   22 classstmnts: classstmnt
+   23            | classstmnts classstmnt
+
+   24 codestmnt: ifelse
+   25          | using
+   26          | for
+   27          | trycatch
+   28          | while
+   29          | switch
+   30          | statement ";"
+   31          | scope
+   32          | declaration ";"
+   33          | val ";"
+   34          | ";"
+   35          | error
+
+   36 codestmnts: codestmnt
+   37           | codestmnt codestmnts
+
+   38 type_ident: IDENT
+   39           | type_ident "::" IDENT
+
+   40 type: type_ident
+   41     | "::" type_ident
+   42     | "::" type_ident template_use
+   43     | type_ident template_use
+
+   44 typelist: type
+   45         | type ","
+   46         | type "," typelist
+
+   47 encpsltn: encpsltn_n_cls
+   48         | "derived"
+   49         | "private"
+
+   50 encpsltn_n_cls: "public"
+   51               | "local"
+
+   52 template_def: type IDENT
+   53             | type IDENT "=" cval
+
+   54 template_defs: template_def
+   55              | template_def ","
+   56              | template_defs "," template_def
+
+   57 template_use: "<" typelist ">"
+
+   58 template: "<" template_defs ">"
+
+   59 namespace: "namespace" type_ident "{" filestmnt "}"
+
+   60 enum: encpsltn_n_cls "enum" enum_body
+   61     | encpsltn_n_cls "enum" ":" type enum_body
+
+   62 enum_body: "{" "}"
+   63          | "{" enum_values "}"
+
+   64 enum_values: enum_value
+   65            | enum_value ","
+   66            | enum_value ";"
+   67            | enum_value "," enum_values
+   68            | enum_value ";" enum_values
+
+   69 enum_value: IDENT
+   70           | IDENT "=" cval
+
+   71 class: classhead classbody
+   72      | classhead ":" typelist classbody
+   73      | classhead template classbody
+   74      | classhead template ":" typelist classbody
+
+   75 classhead: encpsltn "class" IDENT
+
+   76 classbody: "{" classstmnts "}"
+
+   77 mthd: mthd_head mthd_args mthd_body
+   78     | mthd_head template mthd_args mthd_body
+
+   79 mthd_head: encpsltn type IDENT
+   80          | "unbound" encpsltn type IDENT
+
+   81 mthd_args: "(" ")"
+   82          | "(" mthd_arglist ")"
+
+   83 mthd_body: "{" "}"
+   84          | "{" codestmnts "}"
+   85          | "=>" codestmnt
+
+   86 mthd_arglist: mthd_arg
+   87             | mthd_arg ","
+   88             | mthd_arg "," mthd_arglist
+
+   89 mthd_arg: type IDENT
+   90         | type IDENT "=" cval
+
+   91 mthdop: mthdop_head mthdop_args mthd_body
+   92       | mthdop_head template mthdop_args mthd_body
+
+   93 mthdop_head: "unbound" encpsltn type
+
+   94 mthdop_args: "operator" mthdop_ops1s "(" mthd_arg ")"
+   95            | mthdop_ops1p "operator" "(" mthd_arg ")"
+   96            | mthdop_ops1s "operator" "(" mthd_arg ")"
+   97            | "operator" mthdop_ops2 "(" mthd_arg "," mthd_arg ")"
+
+   98 mthdop_ops1p: "!"
+   99             | "~"
+  100             | "-"
+  101             | "+"
+
+  102 mthdop_ops1s: "++"
+  103             | "--"
+
+  104 mthdop_ops2: "+"
+  105            | "-"
+  106            | "*"
+  107            | "/"
+  108            | ">"
+  109            | ">="
+  110            | ">>"
+  111            | ">>>"
+  112            | "<"
+  113            | "<="
+  114            | "<<"
+  115            | "<<<"
+  116            | "!="
+  117            | "=="
+  118            | ".."
+  119            | "&"
+  120            | "&&"
+  121            | "|"
+  122            | "||"
+  123            | "^"
+  124            | "%"
+
+  125 mthdcnst: mthdcnst_head mthd_args mthd_body
+
+  126 mthdcnst_head: encpsltn IDENT
+  127              | "~" IDENT
+
+  128 prop: prop_head prop_body
+
+  129 prop_head: encpsltn type IDENT
+  130          | "unbound" encpsltn type IDENT
+
+  131 prop_body: "{" prop_get prop_set "}"
+  132          | "{" prop_get "}"
+  133          | "{" prop_set prop_get "}"
+  134          | "{" prop_set "}"
+  135          | ";"
+
+  136 prop_get: "get" "(" IDENT ")" mthd_body
+
+  137 prop_set: "set" mthd_body
+
+  138 ifelse: "if" "(" val ")" codestmnt
+  139       | "if" "(" val ")" codestmnt "else" codestmnt
+
+  140 for: "for" "(" for_step ")" codestmnt
+  141    | "for" "(" for_each ")" codestmnt
+
+  142 for_step: for_step_arg ";" for_step_arg ";" for_step_arg
+  143         | for_step_arg ";" for_step_arg ";"
+  144         | for_step_arg ";" ";" for_step_arg
+  145         | for_step_arg ";" ";"
+  146         | ";" for_step_arg ";" for_step_arg
+  147         | ";" for_step_arg ";"
+  148         | ";" ";" for_step_arg
+
+  149 for_step_arg: val
+  150             | val ","
+  151             | val "," for_step_arg
+
+  152 for_each: declaration ":" val
+  153         | declaration ":" val ".." val
+
+  154 while: "while" "(" val ")" codestmnt
+  155      | "do" codestmnt "while" "(" val ")"
+
+  156 switch: "switch" "(" val ")" "{" switch_cases "}"
+
+  157 switch_cases: switch_case
+  158             | switch_case switch_cases
+
+  159 switch_case: case ":"
+  160            | case ":" codestmnt
+
+  161 case: "case" cval
+  162     | "default"
+
+  163 try: "try" codestmnt
+
+  164 catch: "catch" codestmnt
+  165      | "catch" "(" declaration ")" codestmnt
+
+  166 catchlist: catch
+  167          | catch catchlist
+
+  168 finally: "finally" codestmnt
+
+  169 trycatch: try catchlist finally
+  170         | try catchlist
+  171         | try finally
+
+  172 statement: "return"
+  173          | "return" val
+  174          | "throw"
+  175          | "throw" val
+  176          | "delete" val
+  177          | "goto" IDENT
+  178          | "goto" case
+
+  179 declaration: type IDENT
+
+  180 assignment: IDENT "=" val
+  181           | declaration "=" val
+
+  182 scope: "{" "}"
+  183      | "{" codestmnt "}"
+
+  184 val: exp01
+
+  185 exp01: exp02
+  186      | exp02 "?" exp01 ":" exp01
+
+  187 exp02: exp03
+  188      | exp03 "||" exp03
+
+  189 exp03: exp04
+  190      | exp04 "&&" exp04
+
+  191 exp04: exp05
+  192      | exp05 "==" exp05
+  193      | exp05 "!=" exp05
+
+  194 exp05: exp06
+  195      | exp06 "<" exp06
+  196      | exp06 "<=" exp06
+  197      | exp06 ">" exp06
+  198      | exp06 ">=" exp06
+
+  199 exp06: exp07
+  200      | exp07 "+" exp07
+  201      | exp07 "-" exp07
+
+  202 exp07: exp08
+  203      | exp08 "*" exp08
+  204      | exp08 "/" exp08
+  205      | exp08 "%" exp08
+
+  206 exp08: exp09
+  207      | exp09 "<<" exp09
+  208      | exp09 "<<<" exp09
+  209      | exp09 ">>" exp09
+  210      | exp09 ">>>" exp09
+
+  211 exp09: exp10
+  212      | exp10 "^" exp10
+  213      | exp10 "|" exp10
+  214      | exp10 "&" exp10
+
+  215 exp10: exp11
+  216      | "!" exp11
+  217      | "~" exp11
+
+  218 exp11: expp
+  219      | call
+  220      | dotnav
+  221      | arrget
+
+  222 arrget: exp11 "[" exp01 "]"
+
+  223 dotnav: exp11 "." IDENT
+
+  224 call: exp11 "(" explist ")"
+  225     | exp11 "(" ")"
+
+  226 explist: exp01
+  227        | exp01 ","
+  228        | exp01 "," explist
+
+  229 expp: cval
+  230     | "this"
+  231     | "new" type
+  232     | assignment
+
+  233 cval: L_NUMBER
+  234     | L_STRING
+  235     | L_CHAR
+  236     | "true"
+  237     | "false"
+  238     | type
+
+
+Terminale und die Regeln, in denen sie verwendet werden
+
+$end (0) 0
+error (256) 35
+"public" (258) 50
+"local" (259) 51
+"derived" (260) 48
+"private" (261) 49
+"unbound" (262) 80 93 130
+"=" (263) 4 53 70 90 180 181
+"&&" (264) 120 190
+"&" (265) 119 214
+"/" (266) 107 204
+"*" (267) 106 203
+"%" (268) 124 205
+"||" (269) 122 188
+"|" (270) 121 213
+"^" (271) 123 212
+"~" (272) 99 127 217
+":" (273) 61 72 74 152 153 159 160 186
+"::" (274) 39 41 42
+"+" (275) 101 104 200
+"++" (276) 102
+"-" (277) 100 105 201
+"--" (278) 103
+"<=" (279) 113 196
+"<" (280) 57 58 112 195
+"<<" (281) 114 207
+"<<<" (282) 115 208
+">=" (283) 109 198
+">" (284) 57 58 108 197
+">>" (285) 110 209
+">>>" (286) 111 210
+"==" (287) 117 192
+"!=" (288) 116 193
+"!" (289) 98 216
+"{" (290) 59 62 63 76 83 84 131 132 133 134 156 182 183
+"}" (291) 59 62 63 76 83 84 131 132 133 134 156 182 183
+"(" (292) 81 82 94 95 96 97 136 138 139 140 141 154 155 156 165 224
+    225
+")" (293) 81 82 94 95 96 97 136 138 139 140 141 154 155 156 165 224
+    225
+"[" (294) 222
+"]" (295) 222
+";" (296) 5 6 7 30 32 33 34 66 68 135 142 143 144 145 146 147 148
+"," (297) 45 46 55 56 65 67 87 88 97 150 151 227 228
+"." (298) 223
+"?" (299) 186
+"=>" (300) 85
+"class" (301) 7 75
+"get" (302) 136
+"set" (303) 137
+"namespace" (304) 5 59
+"if" (305) 138 139
+"for" (306) 140 141
+"else" (307) 139
+"while" (308) 154 155
+"do" (309) 155
+"switch" (310) 156
+"case" (311) 161
+"default" (312) 162
+"return" (313) 172 173
+"throw" (314) 174 175
+"goto" (315) 177 178
+"try" (316) 163
+"catch" (317) 164 165
+"finally" (318) 168
+"operator" (319) 94 95 96 97
+"using" (320) 5 6 7
+"enum" (321) 6 60 61
+".." (322) 118 153
+"true" (323) 236
+"false" (324) 237
+"this" (325) 230
+"new" (326) 231
+"delete" (327) 176
+IDENT (328) 4 38 39 52 53 69 70 75 79 80 89 90 126 127 129 130 136
+    177 179 180 223
+L_STRING (329) 234
+L_NUMBER (330) 233
+L_CHAR (331) 235
+
+
+Nicht-Terminal und die Regeln, in denen sie verwendet werden
+
+$accept (77)
+    auf der linken Seite: 0
+start (78)
+    auf der linken Seite: 1 2, auf der rechten Seite: 0
+using (79)
+    auf der linken Seite: 3 4, auf der rechten Seite: 11 20 25
+using_low (80)
+    auf der linken Seite: 5 6 7, auf der rechten Seite: 3 4
+filestmnt (81)
+    auf der linken Seite: 8 9 10 11 12, auf der rechten Seite: 13 14
+    59
+filestmnts (82)
+    auf der linken Seite: 13 14, auf der rechten Seite: 2 14
+classstmnt (83)
+    auf der linken Seite: 15 16 17 18 19 20 21, auf der rechten Seite:
+    22 23
+classstmnts (84)
+    auf der linken Seite: 22 23, auf der rechten Seite: 23 76
+codestmnt (85)
+    auf der linken Seite: 24 25 26 27 28 29 30 31 32 33 34 35, auf der rechten Seite:
+    36 37 85 138 139 140 141 154 155 160 163 164 165 168 183
+codestmnts (86)
+    auf der linken Seite: 36 37, auf der rechten Seite: 37 84
+type_ident (87)
+    auf der linken Seite: 38 39, auf der rechten Seite: 39 40 41 42
+    43 59
+type (88)
+    auf der linken Seite: 40 41 42 43, auf der rechten Seite: 5 6 7
+    44 45 46 52 53 61 79 80 89 90 93 129 130 179 231 238
+typelist (89)
+    auf der linken Seite: 44 45 46, auf der rechten Seite: 46 57 72
+    74
+encpsltn (90)
+    auf der linken Seite: 47 48 49, auf der rechten Seite: 75 79 80
+    93 126 129 130
+encpsltn_n_cls (91)
+    auf der linken Seite: 50 51, auf der rechten Seite: 47 60 61
+template_def (92)
+    auf der linken Seite: 52 53, auf der rechten Seite: 54 55 56
+template_defs (93)
+    auf der linken Seite: 54 55 56, auf der rechten Seite: 56 58
+template_use (94)
+    auf der linken Seite: 57, auf der rechten Seite: 42 43
+template (95)
+    auf der linken Seite: 58, auf der rechten Seite: 73 74 78 92
+namespace (96)
+    auf der linken Seite: 59, auf der rechten Seite: 9
+enum (97)
+    auf der linken Seite: 60 61, auf der rechten Seite: 12 21
+enum_body (98)
+    auf der linken Seite: 62 63, auf der rechten Seite: 60 61
+enum_values (99)
+    auf der linken Seite: 64 65 66 67 68, auf der rechten Seite: 63
+    67 68
+enum_value (100)
+    auf der linken Seite: 69 70, auf der rechten Seite: 64 65 66 67
+    68
+class (101)
+    auf der linken Seite: 71 72 73 74, auf der rechten Seite: 8 18
+classhead (102)
+    auf der linken Seite: 75, auf der rechten Seite: 71 72 73 74
+classbody (103)
+    auf der linken Seite: 76, auf der rechten Seite: 71 72 73 74
+mthd (104)
+    auf der linken Seite: 77 78, auf der rechten Seite: 10 15
+mthd_head (105)
+    auf der linken Seite: 79 80, auf der rechten Seite: 77 78
+mthd_args (106)
+    auf der linken Seite: 81 82, auf der rechten Seite: 77 78 125
+mthd_body (107)
+    auf der linken Seite: 83 84 85, auf der rechten Seite: 77 78 91
+    92 125 136 137
+mthd_arglist (108)
+    auf der linken Seite: 86 87 88, auf der rechten Seite: 82 88
+mthd_arg (109)
+    auf der linken Seite: 89 90, auf der rechten Seite: 86 87 88 94
+    95 96 97
+mthdop (110)
+    auf der linken Seite: 91 92, auf der rechten Seite: 16
+mthdop_head (111)
+    auf der linken Seite: 93, auf der rechten Seite: 91 92
+mthdop_args (112)
+    auf der linken Seite: 94 95 96 97, auf der rechten Seite: 91 92
+mthdop_ops1p (113)
+    auf der linken Seite: 98 99 100 101, auf der rechten Seite: 95
+mthdop_ops1s (114)
+    auf der linken Seite: 102 103, auf der rechten Seite: 94 96
+mthdop_ops2 (115)
+    auf der linken Seite: 104 105 106 107 108 109 110 111 112 113 114
+    115 116 117 118 119 120 121 122 123 124, auf der rechten Seite:
+    97
+mthdcnst (116)
+    auf der linken Seite: 125, auf der rechten Seite: 17
+mthdcnst_head (117)
+    auf der linken Seite: 126 127, auf der rechten Seite: 125
+prop (118)
+    auf der linken Seite: 128, auf der rechten Seite: 19
+prop_head (119)
+    auf der linken Seite: 129 130, auf der rechten Seite: 128
+prop_body (120)
+    auf der linken Seite: 131 132 133 134 135, auf der rechten Seite:
+    128
+prop_get (121)
+    auf der linken Seite: 136, auf der rechten Seite: 131 132 133
+prop_set (122)
+    auf der linken Seite: 137, auf der rechten Seite: 131 133 134
+ifelse (123)
+    auf der linken Seite: 138 139, auf der rechten Seite: 24
+for (124)
+    auf der linken Seite: 140 141, auf der rechten Seite: 26
+for_step (125)
+    auf der linken Seite: 142 143 144 145 146 147 148, auf der rechten Seite:
+    140
+for_step_arg (126)
+    auf der linken Seite: 149 150 151, auf der rechten Seite: 142 143
+    144 145 146 147 148 151
+for_each (127)
+    auf der linken Seite: 152 153, auf der rechten Seite: 141
+while (128)
+    auf der linken Seite: 154 155, auf der rechten Seite: 28
+switch (129)
+    auf der linken Seite: 156, auf der rechten Seite: 29
+switch_cases (130)
+    auf der linken Seite: 157 158, auf der rechten Seite: 156 158
+switch_case (131)
+    auf der linken Seite: 159 160, auf der rechten Seite: 157 158
+case (132)
+    auf der linken Seite: 161 162, auf der rechten Seite: 159 160 178
+try (133)
+    auf der linken Seite: 163, auf der rechten Seite: 169 170 171
+catch (134)
+    auf der linken Seite: 164 165, auf der rechten Seite: 166 167
+catchlist (135)
+    auf der linken Seite: 166 167, auf der rechten Seite: 167 169 170
+finally (136)
+    auf der linken Seite: 168, auf der rechten Seite: 169 171
+trycatch (137)
+    auf der linken Seite: 169 170 171, auf der rechten Seite: 27
+statement (138)
+    auf der linken Seite: 172 173 174 175 176 177 178, auf der rechten Seite:
+    30
+declaration (139)
+    auf der linken Seite: 179, auf der rechten Seite: 32 152 153 165
+    181
+assignment (140)
+    auf der linken Seite: 180 181, auf der rechten Seite: 232
+scope (141)
+    auf der linken Seite: 182 183, auf der rechten Seite: 31
+val (142)
+    auf der linken Seite: 184, auf der rechten Seite: 33 138 139 149
+    150 151 152 153 154 155 156 173 175 176 180 181
+exp01 (143)
+    auf der linken Seite: 185 186, auf der rechten Seite: 184 186 222
+    226 227 228
+exp02 (144)
+    auf der linken Seite: 187 188, auf der rechten Seite: 185 186
+exp03 (145)
+    auf der linken Seite: 189 190, auf der rechten Seite: 187 188
+exp04 (146)
+    auf der linken Seite: 191 192 193, auf der rechten Seite: 189 190
+exp05 (147)
+    auf der linken Seite: 194 195 196 197 198, auf der rechten Seite:
+    191 192 193
+exp06 (148)
+    auf der linken Seite: 199 200 201, auf der rechten Seite: 194 195
+    196 197 198
+exp07 (149)
+    auf der linken Seite: 202 203 204 205, auf der rechten Seite: 199
+    200 201
+exp08 (150)
+    auf der linken Seite: 206 207 208 209 210, auf der rechten Seite:
+    202 203 204 205
+exp09 (151)
+    auf der linken Seite: 211 212 213 214, auf der rechten Seite: 206
+    207 208 209 210
+exp10 (152)
+    auf der linken Seite: 215 216 217, auf der rechten Seite: 211 212
+    213 214
+exp11 (153)
+    auf der linken Seite: 218 219 220 221, auf der rechten Seite: 215
+    216 217 222 223 224 225
+arrget (154)
+    auf der linken Seite: 222, auf der rechten Seite: 221
+dotnav (155)
+    auf der linken Seite: 223, auf der rechten Seite: 220
+call (156)
+    auf der linken Seite: 224 225, auf der rechten Seite: 219
+explist (157)
+    auf der linken Seite: 226 227 228, auf der rechten Seite: 224 228
+expp (158)
+    auf der linken Seite: 229 230 231 232, auf der rechten Seite: 218
+cval (159)
+    auf der linken Seite: 233 234 235 236 237 238, auf der rechten Seite:
+    53 70 90 161 229
+
+
+Zustand 0
+
+    0 $accept: . start $end
+
+    "public"     schiebe und gehe zu Zustand 1 über
+    "local"      schiebe und gehe zu Zustand 2 über
+    "derived"    schiebe und gehe zu Zustand 3 über
+    "private"    schiebe und gehe zu Zustand 4 über
+    "unbound"    schiebe und gehe zu Zustand 5 über
+    "namespace"  schiebe und gehe zu Zustand 6 über
+    "using"      schiebe und gehe zu Zustand 7 über
+
+    $default  reduziere mit Regel 1 (start)
+
+    start           gehe zu Zustand 8 über
+    using           gehe zu Zustand 9 über
+    using_low       gehe zu Zustand 10 über
+    filestmnt       gehe zu Zustand 11 über
+    filestmnts      gehe zu Zustand 12 über
+    encpsltn        gehe zu Zustand 13 über
+    encpsltn_n_cls  gehe zu Zustand 14 über
+    namespace       gehe zu Zustand 15 über
+    enum            gehe zu Zustand 16 über
+    class           gehe zu Zustand 17 über
+    classhead       gehe zu Zustand 18 über
+    mthd            gehe zu Zustand 19 über
+    mthd_head       gehe zu Zustand 20 über
+
+
+Zustand 1
+
+   50 encpsltn_n_cls: "public" .
+
+    $default  reduziere mit Regel 50 (encpsltn_n_cls)
+
+
+Zustand 2
+
+   51 encpsltn_n_cls: "local" .
+
+    $default  reduziere mit Regel 51 (encpsltn_n_cls)
+
+
+Zustand 3
+
+   48 encpsltn: "derived" .
+
+    $default  reduziere mit Regel 48 (encpsltn)
+
+
+Zustand 4
+
+   49 encpsltn: "private" .
+
+    $default  reduziere mit Regel 49 (encpsltn)
+
+
+Zustand 5
+
+   80 mthd_head: "unbound" . encpsltn type IDENT
+
+    "public"   schiebe und gehe zu Zustand 1 über
+    "local"    schiebe und gehe zu Zustand 2 über
+    "derived"  schiebe und gehe zu Zustand 3 über
+    "private"  schiebe und gehe zu Zustand 4 über
+
+    encpsltn        gehe zu Zustand 21 über
+    encpsltn_n_cls  gehe zu Zustand 22 über
+
+
+Zustand 6
+
+   59 namespace: "namespace" . type_ident "{" filestmnt "}"
+
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 24 über
+
+
+Zustand 7
+
+    5 using_low: "using" . "namespace" type ";"
+    6          | "using" . "enum" type ";"
+    7          | "using" . "class" type ";"
+
+    "class"      schiebe und gehe zu Zustand 25 über
+    "namespace"  schiebe und gehe zu Zustand 26 über
+    "enum"       schiebe und gehe zu Zustand 27 über
+
+
+Zustand 8
+
+    0 $accept: start . $end
+
+    $end  schiebe und gehe zu Zustand 28 über
+
+
+Zustand 9
+
+   11 filestmnt: using .
+
+    $default  reduziere mit Regel 11 (filestmnt)
+
+
+Zustand 10
+
+    3 using: using_low .
+    4      | using_low . "=" IDENT
+
+    "="  schiebe und gehe zu Zustand 29 über
+
+    $default  reduziere mit Regel 3 (using)
+
+
+Zustand 11
+
+   13 filestmnts: filestmnt .
+
+    $default  reduziere mit Regel 13 (filestmnts)
+
+
+Zustand 12
+
+    2 start: filestmnts .
+   14 filestmnts: filestmnts . filestmnt
+
+    "public"     schiebe und gehe zu Zustand 1 über
+    "local"      schiebe und gehe zu Zustand 2 über
+    "derived"    schiebe und gehe zu Zustand 3 über
+    "private"    schiebe und gehe zu Zustand 4 über
+    "unbound"    schiebe und gehe zu Zustand 5 über
+    "namespace"  schiebe und gehe zu Zustand 6 über
+    "using"      schiebe und gehe zu Zustand 7 über
+
+    $default  reduziere mit Regel 2 (start)
+
+    using           gehe zu Zustand 9 über
+    using_low       gehe zu Zustand 10 über
+    filestmnt       gehe zu Zustand 30 über
+    encpsltn        gehe zu Zustand 13 über
+    encpsltn_n_cls  gehe zu Zustand 14 über
+    namespace       gehe zu Zustand 15 über
+    enum            gehe zu Zustand 16 über
+    class           gehe zu Zustand 17 über
+    classhead       gehe zu Zustand 18 über
+    mthd            gehe zu Zustand 19 über
+    mthd_head       gehe zu Zustand 20 über
+
+
+Zustand 13
+
+   75 classhead: encpsltn . "class" IDENT
+   79 mthd_head: encpsltn . type IDENT
+
+    "::"     schiebe und gehe zu Zustand 31 über
+    "class"  schiebe und gehe zu Zustand 32 über
+    IDENT    schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 34 über
+
+
+Zustand 14
+
+   47 encpsltn: encpsltn_n_cls .
+   60 enum: encpsltn_n_cls . "enum" enum_body
+   61     | encpsltn_n_cls . "enum" ":" type enum_body
+
+    "enum"  schiebe und gehe zu Zustand 35 über
+
+    $default  reduziere mit Regel 47 (encpsltn)
+
+
+Zustand 15
+
+    9 filestmnt: namespace .
+
+    $default  reduziere mit Regel 9 (filestmnt)
+
+
+Zustand 16
+
+   12 filestmnt: enum .
+
+    $default  reduziere mit Regel 12 (filestmnt)
+
+
+Zustand 17
+
+    8 filestmnt: class .
+
+    $default  reduziere mit Regel 8 (filestmnt)
+
+
+Zustand 18
+
+   71 class: classhead . classbody
+   72      | classhead . ":" typelist classbody
+   73      | classhead . template classbody
+   74      | classhead . template ":" typelist classbody
+
+    ":"  schiebe und gehe zu Zustand 36 über
+    "<"  schiebe und gehe zu Zustand 37 über
+    "{"  schiebe und gehe zu Zustand 38 über
+
+    template   gehe zu Zustand 39 über
+    classbody  gehe zu Zustand 40 über
+
+
+Zustand 19
+
+   10 filestmnt: mthd .
+
+    $default  reduziere mit Regel 10 (filestmnt)
+
+
+Zustand 20
+
+   77 mthd: mthd_head . mthd_args mthd_body
+   78     | mthd_head . template mthd_args mthd_body
+
+    "<"  schiebe und gehe zu Zustand 37 über
+    "("  schiebe und gehe zu Zustand 41 über
+
+    template   gehe zu Zustand 42 über
+    mthd_args  gehe zu Zustand 43 über
+
+
+Zustand 21
+
+   80 mthd_head: "unbound" encpsltn . type IDENT
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 44 über
+
+
+Zustand 22
+
+   47 encpsltn: encpsltn_n_cls .
+
+    $default  reduziere mit Regel 47 (encpsltn)
+
+
+Zustand 23
+
+   38 type_ident: IDENT .
+
+    $default  reduziere mit Regel 38 (type_ident)
+
+
+Zustand 24
+
+   39 type_ident: type_ident . "::" IDENT
+   59 namespace: "namespace" type_ident . "{" filestmnt "}"
+
+    "::"  schiebe und gehe zu Zustand 45 über
+    "{"   schiebe und gehe zu Zustand 46 über
+
+
+Zustand 25
+
+    7 using_low: "using" "class" . type ";"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 47 über
+
+
+Zustand 26
+
+    5 using_low: "using" "namespace" . type ";"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 48 über
+
+
+Zustand 27
+
+    6 using_low: "using" "enum" . type ";"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 49 über
+
+
+Zustand 28
+
+    0 $accept: start $end .
+
+    $default  annehmen
+
+
+Zustand 29
+
+    4 using: using_low "=" . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 50 über
+
+
+Zustand 30
+
+   14 filestmnts: filestmnts filestmnt .
+
+    $default  reduziere mit Regel 14 (filestmnts)
+
+
+Zustand 31
+
+   41 type: "::" . type_ident
+   42     | "::" . type_ident template_use
+
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 51 über
+
+
+Zustand 32
+
+   75 classhead: encpsltn "class" . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 52 über
+
+
+Zustand 33
+
+   39 type_ident: type_ident . "::" IDENT
+   40 type: type_ident .
+   43     | type_ident . template_use
+
+    "::"  schiebe und gehe zu Zustand 45 über
+    "<"   schiebe und gehe zu Zustand 53 über
+
+    "<"       [reduziere mit Regel 40 (type)]
+    $default  reduziere mit Regel 40 (type)
+
+    template_use  gehe zu Zustand 54 über
+
+
+Zustand 34
+
+   79 mthd_head: encpsltn type . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 55 über
+
+
+Zustand 35
+
+   60 enum: encpsltn_n_cls "enum" . enum_body
+   61     | encpsltn_n_cls "enum" . ":" type enum_body
+
+    ":"  schiebe und gehe zu Zustand 56 über
+    "{"  schiebe und gehe zu Zustand 57 über
+
+    enum_body  gehe zu Zustand 58 über
+
+
+Zustand 36
+
+   72 class: classhead ":" . typelist classbody
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 59 über
+    typelist    gehe zu Zustand 60 über
+
+
+Zustand 37
+
+   58 template: "<" . template_defs ">"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident     gehe zu Zustand 33 über
+    type           gehe zu Zustand 61 über
+    template_def   gehe zu Zustand 62 über
+    template_defs  gehe zu Zustand 63 über
+
+
+Zustand 38
+
+   76 classbody: "{" . classstmnts "}"
+
+    "public"   schiebe und gehe zu Zustand 1 über
+    "local"    schiebe und gehe zu Zustand 2 über
+    "derived"  schiebe und gehe zu Zustand 3 über
+    "private"  schiebe und gehe zu Zustand 4 über
+    "unbound"  schiebe und gehe zu Zustand 64 über
+    "~"        schiebe und gehe zu Zustand 65 über
+    "using"    schiebe und gehe zu Zustand 7 über
+
+    using           gehe zu Zustand 66 über
+    using_low       gehe zu Zustand 10 über
+    classstmnt      gehe zu Zustand 67 über
+    classstmnts     gehe zu Zustand 68 über
+    encpsltn        gehe zu Zustand 69 über
+    encpsltn_n_cls  gehe zu Zustand 14 über
+    enum            gehe zu Zustand 70 über
+    class           gehe zu Zustand 71 über
+    classhead       gehe zu Zustand 18 über
+    mthd            gehe zu Zustand 72 über
+    mthd_head       gehe zu Zustand 20 über
+    mthdop          gehe zu Zustand 73 über
+    mthdop_head     gehe zu Zustand 74 über
+    mthdcnst        gehe zu Zustand 75 über
+    mthdcnst_head   gehe zu Zustand 76 über
+    prop            gehe zu Zustand 77 über
+    prop_head       gehe zu Zustand 78 über
+
+
+Zustand 39
+
+   73 class: classhead template . classbody
+   74      | classhead template . ":" typelist classbody
+
+    ":"  schiebe und gehe zu Zustand 79 über
+    "{"  schiebe und gehe zu Zustand 38 über
+
+    classbody  gehe zu Zustand 80 über
+
+
+Zustand 40
+
+   71 class: classhead classbody .
+
+    $default  reduziere mit Regel 71 (class)
+
+
+Zustand 41
+
+   81 mthd_args: "(" . ")"
+   82          | "(" . mthd_arglist ")"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    ")"    schiebe und gehe zu Zustand 81 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 82 über
+    mthd_arglist  gehe zu Zustand 83 über
+    mthd_arg      gehe zu Zustand 84 über
+
+
+Zustand 42
+
+   78 mthd: mthd_head template . mthd_args mthd_body
+
+    "("  schiebe und gehe zu Zustand 41 über
+
+    mthd_args  gehe zu Zustand 85 über
+
+
+Zustand 43
+
+   77 mthd: mthd_head mthd_args . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 88 über
+
+
+Zustand 44
+
+   80 mthd_head: "unbound" encpsltn type . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 89 über
+
+
+Zustand 45
+
+   39 type_ident: type_ident "::" . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 90 über
+
+
+Zustand 46
+
+   59 namespace: "namespace" type_ident "{" . filestmnt "}"
+
+    "public"     schiebe und gehe zu Zustand 1 über
+    "local"      schiebe und gehe zu Zustand 2 über
+    "derived"    schiebe und gehe zu Zustand 3 über
+    "private"    schiebe und gehe zu Zustand 4 über
+    "unbound"    schiebe und gehe zu Zustand 5 über
+    "namespace"  schiebe und gehe zu Zustand 6 über
+    "using"      schiebe und gehe zu Zustand 7 über
+
+    using           gehe zu Zustand 9 über
+    using_low       gehe zu Zustand 10 über
+    filestmnt       gehe zu Zustand 91 über
+    encpsltn        gehe zu Zustand 13 über
+    encpsltn_n_cls  gehe zu Zustand 14 über
+    namespace       gehe zu Zustand 15 über
+    enum            gehe zu Zustand 16 über
+    class           gehe zu Zustand 17 über
+    classhead       gehe zu Zustand 18 über
+    mthd            gehe zu Zustand 19 über
+    mthd_head       gehe zu Zustand 20 über
+
+
+Zustand 47
+
+    7 using_low: "using" "class" type . ";"
+
+    ";"  schiebe und gehe zu Zustand 92 über
+
+
+Zustand 48
+
+    5 using_low: "using" "namespace" type . ";"
+
+    ";"  schiebe und gehe zu Zustand 93 über
+
+
+Zustand 49
+
+    6 using_low: "using" "enum" type . ";"
+
+    ";"  schiebe und gehe zu Zustand 94 über
+
+
+Zustand 50
+
+    4 using: using_low "=" IDENT .
+
+    $default  reduziere mit Regel 4 (using)
+
+
+Zustand 51
+
+   39 type_ident: type_ident . "::" IDENT
+   41 type: "::" type_ident .
+   42     | "::" type_ident . template_use
+
+    "::"  schiebe und gehe zu Zustand 45 über
+    "<"   schiebe und gehe zu Zustand 53 über
+
+    "<"       [reduziere mit Regel 41 (type)]
+    $default  reduziere mit Regel 41 (type)
+
+    template_use  gehe zu Zustand 95 über
+
+
+Zustand 52
+
+   75 classhead: encpsltn "class" IDENT .
+
+    $default  reduziere mit Regel 75 (classhead)
+
+
+Zustand 53
+
+   57 template_use: "<" . typelist ">"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 59 über
+    typelist    gehe zu Zustand 96 über
+
+
+Zustand 54
+
+   43 type: type_ident template_use .
+
+    $default  reduziere mit Regel 43 (type)
+
+
+Zustand 55
+
+   79 mthd_head: encpsltn type IDENT .
+
+    $default  reduziere mit Regel 79 (mthd_head)
+
+
+Zustand 56
+
+   61 enum: encpsltn_n_cls "enum" ":" . type enum_body
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 97 über
+
+
+Zustand 57
+
+   62 enum_body: "{" . "}"
+   63          | "{" . enum_values "}"
+
+    "}"    schiebe und gehe zu Zustand 98 über
+    IDENT  schiebe und gehe zu Zustand 99 über
+
+    enum_values  gehe zu Zustand 100 über
+    enum_value   gehe zu Zustand 101 über
+
+
+Zustand 58
+
+   60 enum: encpsltn_n_cls "enum" enum_body .
+
+    $default  reduziere mit Regel 60 (enum)
+
+
+Zustand 59
+
+   44 typelist: type .
+   45         | type . ","
+   46         | type . "," typelist
+
+    ","  schiebe und gehe zu Zustand 102 über
+
+    $default  reduziere mit Regel 44 (typelist)
+
+
+Zustand 60
+
+   72 class: classhead ":" typelist . classbody
+
+    "{"  schiebe und gehe zu Zustand 38 über
+
+    classbody  gehe zu Zustand 103 über
+
+
+Zustand 61
+
+   52 template_def: type . IDENT
+   53             | type . IDENT "=" cval
+
+    IDENT  schiebe und gehe zu Zustand 104 über
+
+
+Zustand 62
+
+   54 template_defs: template_def .
+   55              | template_def . ","
+
+    ","  schiebe und gehe zu Zustand 105 über
+
+    ","       [reduziere mit Regel 54 (template_defs)]
+    $default  reduziere mit Regel 54 (template_defs)
+
+
+Zustand 63
+
+   56 template_defs: template_defs . "," template_def
+   58 template: "<" template_defs . ">"
+
+    ">"  schiebe und gehe zu Zustand 106 über
+    ","  schiebe und gehe zu Zustand 107 über
+
+
+Zustand 64
+
+   80 mthd_head: "unbound" . encpsltn type IDENT
+   93 mthdop_head: "unbound" . encpsltn type
+  130 prop_head: "unbound" . encpsltn type IDENT
+
+    "public"   schiebe und gehe zu Zustand 1 über
+    "local"    schiebe und gehe zu Zustand 2 über
+    "derived"  schiebe und gehe zu Zustand 3 über
+    "private"  schiebe und gehe zu Zustand 4 über
+
+    encpsltn        gehe zu Zustand 108 über
+    encpsltn_n_cls  gehe zu Zustand 22 über
+
+
+Zustand 65
+
+  127 mthdcnst_head: "~" . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 109 über
+
+
+Zustand 66
+
+   20 classstmnt: using .
+
+    $default  reduziere mit Regel 20 (classstmnt)
+
+
+Zustand 67
+
+   22 classstmnts: classstmnt .
+
+    $default  reduziere mit Regel 22 (classstmnts)
+
+
+Zustand 68
+
+   23 classstmnts: classstmnts . classstmnt
+   76 classbody: "{" classstmnts . "}"
+
+    "public"   schiebe und gehe zu Zustand 1 über
+    "local"    schiebe und gehe zu Zustand 2 über
+    "derived"  schiebe und gehe zu Zustand 3 über
+    "private"  schiebe und gehe zu Zustand 4 über
+    "unbound"  schiebe und gehe zu Zustand 64 über
+    "~"        schiebe und gehe zu Zustand 65 über
+    "}"        schiebe und gehe zu Zustand 110 über
+    "using"    schiebe und gehe zu Zustand 7 über
+
+    using           gehe zu Zustand 66 über
+    using_low       gehe zu Zustand 10 über
+    classstmnt      gehe zu Zustand 111 über
+    encpsltn        gehe zu Zustand 69 über
+    encpsltn_n_cls  gehe zu Zustand 14 über
+    enum            gehe zu Zustand 70 über
+    class           gehe zu Zustand 71 über
+    classhead       gehe zu Zustand 18 über
+    mthd            gehe zu Zustand 72 über
+    mthd_head       gehe zu Zustand 20 über
+    mthdop          gehe zu Zustand 73 über
+    mthdop_head     gehe zu Zustand 74 über
+    mthdcnst        gehe zu Zustand 75 über
+    mthdcnst_head   gehe zu Zustand 76 über
+    prop            gehe zu Zustand 77 über
+    prop_head       gehe zu Zustand 78 über
+
+
+Zustand 69
+
+   75 classhead: encpsltn . "class" IDENT
+   79 mthd_head: encpsltn . type IDENT
+  126 mthdcnst_head: encpsltn . IDENT
+  129 prop_head: encpsltn . type IDENT
+
+    "::"     schiebe und gehe zu Zustand 31 über
+    "class"  schiebe und gehe zu Zustand 32 über
+    IDENT    schiebe und gehe zu Zustand 112 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 113 über
+
+
+Zustand 70
+
+   21 classstmnt: enum .
+
+    $default  reduziere mit Regel 21 (classstmnt)
+
+
+Zustand 71
+
+   18 classstmnt: class .
+
+    $default  reduziere mit Regel 18 (classstmnt)
+
+
+Zustand 72
+
+   15 classstmnt: mthd .
+
+    $default  reduziere mit Regel 15 (classstmnt)
+
+
+Zustand 73
+
+   16 classstmnt: mthdop .
+
+    $default  reduziere mit Regel 16 (classstmnt)
+
+
+Zustand 74
+
+   91 mthdop: mthdop_head . mthdop_args mthd_body
+   92       | mthdop_head . template mthdop_args mthd_body
+
+    "~"         schiebe und gehe zu Zustand 114 über
+    "+"         schiebe und gehe zu Zustand 115 über
+    "++"        schiebe und gehe zu Zustand 116 über
+    "-"         schiebe und gehe zu Zustand 117 über
+    "--"        schiebe und gehe zu Zustand 118 über
+    "<"         schiebe und gehe zu Zustand 37 über
+    "!"         schiebe und gehe zu Zustand 119 über
+    "operator"  schiebe und gehe zu Zustand 120 über
+
+    template      gehe zu Zustand 121 über
+    mthdop_args   gehe zu Zustand 122 über
+    mthdop_ops1p  gehe zu Zustand 123 über
+    mthdop_ops1s  gehe zu Zustand 124 über
+
+
+Zustand 75
+
+   17 classstmnt: mthdcnst .
+
+    $default  reduziere mit Regel 17 (classstmnt)
+
+
+Zustand 76
+
+  125 mthdcnst: mthdcnst_head . mthd_args mthd_body
+
+    "("  schiebe und gehe zu Zustand 41 über
+
+    mthd_args  gehe zu Zustand 125 über
+
+
+Zustand 77
+
+   19 classstmnt: prop .
+
+    $default  reduziere mit Regel 19 (classstmnt)
+
+
+Zustand 78
+
+  128 prop: prop_head . prop_body
+
+    "{"  schiebe und gehe zu Zustand 126 über
+    ";"  schiebe und gehe zu Zustand 127 über
+
+    prop_body  gehe zu Zustand 128 über
+
+
+Zustand 79
+
+   74 class: classhead template ":" . typelist classbody
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 59 über
+    typelist    gehe zu Zustand 129 über
+
+
+Zustand 80
+
+   73 class: classhead template classbody .
+
+    $default  reduziere mit Regel 73 (class)
+
+
+Zustand 81
+
+   81 mthd_args: "(" ")" .
+
+    $default  reduziere mit Regel 81 (mthd_args)
+
+
+Zustand 82
+
+   89 mthd_arg: type . IDENT
+   90         | type . IDENT "=" cval
+
+    IDENT  schiebe und gehe zu Zustand 130 über
+
+
+Zustand 83
+
+   82 mthd_args: "(" mthd_arglist . ")"
+
+    ")"  schiebe und gehe zu Zustand 131 über
+
+
+Zustand 84
+
+   86 mthd_arglist: mthd_arg .
+   87             | mthd_arg . ","
+   88             | mthd_arg . "," mthd_arglist
+
+    ","  schiebe und gehe zu Zustand 132 über
+
+    $default  reduziere mit Regel 86 (mthd_arglist)
+
+
+Zustand 85
+
+   78 mthd: mthd_head template mthd_args . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 133 über
+
+
+Zustand 86
+
+   83 mthd_body: "{" . "}"
+   84          | "{" . codestmnts "}"
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    "}"       schiebe und gehe zu Zustand 138 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 159 über
+    codestmnts   gehe zu Zustand 160 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 87
+
+   85 mthd_body: "=>" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 189 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 88
+
+   77 mthd: mthd_head mthd_args mthd_body .
+
+    $default  reduziere mit Regel 77 (mthd)
+
+
+Zustand 89
+
+   80 mthd_head: "unbound" encpsltn type IDENT .
+
+    $default  reduziere mit Regel 80 (mthd_head)
+
+
+Zustand 90
+
+   39 type_ident: type_ident "::" IDENT .
+
+    $default  reduziere mit Regel 39 (type_ident)
+
+
+Zustand 91
+
+   59 namespace: "namespace" type_ident "{" filestmnt . "}"
+
+    "}"  schiebe und gehe zu Zustand 190 über
+
+
+Zustand 92
+
+    7 using_low: "using" "class" type ";" .
+
+    $default  reduziere mit Regel 7 (using_low)
+
+
+Zustand 93
+
+    5 using_low: "using" "namespace" type ";" .
+
+    $default  reduziere mit Regel 5 (using_low)
+
+
+Zustand 94
+
+    6 using_low: "using" "enum" type ";" .
+
+    $default  reduziere mit Regel 6 (using_low)
+
+
+Zustand 95
+
+   42 type: "::" type_ident template_use .
+
+    $default  reduziere mit Regel 42 (type)
+
+
+Zustand 96
+
+   57 template_use: "<" typelist . ">"
+
+    ">"  schiebe und gehe zu Zustand 191 über
+
+
+Zustand 97
+
+   61 enum: encpsltn_n_cls "enum" ":" type . enum_body
+
+    "{"  schiebe und gehe zu Zustand 57 über
+
+    enum_body  gehe zu Zustand 192 über
+
+
+Zustand 98
+
+   62 enum_body: "{" "}" .
+
+    $default  reduziere mit Regel 62 (enum_body)
+
+
+Zustand 99
+
+   69 enum_value: IDENT .
+   70           | IDENT . "=" cval
+
+    "="  schiebe und gehe zu Zustand 193 über
+
+    $default  reduziere mit Regel 69 (enum_value)
+
+
+Zustand 100
+
+   63 enum_body: "{" enum_values . "}"
+
+    "}"  schiebe und gehe zu Zustand 194 über
+
+
+Zustand 101
+
+   64 enum_values: enum_value .
+   65            | enum_value . ","
+   66            | enum_value . ";"
+   67            | enum_value . "," enum_values
+   68            | enum_value . ";" enum_values
+
+    ";"  schiebe und gehe zu Zustand 195 über
+    ","  schiebe und gehe zu Zustand 196 über
+
+    $default  reduziere mit Regel 64 (enum_values)
+
+
+Zustand 102
+
+   45 typelist: type "," .
+   46         | type "," . typelist
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    $default  reduziere mit Regel 45 (typelist)
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 59 über
+    typelist    gehe zu Zustand 197 über
+
+
+Zustand 103
+
+   72 class: classhead ":" typelist classbody .
+
+    $default  reduziere mit Regel 72 (class)
+
+
+Zustand 104
+
+   52 template_def: type IDENT .
+   53             | type IDENT . "=" cval
+
+    "="  schiebe und gehe zu Zustand 198 über
+
+    $default  reduziere mit Regel 52 (template_def)
+
+
+Zustand 105
+
+   55 template_defs: template_def "," .
+
+    $default  reduziere mit Regel 55 (template_defs)
+
+
+Zustand 106
+
+   58 template: "<" template_defs ">" .
+
+    $default  reduziere mit Regel 58 (template)
+
+
+Zustand 107
+
+   56 template_defs: template_defs "," . template_def
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 61 über
+    template_def  gehe zu Zustand 199 über
+
+
+Zustand 108
+
+   80 mthd_head: "unbound" encpsltn . type IDENT
+   93 mthdop_head: "unbound" encpsltn . type
+  130 prop_head: "unbound" encpsltn . type IDENT
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 200 über
+
+
+Zustand 109
+
+  127 mthdcnst_head: "~" IDENT .
+
+    $default  reduziere mit Regel 127 (mthdcnst_head)
+
+
+Zustand 110
+
+   76 classbody: "{" classstmnts "}" .
+
+    $default  reduziere mit Regel 76 (classbody)
+
+
+Zustand 111
+
+   23 classstmnts: classstmnts classstmnt .
+
+    $default  reduziere mit Regel 23 (classstmnts)
+
+
+Zustand 112
+
+   38 type_ident: IDENT .
+  126 mthdcnst_head: encpsltn IDENT .
+
+    "("       reduziere mit Regel 126 (mthdcnst_head)
+    $default  reduziere mit Regel 38 (type_ident)
+
+
+Zustand 113
+
+   79 mthd_head: encpsltn type . IDENT
+  129 prop_head: encpsltn type . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 201 über
+
+
+Zustand 114
+
+   99 mthdop_ops1p: "~" .
+
+    $default  reduziere mit Regel 99 (mthdop_ops1p)
+
+
+Zustand 115
+
+  101 mthdop_ops1p: "+" .
+
+    $default  reduziere mit Regel 101 (mthdop_ops1p)
+
+
+Zustand 116
+
+  102 mthdop_ops1s: "++" .
+
+    $default  reduziere mit Regel 102 (mthdop_ops1s)
+
+
+Zustand 117
+
+  100 mthdop_ops1p: "-" .
+
+    $default  reduziere mit Regel 100 (mthdop_ops1p)
+
+
+Zustand 118
+
+  103 mthdop_ops1s: "--" .
+
+    $default  reduziere mit Regel 103 (mthdop_ops1s)
+
+
+Zustand 119
+
+   98 mthdop_ops1p: "!" .
+
+    $default  reduziere mit Regel 98 (mthdop_ops1p)
+
+
+Zustand 120
+
+   94 mthdop_args: "operator" . mthdop_ops1s "(" mthd_arg ")"
+   97            | "operator" . mthdop_ops2 "(" mthd_arg "," mthd_arg ")"
+
+    "&&"   schiebe und gehe zu Zustand 202 über
+    "&"    schiebe und gehe zu Zustand 203 über
+    "/"    schiebe und gehe zu Zustand 204 über
+    "*"    schiebe und gehe zu Zustand 205 über
+    "%"    schiebe und gehe zu Zustand 206 über
+    "||"   schiebe und gehe zu Zustand 207 über
+    "|"    schiebe und gehe zu Zustand 208 über
+    "^"    schiebe und gehe zu Zustand 209 über
+    "+"    schiebe und gehe zu Zustand 210 über
+    "++"   schiebe und gehe zu Zustand 116 über
+    "-"    schiebe und gehe zu Zustand 211 über
+    "--"   schiebe und gehe zu Zustand 118 über
+    "<="   schiebe und gehe zu Zustand 212 über
+    "<"    schiebe und gehe zu Zustand 213 über
+    "<<"   schiebe und gehe zu Zustand 214 über
+    "<<<"  schiebe und gehe zu Zustand 215 über
+    ">="   schiebe und gehe zu Zustand 216 über
+    ">"    schiebe und gehe zu Zustand 217 über
+    ">>"   schiebe und gehe zu Zustand 218 über
+    ">>>"  schiebe und gehe zu Zustand 219 über
+    "=="   schiebe und gehe zu Zustand 220 über
+    "!="   schiebe und gehe zu Zustand 221 über
+    ".."   schiebe und gehe zu Zustand 222 über
+
+    mthdop_ops1s  gehe zu Zustand 223 über
+    mthdop_ops2   gehe zu Zustand 224 über
+
+
+Zustand 121
+
+   92 mthdop: mthdop_head template . mthdop_args mthd_body
+
+    "~"         schiebe und gehe zu Zustand 114 über
+    "+"         schiebe und gehe zu Zustand 115 über
+    "++"        schiebe und gehe zu Zustand 116 über
+    "-"         schiebe und gehe zu Zustand 117 über
+    "--"        schiebe und gehe zu Zustand 118 über
+    "!"         schiebe und gehe zu Zustand 119 über
+    "operator"  schiebe und gehe zu Zustand 120 über
+
+    mthdop_args   gehe zu Zustand 225 über
+    mthdop_ops1p  gehe zu Zustand 123 über
+    mthdop_ops1s  gehe zu Zustand 124 über
+
+
+Zustand 122
+
+   91 mthdop: mthdop_head mthdop_args . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 226 über
+
+
+Zustand 123
+
+   95 mthdop_args: mthdop_ops1p . "operator" "(" mthd_arg ")"
+
+    "operator"  schiebe und gehe zu Zustand 227 über
+
+
+Zustand 124
+
+   96 mthdop_args: mthdop_ops1s . "operator" "(" mthd_arg ")"
+
+    "operator"  schiebe und gehe zu Zustand 228 über
+
+
+Zustand 125
+
+  125 mthdcnst: mthdcnst_head mthd_args . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 229 über
+
+
+Zustand 126
+
+  131 prop_body: "{" . prop_get prop_set "}"
+  132          | "{" . prop_get "}"
+  133          | "{" . prop_set prop_get "}"
+  134          | "{" . prop_set "}"
+
+    "get"  schiebe und gehe zu Zustand 230 über
+    "set"  schiebe und gehe zu Zustand 231 über
+
+    prop_get  gehe zu Zustand 232 über
+    prop_set  gehe zu Zustand 233 über
+
+
+Zustand 127
+
+  135 prop_body: ";" .
+
+    $default  reduziere mit Regel 135 (prop_body)
+
+
+Zustand 128
+
+  128 prop: prop_head prop_body .
+
+    $default  reduziere mit Regel 128 (prop)
+
+
+Zustand 129
+
+   74 class: classhead template ":" typelist . classbody
+
+    "{"  schiebe und gehe zu Zustand 38 über
+
+    classbody  gehe zu Zustand 234 über
+
+
+Zustand 130
+
+   89 mthd_arg: type IDENT .
+   90         | type IDENT . "=" cval
+
+    "="  schiebe und gehe zu Zustand 235 über
+
+    $default  reduziere mit Regel 89 (mthd_arg)
+
+
+Zustand 131
+
+   82 mthd_args: "(" mthd_arglist ")" .
+
+    $default  reduziere mit Regel 82 (mthd_args)
+
+
+Zustand 132
+
+   87 mthd_arglist: mthd_arg "," .
+   88             | mthd_arg "," . mthd_arglist
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    $default  reduziere mit Regel 87 (mthd_arglist)
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 82 über
+    mthd_arglist  gehe zu Zustand 236 über
+    mthd_arg      gehe zu Zustand 84 über
+
+
+Zustand 133
+
+   78 mthd: mthd_head template mthd_args mthd_body .
+
+    $default  reduziere mit Regel 78 (mthd)
+
+
+Zustand 134
+
+   35 codestmnt: error .
+
+    $default  reduziere mit Regel 35 (codestmnt)
+
+
+Zustand 135
+
+  217 exp10: "~" . exp11
+
+    "::"      schiebe und gehe zu Zustand 31 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp11        gehe zu Zustand 238 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 136
+
+  216 exp10: "!" . exp11
+
+    "::"      schiebe und gehe zu Zustand 31 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp11        gehe zu Zustand 239 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 137
+
+  182 scope: "{" . "}"
+  183      | "{" . codestmnt "}"
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    "}"       schiebe und gehe zu Zustand 240 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 241 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 138
+
+   83 mthd_body: "{" "}" .
+
+    $default  reduziere mit Regel 83 (mthd_body)
+
+
+Zustand 139
+
+   34 codestmnt: ";" .
+
+    $default  reduziere mit Regel 34 (codestmnt)
+
+
+Zustand 140
+
+  138 ifelse: "if" . "(" val ")" codestmnt
+  139       | "if" . "(" val ")" codestmnt "else" codestmnt
+
+    "("  schiebe und gehe zu Zustand 242 über
+
+
+Zustand 141
+
+  140 for: "for" . "(" for_step ")" codestmnt
+  141    | "for" . "(" for_each ")" codestmnt
+
+    "("  schiebe und gehe zu Zustand 243 über
+
+
+Zustand 142
+
+  154 while: "while" . "(" val ")" codestmnt
+
+    "("  schiebe und gehe zu Zustand 244 über
+
+
+Zustand 143
+
+  155 while: "do" . codestmnt "while" "(" val ")"
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 245 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 144
+
+  156 switch: "switch" . "(" val ")" "{" switch_cases "}"
+
+    "("  schiebe und gehe zu Zustand 246 über
+
+
+Zustand 145
+
+  172 statement: "return" .
+  173          | "return" . val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 172 (statement)
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 247 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 146
+
+  174 statement: "throw" .
+  175          | "throw" . val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 174 (statement)
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 248 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 147
+
+  177 statement: "goto" . IDENT
+  178          | "goto" . case
+
+    "case"     schiebe und gehe zu Zustand 249 über
+    "default"  schiebe und gehe zu Zustand 250 über
+    IDENT      schiebe und gehe zu Zustand 251 über
+
+    case  gehe zu Zustand 252 über
+
+
+Zustand 148
+
+  163 try: "try" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 253 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 149
+
+  236 cval: "true" .
+
+    $default  reduziere mit Regel 236 (cval)
+
+
+Zustand 150
+
+  237 cval: "false" .
+
+    $default  reduziere mit Regel 237 (cval)
+
+
+Zustand 151
+
+  230 expp: "this" .
+
+    $default  reduziere mit Regel 230 (expp)
+
+
+Zustand 152
+
+  231 expp: "new" . type
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 254 über
+
+
+Zustand 153
+
+  176 statement: "delete" . val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 255 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 154
+
+   38 type_ident: IDENT .
+  180 assignment: IDENT . "=" val
+
+    "="  schiebe und gehe zu Zustand 256 über
+
+    $default  reduziere mit Regel 38 (type_ident)
+
+
+Zustand 155
+
+  234 cval: L_STRING .
+
+    $default  reduziere mit Regel 234 (cval)
+
+
+Zustand 156
+
+  233 cval: L_NUMBER .
+
+    $default  reduziere mit Regel 233 (cval)
+
+
+Zustand 157
+
+  235 cval: L_CHAR .
+
+    $default  reduziere mit Regel 235 (cval)
+
+
+Zustand 158
+
+   25 codestmnt: using .
+
+    $default  reduziere mit Regel 25 (codestmnt)
+
+
+Zustand 159
+
+   36 codestmnts: codestmnt .
+   37           | codestmnt . codestmnts
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    "}"  reduziere mit Regel 36 (codestmnts)
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 159 über
+    codestmnts   gehe zu Zustand 257 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 160
+
+   84 mthd_body: "{" codestmnts . "}"
+
+    "}"  schiebe und gehe zu Zustand 258 über
+
+
+Zustand 161
+
+  179 declaration: type . IDENT
+  238 cval: type .
+
+    IDENT  schiebe und gehe zu Zustand 259 über
+
+    $default  reduziere mit Regel 238 (cval)
+
+
+Zustand 162
+
+   24 codestmnt: ifelse .
+
+    $default  reduziere mit Regel 24 (codestmnt)
+
+
+Zustand 163
+
+   26 codestmnt: for .
+
+    $default  reduziere mit Regel 26 (codestmnt)
+
+
+Zustand 164
+
+   28 codestmnt: while .
+
+    $default  reduziere mit Regel 28 (codestmnt)
+
+
+Zustand 165
+
+   29 codestmnt: switch .
+
+    $default  reduziere mit Regel 29 (codestmnt)
+
+
+Zustand 166
+
+  169 trycatch: try . catchlist finally
+  170         | try . catchlist
+  171         | try . finally
+
+    "catch"    schiebe und gehe zu Zustand 260 über
+    "finally"  schiebe und gehe zu Zustand 261 über
+
+    catch      gehe zu Zustand 262 über
+    catchlist  gehe zu Zustand 263 über
+    finally    gehe zu Zustand 264 über
+
+
+Zustand 167
+
+   27 codestmnt: trycatch .
+
+    $default  reduziere mit Regel 27 (codestmnt)
+
+
+Zustand 168
+
+   30 codestmnt: statement . ";"
+
+    ";"  schiebe und gehe zu Zustand 265 über
+
+
+Zustand 169
+
+   32 codestmnt: declaration . ";"
+  181 assignment: declaration . "=" val
+
+    "="  schiebe und gehe zu Zustand 266 über
+    ";"  schiebe und gehe zu Zustand 267 über
+
+
+Zustand 170
+
+  232 expp: assignment .
+
+    $default  reduziere mit Regel 232 (expp)
+
+
+Zustand 171
+
+   31 codestmnt: scope .
+
+    $default  reduziere mit Regel 31 (codestmnt)
+
+
+Zustand 172
+
+   33 codestmnt: val . ";"
+
+    ";"  schiebe und gehe zu Zustand 268 über
+
+
+Zustand 173
+
+  184 val: exp01 .
+
+    $default  reduziere mit Regel 184 (val)
+
+
+Zustand 174
+
+  185 exp01: exp02 .
+  186      | exp02 . "?" exp01 ":" exp01
+
+    "?"  schiebe und gehe zu Zustand 269 über
+
+    "?"       [reduziere mit Regel 185 (exp01)]
+    $default  reduziere mit Regel 185 (exp01)
+
+
+Zustand 175
+
+  187 exp02: exp03 .
+  188      | exp03 . "||" exp03
+
+    "||"  schiebe und gehe zu Zustand 270 über
+
+    "||"      [reduziere mit Regel 187 (exp02)]
+    $default  reduziere mit Regel 187 (exp02)
+
+
+Zustand 176
+
+  189 exp03: exp04 .
+  190      | exp04 . "&&" exp04
+
+    "&&"  schiebe und gehe zu Zustand 271 über
+
+    "&&"      [reduziere mit Regel 189 (exp03)]
+    $default  reduziere mit Regel 189 (exp03)
+
+
+Zustand 177
+
+  191 exp04: exp05 .
+  192      | exp05 . "==" exp05
+  193      | exp05 . "!=" exp05
+
+    "=="  schiebe und gehe zu Zustand 272 über
+    "!="  schiebe und gehe zu Zustand 273 über
+
+    "=="      [reduziere mit Regel 191 (exp04)]
+    "!="      [reduziere mit Regel 191 (exp04)]
+    $default  reduziere mit Regel 191 (exp04)
+
+
+Zustand 178
+
+  194 exp05: exp06 .
+  195      | exp06 . "<" exp06
+  196      | exp06 . "<=" exp06
+  197      | exp06 . ">" exp06
+  198      | exp06 . ">=" exp06
+
+    "<="  schiebe und gehe zu Zustand 274 über
+    "<"   schiebe und gehe zu Zustand 275 über
+    ">="  schiebe und gehe zu Zustand 276 über
+    ">"   schiebe und gehe zu Zustand 277 über
+
+    "<="      [reduziere mit Regel 194 (exp05)]
+    "<"       [reduziere mit Regel 194 (exp05)]
+    ">="      [reduziere mit Regel 194 (exp05)]
+    ">"       [reduziere mit Regel 194 (exp05)]
+    $default  reduziere mit Regel 194 (exp05)
+
+
+Zustand 179
+
+  199 exp06: exp07 .
+  200      | exp07 . "+" exp07
+  201      | exp07 . "-" exp07
+
+    "+"  schiebe und gehe zu Zustand 278 über
+    "-"  schiebe und gehe zu Zustand 279 über
+
+    "+"       [reduziere mit Regel 199 (exp06)]
+    "-"       [reduziere mit Regel 199 (exp06)]
+    $default  reduziere mit Regel 199 (exp06)
+
+
+Zustand 180
+
+  202 exp07: exp08 .
+  203      | exp08 . "*" exp08
+  204      | exp08 . "/" exp08
+  205      | exp08 . "%" exp08
+
+    "/"  schiebe und gehe zu Zustand 280 über
+    "*"  schiebe und gehe zu Zustand 281 über
+    "%"  schiebe und gehe zu Zustand 282 über
+
+    "/"       [reduziere mit Regel 202 (exp07)]
+    "*"       [reduziere mit Regel 202 (exp07)]
+    "%"       [reduziere mit Regel 202 (exp07)]
+    $default  reduziere mit Regel 202 (exp07)
+
+
+Zustand 181
+
+  206 exp08: exp09 .
+  207      | exp09 . "<<" exp09
+  208      | exp09 . "<<<" exp09
+  209      | exp09 . ">>" exp09
+  210      | exp09 . ">>>" exp09
+
+    "<<"   schiebe und gehe zu Zustand 283 über
+    "<<<"  schiebe und gehe zu Zustand 284 über
+    ">>"   schiebe und gehe zu Zustand 285 über
+    ">>>"  schiebe und gehe zu Zustand 286 über
+
+    "<<"      [reduziere mit Regel 206 (exp08)]
+    "<<<"     [reduziere mit Regel 206 (exp08)]
+    ">>"      [reduziere mit Regel 206 (exp08)]
+    ">>>"     [reduziere mit Regel 206 (exp08)]
+    $default  reduziere mit Regel 206 (exp08)
+
+
+Zustand 182
+
+  211 exp09: exp10 .
+  212      | exp10 . "^" exp10
+  213      | exp10 . "|" exp10
+  214      | exp10 . "&" exp10
+
+    "&"  schiebe und gehe zu Zustand 287 über
+    "|"  schiebe und gehe zu Zustand 288 über
+    "^"  schiebe und gehe zu Zustand 289 über
+
+    "&"       [reduziere mit Regel 211 (exp09)]
+    "|"       [reduziere mit Regel 211 (exp09)]
+    "^"       [reduziere mit Regel 211 (exp09)]
+    $default  reduziere mit Regel 211 (exp09)
+
+
+Zustand 183
+
+  215 exp10: exp11 .
+  222 arrget: exp11 . "[" exp01 "]"
+  223 dotnav: exp11 . "." IDENT
+  224 call: exp11 . "(" explist ")"
+  225     | exp11 . "(" ")"
+
+    "("  schiebe und gehe zu Zustand 290 über
+    "["  schiebe und gehe zu Zustand 291 über
+    "."  schiebe und gehe zu Zustand 292 über
+
+    "("       [reduziere mit Regel 215 (exp10)]
+    "["       [reduziere mit Regel 215 (exp10)]
+    "."       [reduziere mit Regel 215 (exp10)]
+    $default  reduziere mit Regel 215 (exp10)
+
+
+Zustand 184
+
+  221 exp11: arrget .
+
+    $default  reduziere mit Regel 221 (exp11)
+
+
+Zustand 185
+
+  220 exp11: dotnav .
+
+    $default  reduziere mit Regel 220 (exp11)
+
+
+Zustand 186
+
+  219 exp11: call .
+
+    $default  reduziere mit Regel 219 (exp11)
+
+
+Zustand 187
+
+  218 exp11: expp .
+
+    $default  reduziere mit Regel 218 (exp11)
+
+
+Zustand 188
+
+  229 expp: cval .
+
+    $default  reduziere mit Regel 229 (expp)
+
+
+Zustand 189
+
+   85 mthd_body: "=>" codestmnt .
+
+    $default  reduziere mit Regel 85 (mthd_body)
+
+
+Zustand 190
+
+   59 namespace: "namespace" type_ident "{" filestmnt "}" .
+
+    $default  reduziere mit Regel 59 (namespace)
+
+
+Zustand 191
+
+   57 template_use: "<" typelist ">" .
+
+    $default  reduziere mit Regel 57 (template_use)
+
+
+Zustand 192
+
+   61 enum: encpsltn_n_cls "enum" ":" type enum_body .
+
+    $default  reduziere mit Regel 61 (enum)
+
+
+Zustand 193
+
+   70 enum_value: IDENT "=" . cval
+
+    "::"      schiebe und gehe zu Zustand 31 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    IDENT     schiebe und gehe zu Zustand 23 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 293 über
+    cval        gehe zu Zustand 294 über
+
+
+Zustand 194
+
+   63 enum_body: "{" enum_values "}" .
+
+    $default  reduziere mit Regel 63 (enum_body)
+
+
+Zustand 195
+
+   66 enum_values: enum_value ";" .
+   68            | enum_value ";" . enum_values
+
+    IDENT  schiebe und gehe zu Zustand 99 über
+
+    $default  reduziere mit Regel 66 (enum_values)
+
+    enum_values  gehe zu Zustand 295 über
+    enum_value   gehe zu Zustand 101 über
+
+
+Zustand 196
+
+   65 enum_values: enum_value "," .
+   67            | enum_value "," . enum_values
+
+    IDENT  schiebe und gehe zu Zustand 99 über
+
+    $default  reduziere mit Regel 65 (enum_values)
+
+    enum_values  gehe zu Zustand 296 über
+    enum_value   gehe zu Zustand 101 über
+
+
+Zustand 197
+
+   46 typelist: type "," typelist .
+
+    $default  reduziere mit Regel 46 (typelist)
+
+
+Zustand 198
+
+   53 template_def: type IDENT "=" . cval
+
+    "::"      schiebe und gehe zu Zustand 31 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    IDENT     schiebe und gehe zu Zustand 23 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 293 über
+    cval        gehe zu Zustand 297 über
+
+
+Zustand 199
+
+   56 template_defs: template_defs "," template_def .
+
+    $default  reduziere mit Regel 56 (template_defs)
+
+
+Zustand 200
+
+   80 mthd_head: "unbound" encpsltn type . IDENT
+   93 mthdop_head: "unbound" encpsltn type .
+  130 prop_head: "unbound" encpsltn type . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 298 über
+
+    $default  reduziere mit Regel 93 (mthdop_head)
+
+
+Zustand 201
+
+   79 mthd_head: encpsltn type IDENT .
+  129 prop_head: encpsltn type IDENT .
+
+    "{"       reduziere mit Regel 129 (prop_head)
+    ";"       reduziere mit Regel 129 (prop_head)
+    $default  reduziere mit Regel 79 (mthd_head)
+
+
+Zustand 202
+
+  120 mthdop_ops2: "&&" .
+
+    $default  reduziere mit Regel 120 (mthdop_ops2)
+
+
+Zustand 203
+
+  119 mthdop_ops2: "&" .
+
+    $default  reduziere mit Regel 119 (mthdop_ops2)
+
+
+Zustand 204
+
+  107 mthdop_ops2: "/" .
+
+    $default  reduziere mit Regel 107 (mthdop_ops2)
+
+
+Zustand 205
+
+  106 mthdop_ops2: "*" .
+
+    $default  reduziere mit Regel 106 (mthdop_ops2)
+
+
+Zustand 206
+
+  124 mthdop_ops2: "%" .
+
+    $default  reduziere mit Regel 124 (mthdop_ops2)
+
+
+Zustand 207
+
+  122 mthdop_ops2: "||" .
+
+    $default  reduziere mit Regel 122 (mthdop_ops2)
+
+
+Zustand 208
+
+  121 mthdop_ops2: "|" .
+
+    $default  reduziere mit Regel 121 (mthdop_ops2)
+
+
+Zustand 209
+
+  123 mthdop_ops2: "^" .
+
+    $default  reduziere mit Regel 123 (mthdop_ops2)
+
+
+Zustand 210
+
+  104 mthdop_ops2: "+" .
+
+    $default  reduziere mit Regel 104 (mthdop_ops2)
+
+
+Zustand 211
+
+  105 mthdop_ops2: "-" .
+
+    $default  reduziere mit Regel 105 (mthdop_ops2)
+
+
+Zustand 212
+
+  113 mthdop_ops2: "<=" .
+
+    $default  reduziere mit Regel 113 (mthdop_ops2)
+
+
+Zustand 213
+
+  112 mthdop_ops2: "<" .
+
+    $default  reduziere mit Regel 112 (mthdop_ops2)
+
+
+Zustand 214
+
+  114 mthdop_ops2: "<<" .
+
+    $default  reduziere mit Regel 114 (mthdop_ops2)
+
+
+Zustand 215
+
+  115 mthdop_ops2: "<<<" .
+
+    $default  reduziere mit Regel 115 (mthdop_ops2)
+
+
+Zustand 216
+
+  109 mthdop_ops2: ">=" .
+
+    $default  reduziere mit Regel 109 (mthdop_ops2)
+
+
+Zustand 217
+
+  108 mthdop_ops2: ">" .
+
+    $default  reduziere mit Regel 108 (mthdop_ops2)
+
+
+Zustand 218
+
+  110 mthdop_ops2: ">>" .
+
+    $default  reduziere mit Regel 110 (mthdop_ops2)
+
+
+Zustand 219
+
+  111 mthdop_ops2: ">>>" .
+
+    $default  reduziere mit Regel 111 (mthdop_ops2)
+
+
+Zustand 220
+
+  117 mthdop_ops2: "==" .
+
+    $default  reduziere mit Regel 117 (mthdop_ops2)
+
+
+Zustand 221
+
+  116 mthdop_ops2: "!=" .
+
+    $default  reduziere mit Regel 116 (mthdop_ops2)
+
+
+Zustand 222
+
+  118 mthdop_ops2: ".." .
+
+    $default  reduziere mit Regel 118 (mthdop_ops2)
+
+
+Zustand 223
+
+   94 mthdop_args: "operator" mthdop_ops1s . "(" mthd_arg ")"
+
+    "("  schiebe und gehe zu Zustand 299 über
+
+
+Zustand 224
+
+   97 mthdop_args: "operator" mthdop_ops2 . "(" mthd_arg "," mthd_arg ")"
+
+    "("  schiebe und gehe zu Zustand 300 über
+
+
+Zustand 225
+
+   92 mthdop: mthdop_head template mthdop_args . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 301 über
+
+
+Zustand 226
+
+   91 mthdop: mthdop_head mthdop_args mthd_body .
+
+    $default  reduziere mit Regel 91 (mthdop)
+
+
+Zustand 227
+
+   95 mthdop_args: mthdop_ops1p "operator" . "(" mthd_arg ")"
+
+    "("  schiebe und gehe zu Zustand 302 über
+
+
+Zustand 228
+
+   96 mthdop_args: mthdop_ops1s "operator" . "(" mthd_arg ")"
+
+    "("  schiebe und gehe zu Zustand 303 über
+
+
+Zustand 229
+
+  125 mthdcnst: mthdcnst_head mthd_args mthd_body .
+
+    $default  reduziere mit Regel 125 (mthdcnst)
+
+
+Zustand 230
+
+  136 prop_get: "get" . "(" IDENT ")" mthd_body
+
+    "("  schiebe und gehe zu Zustand 304 über
+
+
+Zustand 231
+
+  137 prop_set: "set" . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 305 über
+
+
+Zustand 232
+
+  131 prop_body: "{" prop_get . prop_set "}"
+  132          | "{" prop_get . "}"
+
+    "}"    schiebe und gehe zu Zustand 306 über
+    "set"  schiebe und gehe zu Zustand 231 über
+
+    prop_set  gehe zu Zustand 307 über
+
+
+Zustand 233
+
+  133 prop_body: "{" prop_set . prop_get "}"
+  134          | "{" prop_set . "}"
+
+    "}"    schiebe und gehe zu Zustand 308 über
+    "get"  schiebe und gehe zu Zustand 230 über
+
+    prop_get  gehe zu Zustand 309 über
+
+
+Zustand 234
+
+   74 class: classhead template ":" typelist classbody .
+
+    $default  reduziere mit Regel 74 (class)
+
+
+Zustand 235
+
+   90 mthd_arg: type IDENT "=" . cval
+
+    "::"      schiebe und gehe zu Zustand 31 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    IDENT     schiebe und gehe zu Zustand 23 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 293 über
+    cval        gehe zu Zustand 310 über
+
+
+Zustand 236
+
+   88 mthd_arglist: mthd_arg "," mthd_arglist .
+
+    $default  reduziere mit Regel 88 (mthd_arglist)
+
+
+Zustand 237
+
+  181 assignment: declaration . "=" val
+
+    "="  schiebe und gehe zu Zustand 266 über
+
+
+Zustand 238
+
+  217 exp10: "~" exp11 .
+  222 arrget: exp11 . "[" exp01 "]"
+  223 dotnav: exp11 . "." IDENT
+  224 call: exp11 . "(" explist ")"
+  225     | exp11 . "(" ")"
+
+    "("  schiebe und gehe zu Zustand 290 über
+    "["  schiebe und gehe zu Zustand 291 über
+    "."  schiebe und gehe zu Zustand 292 über
+
+    "("       [reduziere mit Regel 217 (exp10)]
+    "["       [reduziere mit Regel 217 (exp10)]
+    "."       [reduziere mit Regel 217 (exp10)]
+    $default  reduziere mit Regel 217 (exp10)
+
+
+Zustand 239
+
+  216 exp10: "!" exp11 .
+  222 arrget: exp11 . "[" exp01 "]"
+  223 dotnav: exp11 . "." IDENT
+  224 call: exp11 . "(" explist ")"
+  225     | exp11 . "(" ")"
+
+    "("  schiebe und gehe zu Zustand 290 über
+    "["  schiebe und gehe zu Zustand 291 über
+    "."  schiebe und gehe zu Zustand 292 über
+
+    "("       [reduziere mit Regel 216 (exp10)]
+    "["       [reduziere mit Regel 216 (exp10)]
+    "."       [reduziere mit Regel 216 (exp10)]
+    $default  reduziere mit Regel 216 (exp10)
+
+
+Zustand 240
+
+  182 scope: "{" "}" .
+
+    $default  reduziere mit Regel 182 (scope)
+
+
+Zustand 241
+
+  183 scope: "{" codestmnt . "}"
+
+    "}"  schiebe und gehe zu Zustand 311 über
+
+
+Zustand 242
+
+  138 ifelse: "if" "(" . val ")" codestmnt
+  139       | "if" "(" . val ")" codestmnt "else" codestmnt
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 312 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 243
+
+  140 for: "for" "(" . for_step ")" codestmnt
+  141    | "for" "(" . for_each ")" codestmnt
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    ";"       schiebe und gehe zu Zustand 313 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step      gehe zu Zustand 314 über
+    for_step_arg  gehe zu Zustand 315 über
+    for_each      gehe zu Zustand 316 über
+    declaration   gehe zu Zustand 317 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 244
+
+  154 while: "while" "(" . val ")" codestmnt
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 319 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 245
+
+  155 while: "do" codestmnt . "while" "(" val ")"
+
+    "while"  schiebe und gehe zu Zustand 320 über
+
+
+Zustand 246
+
+  156 switch: "switch" "(" . val ")" "{" switch_cases "}"
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 321 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 247
+
+  173 statement: "return" val .
+
+    $default  reduziere mit Regel 173 (statement)
+
+
+Zustand 248
+
+  175 statement: "throw" val .
+
+    $default  reduziere mit Regel 175 (statement)
+
+
+Zustand 249
+
+  161 case: "case" . cval
+
+    "::"      schiebe und gehe zu Zustand 31 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    IDENT     schiebe und gehe zu Zustand 23 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 293 über
+    cval        gehe zu Zustand 322 über
+
+
+Zustand 250
+
+  162 case: "default" .
+
+    $default  reduziere mit Regel 162 (case)
+
+
+Zustand 251
+
+  177 statement: "goto" IDENT .
+
+    $default  reduziere mit Regel 177 (statement)
+
+
+Zustand 252
+
+  178 statement: "goto" case .
+
+    $default  reduziere mit Regel 178 (statement)
+
+
+Zustand 253
+
+  163 try: "try" codestmnt .
+
+    $default  reduziere mit Regel 163 (try)
+
+
+Zustand 254
+
+  231 expp: "new" type .
+
+    $default  reduziere mit Regel 231 (expp)
+
+
+Zustand 255
+
+  176 statement: "delete" val .
+
+    $default  reduziere mit Regel 176 (statement)
+
+
+Zustand 256
+
+  180 assignment: IDENT "=" . val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 323 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 257
+
+   37 codestmnts: codestmnt codestmnts .
+
+    $default  reduziere mit Regel 37 (codestmnts)
+
+
+Zustand 258
+
+   84 mthd_body: "{" codestmnts "}" .
+
+    $default  reduziere mit Regel 84 (mthd_body)
+
+
+Zustand 259
+
+  179 declaration: type IDENT .
+
+    $default  reduziere mit Regel 179 (declaration)
+
+
+Zustand 260
+
+  164 catch: "catch" . codestmnt
+  165      | "catch" . "(" declaration ")" codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    "("       schiebe und gehe zu Zustand 324 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 325 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 261
+
+  168 finally: "finally" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 326 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 262
+
+  166 catchlist: catch .
+  167          | catch . catchlist
+
+    "catch"  schiebe und gehe zu Zustand 260 über
+
+    "catch"   [reduziere mit Regel 166 (catchlist)]
+    $default  reduziere mit Regel 166 (catchlist)
+
+    catch      gehe zu Zustand 262 über
+    catchlist  gehe zu Zustand 327 über
+
+
+Zustand 263
+
+  169 trycatch: try catchlist . finally
+  170         | try catchlist .
+
+    "finally"  schiebe und gehe zu Zustand 261 über
+
+    "finally"  [reduziere mit Regel 170 (trycatch)]
+    $default   reduziere mit Regel 170 (trycatch)
+
+    finally  gehe zu Zustand 328 über
+
+
+Zustand 264
+
+  171 trycatch: try finally .
+
+    $default  reduziere mit Regel 171 (trycatch)
+
+
+Zustand 265
+
+   30 codestmnt: statement ";" .
+
+    $default  reduziere mit Regel 30 (codestmnt)
+
+
+Zustand 266
+
+  181 assignment: declaration "=" . val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 329 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 267
+
+   32 codestmnt: declaration ";" .
+
+    $default  reduziere mit Regel 32 (codestmnt)
+
+
+Zustand 268
+
+   33 codestmnt: val ";" .
+
+    $default  reduziere mit Regel 33 (codestmnt)
+
+
+Zustand 269
+
+  186 exp01: exp02 "?" . exp01 ":" exp01
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp01        gehe zu Zustand 330 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 270
+
+  188 exp02: exp03 "||" . exp03
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp03        gehe zu Zustand 331 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 271
+
+  190 exp03: exp04 "&&" . exp04
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp04        gehe zu Zustand 332 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 272
+
+  192 exp04: exp05 "==" . exp05
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp05        gehe zu Zustand 333 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 273
+
+  193 exp04: exp05 "!=" . exp05
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp05        gehe zu Zustand 334 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 274
+
+  196 exp05: exp06 "<=" . exp06
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp06        gehe zu Zustand 335 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 275
+
+  195 exp05: exp06 "<" . exp06
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp06        gehe zu Zustand 336 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 276
+
+  198 exp05: exp06 ">=" . exp06
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp06        gehe zu Zustand 337 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 277
+
+  197 exp05: exp06 ">" . exp06
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp06        gehe zu Zustand 338 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 278
+
+  200 exp06: exp07 "+" . exp07
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp07        gehe zu Zustand 339 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 279
+
+  201 exp06: exp07 "-" . exp07
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp07        gehe zu Zustand 340 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 280
+
+  204 exp07: exp08 "/" . exp08
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp08        gehe zu Zustand 341 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 281
+
+  203 exp07: exp08 "*" . exp08
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp08        gehe zu Zustand 342 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 282
+
+  205 exp07: exp08 "%" . exp08
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp08        gehe zu Zustand 343 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 283
+
+  207 exp08: exp09 "<<" . exp09
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp09        gehe zu Zustand 344 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 284
+
+  208 exp08: exp09 "<<<" . exp09
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp09        gehe zu Zustand 345 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 285
+
+  209 exp08: exp09 ">>" . exp09
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp09        gehe zu Zustand 346 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 286
+
+  210 exp08: exp09 ">>>" . exp09
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp09        gehe zu Zustand 347 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 287
+
+  214 exp09: exp10 "&" . exp10
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp10        gehe zu Zustand 348 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 288
+
+  213 exp09: exp10 "|" . exp10
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp10        gehe zu Zustand 349 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 289
+
+  212 exp09: exp10 "^" . exp10
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp10        gehe zu Zustand 350 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 290
+
+  224 call: exp11 "(" . explist ")"
+  225     | exp11 "(" . ")"
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    ")"       schiebe und gehe zu Zustand 351 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp01        gehe zu Zustand 352 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    explist      gehe zu Zustand 353 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 291
+
+  222 arrget: exp11 "[" . exp01 "]"
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp01        gehe zu Zustand 354 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 292
+
+  223 dotnav: exp11 "." . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 355 über
+
+
+Zustand 293
+
+  238 cval: type .
+
+    $default  reduziere mit Regel 238 (cval)
+
+
+Zustand 294
+
+   70 enum_value: IDENT "=" cval .
+
+    $default  reduziere mit Regel 70 (enum_value)
+
+
+Zustand 295
+
+   68 enum_values: enum_value ";" enum_values .
+
+    $default  reduziere mit Regel 68 (enum_values)
+
+
+Zustand 296
+
+   67 enum_values: enum_value "," enum_values .
+
+    $default  reduziere mit Regel 67 (enum_values)
+
+
+Zustand 297
+
+   53 template_def: type IDENT "=" cval .
+
+    $default  reduziere mit Regel 53 (template_def)
+
+
+Zustand 298
+
+   80 mthd_head: "unbound" encpsltn type IDENT .
+  130 prop_head: "unbound" encpsltn type IDENT .
+
+    "{"       reduziere mit Regel 130 (prop_head)
+    ";"       reduziere mit Regel 130 (prop_head)
+    $default  reduziere mit Regel 80 (mthd_head)
+
+
+Zustand 299
+
+   94 mthdop_args: "operator" mthdop_ops1s "(" . mthd_arg ")"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 82 über
+    mthd_arg    gehe zu Zustand 356 über
+
+
+Zustand 300
+
+   97 mthdop_args: "operator" mthdop_ops2 "(" . mthd_arg "," mthd_arg ")"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 82 über
+    mthd_arg    gehe zu Zustand 357 über
+
+
+Zustand 301
+
+   92 mthdop: mthdop_head template mthdop_args mthd_body .
+
+    $default  reduziere mit Regel 92 (mthdop)
+
+
+Zustand 302
+
+   95 mthdop_args: mthdop_ops1p "operator" "(" . mthd_arg ")"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 82 über
+    mthd_arg    gehe zu Zustand 358 über
+
+
+Zustand 303
+
+   96 mthdop_args: mthdop_ops1s "operator" "(" . mthd_arg ")"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 82 über
+    mthd_arg    gehe zu Zustand 359 über
+
+
+Zustand 304
+
+  136 prop_get: "get" "(" . IDENT ")" mthd_body
+
+    IDENT  schiebe und gehe zu Zustand 360 über
+
+
+Zustand 305
+
+  137 prop_set: "set" mthd_body .
+
+    $default  reduziere mit Regel 137 (prop_set)
+
+
+Zustand 306
+
+  132 prop_body: "{" prop_get "}" .
+
+    $default  reduziere mit Regel 132 (prop_body)
+
+
+Zustand 307
+
+  131 prop_body: "{" prop_get prop_set . "}"
+
+    "}"  schiebe und gehe zu Zustand 361 über
+
+
+Zustand 308
+
+  134 prop_body: "{" prop_set "}" .
+
+    $default  reduziere mit Regel 134 (prop_body)
+
+
+Zustand 309
+
+  133 prop_body: "{" prop_set prop_get . "}"
+
+    "}"  schiebe und gehe zu Zustand 362 über
+
+
+Zustand 310
+
+   90 mthd_arg: type IDENT "=" cval .
+
+    $default  reduziere mit Regel 90 (mthd_arg)
+
+
+Zustand 311
+
+  183 scope: "{" codestmnt "}" .
+
+    $default  reduziere mit Regel 183 (scope)
+
+
+Zustand 312
+
+  138 ifelse: "if" "(" val . ")" codestmnt
+  139       | "if" "(" val . ")" codestmnt "else" codestmnt
+
+    ")"  schiebe und gehe zu Zustand 363 über
+
+
+Zustand 313
+
+  146 for_step: ";" . for_step_arg ";" for_step_arg
+  147         | ";" . for_step_arg ";"
+  148         | ";" . ";" for_step_arg
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    ";"       schiebe und gehe zu Zustand 364 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 365 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 314
+
+  140 for: "for" "(" for_step . ")" codestmnt
+
+    ")"  schiebe und gehe zu Zustand 366 über
+
+
+Zustand 315
+
+  142 for_step: for_step_arg . ";" for_step_arg ";" for_step_arg
+  143         | for_step_arg . ";" for_step_arg ";"
+  144         | for_step_arg . ";" ";" for_step_arg
+  145         | for_step_arg . ";" ";"
+
+    ";"  schiebe und gehe zu Zustand 367 über
+
+
+Zustand 316
+
+  141 for: "for" "(" for_each . ")" codestmnt
+
+    ")"  schiebe und gehe zu Zustand 368 über
+
+
+Zustand 317
+
+  152 for_each: declaration . ":" val
+  153         | declaration . ":" val ".." val
+  181 assignment: declaration . "=" val
+
+    "="  schiebe und gehe zu Zustand 266 über
+    ":"  schiebe und gehe zu Zustand 369 über
+
+
+Zustand 318
+
+  149 for_step_arg: val .
+  150             | val . ","
+  151             | val . "," for_step_arg
+
+    ","  schiebe und gehe zu Zustand 370 über
+
+    $default  reduziere mit Regel 149 (for_step_arg)
+
+
+Zustand 319
+
+  154 while: "while" "(" val . ")" codestmnt
+
+    ")"  schiebe und gehe zu Zustand 371 über
+
+
+Zustand 320
+
+  155 while: "do" codestmnt "while" . "(" val ")"
+
+    "("  schiebe und gehe zu Zustand 372 über
+
+
+Zustand 321
+
+  156 switch: "switch" "(" val . ")" "{" switch_cases "}"
+
+    ")"  schiebe und gehe zu Zustand 373 über
+
+
+Zustand 322
+
+  161 case: "case" cval .
+
+    $default  reduziere mit Regel 161 (case)
+
+
+Zustand 323
+
+  180 assignment: IDENT "=" val .
+
+    $default  reduziere mit Regel 180 (assignment)
+
+
+Zustand 324
+
+  165 catch: "catch" "(" . declaration ")" codestmnt
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 374 über
+    declaration  gehe zu Zustand 375 über
+
+
+Zustand 325
+
+  164 catch: "catch" codestmnt .
+
+    $default  reduziere mit Regel 164 (catch)
+
+
+Zustand 326
+
+  168 finally: "finally" codestmnt .
+
+    $default  reduziere mit Regel 168 (finally)
+
+
+Zustand 327
+
+  167 catchlist: catch catchlist .
+
+    $default  reduziere mit Regel 167 (catchlist)
+
+
+Zustand 328
+
+  169 trycatch: try catchlist finally .
+
+    $default  reduziere mit Regel 169 (trycatch)
+
+
+Zustand 329
+
+  181 assignment: declaration "=" val .
+
+    $default  reduziere mit Regel 181 (assignment)
+
+
+Zustand 330
+
+  186 exp01: exp02 "?" exp01 . ":" exp01
+
+    ":"  schiebe und gehe zu Zustand 376 über
+
+
+Zustand 331
+
+  188 exp02: exp03 "||" exp03 .
+
+    $default  reduziere mit Regel 188 (exp02)
+
+
+Zustand 332
+
+  190 exp03: exp04 "&&" exp04 .
+
+    $default  reduziere mit Regel 190 (exp03)
+
+
+Zustand 333
+
+  192 exp04: exp05 "==" exp05 .
+
+    $default  reduziere mit Regel 192 (exp04)
+
+
+Zustand 334
+
+  193 exp04: exp05 "!=" exp05 .
+
+    $default  reduziere mit Regel 193 (exp04)
+
+
+Zustand 335
+
+  196 exp05: exp06 "<=" exp06 .
+
+    $default  reduziere mit Regel 196 (exp05)
+
+
+Zustand 336
+
+  195 exp05: exp06 "<" exp06 .
+
+    $default  reduziere mit Regel 195 (exp05)
+
+
+Zustand 337
+
+  198 exp05: exp06 ">=" exp06 .
+
+    $default  reduziere mit Regel 198 (exp05)
+
+
+Zustand 338
+
+  197 exp05: exp06 ">" exp06 .
+
+    $default  reduziere mit Regel 197 (exp05)
+
+
+Zustand 339
+
+  200 exp06: exp07 "+" exp07 .
+
+    $default  reduziere mit Regel 200 (exp06)
+
+
+Zustand 340
+
+  201 exp06: exp07 "-" exp07 .
+
+    $default  reduziere mit Regel 201 (exp06)
+
+
+Zustand 341
+
+  204 exp07: exp08 "/" exp08 .
+
+    $default  reduziere mit Regel 204 (exp07)
+
+
+Zustand 342
+
+  203 exp07: exp08 "*" exp08 .
+
+    $default  reduziere mit Regel 203 (exp07)
+
+
+Zustand 343
+
+  205 exp07: exp08 "%" exp08 .
+
+    $default  reduziere mit Regel 205 (exp07)
+
+
+Zustand 344
+
+  207 exp08: exp09 "<<" exp09 .
+
+    $default  reduziere mit Regel 207 (exp08)
+
+
+Zustand 345
+
+  208 exp08: exp09 "<<<" exp09 .
+
+    $default  reduziere mit Regel 208 (exp08)
+
+
+Zustand 346
+
+  209 exp08: exp09 ">>" exp09 .
+
+    $default  reduziere mit Regel 209 (exp08)
+
+
+Zustand 347
+
+  210 exp08: exp09 ">>>" exp09 .
+
+    $default  reduziere mit Regel 210 (exp08)
+
+
+Zustand 348
+
+  214 exp09: exp10 "&" exp10 .
+
+    $default  reduziere mit Regel 214 (exp09)
+
+
+Zustand 349
+
+  213 exp09: exp10 "|" exp10 .
+
+    $default  reduziere mit Regel 213 (exp09)
+
+
+Zustand 350
+
+  212 exp09: exp10 "^" exp10 .
+
+    $default  reduziere mit Regel 212 (exp09)
+
+
+Zustand 351
+
+  225 call: exp11 "(" ")" .
+
+    $default  reduziere mit Regel 225 (call)
+
+
+Zustand 352
+
+  226 explist: exp01 .
+  227        | exp01 . ","
+  228        | exp01 . "," explist
+
+    ","  schiebe und gehe zu Zustand 377 über
+
+    $default  reduziere mit Regel 226 (explist)
+
+
+Zustand 353
+
+  224 call: exp11 "(" explist . ")"
+
+    ")"  schiebe und gehe zu Zustand 378 über
+
+
+Zustand 354
+
+  222 arrget: exp11 "[" exp01 . "]"
+
+    "]"  schiebe und gehe zu Zustand 379 über
+
+
+Zustand 355
+
+  223 dotnav: exp11 "." IDENT .
+
+    $default  reduziere mit Regel 223 (dotnav)
+
+
+Zustand 356
+
+   94 mthdop_args: "operator" mthdop_ops1s "(" mthd_arg . ")"
+
+    ")"  schiebe und gehe zu Zustand 380 über
+
+
+Zustand 357
+
+   97 mthdop_args: "operator" mthdop_ops2 "(" mthd_arg . "," mthd_arg ")"
+
+    ","  schiebe und gehe zu Zustand 381 über
+
+
+Zustand 358
+
+   95 mthdop_args: mthdop_ops1p "operator" "(" mthd_arg . ")"
+
+    ")"  schiebe und gehe zu Zustand 382 über
+
+
+Zustand 359
+
+   96 mthdop_args: mthdop_ops1s "operator" "(" mthd_arg . ")"
+
+    ")"  schiebe und gehe zu Zustand 383 über
+
+
+Zustand 360
+
+  136 prop_get: "get" "(" IDENT . ")" mthd_body
+
+    ")"  schiebe und gehe zu Zustand 384 über
+
+
+Zustand 361
+
+  131 prop_body: "{" prop_get prop_set "}" .
+
+    $default  reduziere mit Regel 131 (prop_body)
+
+
+Zustand 362
+
+  133 prop_body: "{" prop_set prop_get "}" .
+
+    $default  reduziere mit Regel 133 (prop_body)
+
+
+Zustand 363
+
+  138 ifelse: "if" "(" val ")" . codestmnt
+  139       | "if" "(" val ")" . codestmnt "else" codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 385 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 364
+
+  148 for_step: ";" ";" . for_step_arg
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 386 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 365
+
+  146 for_step: ";" for_step_arg . ";" for_step_arg
+  147         | ";" for_step_arg . ";"
+
+    ";"  schiebe und gehe zu Zustand 387 über
+
+
+Zustand 366
+
+  140 for: "for" "(" for_step ")" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 388 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 367
+
+  142 for_step: for_step_arg ";" . for_step_arg ";" for_step_arg
+  143         | for_step_arg ";" . for_step_arg ";"
+  144         | for_step_arg ";" . ";" for_step_arg
+  145         | for_step_arg ";" . ";"
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    ";"       schiebe und gehe zu Zustand 389 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 390 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 368
+
+  141 for: "for" "(" for_each ")" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 391 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 369
+
+  152 for_each: declaration ":" . val
+  153         | declaration ":" . val ".." val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 392 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 370
+
+  150 for_step_arg: val "," .
+  151             | val "," . for_step_arg
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 150 (for_step_arg)
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 393 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 371
+
+  154 while: "while" "(" val ")" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 394 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 372
+
+  155 while: "do" codestmnt "while" "(" . val ")"
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 395 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 373
+
+  156 switch: "switch" "(" val ")" . "{" switch_cases "}"
+
+    "{"  schiebe und gehe zu Zustand 396 über
+
+
+Zustand 374
+
+  179 declaration: type . IDENT
+
+    IDENT  schiebe und gehe zu Zustand 259 über
+
+
+Zustand 375
+
+  165 catch: "catch" "(" declaration . ")" codestmnt
+
+    ")"  schiebe und gehe zu Zustand 397 über
+
+
+Zustand 376
+
+  186 exp01: exp02 "?" exp01 ":" . exp01
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp01        gehe zu Zustand 398 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 377
+
+  227 explist: exp01 "," .
+  228        | exp01 "," . explist
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 227 (explist)
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    exp01        gehe zu Zustand 352 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    explist      gehe zu Zustand 399 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 378
+
+  224 call: exp11 "(" explist ")" .
+
+    $default  reduziere mit Regel 224 (call)
+
+
+Zustand 379
+
+  222 arrget: exp11 "[" exp01 "]" .
+
+    $default  reduziere mit Regel 222 (arrget)
+
+
+Zustand 380
+
+   94 mthdop_args: "operator" mthdop_ops1s "(" mthd_arg ")" .
+
+    $default  reduziere mit Regel 94 (mthdop_args)
+
+
+Zustand 381
+
+   97 mthdop_args: "operator" mthdop_ops2 "(" mthd_arg "," . mthd_arg ")"
+
+    "::"   schiebe und gehe zu Zustand 31 über
+    IDENT  schiebe und gehe zu Zustand 23 über
+
+    type_ident  gehe zu Zustand 33 über
+    type        gehe zu Zustand 82 über
+    mthd_arg    gehe zu Zustand 400 über
+
+
+Zustand 382
+
+   95 mthdop_args: mthdop_ops1p "operator" "(" mthd_arg ")" .
+
+    $default  reduziere mit Regel 95 (mthdop_args)
+
+
+Zustand 383
+
+   96 mthdop_args: mthdop_ops1s "operator" "(" mthd_arg ")" .
+
+    $default  reduziere mit Regel 96 (mthdop_args)
+
+
+Zustand 384
+
+  136 prop_get: "get" "(" IDENT ")" . mthd_body
+
+    "{"   schiebe und gehe zu Zustand 86 über
+    "=>"  schiebe und gehe zu Zustand 87 über
+
+    mthd_body  gehe zu Zustand 401 über
+
+
+Zustand 385
+
+  138 ifelse: "if" "(" val ")" codestmnt .
+  139       | "if" "(" val ")" codestmnt . "else" codestmnt
+
+    "else"  schiebe und gehe zu Zustand 402 über
+
+    "else"    [reduziere mit Regel 138 (ifelse)]
+    $default  reduziere mit Regel 138 (ifelse)
+
+
+Zustand 386
+
+  148 for_step: ";" ";" for_step_arg .
+
+    $default  reduziere mit Regel 148 (for_step)
+
+
+Zustand 387
+
+  146 for_step: ";" for_step_arg ";" . for_step_arg
+  147         | ";" for_step_arg ";" .
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 147 (for_step)
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 403 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 388
+
+  140 for: "for" "(" for_step ")" codestmnt .
+
+    $default  reduziere mit Regel 140 (for)
+
+
+Zustand 389
+
+  144 for_step: for_step_arg ";" ";" . for_step_arg
+  145         | for_step_arg ";" ";" .
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 145 (for_step)
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 404 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 390
+
+  142 for_step: for_step_arg ";" for_step_arg . ";" for_step_arg
+  143         | for_step_arg ";" for_step_arg . ";"
+
+    ";"  schiebe und gehe zu Zustand 405 über
+
+
+Zustand 391
+
+  141 for: "for" "(" for_each ")" codestmnt .
+
+    $default  reduziere mit Regel 141 (for)
+
+
+Zustand 392
+
+  152 for_each: declaration ":" val .
+  153         | declaration ":" val . ".." val
+
+    ".."  schiebe und gehe zu Zustand 406 über
+
+    $default  reduziere mit Regel 152 (for_each)
+
+
+Zustand 393
+
+  151 for_step_arg: val "," for_step_arg .
+
+    $default  reduziere mit Regel 151 (for_step_arg)
+
+
+Zustand 394
+
+  154 while: "while" "(" val ")" codestmnt .
+
+    $default  reduziere mit Regel 154 (while)
+
+
+Zustand 395
+
+  155 while: "do" codestmnt "while" "(" val . ")"
+
+    ")"  schiebe und gehe zu Zustand 407 über
+
+
+Zustand 396
+
+  156 switch: "switch" "(" val ")" "{" . switch_cases "}"
+
+    "case"     schiebe und gehe zu Zustand 249 über
+    "default"  schiebe und gehe zu Zustand 250 über
+
+    switch_cases  gehe zu Zustand 408 über
+    switch_case   gehe zu Zustand 409 über
+    case          gehe zu Zustand 410 über
+
+
+Zustand 397
+
+  165 catch: "catch" "(" declaration ")" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 411 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 398
+
+  186 exp01: exp02 "?" exp01 ":" exp01 .
+
+    $default  reduziere mit Regel 186 (exp01)
+
+
+Zustand 399
+
+  228 explist: exp01 "," explist .
+
+    $default  reduziere mit Regel 228 (explist)
+
+
+Zustand 400
+
+   97 mthdop_args: "operator" mthdop_ops2 "(" mthd_arg "," mthd_arg . ")"
+
+    ")"  schiebe und gehe zu Zustand 412 über
+
+
+Zustand 401
+
+  136 prop_get: "get" "(" IDENT ")" mthd_body .
+
+    $default  reduziere mit Regel 136 (prop_get)
+
+
+Zustand 402
+
+  139 ifelse: "if" "(" val ")" codestmnt "else" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 413 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 403
+
+  146 for_step: ";" for_step_arg ";" for_step_arg .
+
+    $default  reduziere mit Regel 146 (for_step)
+
+
+Zustand 404
+
+  144 for_step: for_step_arg ";" ";" for_step_arg .
+
+    $default  reduziere mit Regel 144 (for_step)
+
+
+Zustand 405
+
+  142 for_step: for_step_arg ";" for_step_arg ";" . for_step_arg
+  143         | for_step_arg ";" for_step_arg ";" .
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    $default  reduziere mit Regel 143 (for_step)
+
+    type_ident    gehe zu Zustand 33 über
+    type          gehe zu Zustand 161 über
+    for_step_arg  gehe zu Zustand 414 über
+    declaration   gehe zu Zustand 237 über
+    assignment    gehe zu Zustand 170 über
+    val           gehe zu Zustand 318 über
+    exp01         gehe zu Zustand 173 über
+    exp02         gehe zu Zustand 174 über
+    exp03         gehe zu Zustand 175 über
+    exp04         gehe zu Zustand 176 über
+    exp05         gehe zu Zustand 177 über
+    exp06         gehe zu Zustand 178 über
+    exp07         gehe zu Zustand 179 über
+    exp08         gehe zu Zustand 180 über
+    exp09         gehe zu Zustand 181 über
+    exp10         gehe zu Zustand 182 über
+    exp11         gehe zu Zustand 183 über
+    arrget        gehe zu Zustand 184 über
+    dotnav        gehe zu Zustand 185 über
+    call          gehe zu Zustand 186 über
+    expp          gehe zu Zustand 187 über
+    cval          gehe zu Zustand 188 über
+
+
+Zustand 406
+
+  153 for_each: declaration ":" val ".." . val
+
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    declaration  gehe zu Zustand 237 über
+    assignment   gehe zu Zustand 170 über
+    val          gehe zu Zustand 415 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 407
+
+  155 while: "do" codestmnt "while" "(" val ")" .
+
+    $default  reduziere mit Regel 155 (while)
+
+
+Zustand 408
+
+  156 switch: "switch" "(" val ")" "{" switch_cases . "}"
+
+    "}"  schiebe und gehe zu Zustand 416 über
+
+
+Zustand 409
+
+  157 switch_cases: switch_case .
+  158             | switch_case . switch_cases
+
+    "case"     schiebe und gehe zu Zustand 249 über
+    "default"  schiebe und gehe zu Zustand 250 über
+
+    $default  reduziere mit Regel 157 (switch_cases)
+
+    switch_cases  gehe zu Zustand 417 über
+    switch_case   gehe zu Zustand 409 über
+    case          gehe zu Zustand 410 über
+
+
+Zustand 410
+
+  159 switch_case: case . ":"
+  160            | case . ":" codestmnt
+
+    ":"  schiebe und gehe zu Zustand 418 über
+
+
+Zustand 411
+
+  165 catch: "catch" "(" declaration ")" codestmnt .
+
+    $default  reduziere mit Regel 165 (catch)
+
+
+Zustand 412
+
+   97 mthdop_args: "operator" mthdop_ops2 "(" mthd_arg "," mthd_arg ")" .
+
+    $default  reduziere mit Regel 97 (mthdop_args)
+
+
+Zustand 413
+
+  139 ifelse: "if" "(" val ")" codestmnt "else" codestmnt .
+
+    $default  reduziere mit Regel 139 (ifelse)
+
+
+Zustand 414
+
+  142 for_step: for_step_arg ";" for_step_arg ";" for_step_arg .
+
+    $default  reduziere mit Regel 142 (for_step)
+
+
+Zustand 415
+
+  153 for_each: declaration ":" val ".." val .
+
+    $default  reduziere mit Regel 153 (for_each)
+
+
+Zustand 416
+
+  156 switch: "switch" "(" val ")" "{" switch_cases "}" .
+
+    $default  reduziere mit Regel 156 (switch)
+
+
+Zustand 417
+
+  158 switch_cases: switch_case switch_cases .
+
+    $default  reduziere mit Regel 158 (switch_cases)
+
+
+Zustand 418
+
+  159 switch_case: case ":" .
+  160            | case ":" . codestmnt
+
+    error     schiebe und gehe zu Zustand 134 über
+    "~"       schiebe und gehe zu Zustand 135 über
+    "::"      schiebe und gehe zu Zustand 31 über
+    "!"       schiebe und gehe zu Zustand 136 über
+    "{"       schiebe und gehe zu Zustand 137 über
+    ";"       schiebe und gehe zu Zustand 139 über
+    "if"      schiebe und gehe zu Zustand 140 über
+    "for"     schiebe und gehe zu Zustand 141 über
+    "while"   schiebe und gehe zu Zustand 142 über
+    "do"      schiebe und gehe zu Zustand 143 über
+    "switch"  schiebe und gehe zu Zustand 144 über
+    "return"  schiebe und gehe zu Zustand 145 über
+    "throw"   schiebe und gehe zu Zustand 146 über
+    "goto"    schiebe und gehe zu Zustand 147 über
+    "try"     schiebe und gehe zu Zustand 148 über
+    "using"   schiebe und gehe zu Zustand 7 über
+    "true"    schiebe und gehe zu Zustand 149 über
+    "false"   schiebe und gehe zu Zustand 150 über
+    "this"    schiebe und gehe zu Zustand 151 über
+    "new"     schiebe und gehe zu Zustand 152 über
+    "delete"  schiebe und gehe zu Zustand 153 über
+    IDENT     schiebe und gehe zu Zustand 154 über
+    L_STRING  schiebe und gehe zu Zustand 155 über
+    L_NUMBER  schiebe und gehe zu Zustand 156 über
+    L_CHAR    schiebe und gehe zu Zustand 157 über
+
+    "}"        reduziere mit Regel 159 (switch_case)
+    "case"     reduziere mit Regel 159 (switch_case)
+    "default"  reduziere mit Regel 159 (switch_case)
+
+    using        gehe zu Zustand 158 über
+    using_low    gehe zu Zustand 10 über
+    codestmnt    gehe zu Zustand 419 über
+    type_ident   gehe zu Zustand 33 über
+    type         gehe zu Zustand 161 über
+    ifelse       gehe zu Zustand 162 über
+    for          gehe zu Zustand 163 über
+    while        gehe zu Zustand 164 über
+    switch       gehe zu Zustand 165 über
+    try          gehe zu Zustand 166 über
+    trycatch     gehe zu Zustand 167 über
+    statement    gehe zu Zustand 168 über
+    declaration  gehe zu Zustand 169 über
+    assignment   gehe zu Zustand 170 über
+    scope        gehe zu Zustand 171 über
+    val          gehe zu Zustand 172 über
+    exp01        gehe zu Zustand 173 über
+    exp02        gehe zu Zustand 174 über
+    exp03        gehe zu Zustand 175 über
+    exp04        gehe zu Zustand 176 über
+    exp05        gehe zu Zustand 177 über
+    exp06        gehe zu Zustand 178 über
+    exp07        gehe zu Zustand 179 über
+    exp08        gehe zu Zustand 180 über
+    exp09        gehe zu Zustand 181 über
+    exp10        gehe zu Zustand 182 über
+    exp11        gehe zu Zustand 183 über
+    arrget       gehe zu Zustand 184 über
+    dotnav       gehe zu Zustand 185 über
+    call         gehe zu Zustand 186 über
+    expp         gehe zu Zustand 187 über
+    cval         gehe zu Zustand 188 über
+
+
+Zustand 419
+
+  160 switch_case: case ":" codestmnt .
+
+    $default  reduziere mit Regel 160 (switch_case)
