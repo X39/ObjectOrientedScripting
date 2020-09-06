@@ -86,6 +86,13 @@
 %token<token> L_NUMBER
 %token<token> L_CHAR
 
+%type <sqf::sqo::data::type_ident> type_ident
+%type <sqf::sqo::data::type> type
+%type <std::vector<sqf::sqo::data::type>> typelist template_use
+%type <sqf::sqo::data::encapsulation> encpsltn encpsltn_n_cls
+%type <sqf::sqo:data::template_def> template_def
+%type <std::vector<sqf::sqo::data::template_def>> template_defs template
+
 %%
 start           : %empty
                 | filestmnts
@@ -135,45 +142,45 @@ codestmnt       : ifelse
                 | error
                 ;
 codestmnts      : codestmnt
-                | codestmnt codestmnts
+                | codestmnts codestmnt
                 ;
 
 // --------------------- TYPE ---------------------- \\
-type_ident      : IDENT
-                | type_ident "::" IDENT
+type_ident      : IDENT                                 { $$ = sqf::sqo::data::type_ident{ $1, { $1.contents } }; }
+                | type_ident "::" IDENT                 { $1.idents.push_back($3.contents); $$ = $1; }
                 ;
                 
-type            : type_ident
-                | "::" type_ident
-                | "::" type_ident template_use
-                | type_ident template_use
+type            : type_ident                            { $$ = sqf::sqo::data::type{ $1, {} }; }
+                | "::" type_ident                       { $$ = sqf::sqo::data::type{ $2, {} }; }
+                | "::" type_ident template_use          { $$ = sqf::sqo::data::type{ $2, $3 }; }
+                | type_ident template_use               { $$ = sqf::sqo::data::type{ $1, $2 }; }
                 ;
 
-typelist        : type
-                | type ","
-                | type "," typelist
+typelist        : type                                  { $$ = std::vector<sqf::sqo::data::type>{ $1 }; }
+                | type ","                              { $$ = std::vector<sqf::sqo::data::type>{ $1 }; }
+                | typelist "," type                     { $1.push_back($3); $$ = $1; }
                 ;
 
 // ----------------- ENCAPSULATION ----------------- \\
-encpsltn        : encpsltn_n_cls
-                | "derived"
-                | "private"
+encpsltn        : encpsltn_n_cls                        { $$ = $1; }
+                | "derived"                             { $$ = sqf::sqo::data::encapsulation::DERIVED; }
+                | "private"                             { $$ = sqf::sqo::data::encapsulation::PRIVATE; }
                 ;
-encpsltn_n_cls  : "public"
-                | "local"
+encpsltn_n_cls  : "public"                              { $$ = sqf::sqo::data::encapsulation::PUBLIC; }
+                | "local"                               { $$ = sqf::sqo::data::encapsulation::LOCAL; }
                 ;
 // ------------------- TEMPLATE -------------------- \\
-template_def    : type IDENT
-                | type IDENT "=" cval
+template_def    : type IDENT                            { $$ = sqf::sqo::data::template_def{ $1, $2.contents, {} }; }
+                | type IDENT "=" cval                   { $$ = sqf::sqo::data::template_def{ $1, $2.contents, $4 }; }
                 ;
 
-template_defs   : template_def
-                | template_def ","
-                | template_defs "," template_def
+template_defs   : template_def                          { $$ = std::vector<sqf::sqo::data::template_def>{ $1 }; }
+                | template_def ","                      { $$ = std::vector<sqf::sqo::data::template_def>{ $1 }; }
+                | template_defs "," template_def        { $1.push_back($3); $$ = $1; }
                 ;
-template_use    : "<" typelist ">"
+template_use    : "<" typelist ">"                      { $$ = $2; }
                 ;
-template        : "<" template_defs ">"
+template        : "<" template_defs ">"                 { $$ = $2; }
                 ;
 
 // ------------------- NAMESPACE ------------------- \\
@@ -457,7 +464,7 @@ call            : exp11 "(" explist ")"
 
 explist         : exp01
                 | exp01 ","
-                | exp01 "," explist
+                | explist "," exp01
                 ;
 
 expp            : cval
