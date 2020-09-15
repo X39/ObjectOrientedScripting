@@ -92,6 +92,7 @@
 %type <sqf::sqo::data::encapsulation> encpsltn encpsltn_n_cls
 %type <sqf::sqo:data::template_def> template_def
 %type <std::vector<sqf::sqo::data::template_def>> template_defs template
+%type <std::vector<sqf::sqo::data::constval>> cval
 
 %%
 start           : %empty
@@ -402,48 +403,48 @@ exp01           : exp02
                 | exp02 "?" exp01 ":" exp01
                 ;
 exp02           : exp03
-                | exp03 "||" exp03
+                | exp02 "||" exp03
                 ;
 exp03           : exp04
-                | exp04 "&&" exp04
+                | exp03 "&&" exp04
                 ;
 exp04           : exp05
-                | exp05 "==" exp05
-                | exp05 "!=" exp05
+                | exp04 "==" exp05
+                | exp04 "!=" exp05
                 ;
 exp05           : exp06
-                | exp06 "<"  exp06
-                | exp06 "<=" exp06
-                | exp06 ">"  exp06
-                | exp06 ">=" exp06
+                | exp05 "<"  exp06
+                | exp05 "<=" exp06
+                | exp05 ">"  exp06
+                | exp05 ">=" exp06
                 ;
 exp06           : exp07
-                | exp07 "+" exp07
-                | exp07 "-" exp07
+                | exp06 "+" exp07
+                | exp06 "-" exp07
                 ;
 
 exp07           : exp08
-                | exp08 "*" exp08
-                | exp08 "/" exp08
-                | exp08 "%" exp08
+                | exp07 "*" exp08
+                | exp07 "/" exp08
+                | exp07 "%" exp08
                 ;
 
 exp08           : exp09
-                | exp09 "<<"  exp09
-                | exp09 "<<<" exp09
-                | exp09 ">>"  exp09
-                | exp09 ">>>" exp09
+                | exp08 "<<"  exp09
+                | exp08 "<<<" exp09
+                | exp08 ">>"  exp09
+                | exp08 ">>>" exp09
                 ;
 
 exp09           : exp10
-                | exp10 "^" exp10
-                | exp10 "|" exp10
-                | exp10 "&" exp10
+                | exp09 "^" exp10
+                | exp09 "|" exp10
+                | exp09 "&" exp10
                 ;
 
 exp10           : exp11
-                | "!" exp11
-                | "~" exp11
+                | "!" exp10
+                | "~" exp10
                 ;
 
 exp11           : expp
@@ -467,18 +468,18 @@ explist         : exp01
                 | explist "," exp01
                 ;
 
-expp            : cval
-                | "this"
-                | "new" type
-                | assignment
+expp            : cval                          { }
+                | "this"                        { }
+                | "new" type                    { }
+                | assignment                    { }
                 ;
 
-cval            : L_NUMBER
-                | L_STRING
-                | L_CHAR
-                | "true"
-                | "false"
-                | type
+cval            : L_NUMBER                      { $$ = ::sqf::sqo::data::constval{ $1, ::sqf::sqo::data::cval::NUMBER, {} }; }
+                | L_STRING                      { $$ = ::sqf::sqo::data::constval{ $1, ::sqf::sqo::data::cval::STRING, {} }; }
+                | L_CHAR                        { $$ = ::sqf::sqo::data::constval{ $1, ::sqf::sqo::data::cval::CHAR, {} }; }
+                | "true"                        { $$ = ::sqf::sqo::data::constval{ {}, ::sqf::sqo::data::cval::TRUE, {} }; }
+                | "false"                       { $$ = ::sqf::sqo::data::constval{ {}, ::sqf::sqo::data::cval::FALSE, {} }; }
+                | type                          { $$ = ::sqf::sqo::data::constval{ {}, ::sqf::sqo::data::cval::TYPE, $1 }; }
                 ;
 
 %%

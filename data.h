@@ -31,7 +31,7 @@ namespace sqf::sqo::data
     };
     struct constval 
     {
-        enum type
+        enum valtype
         {
             NUMBER,
             STRING,
@@ -41,6 +41,7 @@ namespace sqf::sqo::data
             TYPE
         };
         std::string value;
+        valtype type;
         type ident;
     };
     struct template_def
