@@ -40,6 +40,7 @@
 %token<token> GTGT                      ">>"
 %token<token> GTGTGT                    ">>>"
 %token<token> EQUALEQUAL                "=="
+%token<token> TILDEEQUAL                "~="
 %token<token> EXCLAMATIONMARKEQUAL      "!="
 %token<token> EXCLAMATIONMARK           "!"
 %token<token> CURLYO                    "{"
@@ -92,7 +93,12 @@
 %type <sqf::sqo::data::encapsulation> encpsltn encpsltn_n_cls
 %type <sqf::sqo:data::template_def> template_def
 %type <std::vector<sqf::sqo::data::template_def>> template_defs template
-%type <std::vector<sqf::sqo::data::constval>> cval
+%type <sqf::sqo::data::constval> cval
+%type <sqf::sqo::data::exp_primary> expp
+%type <sqf::sqo::data::declaration> declaration
+%type <std::vector<sqf::sqo::data::exp_primary>> exp12 call assignment dotnav arrget
+%type <sqf::sqo::data::exp> exp01 exp02 exp03 exp04 exp05 exp06 exp07 exp08 exp09 exp10 exp11 val
+%type <std::vector<sqf::sqo::data::exp>> explist
 
 %%
 start           : %empty
@@ -386,100 +392,102 @@ statement       : "return"
                 | "goto" case
                 ;
 
-declaration     : type IDENT
-                ;
-
-assignment      : IDENT "=" val
-                | declaration "=" val
+declaration     : type IDENT                    { $$ = ::sqf::sqo::data::declaration{ $1, $2 }; }
                 ;
 
 scope           : "{" "}"
                 | "{" codestmnt "}"
                 ;
 
-val             : exp01
+val             : exp01                         { $$ = $1; }
                 ;
-exp01           : exp02
-                | exp02 "?" exp01 ":" exp01
+explist         : val                           { $$ = std::vector<::sqf::sqo::data::exp>{ $1 }; }
+                | val ","                       { $$ = std::vector<::sqf::sqo::data::exp>{ $1 }; }
+                | explist "," val               { $$ = $1; $$.push_back($3); }
                 ;
-exp02           : exp03
-                | exp02 "||" exp03
+exp01           : exp02                         { $$ = $1; }
+                | exp02 "?" exp01 ":" exp01     { $$ = sqf::sqo::data::exp{ $1, $3, $5 }; }
                 ;
-exp03           : exp04
-                | exp03 "&&" exp04
+exp02           : exp03                         { $$ = $1; }
+                | exp02 "||" exp03              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_LOGICAL_OR,         $1, $3 }; }
                 ;
-exp04           : exp05
-                | exp04 "==" exp05
-                | exp04 "!=" exp05
+exp03           : exp04                         { $$ = $1; }
+                | exp03 "&&" exp04              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_LOGICAL_AND,        $1, $3 }; }
                 ;
-exp05           : exp06
-                | exp05 "<"  exp06
-                | exp05 "<=" exp06
-                | exp05 ">"  exp06
-                | exp05 ">=" exp06
+exp04           : exp05                         { $$ = $1; }
+                | exp04 "==" exp05              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_EQUAL,              $1, $3 }; }
+                | exp04 "~=" exp05              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_EQUAL_INVARIANT,    $1, $3 }; }
+                | exp04 "!=" exp05              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_NOT_EQUAL,          $1, $3 }; }
                 ;
-exp06           : exp07
-                | exp06 "+" exp07
-                | exp06 "-" exp07
+exp05           : exp06                         { $$ = $1; }
+                | exp05 "<"  exp06              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_LESS_THEN,          $1, $3 }; }
+                | exp05 "<=" exp06              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_LESS_THEN_EQUAL,    $1, $3 }; }
+                | exp05 ">"  exp06              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_GREATER_THEN,       $1, $3 }; }
+                | exp05 ">=" exp06              { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_GREATER_THEN_EQUAL, $1, $3 }; }
                 ;
-
-exp07           : exp08
-                | exp07 "*" exp08
-                | exp07 "/" exp08
-                | exp07 "%" exp08
-                ;
-
-exp08           : exp09
-                | exp08 "<<"  exp09
-                | exp08 "<<<" exp09
-                | exp08 ">>"  exp09
-                | exp08 ">>>" exp09
+exp06           : exp07                         { $$ = $1; }
+                | exp06 "+" exp07               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_PLUS,               $1, $3 }; }
+                | exp06 "-" exp07               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_MINUS,              $1, $3 }; }
                 ;
 
-exp09           : exp10
-                | exp09 "^" exp10
-                | exp09 "|" exp10
-                | exp09 "&" exp10
+exp07           : exp08                         { $$ = $1; }
+                | exp07 "*" exp08               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_MULTIPLY,           $1, $3 }; }
+                | exp07 "/" exp08               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_DIVIDE,             $1, $3 }; }
+                | exp07 "%" exp08               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_REMAINDER,          $1, $3 }; }
                 ;
 
-exp10           : exp11
-                | "!" exp10
-                | "~" exp10
+exp08           : exp09                         { $$ = $1; }
+                | exp08 "<<"  exp09             { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_SHIFT_LEFT2,        $1, $3 }; }
+                | exp08 "<<<" exp09             { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_SHIFT_LEFT3,        $1, $3 }; }
+                | exp08 ">>"  exp09             { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_SHIFT_RIGHT2,       $1, $3 }; }
+                | exp08 ">>>" exp09             { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_SHIFT_RIGHT3,       $1, $3 }; }
                 ;
 
-exp11           : expp
-                | call
-                | dotnav
-                | arrget
+exp09           : exp10                         { $$ = $1; }
+                | exp09 "^" exp10               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_BINARY_XOR,         $1, $3 }; }
+                | exp09 "|" exp10               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_BINARY_OR,          $1, $3 }; }
+                ;
+exp10           : exp11                         { $$ = $1; }
+                | exp10 "&" exp11               { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_BINARY_AND,         $1, $3 }; }
                 ;
 
-arrget          : exp11 "[" exp01 "]"
+exp11           : exp12                         { $$ = sqf::sqo::data::exp{ $1 };  }
+                | "!" exp11                     { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_LOGICAL_INVERT,     $2 }; }
+                | "~" exp11                     { $$ = sqf::sqo::data::exp{ sqf::sqo::data::exp::OP_BINARY_INVERT,      $2 }; }
+                | "(" val ")"                   { $$ = $2; }
                 ;
 
-dotnav          : exp11 "." IDENT
+exp12           : expp                          { $$ = std::vector<sqf::sqo::data::exp>{ $1 } }; }
+                | call                          { $$ = $1; }
+                | dotnav                        { $$ = $1; }
+                | arrget                        { $$ = $1; }
                 ;
 
-call            : exp11 "(" explist ")"
-                | exp11 "(" ")"
+arrget          : exp12 "[" val "]"             { $$ = $1; $$.push_back(::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::ARRAY_ACCESS, {}, {}, std::vector<::sqf::sqo::data::value>{ $3 } }); }
                 ;
 
-explist         : exp01
-                | exp01 ","
-                | explist "," exp01
+dotnav          : exp12 "." IDENT               { $$ = $1; $$.push_back(::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::NAVIGATE,     {}, {}, {}, $3 }); }
                 ;
 
-expp            : cval                          { }
-                | "this"                        { }
-                | "new" type                    { }
-                | assignment                    { }
+call            : exp12 "(" explist ")"         { $$ = $1; $$.push_back(::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::CALL,         {}, {}, $3, {} }); }
+                | exp12 "(" ")"                 { $$ = $1; $$.push_back(::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::CALL,         {}, {}, {}, {} }); }
+                ;
+                
+assignment      : exp12 "=" val                 { $$ = $1; $$.push_back(::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::ASSIGNMENT,   {}, {}, std::vector<::sqf::sqo::data::value>{ $3 }, {} }); }
                 ;
 
-cval            : L_NUMBER                      { $$ = ::sqf::sqo::data::constval{ $1, ::sqf::sqo::data::cval::NUMBER, {} }; }
-                | L_STRING                      { $$ = ::sqf::sqo::data::constval{ $1, ::sqf::sqo::data::cval::STRING, {} }; }
-                | L_CHAR                        { $$ = ::sqf::sqo::data::constval{ $1, ::sqf::sqo::data::cval::CHAR, {} }; }
-                | "true"                        { $$ = ::sqf::sqo::data::constval{ {}, ::sqf::sqo::data::cval::TRUE, {} }; }
-                | "false"                       { $$ = ::sqf::sqo::data::constval{ {}, ::sqf::sqo::data::cval::FALSE, {} }; }
-                | type                          { $$ = ::sqf::sqo::data::constval{ {}, ::sqf::sqo::data::cval::TYPE, $1 }; }
+expp            : cval                          { $$ = ::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::CVAL,           $1, {}, {}, {} }; }
+                | "this"                        { $$ = ::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::THIS,           {}, {}, {}, {} }; }
+                | "new" type                    { $$ = ::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::NEW,            ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::TYPE,     {}, $2 }, {}, {}, {} }; }
+                | declaration                   { $$ = ::sqf::sqo::data::exp_primary{ ::sqf::sqo::data::exp_primary::DECLARATION,    {}, $1, {}, {} }; }
+                ;
+
+cval            : L_NUMBER                      { $$ = ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::NUMBER,   $1, {} }; }
+                | L_STRING                      { $$ = ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::STRING,   $1, {} }; }
+                | L_CHAR                        { $$ = ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::CHAR,     $1, {} }; }
+                | "true"                        { $$ = ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::TRUE,     {}, {} }; }
+                | "false"                       { $$ = ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::FALSE,    {}, {} }; }
+                | type                          { $$ = ::sqf::sqo::data::cval{ ::sqf::sqo::data::cval::TYPE,     {}, $1 }; }
                 ;
 
 %%
