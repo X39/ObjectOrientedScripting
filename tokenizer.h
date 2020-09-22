@@ -13,66 +13,89 @@ namespace sqf::sqo
         {
             eof,
             invalid,
+
             m_line,
+
             i_comment_line,
             i_comment_block,
             i_whitespace,
 
-            t_return,
-            t_throw,
-            t_let,
-            t_be,
-            t_function,
-            t_if,
-            t_else,
-            t_from,
-            t_to,
-            t_step,
-            t_while,
-            t_do,
-            t_try,
-            t_catch,
-            t_switch,
+            l_ident,
+            l_string,
+            l_number,
+            l_char,
+
             t_case,
+            t_catch,
+            t_class,
             t_default,
-            t_nil,
-            t_true,
+            t_delete,
+            t_derived,
+            t_do,
+            t_else,
+            t_enum,
             t_false,
+            t_finally,
             t_for,
+            t_get,
+            t_goto,
+            t_if,
+            t_local,
+            t_namespace,
+            t_new,
+            t_operator,
             t_private,
+            t_public,
+            t_return,
+            t_set,
+            t_switch,
+            t_this,
+            t_throw,
+            t_true,
+            t_try,
+            t_unbound,
+            t_using,
+            t_while,
 
-            s_curlyo,
-            s_curlyc,
-            s_roundo,
-            s_roundc,
-            s_edgeo,
-            s_edgec,
-            s_equalequalequal,
-            s_equalequal,
-            s_equal,
-            s_greaterthenequal,
-            s_greaterthen,
-            s_lessthenequal,
-            s_lessthen,
-            s_plus,
-            s_minus,
-            s_notequalequal,
-            s_notequal,
-            s_exclamationmark,
-            s_percent,
-            s_star,
-            s_slash,
+            s_and,
             s_andand,
-            s_oror,
-            s_questionmark,
+            s_arrowhead,
+            s_circumflex,
             s_colon,
-            s_semicolon,
+            s_coloncolon,
             s_comma,
+            s_curlyc,
+            s_curlyo,
             s_dot,
-
-            t_string,
-            t_ident,
-            t_number
+            s_equal,
+            s_equalequal,
+            s_exclamationmarkequal,
+            s_exclamationmark,
+            s_gt,
+            s_gtequal,
+            s_gtgt,
+            s_gtgtgt,
+            s_lt,
+            s_ltequal,
+            s_ltlt,
+            s_ltltlt,
+            s_minus,
+            s_minusminus,
+            s_percent,
+            s_plus,
+            s_plusplus,
+            s_questionmark,
+            s_roundc,
+            s_roundo,
+            s_semicolon,
+            s_slash,
+            s_squarec,
+            s_squareo,
+            s_star,
+            s_tilde,
+            s_tildeequal,
+            s_vline,
+            s_vlinevline
         };
         struct token
         {
@@ -96,7 +119,7 @@ namespace sqf::sqo
         template<typename = void>
         inline bool is_match(char value) { return false; }
         template<char TArg, char ... TArgs>
-        bool is_match(char value)
+        inline bool is_match(char value)
         {
             switch (value)
             {
@@ -105,23 +128,32 @@ namespace sqf::sqo
             }
         }
         template<char ... TArgs>
-        bool is_match(iterator value) { return value < m_end&& is_match<TArgs...>(*value); }
+        inline bool is_match(iterator value) { return value < m_end && is_match<TArgs...>(*value); }
         template<size_t len, char ... TArgs>
-        bool is_match_repeated(iterator value)
+        inline bool is_match_repeated(iterator value)
         {
             size_t i = 0;
             while (value < m_end && is_match<TArgs...>(*value++)) { ++i; }
             return len == i;
         }
 
+        template<typename = void>
+        inline size_t len_match_exact(iterator value) { return true; }
+        template<char C, char ... TArgs>
+        inline size_t len_match_exact(iterator value)
+        {
+            auto res = is_match_exact<TArgs...>(value + 1);
+            return value < m_end && res && *value == C ? res + 1 : 0;
+        }
+
         template<char ... TArgs>
-        size_t len_match(iterator str)
+        inline size_t len_match(iterator str)
         {
             iterator it = str;
             while (it < m_end && is_match<TArgs...>(*it++)) {}
             return it - str - 1;
         }
-        size_t len_match(iterator start, const char* against)
+        inline size_t len_match(iterator start, const char* against)
         {
             auto it = start;
             auto len = ::sqf::runtime::util::strlen(against);
@@ -156,7 +188,6 @@ namespace sqf::sqo
                 switch (token_type)
                 {
                 default: return { etoken::invalid, m_line, m_column, (size_t)(m_current - m_start), {} };
-
                 case etoken::m_line: /* ToDo: Properly handle #line instruction */ {
                     // Check if line comment start
                     if (len_ident_match(iter, "#line"))
@@ -172,7 +203,7 @@ namespace sqf::sqo
                         // Try skip to file
                         iter += len_match<' ', '\t'>(iter);
                         start = iter;
-                        for (; iter != m_end && *iter != '\n' && *iter != ' '; iter++);
+                        for (; iter != m_end && *iter != '\n'; iter++);
                         if (iter != m_end && iter - start >= 2)
                         {
                             // Read-in file
@@ -251,60 +282,7 @@ namespace sqf::sqo
                     // set length
                     len = iter - m_current;
                 } break;
-
-                case etoken::t_return:           len = len_ident_match(iter, "return"); break;
-                case etoken::t_throw:            len = len_ident_match(iter, "throw"); break;
-                case etoken::t_let:              len = len_ident_match(iter, "let"); break;
-                case etoken::t_be:               len = len_ident_match(iter, "be"); break;
-                case etoken::t_function:         len = len_ident_match(iter, "function"); break;
-                case etoken::t_if:               len = len_ident_match(iter, "if"); break;
-                case etoken::t_else:             len = len_ident_match(iter, "else"); break;
-                case etoken::t_from:             len = len_ident_match(iter, "from"); break;
-                case etoken::t_to:               len = len_ident_match(iter, "to"); break;
-                case etoken::t_step:             len = len_ident_match(iter, "step"); break;
-                case etoken::t_while:            len = len_ident_match(iter, "while"); break;
-                case etoken::t_do:               len = len_ident_match(iter, "do"); break;
-                case etoken::t_try:              len = len_ident_match(iter, "try"); break;
-                case etoken::t_catch:            len = len_ident_match(iter, "catch"); break;
-                case etoken::t_switch:           len = len_ident_match(iter, "switch"); break;
-                case etoken::t_case:             len = len_ident_match(iter, "case"); break;
-                case etoken::t_default:          len = len_ident_match(iter, "default"); break;
-                case etoken::t_nil:              len = len_ident_match(iter, "nil"); break;
-                case etoken::t_true:             len = len_ident_match(iter, "true"); break;
-                case etoken::t_false:            len = len_ident_match(iter, "false"); break;
-                case etoken::t_for:              len = len_ident_match(iter, "for"); break;
-                case etoken::t_private:          len = len_ident_match(iter, "private"); break;
-
-                case etoken::s_curlyo:           len = is_match<'{'>(iter); break;
-                case etoken::s_curlyc:           len = is_match<'}'>(iter); break;
-                case etoken::s_roundo:           len = is_match<'('>(iter); break;
-                case etoken::s_roundc:           len = is_match<')'>(iter); break;
-                case etoken::s_edgeo:            len = is_match<'['>(iter); break;
-                case etoken::s_edgec:            len = is_match<']'>(iter); break;
-                case etoken::s_equalequalequal:  len = is_match_repeated<3, '='>(iter) ? 3 : 0; break;
-                case etoken::s_equalequal:       len = is_match_repeated<2, '='>(iter) ? 2 : 0; break;
-                case etoken::s_equal:            len = is_match<'='>(iter); break;
-                case etoken::s_greaterthenequal: len = is_match<'<'>(iter) && is_match<'='>(iter + 1) ? 2 : 0; break;
-                case etoken::s_greaterthen:      len = is_match<'>'>(iter); break;
-                case etoken::s_lessthenequal:    len = is_match<'<'>(iter) && is_match<'='>(iter + 1) ? 2 : 0; break;
-                case etoken::s_lessthen:         len = is_match<'<'>(iter); break;
-                case etoken::s_plus:             len = is_match<'+'>(iter); break;
-                case etoken::s_minus:            len = is_match<'-'>(iter); break;
-                case etoken::s_notequalequal:    len = is_match<'!'>(iter) && is_match_repeated<2, '='>(iter + 1) ? 3 : 0; break;
-                case etoken::s_notequal:         len = is_match<'!'>(iter) && is_match<'='>(iter + 1) ? 2 : 0; break;
-                case etoken::s_exclamationmark:  len = is_match<'!'>(iter); break;
-                case etoken::s_percent:          len = is_match<'%'>(iter); break;
-                case etoken::s_star:             len = is_match<'*'>(iter); break;
-                case etoken::s_slash:            len = is_match<'/'>(iter); break;
-                case etoken::s_andand:           len = is_match_repeated<2, '&'>(iter) ? 2 : 0; break;
-                case etoken::s_oror:             len = is_match_repeated<2, '|'>(iter) ? 2 : 0; break;
-                case etoken::s_questionmark:     len = is_match<'?'>(iter); break;
-                case etoken::s_colon:            len = is_match<':'>(iter); break;
-                case etoken::s_semicolon:        len = is_match<';'>(iter); break;
-                case etoken::s_comma:            len = is_match<','>(iter); break;
-                case etoken::s_dot:              len = is_match<'.'>(iter); break;
-
-                case etoken::t_string: {
+                case etoken::l_string: {
                     ++iter;
                     // find string end
                     while (true)
@@ -333,13 +311,135 @@ namespace sqf::sqo
                     // set length
                     len = iter - m_current;
                 } break;
-                case etoken::t_ident: {
+                case etoken::l_char: {
+                    ++iter;
+                    // find string end
+                    while (true)
+                    {
+                        if (is_match<'\''>(iter) && is_match<'\''>(iter + 1))
+                        {
+                            ++iter;
+                        }
+                        else if (is_match<'\''>(iter))
+                        {
+                            ++iter;
+                            break;
+                        }
+                        // update position info
+                        if (!is_match<'\n'>(iter))
+                        {
+                            m_column++;
+                        }
+                        else
+                        {
+                            m_line++;
+                            m_column = 0;
+                        }
+                        ++iter;
+                    }
+                    // set length
+                    len = iter - m_current;
+                } break;
+                case etoken::l_ident: {
                     len = len_match<
                         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'>(iter);
                 } break;
-                case etoken::t_number:          len = len_match<'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'>(iter); break;
+                case etoken::l_number: {
+                    size_t res = 0;
+                    // match (optional) prefix
+                    res = is_match<'-', '+'>(iter);
+                    len += res; iter += res;
+
+                    // match first part of number
+                    res = len_match<'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'>(iter);
+                    if (res == 0) { len = 0; break; }
+                    len += res; iter += res;
+
+                    // match optional dot
+                    if (is_match<'.'>(iter))
+                    {
+                        len++; iter++;
+
+                        // match second part of number
+                        res = len_match<'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'>(iter);
+                        if (res == 0) { len--; iter--; }
+                        else { len += res; iter += res; }
+                    }
+                } break;
+
+                case etoken::t_case:                    len = len_ident_match(iter, "case");        break;
+                case etoken::t_catch:                   len = len_ident_match(iter, "catch");       break;
+                case etoken::t_class:                   len = len_ident_match(iter, "class");       break;
+                case etoken::t_default:                 len = len_ident_match(iter, "default");     break;
+                case etoken::t_delete:                  len = len_ident_match(iter, "delete");      break;
+                case etoken::t_derived:                 len = len_ident_match(iter, "derived");     break;
+                case etoken::t_do:                      len = len_ident_match(iter, "do");          break;
+                case etoken::t_else:                    len = len_ident_match(iter, "else");        break;
+                case etoken::t_enum:                    len = len_ident_match(iter, "enum");        break;
+                case etoken::t_false:                   len = len_ident_match(iter, "false");       break;
+                case etoken::t_finally:                 len = len_ident_match(iter, "finally");     break;
+                case etoken::t_for:                     len = len_ident_match(iter, "for");         break;
+                case etoken::t_get:                     len = len_ident_match(iter, "get");         break;
+                case etoken::t_goto:                    len = len_ident_match(iter, "goto");        break;
+                case etoken::t_if:                      len = len_ident_match(iter, "if");          break;
+                case etoken::t_local:                   len = len_ident_match(iter, "local");       break;
+                case etoken::t_namespace:               len = len_ident_match(iter, "namespace");   break;
+                case etoken::t_new:                     len = len_ident_match(iter, "new");         break;
+                case etoken::t_operator:                len = len_ident_match(iter, "operator");    break;
+                case etoken::t_private:                 len = len_ident_match(iter, "private");     break;
+                case etoken::t_public:                  len = len_ident_match(iter, "public");      break;
+                case etoken::t_return:                  len = len_ident_match(iter, "return");      break;
+                case etoken::t_set:                     len = len_ident_match(iter, "set");         break;
+                case etoken::t_switch:                  len = len_ident_match(iter, "switch");      break;
+                case etoken::t_this:                    len = len_ident_match(iter, "this");        break;
+                case etoken::t_throw:                   len = len_ident_match(iter, "throw");       break;
+                case etoken::t_true:                    len = len_ident_match(iter, "true");        break;
+                case etoken::t_try:                     len = len_ident_match(iter, "try");         break;
+                case etoken::t_unbound:                 len = len_ident_match(iter, "unbound");     break;
+                case etoken::t_using:                   len = len_ident_match(iter, "using");       break;
+                case etoken::t_while:                   len = len_ident_match(iter, "while");       break;
+
+                case etoken::s_and:                     len = len_match_exact<'&'>(iter);           break;
+                case etoken::s_andand:                  len = len_match_exact<'&', '&'>(iter);      break;
+                case etoken::s_arrowhead:               len = len_match_exact<'=', '>'>(iter);      break;
+                case etoken::s_circumflex:              len = len_match_exact<'^'>(iter);           break;
+                case etoken::s_colon:                   len = len_match_exact<':'>(iter);           break;
+                case etoken::s_coloncolon:              len = len_match_exact<':', ':'>(iter);      break;
+                case etoken::s_comma:                   len = len_match_exact<','>(iter);           break;
+                case etoken::s_curlyc:                  len = len_match_exact<'}'>(iter);           break;
+                case etoken::s_curlyo:                  len = len_match_exact<'{'>(iter);           break;
+                case etoken::s_dot:                     len = len_match_exact<'.'>(iter);           break;
+                case etoken::s_equal:                   len = len_match_exact<'='>(iter);           break;
+                case etoken::s_equalequal:              len = len_match_exact<'=='>(iter);          break;
+                case etoken::s_exclamationmark:         len = len_match_exact<'!'>(iter);           break;
+                case etoken::s_exclamationmarkequal:    len = len_match_exact<'!', '='>(iter);      break;
+                case etoken::s_gt:                      len = len_match_exact<'>'>(iter);           break;
+                case etoken::s_gtequal:                 len = len_match_exact<'>', '='>(iter);      break;
+                case etoken::s_gtgt:                    len = len_match_exact<'>', '>'>(iter);      break;
+                case etoken::s_gtgtgt:                  len = len_match_exact<'>', '>', '>'>(iter); break;
+                case etoken::s_lt:                      len = len_match_exact<'<'>(iter);           break;
+                case etoken::s_ltequal:                 len = len_match_exact<'<', '='>(iter);      break;
+                case etoken::s_ltlt:                    len = len_match_exact<'<', '<'>(iter);      break;
+                case etoken::s_ltltlt:                  len = len_match_exact<'<', '<', '<'>(iter); break;
+                case etoken::s_minus:                   len = len_match_exact<'-'>(iter);           break;
+                case etoken::s_minusminus:              len = len_match_exact<'-', '-'>(iter);      break;
+                case etoken::s_percent:                 len = len_match_exact<'%'>(iter);           break;
+                case etoken::s_plus:                    len = len_match_exact<'+'>(iter);           break;
+                case etoken::s_plusplus:                len = len_match_exact<'+', '+'>(iter);      break;
+                case etoken::s_questionmark:            len = len_match_exact<'?'>(iter);           break;
+                case etoken::s_roundc:                  len = len_match_exact<')'>(iter);           break;
+                case etoken::s_roundo:                  len = len_match_exact<'('>(iter);           break;
+                case etoken::s_semicolon:               len = len_match_exact<';'>(iter);           break;
+                case etoken::s_slash:                   len = len_match_exact<'/'>(iter);           break;
+                case etoken::s_squarec:                 len = len_match_exact<'['>(iter);           break;
+                case etoken::s_squareo:                 len = len_match_exact<']'>(iter);           break;
+                case etoken::s_star:                    len = len_match_exact<'*'>(iter);           break;
+                case etoken::s_tilde:                   len = len_match_exact<'~'>(iter);           break;
+                case etoken::s_tildeequal:              len = len_match_exact<'~', '='>(iter);      break;
+                case etoken::s_vline:                   len = len_match_exact<'|'>(iter);           break;
+                case etoken::s_vlinevline:              len = len_match_exact<'|', '|'>(iter);      break;
                 }
 
                 if (len > 0)
@@ -360,72 +460,104 @@ namespace sqf::sqo
             if (m_current == m_end) { return { etoken::eof, m_line, m_column, (size_t)(m_current - m_start), {} }; };
             switch (*m_current)
             {
-            case 'a': case 'A': return try_match({ etoken::t_ident });
-            case 'b': case 'B': return try_match({ etoken::t_be, etoken::t_ident });
-            case 'c': case 'C': return try_match({ etoken::t_catch, etoken::t_case, etoken::t_ident });
-            case 'd': case 'D': return try_match({ etoken::t_do, etoken::t_default, etoken::t_ident });
-            case 'e': case 'E': return try_match({ etoken::t_else, etoken::t_ident });
-            case 'f': case 'F': return try_match({ etoken::t_function, etoken::t_from, etoken::t_for, etoken::t_false, etoken::t_ident });
-            case 'g': case 'G': return try_match({ etoken::t_ident });
-            case 'h': case 'H': return try_match({ etoken::t_ident });
-            case 'i': case 'I': return try_match({ etoken::t_if, etoken::t_ident });
-            case 'j': case 'J': return try_match({ etoken::t_ident });
-            case 'k': case 'K': return try_match({ etoken::t_ident });
-            case 'l': case 'L': return try_match({ etoken::t_let, etoken::t_ident });
-            case 'm': case 'M': return try_match({ etoken::t_ident });
-            case 'n': case 'N': return try_match({ etoken::t_nil, etoken::t_ident });
-            case 'o': case 'O': return try_match({ etoken::t_ident });
-            case 'p': case 'P': return try_match({ etoken::t_private, etoken::t_ident });
-            case 'q': case 'Q': return try_match({ etoken::t_ident });
-            case 'r': case 'R': return try_match({ etoken::t_return, etoken::t_switch, etoken::t_ident });
-            case 's': case 'S': return try_match({ etoken::t_step, etoken::t_ident });
-            case 't': case 'T': return try_match({ etoken::t_throw, etoken::t_to, etoken::t_try, etoken::t_true, etoken::t_ident });
-            case 'u': case 'U': return try_match({ etoken::t_ident });
-            case 'v': case 'V': return try_match({ etoken::t_ident });
-            case 'w': case 'W': return try_match({ etoken::t_while, etoken::t_ident });
-            case 'x': case 'X': return try_match({ etoken::t_ident });
-            case 'y': case 'Y': return try_match({ etoken::t_ident });
-            case 'z': case 'Z': return try_match({ etoken::t_ident });
-            case '_':           return try_match({ etoken::t_ident });
-            case '0':           return try_match({ etoken::t_number });
-            case '1':           return try_match({ etoken::t_number });
-            case '2':           return try_match({ etoken::t_number });
-            case '3':           return try_match({ etoken::t_number });
-            case '4':           return try_match({ etoken::t_number });
-            case '5':           return try_match({ etoken::t_number });
-            case '6':           return try_match({ etoken::t_number });
-            case '7':           return try_match({ etoken::t_number });
-            case '8':           return try_match({ etoken::t_number });
-            case '9':           return try_match({ etoken::t_number });
-            case '+':           return try_match({ etoken::s_plus });
-            case '-':           return try_match({ etoken::s_minus });
-            case '/':           return try_match({ etoken::i_comment_line, etoken::i_comment_block, etoken::s_slash });
-            case '*':           return try_match({ etoken::s_star });
-            case '(':           return try_match({ etoken::s_roundo });
-            case ')':           return try_match({ etoken::s_roundc });
-            case '[':           return try_match({ etoken::s_edgeo });
-            case ']':           return try_match({ etoken::s_edgec });
-            case '{':           return try_match({ etoken::s_curlyo });
-            case '}':           return try_match({ etoken::s_curlyc });
-            case '&':           return try_match({ etoken::s_andand });
-            case '!':           return try_match({ etoken::s_notequalequal, etoken::s_notequal, etoken::s_exclamationmark });
-            case '|':           return try_match({ etoken::s_oror });
-            case '>':           return try_match({ etoken::s_greaterthenequal, etoken::s_greaterthen });
-            case '<':           return try_match({ etoken::s_lessthenequal, etoken::s_lessthen });
-            case '"':           return try_match({ etoken::t_string });
-            case '=':           return try_match({ etoken::s_equalequalequal, etoken::s_equalequal, etoken::s_equal });
-            case '\'':          return try_match({ etoken::t_string });
-            case '?':           return try_match({ etoken::s_questionmark });
-            case ':':           return try_match({ etoken::s_colon });
-            case ';':           return try_match({ etoken::s_semicolon });
-            case ',':           return try_match({ etoken::s_comma });
-            case '.':           return try_match({ etoken::s_dot });
-            case ' ':			return try_match({ etoken::i_whitespace });
-            case '\r':			return try_match({ etoken::i_whitespace });
-            case '\t':			return try_match({ etoken::i_whitespace });
-            case '\n': 			return try_match({ etoken::i_whitespace });
-            case '#':           return try_match({ etoken::m_line });
-            default:			return { etoken::invalid, m_line, m_column, (size_t)(m_current - m_start), {} };
+            case 'a':   return try_match({ etoken::l_ident });
+            case 'b':   return try_match({ etoken::l_ident });
+            case 'c':   return try_match({ etoken::t_case, etoken::t_catch, etoken::t_class, etoken::l_ident });
+            case 'd':   return try_match({ etoken::t_default, etoken::t_delete, etoken::t_derived, etoken::t_do, etoken::l_ident });
+            case 'e':   return try_match({ etoken::t_else, etoken::t_enum, etoken::l_ident });
+            case 'f':   return try_match({ etoken::t_false, etoken::t_finally, etoken::t_for, etoken::l_ident });
+            case 'g':   return try_match({ etoken::t_get, etoken::t_goto, etoken::l_ident });
+            case 'h':   return try_match({ etoken::l_ident });
+            case 'i':   return try_match({ etoken::t_if, etoken::l_ident });
+            case 'j':   return try_match({ etoken::l_ident });
+            case 'k':   return try_match({ etoken::l_ident });
+            case 'l':   return try_match({ etoken::t_local, etoken::l_ident });
+            case 'm':   return try_match({ etoken::l_ident });
+            case 'n':   return try_match({ etoken::t_namespace, etoken::t_new, etoken::l_ident });
+            case 'o':   return try_match({ etoken::t_operator, etoken::l_ident });
+            case 'p':   return try_match({ etoken::t_private, etoken::t_public, etoken::l_ident });
+            case 'q':   return try_match({ etoken::l_ident });
+            case 'r':   return try_match({ etoken::t_return, etoken::l_ident });
+            case 's':   return try_match({ etoken::t_set, etoken::t_switch, etoken::l_ident });
+            case 't':   return try_match({ etoken::t_this, etoken::t_throw, etoken::t_true, etoken::t_try, etoken::l_ident });
+            case 'u':   return try_match({ etoken::t_unbound, etoken::t_using, etoken::l_ident });
+            case 'v':   return try_match({ etoken::l_ident });
+            case 'w':   return try_match({ etoken::t_while, etoken::l_ident });
+            case 'x':   return try_match({ etoken::l_ident });
+            case 'y':   return try_match({ etoken::l_ident });
+            case 'z':   return try_match({ etoken::l_ident });
+            case 'A':   return try_match({ etoken::l_ident });
+            case 'B':   return try_match({ etoken::l_ident });
+            case 'C':   return try_match({ etoken::l_ident });
+            case 'D':   return try_match({ etoken::l_ident });
+            case 'E':   return try_match({ etoken::l_ident });
+            case 'F':   return try_match({ etoken::l_ident });
+            case 'G':   return try_match({ etoken::l_ident });
+            case 'H':   return try_match({ etoken::l_ident });
+            case 'I':   return try_match({ etoken::l_ident });
+            case 'J':   return try_match({ etoken::l_ident });
+            case 'K':   return try_match({ etoken::l_ident });
+            case 'L':   return try_match({ etoken::l_ident });
+            case 'M':   return try_match({ etoken::l_ident });
+            case 'N':   return try_match({ etoken::l_ident });
+            case 'O':   return try_match({ etoken::l_ident });
+            case 'P':   return try_match({ etoken::l_ident });
+            case 'Q':   return try_match({ etoken::l_ident });
+            case 'R':   return try_match({ etoken::l_ident });
+            case 'S':   return try_match({ etoken::l_ident });
+            case 'T':   return try_match({ etoken::l_ident });
+            case 'U':   return try_match({ etoken::l_ident });
+            case 'V':   return try_match({ etoken::l_ident });
+            case 'W':   return try_match({ etoken::l_ident });
+            case 'X':   return try_match({ etoken::l_ident });
+            case 'Y':   return try_match({ etoken::l_ident });
+            case 'Z':   return try_match({ etoken::l_ident });
+            case '_':   return try_match({ etoken::l_ident });
+            case '0':   return try_match({ etoken::l_number });
+            case '1':   return try_match({ etoken::l_number });
+            case '2':   return try_match({ etoken::l_number });
+            case '3':   return try_match({ etoken::l_number });
+            case '4':   return try_match({ etoken::l_number });
+            case '5':   return try_match({ etoken::l_number });
+            case '6':   return try_match({ etoken::l_number });
+            case '7':   return try_match({ etoken::l_number });
+            case '8':   return try_match({ etoken::l_number });
+            case '9':   return try_match({ etoken::l_number });
+            case '^':   return try_match({ etoken::s_circumflex });
+            case '~':   return try_match({ etoken::s_tilde, etoken::s_tildeequal });
+            case '+':   return try_match({ etoken::s_plusplus, etoken::s_plus });
+            case '-':   return try_match({ etoken::s_minusminus, etoken::s_minus });
+            case '%':   return try_match({ etoken::s_percent });
+            case '/':   return try_match({ etoken::i_comment_line, etoken::i_comment_block, etoken::s_slash });
+            case '*':   return try_match({ etoken::s_star });
+            case '(':   return try_match({ etoken::s_roundo });
+            case ')':   return try_match({ etoken::s_roundc });
+            case '[':   return try_match({ etoken::s_squareo });
+            case ']':   return try_match({ etoken::s_squarec });
+            case '{':   return try_match({ etoken::s_curlyo });
+            case '}':   return try_match({ etoken::s_curlyc });
+            case '&':   return try_match({ etoken::s_andand, etoken::s_and });
+            case '!':   return try_match({ etoken::s_exclamationmarkequal, etoken::s_exclamationmark });
+            case '|':   return try_match({ etoken::s_vlinevline, etoken::s_vline });
+            case '>':   return try_match({ etoken::s_gtequal, etoken::s_gtgtgt, etoken::s_gtgt, etoken::s_gt });
+            case '<':   return try_match({ etoken::s_ltequal, etoken::s_ltltlt, etoken::s_ltlt, etoken::s_lt });
+            case '"':   return try_match({ etoken::l_string });
+            case '\'':  return try_match({ etoken::l_char });
+            case '=':   return try_match({ etoken::s_equalequal, etoken::s_equal });
+            case '?':   return try_match({ etoken::s_questionmark });
+            case ':':   return try_match({ etoken::s_coloncolon, etoken::s_colon });
+            case ';':   return try_match({ etoken::s_semicolon });
+            case ',':   return try_match({ etoken::s_comma });
+            case '.':   return try_match({ etoken::s_dot });
+            case ' ':   return try_match({ etoken::i_whitespace });
+            case '\r':  return try_match({ etoken::i_whitespace });
+            case '\t':  return try_match({ etoken::i_whitespace });
+            case '\n':  return try_match({ etoken::i_whitespace });
+            case '#':   return try_match({ etoken::m_line });
+
+
+
+            default:    return { etoken::invalid, m_line, m_column, (size_t)(m_current - m_start), {} };
             }
         }
         token create_token() const
@@ -437,68 +569,86 @@ namespace sqf::sqo
             using namespace std::string_view_literals;
             switch (t)
             {
-            default:                         return "UNKNOWN"sv;
-            case etoken::eof:                return "eof"sv;
-            case etoken::invalid:            return "invalid"sv;
-            case etoken::i_comment_line:     return "comment_line"sv;
-            case etoken::i_comment_block:    return "comment_block"sv;
-            case etoken::i_whitespace:       return "whitespace"sv;
+            default:                                return "UNKNOWN"sv;
+            case etoken::eof:                       return "eof"sv;
+            case etoken::invalid:                   return "invalid"sv;
+            case etoken::i_comment_line:            return "comment_line"sv;
+            case etoken::i_comment_block:           return "comment_block"sv;
+            case etoken::i_whitespace:              return "whitespace"sv;
 
-            case etoken::t_return:           return "return"sv;
-            case etoken::t_throw:            return "throw"sv;
-            case etoken::t_let:              return "let"sv;
-            case etoken::t_be:               return "be"sv;
-            case etoken::t_function:         return "function"sv;
-            case etoken::t_if:               return "if"sv;
-            case etoken::t_else:             return "else"sv;
-            case etoken::t_from:             return "from"sv;
-            case etoken::t_to:               return "to"sv;
-            case etoken::t_step:             return "step"sv;
-            case etoken::t_while:            return "while"sv;
-            case etoken::t_do:               return "do"sv;
-            case etoken::t_try:              return "try"sv;
-            case etoken::t_catch:            return "catch"sv;
-            case etoken::t_switch:           return "switch"sv;
-            case etoken::t_case:             return "case"sv;
-            case etoken::t_default:          return "default"sv;
-            case etoken::t_nil:              return "nil"sv;
-            case etoken::t_true:             return "true"sv;
-            case etoken::t_false:            return "false"sv;
-            case etoken::t_for:              return "for"sv;
-            case etoken::t_private:          return "private"sv;
+            case etoken::t_case:                    return "case"sv;
+            case etoken::t_catch:                   return "catch"sv;
+            case etoken::t_class:                   return "class"sv;
+            case etoken::t_default:                 return "default"sv;
+            case etoken::t_delete:                  return "delete"sv;
+            case etoken::t_derived:                 return "derived"sv;
+            case etoken::t_do:                      return "do"sv;
+            case etoken::t_else:                    return "else"sv;
+            case etoken::t_enum:                    return "enum"sv;
+            case etoken::t_false:                   return "false"sv;
+            case etoken::t_finally:                 return "finally"sv;
+            case etoken::t_for:                     return "for"sv;
+            case etoken::t_get:                     return "get"sv;
+            case etoken::t_goto:                    return "goto"sv;
+            case etoken::t_if:                      return "if"sv;
+            case etoken::t_local:                   return "local"sv;
+            case etoken::t_namespace:               return "namespace"sv;
+            case etoken::t_new:                     return "new"sv;
+            case etoken::t_operator:                return "operator"sv;
+            case etoken::t_private:                 return "private"sv;
+            case etoken::t_public:                  return "public"sv;
+            case etoken::t_return:                  return "return"sv;
+            case etoken::t_set:                     return "set"sv;
+            case etoken::t_switch:                  return "switch"sv;
+            case etoken::t_this:                    return "this"sv;
+            case etoken::t_throw:                   return "throw"sv;
+            case etoken::t_true:                    return "true"sv;
+            case etoken::t_try:                     return "try"sv;
+            case etoken::t_unbound:                 return "unbound"sv;
+            case etoken::t_using:                   return "using"sv;
+            case etoken::t_while:                   return "while"sv;
 
-            case etoken::s_curlyo:           return "{"sv;
-            case etoken::s_curlyc:           return "}"sv;
-            case etoken::s_roundo:           return "("sv;
-            case etoken::s_roundc:           return ")"sv;
-            case etoken::s_edgeo:            return "["sv;
-            case etoken::s_edgec:            return "]"sv;
-            case etoken::s_equalequalequal:  return "==="sv;
-            case etoken::s_equalequal:       return "=="sv;
-            case etoken::s_equal:            return "="sv;
-            case etoken::s_greaterthenequal: return ">="sv;
-            case etoken::s_greaterthen:      return ">"sv;
-            case etoken::s_lessthenequal:    return "<="sv;
-            case etoken::s_lessthen:         return "<"sv;
-            case etoken::s_plus:             return "+"sv;
-            case etoken::s_minus:            return "-"sv;
-            case etoken::s_notequalequal:    return "!=="sv;
-            case etoken::s_notequal:         return "!="sv;
-            case etoken::s_exclamationmark:  return "!"sv;
-            case etoken::s_percent:          return "%"sv;
-            case etoken::s_star:             return "*"sv;
-            case etoken::s_slash:            return "/"sv;
-            case etoken::s_andand:           return "&&"sv;
-            case etoken::s_oror:             return "||"sv;
-            case etoken::s_questionmark:     return "?"sv;
-            case etoken::s_colon:            return ":"sv;
-            case etoken::s_semicolon:        return ";"sv;
-            case etoken::s_comma:            return ","sv;
-            case etoken::s_dot:              return "."sv;
+            case etoken::s_curlyo:                  return "{"sv;
+            case etoken::s_curlyc:                  return "}"sv;
+            case etoken::s_roundo:                  return "("sv;
+            case etoken::s_roundc:                  return ")"sv;
+            case etoken::s_squareo:                 return "["sv;
+            case etoken::s_squarec:                 return "]"sv;
+            case etoken::s_equalequal:              return "=="sv;
+            case etoken::s_equal:                   return "="sv;
+            case etoken::s_gtequal:                 return ">="sv;
+            case etoken::s_gt:                      return ">"sv;
+            case etoken::s_gtgt:                    return ">>"sv;
+            case etoken::s_gtgtgt:                  return ">>>"sv;
+            case etoken::s_ltequal:                 return "<="sv;
+            case etoken::s_lt:                      return "<"sv;
+            case etoken::s_ltlt:                    return "<<"sv;
+            case etoken::s_ltltlt:                  return "<<<"sv;
+            case etoken::s_plus:                    return "+"sv;
+            case etoken::s_minus:                   return "-"sv;
+            case etoken::s_exclamationmarkequal:    return "!="sv;
+            case etoken::s_exclamationmark:         return "!"sv;
+            case etoken::s_percent:                 return "%"sv;
+            case etoken::s_star:                    return "*"sv;
+            case etoken::s_slash:                   return "/"sv;
+            case etoken::s_and:                     return "&"sv;
+            case etoken::s_andand:                  return "&&"sv;
+            case etoken::s_vline:                   return "|"sv;
+            case etoken::s_vlinevline:              return "||"sv;
+            case etoken::s_questionmark:            return "?"sv;
+            case etoken::s_tilde:                   return "~"sv;
+            case etoken::s_tildeequal:              return "~="sv;
+            case etoken::s_circumflex:              return "^"sv;
+            case etoken::s_colon:                   return ":"sv;
+            case etoken::s_coloncolon:              return "::"sv;
+            case etoken::s_semicolon:               return ";"sv;
+            case etoken::s_comma:                   return ","sv;
+            case etoken::s_dot:                     return "."sv;
 
-            case etoken::t_string:           return "string"sv;
-            case etoken::t_ident:            return "ident"sv;
-            case etoken::t_number:           return "number"sv;
+            case etoken::l_char:                    return "char"sv;
+            case etoken::l_string:                  return "string"sv;
+            case etoken::l_ident:                   return "ident"sv;
+            case etoken::l_number:                  return "number"sv;
             }
         }
     };
