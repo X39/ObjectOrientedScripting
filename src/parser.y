@@ -6,8 +6,6 @@
 %define api.namespace { yaoosl::compiler }
 
 %code top {
-    #include "tokenizer.hpp"
-    #include "cstnode.hpp"
     #include <string>
     #include <vector>
 }
@@ -15,6 +13,8 @@
 
 %code requires
 {
+    #include "tokenizer.hpp"
+    #include "cstnode.hpp"
      namespace yaoosl::compiler
      {
           class parser;
@@ -32,13 +32,13 @@
 %lex-param   { yaoosl::compiler::tokenizer &tokenizer }
 %parse-param { yaoosl::compiler::tokenizer &tokenizer }
 %parse-param { yaoosl::compiler::cstnode& result }
-%parse-param { yaoosl::compiler::parser& actual }
 %parse-param { std::string fpath }
 
 %locations
 %define parse.error verbose
 %define api.token.prefix {}
 
+%token<yaoosl::compiler::tokenizer::token> NA
 
 // Encapsulation - Item attached is available from everywhere
 %token<yaoosl::compiler::tokenizer::token> PUBLIC "public"
@@ -91,6 +91,7 @@
 %token<yaoosl::compiler::tokenizer::token> QUESTIONMARK              "?"
 %token<yaoosl::compiler::tokenizer::token> ARROWHEAD                 "=>"
 %token<yaoosl::compiler::tokenizer::token> CLASS                     "class"
+%token<yaoosl::compiler::tokenizer::token> CONVERSION                "conversion"
 %token<yaoosl::compiler::tokenizer::token> GET                       "get"
 %token<yaoosl::compiler::tokenizer::token> SET                       "set"
 %token<yaoosl::compiler::tokenizer::token> NAMESPACE                 "namespace"
@@ -113,12 +114,12 @@
 %token<yaoosl::compiler::tokenizer::token> ENUM                      "enum"
 %token<yaoosl::compiler::tokenizer::token> DOTDOT                    ".."
 %token<yaoosl::compiler::tokenizer::token> TRUE                      "true"
-%token<yaoosl::compiler::tokenizer::token> FLASE                     "false"
+%token<yaoosl::compiler::tokenizer::token> FALSE                     "false"
 %token<yaoosl::compiler::tokenizer::token> THIS                      "this"
 %token<yaoosl::compiler::tokenizer::token> NEW                       "new"
 %token<yaoosl::compiler::tokenizer::token> DELETE                    "delete"
 
-%token<yaoosl::compiler::tokenizer::token> IDENT
+%token<yaoosl::compiler::tokenizer::token> L_IDENT
 %token<yaoosl::compiler::tokenizer::token> L_STRING
 %token<yaoosl::compiler::tokenizer::token> L_NUMBER
 %token<yaoosl::compiler::tokenizer::token> L_CHAR
@@ -126,13 +127,13 @@
 %type <yaoosl::compiler::cstnode> type_ident type typelist template_use encpsltn encpsltn_n_cls template_def
 %type <yaoosl::compiler::cstnode> template_defs template cval expp declaration exp12 call dotnav statement
 %type <yaoosl::compiler::cstnode> arrget exp01 exp02 exp03 exp04 exp05 exp06 exp07 exp08 exp09 exp10 exp11 val
-%type <yaoosl::compiler::cstnode> explist using using_low filestmnt filestmnts classstmnt classstmnts
+%type <yaoosl::compiler::cstnode> explist using using_low filestmnt filestmnts classstmnt classstmnts cnvrsn
 %type <yaoosl::compiler::cstnode> codestmnt codestmnts namespace enum enum_body enum_values enum_value class
 %type <yaoosl::compiler::cstnode> classhead classbody mthd mthd_head mthd_args mthd_body mthd_arglist mthd_arg
 %type <yaoosl::compiler::cstnode> mthdop mthdop_head mthdop_args mthdop_ops1p mthdop_ops1s mthdop_ops2 
 %type <yaoosl::compiler::cstnode> mthdcnst mthdcnst_head prop prop_head prop_body prop_get prop_set ifelse
 %type <yaoosl::compiler::cstnode> for for_step for_step_arg for_each while switch switch_cases switch_case
-%type <yaoosl::compiler::cstnode> case try catch catchlist finally trycatch scope assignment
+%type <yaoosl::compiler::cstnode> case try catch catchlist finally trycatch scope assignment 
 
 %start start
 
@@ -141,7 +142,7 @@ start           : %empty                                                { result
                 | filestmnts                                            { result = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::START, tokenizer.create_token(), { $1 } }; }
                 ;
 using           : using_low                                             { $$ = $1; }
-                | using_low "=" IDENT                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::USING, $2, {} }; }
+                | using_low "=" L_IDENT                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::USING, $2, {} }; }
                 ;
 using_low       : "using" "namespace" type ";"                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::USING_LOW, $1, { $3 } }; }
                 | "using" "enum" type ";"                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::USING_LOW, $1, { $3 } }; }
@@ -159,6 +160,7 @@ filestmnts      : filestmnt                                             { $$ = y
 classstmnt      : mthd                                                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
                 | mthdop                                                { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
                 | mthdcnst                                              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
+                | cnvrsn                                                { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
                 | class                                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
                 | prop                                                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
                 | using                                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSSTMNT, tokenizer.create_token(), { $1 } }; }
@@ -183,13 +185,17 @@ codestmnts      : codestmnt                                             { $$ = y
                 | codestmnts codestmnt                                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CODESTMNTS, tokenizer.create_token(), { $1 } }; }
                 ;
 // --------------------- TYPE ---------------------- \\
-type_ident      : IDENT                                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE_IDENT, tokenizer.create_token(), { yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE_IDENT, $1, {} } } }; }
-                | type_ident "::" IDENT                                 { $$ = $1; $$.nodes.push_back(yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE_IDENT, $3, {} }); }
+type_ident      : L_IDENT                                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE_IDENT, tokenizer.create_token(), { yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE_IDENT, $1, {} } } }; }
+                | type_ident "::" L_IDENT                               { $$ = $1; $$.nodes.push_back(yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE_IDENT, $3, {} }); }
                 ;
-type            : type_ident template_use                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $1, $2 } }; }
-                | "::" type_ident                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $2 } }; }
-                | "::" type_ident template_use                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $2, $3 } }; }
-                | type_ident                                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $1 } }; }
+type            : type_ident template_use                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $1, $2, {} } }; }
+                | "::" type_ident                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $2, {}, {} } }; }
+                | "::" type_ident template_use                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $2, $3, {} } }; }
+                | type_ident                                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $1, {}, {} } }; }
+                | type_ident template_use "[" "]"                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $1, $2, $3 } }; }
+                | "::" type_ident "[" "]"                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $2, {}, $3 } }; }
+                | "::" type_ident template_use "[" "]"                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $2, $3, $4 } }; }
+                | type_ident "[" "]"                                    { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPE, tokenizer.create_token(), { $1, {}, $2 } }; }
                 ;
 typelist        : type                                                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPELIST, tokenizer.create_token(), { $1 } }; }
                 | type ","                                              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TYPELIST, tokenizer.create_token(), { $1 } }; }
@@ -204,8 +210,8 @@ encpsltn_n_cls  : "public"                                              { $$ = y
                 | "local"                                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENCPSLTN_N_CLS, $1, {} }; }
                 ;
 // ------------------- TEMPLATE -------------------- \\
-template_def    : type IDENT                                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE_DEF, $2, { $1 } }; }
-                | type IDENT "=" cval                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE_DEF, $2, { $1, $4 } }; }
+template_def    : type L_IDENT                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE_DEF, $2, { $1 } }; }
+                | type L_IDENT "=" cval                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE_DEF, $2, { $1, $4 } }; }
                 ;
 template_defs   : template_def                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE_DEFS, tokenizer.create_token(), { $1 } }; }
                 | template_def ","                                      { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE_DEFS, tokenizer.create_token(), { $1 } }; }
@@ -231,8 +237,8 @@ enum_values     : enum_value                                            { $$ = y
                 | enum_values "," enum_value                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENUM_VALUES, tokenizer.create_token(), { $1 } }; }
                 | enum_values ";" enum_value                            { $$ = $1; $$.nodes.push_back($3); }
                 ;
-enum_value      : IDENT                                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENUM_VALUE, $1, {} }; }
-                | IDENT "=" cval                                        { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENUM_VALUE, $1, { $3 } }; }
+enum_value      : L_IDENT                                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENUM_VALUE, $1, {} }; }
+                | L_IDENT "=" cval                                      { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENUM_VALUE, $1, { $3 } }; }
                 ;
 // --------------------- CLASS --------------------- \\
 class           : classhead classbody                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASS, tokenizer.create_token(), { $1, {}, {}, $2 } }; }
@@ -240,7 +246,7 @@ class           : classhead classbody                                   { $$ = y
                 | classhead template classbody                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASS, tokenizer.create_token(), { $1, $2, {}, $3 } }; }
                 | classhead template ":" typelist classbody             { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASS, tokenizer.create_token(), { $1, $2, $4, $5 } }; }
                 ;
-classhead       : encpsltn "class" IDENT                                { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSHEAD, $3, { $1 } }; }
+classhead       : encpsltn "class" L_IDENT                              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSHEAD, $3, { $1 } }; }
                 ;
 classbody       :  "{" classstmnts "}"                                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CLASSBODY, $1, { $2 } }; }
                 ;
@@ -248,8 +254,8 @@ classbody       :  "{" classstmnts "}"                                  { $$ = y
 mthd            : mthd_head mthd_args mthd_body                         { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD, tokenizer.create_token(), { $1, {}, $2, $3 } }; }
                 | mthd_head template mthd_args mthd_body                { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD, tokenizer.create_token(), { $1, $2, $3, $4 } }; }
                 ;
-mthd_head       : encpsltn type IDENT                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_HEAD, $3, { $1, $2 } }; }
-                | "unbound" encpsltn type IDENT                         { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_HEAD_UNBOUND, $4, { $2, $3 } }; }
+mthd_head       : encpsltn type L_IDENT                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_HEAD, $3, { $1, $2 } }; }
+                | "unbound" encpsltn type L_IDENT                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_HEAD_UNBOUND, $4, { $2, $3 } }; }
                 ;
 mthd_args       : "(" ")"                                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARGS, $1, {} }; }
                 | "(" mthd_arglist ")"                                  { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARGS, $1, { $2 } }; }
@@ -261,8 +267,12 @@ mthd_arglist    : mthd_arg                                              { $$ = y
                 | mthd_arg ","                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARGLIST, tokenizer.create_token(), { $1 } }; }
                 | mthd_arglist "," mthd_arg                             { $$ = $1; $$.nodes.push_back($3); }
                 ;
-mthd_arg        : type IDENT                                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARG, $2, { $1 } }; }
-                | type IDENT "=" cval                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARG, $2, { $1, $4 } }; }
+mthd_arg        : type L_IDENT                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARG, $2, { $1 } }; }
+                | type L_IDENT "=" cval                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARG, $2, { $1, $4 } }; }
+                ;
+// ----------------- conversion ------------------ \\
+cnvrsn          : type "conversion" mthd_body                           { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARG, $2, { $1, $3 } }; }
+                | "unbound" type "conversion" "(" mthd_arg ")" mthd_body{ $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHD_ARG, $3, { $2, $5, $7 } }; }
                 ;
 // --------------- mthd-OPERATORS ---------------- \\
 mthdop          : mthdop_head mthdop_args mthd_body                     { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHDOP, tokenizer.create_token(), { $1, {}, $2, $3 } }; }
@@ -308,14 +318,14 @@ mthdop_ops2     : "+"                                                   { $$ = y
 // -------------- mthd-CONSTRUCTOR --------------- \\
 mthdcnst        : mthdcnst_head mthd_args mthd_body                     { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHDCNST, tokenizer.create_token(), { $1, $2, $3 } }; }
                 ;
-mthdcnst_head   : encpsltn IDENT                                        { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHDCNST_HEAD, $2, { $1 } }; }
-                | "~" IDENT                                             { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHDDST_HEAD, $2, {} }; }
+mthdcnst_head   : encpsltn L_IDENT                                      { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHDCNST_HEAD, $2, { $1 } }; }
+                | "~" L_IDENT                                           { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::MTHDDST_HEAD, $2, {} }; }
                 ;
 // ------------------- PROPERTY -------------------- \\
 prop            : prop_head prop_body                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP, tokenizer.create_token(), { $1, $2 } }; }
                 ;
-prop_head       : encpsltn type IDENT                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_HEAD, $3, { $1, $2 } }; }
-                | "unbound" encpsltn type IDENT                         { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_HEAD_UNBOUND, $4, { $2, $3 } }; }
+prop_head       : encpsltn type L_IDENT                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_HEAD, $3, { $1, $2 } }; }
+                | "unbound" encpsltn type L_IDENT                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_HEAD_UNBOUND, $4, { $2, $3 } }; }
                 ;
 prop_body       : "{" prop_get prop_set "}"                             { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_BODY, $1, { $2, $3 } }; }
                 | "{" prop_get "}"                                      { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_BODY, $1, { $2, {} } }; }
@@ -323,10 +333,13 @@ prop_body       : "{" prop_get prop_set "}"                             { $$ = y
                 | "{" prop_set "}"                                      { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_BODY, $1, { {}, $2 } }; }
                 | ";"                                                   { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_BODY, $1, { {}, {} } }; }
                 ;
-prop_get        : "get" "(" IDENT ")" mthd_body                         { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_GET, $1, { { yaoosl::compiler::cstnode::PROP_GET, $3, {} }, $5 } }; }
-                | "get" mthd_body                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_GET, $1, { {}, $2 } }; }
+prop_set        : "set" "(" L_IDENT ")" mthd_body                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_SET, $1, { {}, { yaoosl::compiler::cstnode::PROP_SET, $3, {} }, $5 } }; }
+                | encpsltn "set" "(" L_IDENT ")" mthd_body              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_SET, $2, { $1, { yaoosl::compiler::cstnode::PROP_SET, $4, {} }, $6 } }; }
+                | "set" mthd_body                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_SET, $1, { {}, {}, $2 } }; }
+                | encpsltn "set" mthd_body                              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_SET, $2, { $1, {}, $3 } }; }
                 ;
-prop_set        : "set" mthd_body                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_SET, $1, { $2 } }; }
+prop_get        : "get" mthd_body                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_GET, $1, { {}, $2 } }; }
+                | encpsltn "get" mthd_body                              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::PROP_GET, $1, { $1, $2 } }; }
                 ;
 // ---------------------- IF ----------------------- \\
 ifelse          : "if" "(" val ")" codestmnt                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::IFELSE, $1, { $3, $5 } }; }
@@ -389,10 +402,10 @@ statement       : "return"                                              { $$ = y
                 | "throw"                                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $1, {    } }; }
                 | "throw" val                                           { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $1, { $2 } }; }
                 | "delete" val                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $1, { $2 } }; }
-                | "goto" IDENT                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $1, { yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $2, {} } } }; }
+                | "goto" L_IDENT                                        { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $1, { yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $2, {} } } }; }
                 | "goto" case                                           { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::STATEMENT, $1, { $2 } }; }
                 ;
-declaration     : type IDENT                                            { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::DECLARATION, $2, { $1 } }; }
+declaration     : type L_IDENT                                          { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::DECLARATION, $2, { $1 } }; }
                 ;
 scope           : "{" "}"                                               { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::SCOPE, $1, {    } }; }
                 | "{" codestmnt "}"                                     { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::SCOPE, $1, { $2 } }; }
@@ -460,7 +473,7 @@ exp12           : expp                                                  { $$ = $
                 ;
 arrget          : exp12 "[" val "]"                                     { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ARRGET, $2, { $1, $3 } }; }
                 ;
-dotnav          : exp12 "." IDENT                                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::DOTNAV, $3, { $1 } }; }
+dotnav          : exp12 "." L_IDENT                                     { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::DOTNAV, $3, { $1 } }; }
                 ;
 call            : exp12 "(" explist ")"                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CALL, $2, { $1, $3 } }; }
                 | exp12 "(" ")"                                         { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::CALL, $2, { $1 } }; }
@@ -478,3 +491,119 @@ cval            : L_NUMBER                                              { $$ = y
                 | type                                                  { $$ = $1; }
                 ;
 %%
+
+
+namespace yaoosl::compiler
+{
+     void parser::error(const location_type& loc, const std::string& msg)
+     {
+         std::cout <<
+             tokenizer.create_token().path << std::endl <<
+             "[L" << loc.begin.line << "|C" << loc.begin.column << "]  " << msg << std::endl;
+     }
+     inline parser::symbol_type yylex(yaoosl::compiler::tokenizer& tokenizer)
+     {
+         auto token = tokenizer.next();
+         parser::location_type loc;
+         loc.begin.line = token.line;
+         loc.begin.column = token.column;
+         loc.end.line = token.line;
+         loc.end.column = token.column + token.contents.length();
+
+         switch (token.type)
+         {
+         case tokenizer::etoken::eof: return parser::make_NA(token, loc);
+         case tokenizer::etoken::invalid: return parser::make_NA(token, loc);
+
+
+         case tokenizer::etoken::m_line: return yylex(tokenizer);
+
+         case tokenizer::etoken::i_comment_line: return yylex(tokenizer);
+         case tokenizer::etoken::i_comment_block: return yylex(tokenizer);
+         case tokenizer::etoken::i_whitespace: return yylex(tokenizer);
+
+
+
+         case tokenizer::etoken::l_ident: return parser::make_L_IDENT(token, loc);
+         case tokenizer::etoken::l_string: return parser::make_L_STRING(token, loc);
+         case tokenizer::etoken::l_number: return parser::make_L_NUMBER(token, loc);
+         case tokenizer::etoken::l_char: return parser::make_L_CHAR(token, loc);
+
+         case tokenizer::etoken::t_case: return parser::make_CASE(token, loc);
+         case tokenizer::etoken::t_catch: return parser::make_CATCH(token, loc);
+         case tokenizer::etoken::t_class: return parser::make_CLASS(token, loc);
+         case tokenizer::etoken::t_conversion: return parser::make_CONVERSION(token, loc);
+         case tokenizer::etoken::t_default: return parser::make_DEFAULT(token, loc);
+         case tokenizer::etoken::t_delete: return parser::make_DELETE(token, loc);
+         case tokenizer::etoken::t_derived: return parser::make_DERIVED(token, loc);
+         case tokenizer::etoken::t_do: return parser::make_DO(token, loc);
+         case tokenizer::etoken::t_else: return parser::make_ELSE(token, loc);
+         case tokenizer::etoken::t_enum: return parser::make_ENUM(token, loc);
+         case tokenizer::etoken::t_false: return parser::make_FALSE(token, loc);
+         case tokenizer::etoken::t_finally: return parser::make_FINALLY(token, loc);
+         case tokenizer::etoken::t_for: return parser::make_FOR(token, loc);
+         case tokenizer::etoken::t_get: return parser::make_GET(token, loc);
+         case tokenizer::etoken::t_goto: return parser::make_GOTO(token, loc);
+         case tokenizer::etoken::t_if: return parser::make_IF(token, loc);
+         case tokenizer::etoken::t_local: return parser::make_LOCAL(token, loc);
+         case tokenizer::etoken::t_namespace: return parser::make_NAMESPACE(token, loc);
+         case tokenizer::etoken::t_new: return parser::make_NEW(token, loc);
+         case tokenizer::etoken::t_operator: return parser::make_OPERATOR(token, loc);
+         case tokenizer::etoken::t_private: return parser::make_PRIVATE(token, loc);
+         case tokenizer::etoken::t_public: return parser::make_PUBLIC(token, loc);
+         case tokenizer::etoken::t_return: return parser::make_RETURN(token, loc);
+         case tokenizer::etoken::t_set: return parser::make_SET(token, loc);
+         case tokenizer::etoken::t_switch: return parser::make_SWITCH(token, loc);
+         case tokenizer::etoken::t_this: return parser::make_THIS(token, loc);
+         case tokenizer::etoken::t_throw: return parser::make_THROW(token, loc);
+         case tokenizer::etoken::t_true: return parser::make_TRUE(token, loc);
+         case tokenizer::etoken::t_try: return parser::make_TRY(token, loc);
+         case tokenizer::etoken::t_unbound: return parser::make_UNBOUND(token, loc);
+         case tokenizer::etoken::t_using: return parser::make_USING(token, loc);
+         case tokenizer::etoken::t_while: return parser::make_WHILE(token, loc);
+
+         case tokenizer::etoken::s_and: return parser::make_AND(token, loc);
+         case tokenizer::etoken::s_andand: return parser::make_ANDAND(token, loc);
+         case tokenizer::etoken::s_arrowhead: return parser::make_ARROWHEAD(token, loc);
+         case tokenizer::etoken::s_circumflex: return parser::make_CIRCUMFLEX(token, loc);
+         case tokenizer::etoken::s_colon: return parser::make_COLON(token, loc);
+         case tokenizer::etoken::s_coloncolon: return parser::make_COLONCOLON(token, loc);
+         case tokenizer::etoken::s_comma: return parser::make_COMMA(token, loc);
+         case tokenizer::etoken::s_curlyc: return parser::make_CURLYC(token, loc);
+         case tokenizer::etoken::s_curlyo: return parser::make_CURLYO(token, loc);
+         case tokenizer::etoken::s_dot: return parser::make_DOT(token, loc);
+         case tokenizer::etoken::s_equal: return parser::make_EQUAL(token, loc);
+         case tokenizer::etoken::s_equalequal: return parser::make_EQUALEQUAL(token, loc);
+         case tokenizer::etoken::s_exclamationmarkequal: return parser::make_EXCLAMATIONMARKEQUAL(token, loc);
+         case tokenizer::etoken::s_exclamationmark: return parser::make_EXCLAMATIONMARK(token, loc);
+         case tokenizer::etoken::s_gt: return parser::make_GT(token, loc);
+         case tokenizer::etoken::s_gtequal: return parser::make_GTEQUAL(token, loc);
+         case tokenizer::etoken::s_gtgt: return parser::make_GTGT(token, loc);
+         case tokenizer::etoken::s_gtgtgt: return parser::make_GTGTGT(token, loc);
+         case tokenizer::etoken::s_lt: return parser::make_LT(token, loc);
+         case tokenizer::etoken::s_ltequal: return parser::make_LTEQUAL(token, loc);
+         case tokenizer::etoken::s_ltlt: return parser::make_LTLT(token, loc);
+         case tokenizer::etoken::s_ltltlt: return parser::make_LTLTLT(token, loc);
+         case tokenizer::etoken::s_minus: return parser::make_MINUS(token, loc);
+         case tokenizer::etoken::s_minusminus: return parser::make_MINUSMINUS(token, loc);
+         case tokenizer::etoken::s_percent: return parser::make_PERCENT(token, loc);
+         case tokenizer::etoken::s_plus: return parser::make_PLUS(token, loc);
+         case tokenizer::etoken::s_plusplus: return parser::make_PLUSPLUS(token, loc);
+         case tokenizer::etoken::s_questionmark: return parser::make_QUESTIONMARK(token, loc);
+         case tokenizer::etoken::s_roundc: return parser::make_ROUNDC(token, loc);
+         case tokenizer::etoken::s_roundo: return parser::make_ROUNDO(token, loc);
+         case tokenizer::etoken::s_semicolon: return parser::make_SEMICOLON(token, loc);
+         case tokenizer::etoken::s_slash: return parser::make_SLASH(token, loc);
+         case tokenizer::etoken::s_squarec: return parser::make_SQUAREC(token, loc);
+         case tokenizer::etoken::s_squareo: return parser::make_SQUAREO(token, loc);
+         case tokenizer::etoken::s_star: return parser::make_STAR(token, loc);
+         case tokenizer::etoken::s_tilde: return parser::make_TILDE(token, loc);
+         case tokenizer::etoken::s_tildeequal: return parser::make_TILDEEQUAL(token, loc);
+         case tokenizer::etoken::s_vline: return parser::make_VLINE(token, loc);
+         case tokenizer::etoken::s_vlinevline: return parser::make_VLINEVLINE(token, loc);
+
+         default:
+             return parser::make_NA(token, loc);
+         }
+     }
+}

@@ -27,6 +27,7 @@ namespace yaoosl::compiler
             t_case,
             t_catch,
             t_class,
+            t_conversion,
             t_default,
             t_delete,
             t_derived,
@@ -137,12 +138,12 @@ namespace yaoosl::compiler
         }
 
         template<typename = void>
-        inline size_t len_match_exact(iterator value) { return true; }
-        template<char C, char ... TArgs>
+        inline size_t len_match_exact(iterator value) { return 0; }
+        template<char TArg, char ... TArgs>
         inline size_t len_match_exact(iterator value)
         {
-            auto res = is_match_exact<TArgs...>(value + 1);
-            return value < m_end && res && *value == C ? res + 1 : 0;
+            auto res = len_match_exact<TArgs...>(value + 1);
+            return value < m_end && res && *value == TArg ? res + 1 : 0;
         }
 
         template<char ... TArgs>
@@ -371,6 +372,7 @@ namespace yaoosl::compiler
                 case etoken::t_case:                    len = len_ident_match(iter, "case");        break;
                 case etoken::t_catch:                   len = len_ident_match(iter, "catch");       break;
                 case etoken::t_class:                   len = len_ident_match(iter, "class");       break;
+                case etoken::t_conversion:              len = len_ident_match(iter, "conversion");  break;
                 case etoken::t_default:                 len = len_ident_match(iter, "default");     break;
                 case etoken::t_delete:                  len = len_ident_match(iter, "delete");      break;
                 case etoken::t_derived:                 len = len_ident_match(iter, "derived");     break;
@@ -461,7 +463,7 @@ namespace yaoosl::compiler
             {
             case 'a':   return try_match({ etoken::l_ident });
             case 'b':   return try_match({ etoken::l_ident });
-            case 'c':   return try_match({ etoken::t_case, etoken::t_catch, etoken::t_class, etoken::l_ident });
+            case 'c':   return try_match({ etoken::t_case, etoken::t_catch, etoken::t_class, etoken::t_conversion, etoken::l_ident });
             case 'd':   return try_match({ etoken::t_default, etoken::t_delete, etoken::t_derived, etoken::t_do, etoken::l_ident });
             case 'e':   return try_match({ etoken::t_else, etoken::t_enum, etoken::l_ident });
             case 'f':   return try_match({ etoken::t_false, etoken::t_finally, etoken::t_for, etoken::l_ident });
@@ -578,6 +580,7 @@ namespace yaoosl::compiler
             case etoken::t_case:                    return "case"sv;
             case etoken::t_catch:                   return "catch"sv;
             case etoken::t_class:                   return "class"sv;
+            case etoken::t_conversion:              return "conversion"sv;
             case etoken::t_default:                 return "default"sv;
             case etoken::t_delete:                  return "delete"sv;
             case etoken::t_derived:                 return "derived"sv;
