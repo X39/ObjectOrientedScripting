@@ -2,7 +2,7 @@ namespace yaoosl
 {
     // Template stuff is planned to be somewhat similar to C++
     // down to the point where "uncompilable" stuff just gets dropped and compiles fine
-    public Optional<type t>
+    public class Optional<type t>
     {
         // Field accessors can be blown up into a method, lending this one from C#
         public t Value
@@ -24,32 +24,11 @@ namespace yaoosl
 }
 
 // another conversion, this time the former "unbound" (static for those comming from other langs)
-unbound string conversion (Optional<bool> opt) { return opt.Value ? "T" : "F"; }
-
-// Yes, this will have RAII concept
-local RAIIExample
-{
-    // and fancy encapsulation too!
-    // You can choose from:
-    // - public (Accessible everywhere)
-    // - local (only in current namespace and lower eg.: my::namespace & my::namespace::fancy)
-    // - derived (only in classes, having this as base)
-    // - private (only accessible in current class depending on the context)
-    // only public and local are valid for stuff not inside of classes tho
-    derived File;
-    public RAIIExample()
-    {
-        File = new File();
-    }
-    ~RAIIExample()
-    {
-        File.Close();
-        delete File;
-    }
-}
+unbound public string conversion (Optional<bool> opt) { return opt.Value ? "T" : "F"; }
 
 
-public unbound int32 main(uint32 argc, string[] argv)
+
+unbound public int32 main(uint32 argc, string[] argv,)
 {
     // we can import stuff anywhere btw.
     using namespace yaoosl;
@@ -59,7 +38,7 @@ public unbound int32 main(uint32 argc, string[] argv)
     // Aliasing something is possible too btw. even tho, syntax might change ...
     // as this is rather ... switching the concerns ... not really sure what is the bigger
     // issue at hands here
-    using yaoosl::Optional = opt;
+    using class yaoosl::Optional = opt;
     
     
     // just output range of numbers
@@ -74,13 +53,18 @@ public unbound int32 main(uint32 argc, string[] argv)
     // switch also here
     switch (i)
     {
+        case -2: {
+            yaoosl::Console::WriteLine("RANDOM");
+            yaoosl::Console::WriteLine("STUFF");
+        } break; // Note that multiple lines of code ALWAYS require a scope
+        case -1: yaoosl::Console::WriteLine("FALL"); continue; // Fallthrough using continue
         case 0: yaoosl::Console::WriteLine("ZERO"); break;
-        default: yaoosl::Console::WriteLine(i);
+        default: yaoosl::Console::WriteLine(i); break;
     }
     // try-catch-finally obviously too ...
     try { throw new Exception(); }
     catch { yaoosl::Console::WriteLine("Catched"); }
-    finally { yaoosl::Console::WriteLine("Can also do finally tho");}
+    finally { yaoosl::Console::WriteLine("Can also do finally tho"); }
     
     // not sure if i may have forgotten something at this point :3
     // some if maybe?

@@ -305,6 +305,8 @@ namespace  yaoosl { namespace compiler  {
       // mthd_arglist
       // mthd_arg
       // cnvrsn
+      // ucnvrsn
+      // uecnvrsn
       // mthdop
       // mthdop_head
       // mthdop_args
@@ -403,34 +405,36 @@ namespace  yaoosl { namespace compiler  {
       // "."
       // "?"
       // "=>"
-      // "class"
-      // "conversion"
-      // "get"
-      // "set"
-      // "namespace"
-      // "if"
-      // "for"
-      // "else"
-      // "while"
-      // "do"
-      // "switch"
-      // "case"
-      // "default"
-      // "return"
-      // "throw"
-      // "goto"
-      // "try"
-      // "catch"
-      // "finally"
-      // "operator"
-      // "using"
-      // "enum"
       // ".."
-      // "true"
-      // "false"
-      // "this"
-      // "new"
+      // "break"
+      // "case"
+      // "continue"
+      // "class"
+      // "catch"
+      // "conversion"
+      // "default"
+      // "do"
       // "delete"
+      // "else"
+      // "enum"
+      // "for"
+      // "finally"
+      // "false"
+      // "get"
+      // "goto"
+      // "if"
+      // "namespace"
+      // "new"
+      // "operator"
+      // "return"
+      // "set"
+      // "switch"
+      // "throw"
+      // "try"
+      // "true"
+      // "this"
+      // "using"
+      // "while"
       // L_IDENT
       // L_STRING
       // L_NUMBER
@@ -503,38 +507,40 @@ namespace  yaoosl { namespace compiler  {
         DOT = 300,
         QUESTIONMARK = 301,
         ARROWHEAD = 302,
-        CLASS = 303,
-        CONVERSION = 304,
-        GET = 305,
-        SET = 306,
-        NAMESPACE = 307,
-        IF = 308,
-        FOR = 309,
-        ELSE = 310,
-        WHILE = 311,
-        DO = 312,
-        SWITCH = 313,
-        CASE = 314,
-        DEFAULT = 315,
-        RETURN = 316,
-        THROW = 317,
-        GOTO = 318,
-        TRY = 319,
-        CATCH = 320,
-        FINALLY = 321,
-        OPERATOR = 322,
-        USING = 323,
-        ENUM = 324,
-        DOTDOT = 325,
-        TRUE = 326,
-        FALSE = 327,
-        THIS = 328,
-        NEW = 329,
-        DELETE = 330,
-        L_IDENT = 331,
-        L_STRING = 332,
-        L_NUMBER = 333,
-        L_CHAR = 334
+        DOTDOT = 303,
+        BREAK = 304,
+        CASE = 305,
+        CONTINUE = 306,
+        CLASS = 307,
+        CATCH = 308,
+        CONVERSION = 309,
+        DEFAULT = 310,
+        DO = 311,
+        DELETE = 312,
+        ELSE = 313,
+        ENUM = 314,
+        FOR = 315,
+        FINALLY = 316,
+        FALSE = 317,
+        GET = 318,
+        GOTO = 319,
+        IF = 320,
+        NAMESPACE = 321,
+        NEW = 322,
+        OPERATOR = 323,
+        RETURN = 324,
+        SET = 325,
+        SWITCH = 326,
+        THROW = 327,
+        TRY = 328,
+        TRUE = 329,
+        THIS = 330,
+        USING = 331,
+        WHILE = 332,
+        L_IDENT = 333,
+        L_STRING = 334,
+        L_NUMBER = 335,
+        L_CHAR = 336
       };
     };
 
@@ -825,47 +831,11 @@ namespace  yaoosl { namespace compiler  {
 
     static inline
     symbol_type
-    make_CLASS (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_DOTDOT (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
-    make_CONVERSION (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_GET (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_SET (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_NAMESPACE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_IF (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_FOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_ELSE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_WHILE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_DO (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_SWITCH (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_BREAK (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
@@ -873,23 +843,11 @@ namespace  yaoosl { namespace compiler  {
 
     static inline
     symbol_type
-    make_DEFAULT (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_CONTINUE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RETURN (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_THROW (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_GOTO (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_TRY (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_CLASS (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
@@ -897,15 +855,23 @@ namespace  yaoosl { namespace compiler  {
 
     static inline
     symbol_type
-    make_FINALLY (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_CONVERSION (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
-    make_OPERATOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_DEFAULT (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
-    make_USING (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_DO (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_DELETE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ELSE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
@@ -913,11 +879,11 @@ namespace  yaoosl { namespace compiler  {
 
     static inline
     symbol_type
-    make_DOTDOT (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_FOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
-    make_TRUE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_FINALLY (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
@@ -925,7 +891,19 @@ namespace  yaoosl { namespace compiler  {
 
     static inline
     symbol_type
-    make_THIS (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_GET (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_GOTO (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_IF (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_NAMESPACE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
@@ -933,7 +911,43 @@ namespace  yaoosl { namespace compiler  {
 
     static inline
     symbol_type
-    make_DELETE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+    make_OPERATOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_RETURN (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_SET (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_SWITCH (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_THROW (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_TRY (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_TRUE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_THIS (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_USING (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_WHILE (const yaoosl::compiler::tokenizer::token& v, const location_type& l);
 
     static inline
     symbol_type
@@ -1156,12 +1170,12 @@ namespace  yaoosl { namespace compiler  {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 798,     ///< Last index in yytable_.
-      yynnts_ = 85,  ///< Number of nonterminal symbols.
-      yyfinal_ = 28, ///< Termination state number.
+      yylast_ = 945,     ///< Last index in yytable_.
+      yynnts_ = 87,  ///< Number of nonterminal symbols.
+      yyfinal_ = 29, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 80  ///< Number of tokens.
+      yyntokens_ = 82  ///< Number of tokens.
     };
 
 
@@ -1213,9 +1227,9 @@ namespace  yaoosl { namespace compiler  {
       45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79
+      75,    76,    77,    78,    79,    80,    81
     };
-    const unsigned int user_token_number_max_ = 334;
+    const unsigned int user_token_number_max_ = 336;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -1248,89 +1262,91 @@ namespace  yaoosl { namespace compiler  {
   {
       switch (other.type_get ())
     {
-      case 82: // using
-      case 83: // using_low
-      case 84: // filestmnt
-      case 85: // filestmnts
-      case 86: // classstmnt
-      case 87: // classstmnts
-      case 88: // codestmnt
-      case 89: // codestmnts
-      case 90: // type_ident
-      case 91: // type
-      case 92: // typelist
-      case 93: // encpsltn
-      case 94: // encpsltn_n_cls
-      case 95: // template_def
-      case 96: // template_defs
-      case 97: // template_use
-      case 98: // template
-      case 99: // namespace
-      case 100: // enum
-      case 101: // enum_body
-      case 102: // enum_values
-      case 103: // enum_value
-      case 104: // class
-      case 105: // classhead
-      case 106: // classbody
-      case 107: // mthd
-      case 108: // mthd_head
-      case 109: // mthd_args
-      case 110: // mthd_body
-      case 111: // mthd_arglist
-      case 112: // mthd_arg
-      case 113: // cnvrsn
-      case 114: // mthdop
-      case 115: // mthdop_head
-      case 116: // mthdop_args
-      case 117: // mthdop_ops1p
-      case 118: // mthdop_ops1s
-      case 119: // mthdop_ops2
-      case 120: // mthdcnst
-      case 121: // mthdcnst_head
-      case 122: // prop
-      case 123: // prop_head
-      case 124: // prop_body
-      case 125: // prop_set
-      case 126: // prop_get
-      case 127: // ifelse
-      case 128: // for
-      case 129: // for_step
-      case 130: // for_step_arg
-      case 131: // for_each
-      case 132: // while
-      case 133: // switch
-      case 134: // switch_cases
-      case 135: // switch_case
-      case 136: // case
-      case 137: // try
-      case 138: // catch
-      case 139: // catchlist
-      case 140: // finally
-      case 141: // trycatch
-      case 142: // statement
-      case 143: // declaration
-      case 144: // scope
-      case 145: // val
-      case 146: // assignment
-      case 147: // explist
-      case 148: // exp01
-      case 149: // exp02
-      case 150: // exp03
-      case 151: // exp04
-      case 152: // exp05
-      case 153: // exp06
-      case 154: // exp07
-      case 155: // exp08
-      case 156: // exp09
-      case 157: // exp10
-      case 158: // exp11
-      case 159: // exp12
-      case 160: // arrget
-      case 161: // dotnav
-      case 162: // call
-      case 163: // expp
-      case 164: // cval
+      case 84: // using
+      case 85: // using_low
+      case 86: // filestmnt
+      case 87: // filestmnts
+      case 88: // classstmnt
+      case 89: // classstmnts
+      case 90: // codestmnt
+      case 91: // codestmnts
+      case 92: // type_ident
+      case 93: // type
+      case 94: // typelist
+      case 95: // encpsltn
+      case 96: // encpsltn_n_cls
+      case 97: // template_def
+      case 98: // template_defs
+      case 99: // template_use
+      case 100: // template
+      case 101: // namespace
+      case 102: // enum
+      case 103: // enum_body
+      case 104: // enum_values
+      case 105: // enum_value
+      case 106: // class
+      case 107: // classhead
+      case 108: // classbody
+      case 109: // mthd
+      case 110: // mthd_head
+      case 111: // mthd_args
+      case 112: // mthd_body
+      case 113: // mthd_arglist
+      case 114: // mthd_arg
+      case 115: // cnvrsn
+      case 116: // ucnvrsn
+      case 117: // uecnvrsn
+      case 118: // mthdop
+      case 119: // mthdop_head
+      case 120: // mthdop_args
+      case 121: // mthdop_ops1p
+      case 122: // mthdop_ops1s
+      case 123: // mthdop_ops2
+      case 124: // mthdcnst
+      case 125: // mthdcnst_head
+      case 126: // prop
+      case 127: // prop_head
+      case 128: // prop_body
+      case 129: // prop_set
+      case 130: // prop_get
+      case 131: // ifelse
+      case 132: // for
+      case 133: // for_step
+      case 134: // for_step_arg
+      case 135: // for_each
+      case 136: // while
+      case 137: // switch
+      case 138: // switch_cases
+      case 139: // switch_case
+      case 140: // case
+      case 141: // try
+      case 142: // catch
+      case 143: // catchlist
+      case 144: // finally
+      case 145: // trycatch
+      case 146: // statement
+      case 147: // declaration
+      case 148: // scope
+      case 149: // val
+      case 150: // assignment
+      case 151: // explist
+      case 152: // exp01
+      case 153: // exp02
+      case 154: // exp03
+      case 155: // exp04
+      case 156: // exp05
+      case 157: // exp06
+      case 158: // exp07
+      case 159: // exp08
+      case 160: // exp09
+      case 161: // exp10
+      case 162: // exp11
+      case 163: // exp12
+      case 164: // arrget
+      case 165: // dotnav
+      case 166: // call
+      case 167: // expp
+      case 168: // cval
         value.copy< yaoosl::compiler::cstnode > (other.value);
         break;
 
@@ -1379,38 +1395,40 @@ namespace  yaoosl { namespace compiler  {
       case 45: // "."
       case 46: // "?"
       case 47: // "=>"
-      case 48: // "class"
-      case 49: // "conversion"
-      case 50: // "get"
-      case 51: // "set"
-      case 52: // "namespace"
-      case 53: // "if"
-      case 54: // "for"
-      case 55: // "else"
-      case 56: // "while"
-      case 57: // "do"
-      case 58: // "switch"
-      case 59: // "case"
-      case 60: // "default"
-      case 61: // "return"
-      case 62: // "throw"
-      case 63: // "goto"
-      case 64: // "try"
-      case 65: // "catch"
-      case 66: // "finally"
-      case 67: // "operator"
-      case 68: // "using"
-      case 69: // "enum"
-      case 70: // ".."
-      case 71: // "true"
-      case 72: // "false"
-      case 73: // "this"
-      case 74: // "new"
-      case 75: // "delete"
-      case 76: // L_IDENT
-      case 77: // L_STRING
-      case 78: // L_NUMBER
-      case 79: // L_CHAR
+      case 48: // ".."
+      case 49: // "break"
+      case 50: // "case"
+      case 51: // "continue"
+      case 52: // "class"
+      case 53: // "catch"
+      case 54: // "conversion"
+      case 55: // "default"
+      case 56: // "do"
+      case 57: // "delete"
+      case 58: // "else"
+      case 59: // "enum"
+      case 60: // "for"
+      case 61: // "finally"
+      case 62: // "false"
+      case 63: // "get"
+      case 64: // "goto"
+      case 65: // "if"
+      case 66: // "namespace"
+      case 67: // "new"
+      case 68: // "operator"
+      case 69: // "return"
+      case 70: // "set"
+      case 71: // "switch"
+      case 72: // "throw"
+      case 73: // "try"
+      case 74: // "true"
+      case 75: // "this"
+      case 76: // "using"
+      case 77: // "while"
+      case 78: // L_IDENT
+      case 79: // L_STRING
+      case 80: // L_NUMBER
+      case 81: // L_CHAR
         value.copy< yaoosl::compiler::tokenizer::token > (other.value);
         break;
 
@@ -1431,89 +1449,91 @@ namespace  yaoosl { namespace compiler  {
     (void) v;
       switch (this->type_get ())
     {
-      case 82: // using
-      case 83: // using_low
-      case 84: // filestmnt
-      case 85: // filestmnts
-      case 86: // classstmnt
-      case 87: // classstmnts
-      case 88: // codestmnt
-      case 89: // codestmnts
-      case 90: // type_ident
-      case 91: // type
-      case 92: // typelist
-      case 93: // encpsltn
-      case 94: // encpsltn_n_cls
-      case 95: // template_def
-      case 96: // template_defs
-      case 97: // template_use
-      case 98: // template
-      case 99: // namespace
-      case 100: // enum
-      case 101: // enum_body
-      case 102: // enum_values
-      case 103: // enum_value
-      case 104: // class
-      case 105: // classhead
-      case 106: // classbody
-      case 107: // mthd
-      case 108: // mthd_head
-      case 109: // mthd_args
-      case 110: // mthd_body
-      case 111: // mthd_arglist
-      case 112: // mthd_arg
-      case 113: // cnvrsn
-      case 114: // mthdop
-      case 115: // mthdop_head
-      case 116: // mthdop_args
-      case 117: // mthdop_ops1p
-      case 118: // mthdop_ops1s
-      case 119: // mthdop_ops2
-      case 120: // mthdcnst
-      case 121: // mthdcnst_head
-      case 122: // prop
-      case 123: // prop_head
-      case 124: // prop_body
-      case 125: // prop_set
-      case 126: // prop_get
-      case 127: // ifelse
-      case 128: // for
-      case 129: // for_step
-      case 130: // for_step_arg
-      case 131: // for_each
-      case 132: // while
-      case 133: // switch
-      case 134: // switch_cases
-      case 135: // switch_case
-      case 136: // case
-      case 137: // try
-      case 138: // catch
-      case 139: // catchlist
-      case 140: // finally
-      case 141: // trycatch
-      case 142: // statement
-      case 143: // declaration
-      case 144: // scope
-      case 145: // val
-      case 146: // assignment
-      case 147: // explist
-      case 148: // exp01
-      case 149: // exp02
-      case 150: // exp03
-      case 151: // exp04
-      case 152: // exp05
-      case 153: // exp06
-      case 154: // exp07
-      case 155: // exp08
-      case 156: // exp09
-      case 157: // exp10
-      case 158: // exp11
-      case 159: // exp12
-      case 160: // arrget
-      case 161: // dotnav
-      case 162: // call
-      case 163: // expp
-      case 164: // cval
+      case 84: // using
+      case 85: // using_low
+      case 86: // filestmnt
+      case 87: // filestmnts
+      case 88: // classstmnt
+      case 89: // classstmnts
+      case 90: // codestmnt
+      case 91: // codestmnts
+      case 92: // type_ident
+      case 93: // type
+      case 94: // typelist
+      case 95: // encpsltn
+      case 96: // encpsltn_n_cls
+      case 97: // template_def
+      case 98: // template_defs
+      case 99: // template_use
+      case 100: // template
+      case 101: // namespace
+      case 102: // enum
+      case 103: // enum_body
+      case 104: // enum_values
+      case 105: // enum_value
+      case 106: // class
+      case 107: // classhead
+      case 108: // classbody
+      case 109: // mthd
+      case 110: // mthd_head
+      case 111: // mthd_args
+      case 112: // mthd_body
+      case 113: // mthd_arglist
+      case 114: // mthd_arg
+      case 115: // cnvrsn
+      case 116: // ucnvrsn
+      case 117: // uecnvrsn
+      case 118: // mthdop
+      case 119: // mthdop_head
+      case 120: // mthdop_args
+      case 121: // mthdop_ops1p
+      case 122: // mthdop_ops1s
+      case 123: // mthdop_ops2
+      case 124: // mthdcnst
+      case 125: // mthdcnst_head
+      case 126: // prop
+      case 127: // prop_head
+      case 128: // prop_body
+      case 129: // prop_set
+      case 130: // prop_get
+      case 131: // ifelse
+      case 132: // for
+      case 133: // for_step
+      case 134: // for_step_arg
+      case 135: // for_each
+      case 136: // while
+      case 137: // switch
+      case 138: // switch_cases
+      case 139: // switch_case
+      case 140: // case
+      case 141: // try
+      case 142: // catch
+      case 143: // catchlist
+      case 144: // finally
+      case 145: // trycatch
+      case 146: // statement
+      case 147: // declaration
+      case 148: // scope
+      case 149: // val
+      case 150: // assignment
+      case 151: // explist
+      case 152: // exp01
+      case 153: // exp02
+      case 154: // exp03
+      case 155: // exp04
+      case 156: // exp05
+      case 157: // exp06
+      case 158: // exp07
+      case 159: // exp08
+      case 160: // exp09
+      case 161: // exp10
+      case 162: // exp11
+      case 163: // exp12
+      case 164: // arrget
+      case 165: // dotnav
+      case 166: // call
+      case 167: // expp
+      case 168: // cval
         value.copy< yaoosl::compiler::cstnode > (v);
         break;
 
@@ -1562,38 +1582,40 @@ namespace  yaoosl { namespace compiler  {
       case 45: // "."
       case 46: // "?"
       case 47: // "=>"
-      case 48: // "class"
-      case 49: // "conversion"
-      case 50: // "get"
-      case 51: // "set"
-      case 52: // "namespace"
-      case 53: // "if"
-      case 54: // "for"
-      case 55: // "else"
-      case 56: // "while"
-      case 57: // "do"
-      case 58: // "switch"
-      case 59: // "case"
-      case 60: // "default"
-      case 61: // "return"
-      case 62: // "throw"
-      case 63: // "goto"
-      case 64: // "try"
-      case 65: // "catch"
-      case 66: // "finally"
-      case 67: // "operator"
-      case 68: // "using"
-      case 69: // "enum"
-      case 70: // ".."
-      case 71: // "true"
-      case 72: // "false"
-      case 73: // "this"
-      case 74: // "new"
-      case 75: // "delete"
-      case 76: // L_IDENT
-      case 77: // L_STRING
-      case 78: // L_NUMBER
-      case 79: // L_CHAR
+      case 48: // ".."
+      case 49: // "break"
+      case 50: // "case"
+      case 51: // "continue"
+      case 52: // "class"
+      case 53: // "catch"
+      case 54: // "conversion"
+      case 55: // "default"
+      case 56: // "do"
+      case 57: // "delete"
+      case 58: // "else"
+      case 59: // "enum"
+      case 60: // "for"
+      case 61: // "finally"
+      case 62: // "false"
+      case 63: // "get"
+      case 64: // "goto"
+      case 65: // "if"
+      case 66: // "namespace"
+      case 67: // "new"
+      case 68: // "operator"
+      case 69: // "return"
+      case 70: // "set"
+      case 71: // "switch"
+      case 72: // "throw"
+      case 73: // "try"
+      case 74: // "true"
+      case 75: // "this"
+      case 76: // "using"
+      case 77: // "while"
+      case 78: // L_IDENT
+      case 79: // L_STRING
+      case 80: // L_NUMBER
+      case 81: // L_CHAR
         value.copy< yaoosl::compiler::tokenizer::token > (v);
         break;
 
@@ -1652,89 +1674,91 @@ namespace  yaoosl { namespace compiler  {
     // Type destructor.
     switch (yytype)
     {
-      case 82: // using
-      case 83: // using_low
-      case 84: // filestmnt
-      case 85: // filestmnts
-      case 86: // classstmnt
-      case 87: // classstmnts
-      case 88: // codestmnt
-      case 89: // codestmnts
-      case 90: // type_ident
-      case 91: // type
-      case 92: // typelist
-      case 93: // encpsltn
-      case 94: // encpsltn_n_cls
-      case 95: // template_def
-      case 96: // template_defs
-      case 97: // template_use
-      case 98: // template
-      case 99: // namespace
-      case 100: // enum
-      case 101: // enum_body
-      case 102: // enum_values
-      case 103: // enum_value
-      case 104: // class
-      case 105: // classhead
-      case 106: // classbody
-      case 107: // mthd
-      case 108: // mthd_head
-      case 109: // mthd_args
-      case 110: // mthd_body
-      case 111: // mthd_arglist
-      case 112: // mthd_arg
-      case 113: // cnvrsn
-      case 114: // mthdop
-      case 115: // mthdop_head
-      case 116: // mthdop_args
-      case 117: // mthdop_ops1p
-      case 118: // mthdop_ops1s
-      case 119: // mthdop_ops2
-      case 120: // mthdcnst
-      case 121: // mthdcnst_head
-      case 122: // prop
-      case 123: // prop_head
-      case 124: // prop_body
-      case 125: // prop_set
-      case 126: // prop_get
-      case 127: // ifelse
-      case 128: // for
-      case 129: // for_step
-      case 130: // for_step_arg
-      case 131: // for_each
-      case 132: // while
-      case 133: // switch
-      case 134: // switch_cases
-      case 135: // switch_case
-      case 136: // case
-      case 137: // try
-      case 138: // catch
-      case 139: // catchlist
-      case 140: // finally
-      case 141: // trycatch
-      case 142: // statement
-      case 143: // declaration
-      case 144: // scope
-      case 145: // val
-      case 146: // assignment
-      case 147: // explist
-      case 148: // exp01
-      case 149: // exp02
-      case 150: // exp03
-      case 151: // exp04
-      case 152: // exp05
-      case 153: // exp06
-      case 154: // exp07
-      case 155: // exp08
-      case 156: // exp09
-      case 157: // exp10
-      case 158: // exp11
-      case 159: // exp12
-      case 160: // arrget
-      case 161: // dotnav
-      case 162: // call
-      case 163: // expp
-      case 164: // cval
+      case 84: // using
+      case 85: // using_low
+      case 86: // filestmnt
+      case 87: // filestmnts
+      case 88: // classstmnt
+      case 89: // classstmnts
+      case 90: // codestmnt
+      case 91: // codestmnts
+      case 92: // type_ident
+      case 93: // type
+      case 94: // typelist
+      case 95: // encpsltn
+      case 96: // encpsltn_n_cls
+      case 97: // template_def
+      case 98: // template_defs
+      case 99: // template_use
+      case 100: // template
+      case 101: // namespace
+      case 102: // enum
+      case 103: // enum_body
+      case 104: // enum_values
+      case 105: // enum_value
+      case 106: // class
+      case 107: // classhead
+      case 108: // classbody
+      case 109: // mthd
+      case 110: // mthd_head
+      case 111: // mthd_args
+      case 112: // mthd_body
+      case 113: // mthd_arglist
+      case 114: // mthd_arg
+      case 115: // cnvrsn
+      case 116: // ucnvrsn
+      case 117: // uecnvrsn
+      case 118: // mthdop
+      case 119: // mthdop_head
+      case 120: // mthdop_args
+      case 121: // mthdop_ops1p
+      case 122: // mthdop_ops1s
+      case 123: // mthdop_ops2
+      case 124: // mthdcnst
+      case 125: // mthdcnst_head
+      case 126: // prop
+      case 127: // prop_head
+      case 128: // prop_body
+      case 129: // prop_set
+      case 130: // prop_get
+      case 131: // ifelse
+      case 132: // for
+      case 133: // for_step
+      case 134: // for_step_arg
+      case 135: // for_each
+      case 136: // while
+      case 137: // switch
+      case 138: // switch_cases
+      case 139: // switch_case
+      case 140: // case
+      case 141: // try
+      case 142: // catch
+      case 143: // catchlist
+      case 144: // finally
+      case 145: // trycatch
+      case 146: // statement
+      case 147: // declaration
+      case 148: // scope
+      case 149: // val
+      case 150: // assignment
+      case 151: // explist
+      case 152: // exp01
+      case 153: // exp02
+      case 154: // exp03
+      case 155: // exp04
+      case 156: // exp05
+      case 157: // exp06
+      case 158: // exp07
+      case 159: // exp08
+      case 160: // exp09
+      case 161: // exp10
+      case 162: // exp11
+      case 163: // exp12
+      case 164: // arrget
+      case 165: // dotnav
+      case 166: // call
+      case 167: // expp
+      case 168: // cval
         value.template destroy< yaoosl::compiler::cstnode > ();
         break;
 
@@ -1783,38 +1807,40 @@ namespace  yaoosl { namespace compiler  {
       case 45: // "."
       case 46: // "?"
       case 47: // "=>"
-      case 48: // "class"
-      case 49: // "conversion"
-      case 50: // "get"
-      case 51: // "set"
-      case 52: // "namespace"
-      case 53: // "if"
-      case 54: // "for"
-      case 55: // "else"
-      case 56: // "while"
-      case 57: // "do"
-      case 58: // "switch"
-      case 59: // "case"
-      case 60: // "default"
-      case 61: // "return"
-      case 62: // "throw"
-      case 63: // "goto"
-      case 64: // "try"
-      case 65: // "catch"
-      case 66: // "finally"
-      case 67: // "operator"
-      case 68: // "using"
-      case 69: // "enum"
-      case 70: // ".."
-      case 71: // "true"
-      case 72: // "false"
-      case 73: // "this"
-      case 74: // "new"
-      case 75: // "delete"
-      case 76: // L_IDENT
-      case 77: // L_STRING
-      case 78: // L_NUMBER
-      case 79: // L_CHAR
+      case 48: // ".."
+      case 49: // "break"
+      case 50: // "case"
+      case 51: // "continue"
+      case 52: // "class"
+      case 53: // "catch"
+      case 54: // "conversion"
+      case 55: // "default"
+      case 56: // "do"
+      case 57: // "delete"
+      case 58: // "else"
+      case 59: // "enum"
+      case 60: // "for"
+      case 61: // "finally"
+      case 62: // "false"
+      case 63: // "get"
+      case 64: // "goto"
+      case 65: // "if"
+      case 66: // "namespace"
+      case 67: // "new"
+      case 68: // "operator"
+      case 69: // "return"
+      case 70: // "set"
+      case 71: // "switch"
+      case 72: // "throw"
+      case 73: // "try"
+      case 74: // "true"
+      case 75: // "this"
+      case 76: // "using"
+      case 77: // "while"
+      case 78: // L_IDENT
+      case 79: // L_STRING
+      case 80: // L_NUMBER
+      case 81: // L_CHAR
         value.template destroy< yaoosl::compiler::tokenizer::token > ();
         break;
 
@@ -1841,89 +1867,91 @@ namespace  yaoosl { namespace compiler  {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 82: // using
-      case 83: // using_low
-      case 84: // filestmnt
-      case 85: // filestmnts
-      case 86: // classstmnt
-      case 87: // classstmnts
-      case 88: // codestmnt
-      case 89: // codestmnts
-      case 90: // type_ident
-      case 91: // type
-      case 92: // typelist
-      case 93: // encpsltn
-      case 94: // encpsltn_n_cls
-      case 95: // template_def
-      case 96: // template_defs
-      case 97: // template_use
-      case 98: // template
-      case 99: // namespace
-      case 100: // enum
-      case 101: // enum_body
-      case 102: // enum_values
-      case 103: // enum_value
-      case 104: // class
-      case 105: // classhead
-      case 106: // classbody
-      case 107: // mthd
-      case 108: // mthd_head
-      case 109: // mthd_args
-      case 110: // mthd_body
-      case 111: // mthd_arglist
-      case 112: // mthd_arg
-      case 113: // cnvrsn
-      case 114: // mthdop
-      case 115: // mthdop_head
-      case 116: // mthdop_args
-      case 117: // mthdop_ops1p
-      case 118: // mthdop_ops1s
-      case 119: // mthdop_ops2
-      case 120: // mthdcnst
-      case 121: // mthdcnst_head
-      case 122: // prop
-      case 123: // prop_head
-      case 124: // prop_body
-      case 125: // prop_set
-      case 126: // prop_get
-      case 127: // ifelse
-      case 128: // for
-      case 129: // for_step
-      case 130: // for_step_arg
-      case 131: // for_each
-      case 132: // while
-      case 133: // switch
-      case 134: // switch_cases
-      case 135: // switch_case
-      case 136: // case
-      case 137: // try
-      case 138: // catch
-      case 139: // catchlist
-      case 140: // finally
-      case 141: // trycatch
-      case 142: // statement
-      case 143: // declaration
-      case 144: // scope
-      case 145: // val
-      case 146: // assignment
-      case 147: // explist
-      case 148: // exp01
-      case 149: // exp02
-      case 150: // exp03
-      case 151: // exp04
-      case 152: // exp05
-      case 153: // exp06
-      case 154: // exp07
-      case 155: // exp08
-      case 156: // exp09
-      case 157: // exp10
-      case 158: // exp11
-      case 159: // exp12
-      case 160: // arrget
-      case 161: // dotnav
-      case 162: // call
-      case 163: // expp
-      case 164: // cval
+      case 84: // using
+      case 85: // using_low
+      case 86: // filestmnt
+      case 87: // filestmnts
+      case 88: // classstmnt
+      case 89: // classstmnts
+      case 90: // codestmnt
+      case 91: // codestmnts
+      case 92: // type_ident
+      case 93: // type
+      case 94: // typelist
+      case 95: // encpsltn
+      case 96: // encpsltn_n_cls
+      case 97: // template_def
+      case 98: // template_defs
+      case 99: // template_use
+      case 100: // template
+      case 101: // namespace
+      case 102: // enum
+      case 103: // enum_body
+      case 104: // enum_values
+      case 105: // enum_value
+      case 106: // class
+      case 107: // classhead
+      case 108: // classbody
+      case 109: // mthd
+      case 110: // mthd_head
+      case 111: // mthd_args
+      case 112: // mthd_body
+      case 113: // mthd_arglist
+      case 114: // mthd_arg
+      case 115: // cnvrsn
+      case 116: // ucnvrsn
+      case 117: // uecnvrsn
+      case 118: // mthdop
+      case 119: // mthdop_head
+      case 120: // mthdop_args
+      case 121: // mthdop_ops1p
+      case 122: // mthdop_ops1s
+      case 123: // mthdop_ops2
+      case 124: // mthdcnst
+      case 125: // mthdcnst_head
+      case 126: // prop
+      case 127: // prop_head
+      case 128: // prop_body
+      case 129: // prop_set
+      case 130: // prop_get
+      case 131: // ifelse
+      case 132: // for
+      case 133: // for_step
+      case 134: // for_step_arg
+      case 135: // for_each
+      case 136: // while
+      case 137: // switch
+      case 138: // switch_cases
+      case 139: // switch_case
+      case 140: // case
+      case 141: // try
+      case 142: // catch
+      case 143: // catchlist
+      case 144: // finally
+      case 145: // trycatch
+      case 146: // statement
+      case 147: // declaration
+      case 148: // scope
+      case 149: // val
+      case 150: // assignment
+      case 151: // explist
+      case 152: // exp01
+      case 153: // exp02
+      case 154: // exp03
+      case 155: // exp04
+      case 156: // exp05
+      case 157: // exp06
+      case 158: // exp07
+      case 159: // exp08
+      case 160: // exp09
+      case 161: // exp10
+      case 162: // exp11
+      case 163: // exp12
+      case 164: // arrget
+      case 165: // dotnav
+      case 166: // call
+      case 167: // expp
+      case 168: // cval
         value.move< yaoosl::compiler::cstnode > (s.value);
         break;
 
@@ -1972,38 +2000,40 @@ namespace  yaoosl { namespace compiler  {
       case 45: // "."
       case 46: // "?"
       case 47: // "=>"
-      case 48: // "class"
-      case 49: // "conversion"
-      case 50: // "get"
-      case 51: // "set"
-      case 52: // "namespace"
-      case 53: // "if"
-      case 54: // "for"
-      case 55: // "else"
-      case 56: // "while"
-      case 57: // "do"
-      case 58: // "switch"
-      case 59: // "case"
-      case 60: // "default"
-      case 61: // "return"
-      case 62: // "throw"
-      case 63: // "goto"
-      case 64: // "try"
-      case 65: // "catch"
-      case 66: // "finally"
-      case 67: // "operator"
-      case 68: // "using"
-      case 69: // "enum"
-      case 70: // ".."
-      case 71: // "true"
-      case 72: // "false"
-      case 73: // "this"
-      case 74: // "new"
-      case 75: // "delete"
-      case 76: // L_IDENT
-      case 77: // L_STRING
-      case 78: // L_NUMBER
-      case 79: // L_CHAR
+      case 48: // ".."
+      case 49: // "break"
+      case 50: // "case"
+      case 51: // "continue"
+      case 52: // "class"
+      case 53: // "catch"
+      case 54: // "conversion"
+      case 55: // "default"
+      case 56: // "do"
+      case 57: // "delete"
+      case 58: // "else"
+      case 59: // "enum"
+      case 60: // "for"
+      case 61: // "finally"
+      case 62: // "false"
+      case 63: // "get"
+      case 64: // "goto"
+      case 65: // "if"
+      case 66: // "namespace"
+      case 67: // "new"
+      case 68: // "operator"
+      case 69: // "return"
+      case 70: // "set"
+      case 71: // "switch"
+      case 72: // "throw"
+      case 73: // "try"
+      case 74: // "true"
+      case 75: // "this"
+      case 76: // "using"
+      case 77: // "while"
+      case 78: // L_IDENT
+      case 79: // L_STRING
+      case 80: // L_NUMBER
+      case 81: // L_CHAR
         value.move< yaoosl::compiler::tokenizer::token > (s.value);
         break;
 
@@ -2069,7 +2099,8 @@ namespace  yaoosl { namespace compiler  {
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
-     325,   326,   327,   328,   329,   330,   331,   332,   333,   334
+     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
+     335,   336
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -2345,69 +2376,15 @@ namespace  yaoosl { namespace compiler  {
   }
 
   parser::symbol_type
-  parser::make_CLASS (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_DOTDOT (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::CLASS, v, l);
+    return symbol_type (token::DOTDOT, v, l);
   }
 
   parser::symbol_type
-  parser::make_CONVERSION (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_BREAK (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::CONVERSION, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_GET (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::GET, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_SET (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::SET, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_NAMESPACE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::NAMESPACE, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_IF (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::IF, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_FOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::FOR, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_ELSE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::ELSE, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_WHILE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::WHILE, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_DO (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::DO, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_SWITCH (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::SWITCH, v, l);
+    return symbol_type (token::BREAK, v, l);
   }
 
   parser::symbol_type
@@ -2417,33 +2394,15 @@ namespace  yaoosl { namespace compiler  {
   }
 
   parser::symbol_type
-  parser::make_DEFAULT (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_CONTINUE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::DEFAULT, v, l);
+    return symbol_type (token::CONTINUE, v, l);
   }
 
   parser::symbol_type
-  parser::make_RETURN (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_CLASS (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::RETURN, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_THROW (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::THROW, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_GOTO (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::GOTO, v, l);
-  }
-
-  parser::symbol_type
-  parser::make_TRY (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
-  {
-    return symbol_type (token::TRY, v, l);
+    return symbol_type (token::CLASS, v, l);
   }
 
   parser::symbol_type
@@ -2453,21 +2412,33 @@ namespace  yaoosl { namespace compiler  {
   }
 
   parser::symbol_type
-  parser::make_FINALLY (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_CONVERSION (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::FINALLY, v, l);
+    return symbol_type (token::CONVERSION, v, l);
   }
 
   parser::symbol_type
-  parser::make_OPERATOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_DEFAULT (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::OPERATOR, v, l);
+    return symbol_type (token::DEFAULT, v, l);
   }
 
   parser::symbol_type
-  parser::make_USING (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_DO (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::USING, v, l);
+    return symbol_type (token::DO, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_DELETE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::DELETE, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_ELSE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::ELSE, v, l);
   }
 
   parser::symbol_type
@@ -2477,15 +2448,15 @@ namespace  yaoosl { namespace compiler  {
   }
 
   parser::symbol_type
-  parser::make_DOTDOT (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_FOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::DOTDOT, v, l);
+    return symbol_type (token::FOR, v, l);
   }
 
   parser::symbol_type
-  parser::make_TRUE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_FINALLY (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::TRUE, v, l);
+    return symbol_type (token::FINALLY, v, l);
   }
 
   parser::symbol_type
@@ -2495,9 +2466,27 @@ namespace  yaoosl { namespace compiler  {
   }
 
   parser::symbol_type
-  parser::make_THIS (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_GET (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::THIS, v, l);
+    return symbol_type (token::GET, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_GOTO (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::GOTO, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_IF (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::IF, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_NAMESPACE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::NAMESPACE, v, l);
   }
 
   parser::symbol_type
@@ -2507,9 +2496,63 @@ namespace  yaoosl { namespace compiler  {
   }
 
   parser::symbol_type
-  parser::make_DELETE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  parser::make_OPERATOR (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
   {
-    return symbol_type (token::DELETE, v, l);
+    return symbol_type (token::OPERATOR, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_RETURN (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::RETURN, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_SET (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::SET, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_SWITCH (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::SWITCH, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_THROW (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::THROW, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_TRY (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::TRY, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_TRUE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::TRUE, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_THIS (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::THIS, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_USING (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::USING, v, l);
+  }
+
+  parser::symbol_type
+  parser::make_WHILE (const yaoosl::compiler::tokenizer::token& v, const location_type& l)
+  {
+    return symbol_type (token::WHILE, v, l);
   }
 
   parser::symbol_type
@@ -2539,7 +2582,7 @@ namespace  yaoosl { namespace compiler  {
 
 #line 6 "parser.y" // lalr1.cc:377
 } } //  yaoosl::compiler 
-#line 2543 "parser.tab.hh" // lalr1.cc:377
+#line 2586 "parser.tab.hh" // lalr1.cc:377
 
 
 

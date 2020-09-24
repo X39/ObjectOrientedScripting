@@ -107,9 +107,22 @@ static std::optional<std::string> read_file_from_disk(std::string_view physical_
 
 int main(int argc, char** argv)
 {
-	auto data_ = read_file_from_disk("D:\Git\ObjectOrientedScripting\example.ys");
-	auto data = *data_;
-	yaoosl::compiler::tokenizer tokenizer(data.begin(), data.end(), "");
-	yaoosl::compiler::cstnode root;
-	yaoosl::compiler::parser p(tokenizer, root, "");
+	auto file = "D:\\Git\\ObjectOrientedScripting\\example.ys";
+	std::cout << "\u001b[33m" << "Parsing: " << file << "\u001b[0m" << std::endl;
+	auto data_ = read_file_from_disk(file);
+	if (data_.has_value())
+	{
+		auto data = *data_;
+		yaoosl::compiler::tokenizer tokenizer(data.begin(), data.end(), "");
+		yaoosl::compiler::cstnode root;
+		yaoosl::compiler::parser p(tokenizer, root, "");
+		p.set_debug_level(1);
+		p.parse();
+		return 0;
+	}
+	else
+	{
+		std::cerr << "Failed to open file '" << file << "'." << std::endl;
+		return -1;
+	}
 }

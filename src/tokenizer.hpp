@@ -3,6 +3,9 @@
 #include <string>
 #include <string_view>
 #include <cctype>
+#include <optional>
+
+
 namespace yaoosl::compiler
 {
     class tokenizer
@@ -24,9 +27,11 @@ namespace yaoosl::compiler
             l_number,
             l_char,
 
+            t_break,
             t_case,
             t_catch,
             t_class,
+            t_continue,
             t_conversion,
             t_default,
             t_delete,
@@ -105,6 +110,25 @@ namespace yaoosl::compiler
             size_t offset;
             std::string_view contents;
             std::string path;
+
+            std::string to_string() const
+            {
+                std::string s;
+                s.append("L");
+                s.append(std::to_string(line));
+                s.append("; C");
+                s.append(std::to_string(line));
+                s.append("; O");
+                s.append(std::to_string(line));
+                s.append("; ");
+                s.append(tokenizer::to_string(type));
+                s.append("; P'");
+                s.append(path);
+                s.append("'; '");
+                s.append(contents);
+                s.append("'");
+                return s;
+            }
         };
         using iterator = std::string::iterator;
     private:
@@ -128,9 +152,9 @@ namespace yaoosl::compiler
             }
         }
         template<char ... TArgs>
-        inline bool is_match(iterator value) { return value < m_end && is_match<TArgs...>(*value); }
+        bool is_match(iterator value) { return value < m_end && is_match<TArgs...>(*value); }
         template<size_t len, char ... TArgs>
-        inline bool is_match_repeated(iterator value)
+        bool is_match_repeated(iterator value)
         {
             size_t i = 0;
             while (value < m_end && is_match<TArgs...>(*value++)) { ++i; }
@@ -138,16 +162,22 @@ namespace yaoosl::compiler
         }
 
         template<typename = void>
-        inline size_t len_match_exact(iterator value) { return 0; }
+        std::optional<size_t> len_match_exact_(iterator value) { return 0; }
         template<char TArg, char ... TArgs>
-        inline size_t len_match_exact(iterator value)
+        std::optional<size_t> len_match_exact_(iterator value)
         {
-            auto res = len_match_exact<TArgs...>(value + 1);
-            return value < m_end && res && *value == TArg ? res + 1 : 0;
+            auto res = len_match_exact_<TArgs...>(value + 1);
+            return ((value < m_end) && (res.has_value()) && (*value == TArg)) ? std::optional<size_t>{ *res + 1 } : std::optional<size_t>{};
+        }
+        template<char ... TArgs>
+        size_t len_match_exact(iterator value)
+        {
+            auto res = len_match_exact_<TArgs...>(value);
+            return res.has_value() ? *res : 0;
         }
 
         template<char ... TArgs>
-        inline size_t len_match(iterator str)
+        size_t len_match(iterator str)
         {
             iterator it = str;
             while (it < m_end && is_match<TArgs...>(*it++)) {}
@@ -211,7 +241,7 @@ namespace yaoosl::compiler
                         }
 
                         // update column
-                        m_column = 0;
+                        m_column = null_col;
 
                         // set length
                         len = iter - m_current;
@@ -222,14 +252,14 @@ namespace yaoosl::compiler
                     if (is_match_repeated<2, '/'>(iter))
                     {
                         // find line comment end
-                        while (!is_match<'\n'>(++iter));
+                        while (!is_match<'\n'>(++iter) && iter != m_end);
 
                         // update position info
                         m_line++;
-                        m_column = 0;
+                        m_column = null_col;
 
                         // set length
-                        len = iter - m_current;
+                        len = iter - m_current + (iter == m_end ? 0 : 1);
                     }
                 } break;
                 case etoken::i_comment_block: {
@@ -249,7 +279,7 @@ namespace yaoosl::compiler
                             else
                             {
                                 m_line++;
-                                m_column = 0;
+                                m_column = null_col;
                             }
                             ++iter;
                         }
@@ -275,7 +305,7 @@ namespace yaoosl::compiler
                         else
                         {
                             m_line++;
-                            m_column = 0;
+                            m_column = null_col;
                         }
                         ++iter;
                     }
@@ -304,7 +334,7 @@ namespace yaoosl::compiler
                         else
                         {
                             m_line++;
-                            m_column = 0;
+                            m_column = null_col;
                         }
                         ++iter;
                     }
@@ -333,7 +363,7 @@ namespace yaoosl::compiler
                         else
                         {
                             m_line++;
-                            m_column = 0;
+                            m_column = null_col;
                         }
                         ++iter;
                     }
@@ -345,7 +375,7 @@ namespace yaoosl::compiler
                         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'>(iter);
-                } break;
+                } m_column += len; break;
                 case etoken::l_number: {
                     size_t res = 0;
                     // match (optional) prefix
@@ -367,80 +397,82 @@ namespace yaoosl::compiler
                         if (res == 0) { len--; iter--; }
                         else { len += res; iter += res; }
                     }
-                } break;
+                } m_column += len; break;
 
-                case etoken::t_case:                    len = len_ident_match(iter, "case");        break;
-                case etoken::t_catch:                   len = len_ident_match(iter, "catch");       break;
-                case etoken::t_class:                   len = len_ident_match(iter, "class");       break;
-                case etoken::t_conversion:              len = len_ident_match(iter, "conversion");  break;
-                case etoken::t_default:                 len = len_ident_match(iter, "default");     break;
-                case etoken::t_delete:                  len = len_ident_match(iter, "delete");      break;
-                case etoken::t_derived:                 len = len_ident_match(iter, "derived");     break;
-                case etoken::t_do:                      len = len_ident_match(iter, "do");          break;
-                case etoken::t_else:                    len = len_ident_match(iter, "else");        break;
-                case etoken::t_enum:                    len = len_ident_match(iter, "enum");        break;
-                case etoken::t_false:                   len = len_ident_match(iter, "false");       break;
-                case etoken::t_finally:                 len = len_ident_match(iter, "finally");     break;
-                case etoken::t_for:                     len = len_ident_match(iter, "for");         break;
-                case etoken::t_get:                     len = len_ident_match(iter, "get");         break;
-                case etoken::t_goto:                    len = len_ident_match(iter, "goto");        break;
-                case etoken::t_if:                      len = len_ident_match(iter, "if");          break;
-                case etoken::t_local:                   len = len_ident_match(iter, "local");       break;
-                case etoken::t_namespace:               len = len_ident_match(iter, "namespace");   break;
-                case etoken::t_new:                     len = len_ident_match(iter, "new");         break;
-                case etoken::t_operator:                len = len_ident_match(iter, "operator");    break;
-                case etoken::t_private:                 len = len_ident_match(iter, "private");     break;
-                case etoken::t_public:                  len = len_ident_match(iter, "public");      break;
-                case etoken::t_return:                  len = len_ident_match(iter, "return");      break;
-                case etoken::t_set:                     len = len_ident_match(iter, "set");         break;
-                case etoken::t_switch:                  len = len_ident_match(iter, "switch");      break;
-                case etoken::t_this:                    len = len_ident_match(iter, "this");        break;
-                case etoken::t_throw:                   len = len_ident_match(iter, "throw");       break;
-                case etoken::t_true:                    len = len_ident_match(iter, "true");        break;
-                case etoken::t_try:                     len = len_ident_match(iter, "try");         break;
-                case etoken::t_unbound:                 len = len_ident_match(iter, "unbound");     break;
-                case etoken::t_using:                   len = len_ident_match(iter, "using");       break;
-                case etoken::t_while:                   len = len_ident_match(iter, "while");       break;
+                case etoken::t_break:                   len = len_ident_match(iter, "break");       m_column += len; break;
+                case etoken::t_case:                    len = len_ident_match(iter, "case");        m_column += len; break;
+                case etoken::t_catch:                   len = len_ident_match(iter, "catch");       m_column += len; break;
+                case etoken::t_class:                   len = len_ident_match(iter, "class");       m_column += len; break;
+                case etoken::t_continue:                len = len_ident_match(iter, "continue");    m_column += len; break;
+                case etoken::t_conversion:              len = len_ident_match(iter, "conversion");  m_column += len; break;
+                case etoken::t_default:                 len = len_ident_match(iter, "default");     m_column += len; break;
+                case etoken::t_delete:                  len = len_ident_match(iter, "delete");      m_column += len; break;
+                case etoken::t_derived:                 len = len_ident_match(iter, "derived");     m_column += len; break;
+                case etoken::t_do:                      len = len_ident_match(iter, "do");          m_column += len; break;
+                case etoken::t_else:                    len = len_ident_match(iter, "else");        m_column += len; break;
+                case etoken::t_enum:                    len = len_ident_match(iter, "enum");        m_column += len; break;
+                case etoken::t_false:                   len = len_ident_match(iter, "false");       m_column += len; break;
+                case etoken::t_finally:                 len = len_ident_match(iter, "finally");     m_column += len; break;
+                case etoken::t_for:                     len = len_ident_match(iter, "for");         m_column += len; break;
+                case etoken::t_get:                     len = len_ident_match(iter, "get");         m_column += len; break;
+                case etoken::t_goto:                    len = len_ident_match(iter, "goto");        m_column += len; break;
+                case etoken::t_if:                      len = len_ident_match(iter, "if");          m_column += len; break;
+                case etoken::t_local:                   len = len_ident_match(iter, "local");       m_column += len; break;
+                case etoken::t_namespace:               len = len_ident_match(iter, "namespace");   m_column += len; break;
+                case etoken::t_new:                     len = len_ident_match(iter, "new");         m_column += len; break;
+                case etoken::t_operator:                len = len_ident_match(iter, "operator");    m_column += len; break;
+                case etoken::t_private:                 len = len_ident_match(iter, "private");     m_column += len; break;
+                case etoken::t_public:                  len = len_ident_match(iter, "public");      m_column += len; break;
+                case etoken::t_return:                  len = len_ident_match(iter, "return");      m_column += len; break;
+                case etoken::t_set:                     len = len_ident_match(iter, "set");         m_column += len; break;
+                case etoken::t_switch:                  len = len_ident_match(iter, "switch");      m_column += len; break;
+                case etoken::t_this:                    len = len_ident_match(iter, "this");        m_column += len; break;
+                case etoken::t_throw:                   len = len_ident_match(iter, "throw");       m_column += len; break;
+                case etoken::t_true:                    len = len_ident_match(iter, "true");        m_column += len; break;
+                case etoken::t_try:                     len = len_ident_match(iter, "try");         m_column += len; break;
+                case etoken::t_unbound:                 len = len_ident_match(iter, "unbound");     m_column += len; break;
+                case etoken::t_using:                   len = len_ident_match(iter, "using");       m_column += len; break;
+                case etoken::t_while:                   len = len_ident_match(iter, "while");       m_column += len; break;
 
-                case etoken::s_and:                     len = len_match_exact<'&'>(iter);           break;
-                case etoken::s_andand:                  len = len_match_exact<'&', '&'>(iter);      break;
-                case etoken::s_arrowhead:               len = len_match_exact<'=', '>'>(iter);      break;
-                case etoken::s_circumflex:              len = len_match_exact<'^'>(iter);           break;
-                case etoken::s_colon:                   len = len_match_exact<':'>(iter);           break;
-                case etoken::s_coloncolon:              len = len_match_exact<':', ':'>(iter);      break;
-                case etoken::s_comma:                   len = len_match_exact<','>(iter);           break;
-                case etoken::s_curlyc:                  len = len_match_exact<'}'>(iter);           break;
-                case etoken::s_curlyo:                  len = len_match_exact<'{'>(iter);           break;
-                case etoken::s_dot:                     len = len_match_exact<'.'>(iter);           break;
-                case etoken::s_equal:                   len = len_match_exact<'='>(iter);           break;
-                case etoken::s_equalequal:              len = len_match_exact<'=='>(iter);          break;
-                case etoken::s_exclamationmark:         len = len_match_exact<'!'>(iter);           break;
-                case etoken::s_exclamationmarkequal:    len = len_match_exact<'!', '='>(iter);      break;
-                case etoken::s_gt:                      len = len_match_exact<'>'>(iter);           break;
-                case etoken::s_gtequal:                 len = len_match_exact<'>', '='>(iter);      break;
-                case etoken::s_gtgt:                    len = len_match_exact<'>', '>'>(iter);      break;
-                case etoken::s_gtgtgt:                  len = len_match_exact<'>', '>', '>'>(iter); break;
-                case etoken::s_lt:                      len = len_match_exact<'<'>(iter);           break;
-                case etoken::s_ltequal:                 len = len_match_exact<'<', '='>(iter);      break;
-                case etoken::s_ltlt:                    len = len_match_exact<'<', '<'>(iter);      break;
-                case etoken::s_ltltlt:                  len = len_match_exact<'<', '<', '<'>(iter); break;
-                case etoken::s_minus:                   len = len_match_exact<'-'>(iter);           break;
-                case etoken::s_minusminus:              len = len_match_exact<'-', '-'>(iter);      break;
-                case etoken::s_percent:                 len = len_match_exact<'%'>(iter);           break;
-                case etoken::s_plus:                    len = len_match_exact<'+'>(iter);           break;
-                case etoken::s_plusplus:                len = len_match_exact<'+', '+'>(iter);      break;
-                case etoken::s_questionmark:            len = len_match_exact<'?'>(iter);           break;
-                case etoken::s_roundc:                  len = len_match_exact<')'>(iter);           break;
-                case etoken::s_roundo:                  len = len_match_exact<'('>(iter);           break;
-                case etoken::s_semicolon:               len = len_match_exact<';'>(iter);           break;
-                case etoken::s_slash:                   len = len_match_exact<'/'>(iter);           break;
-                case etoken::s_squarec:                 len = len_match_exact<'['>(iter);           break;
-                case etoken::s_squareo:                 len = len_match_exact<']'>(iter);           break;
-                case etoken::s_star:                    len = len_match_exact<'*'>(iter);           break;
-                case etoken::s_tilde:                   len = len_match_exact<'~'>(iter);           break;
-                case etoken::s_tildeequal:              len = len_match_exact<'~', '='>(iter);      break;
-                case etoken::s_vline:                   len = len_match_exact<'|'>(iter);           break;
-                case etoken::s_vlinevline:              len = len_match_exact<'|', '|'>(iter);      break;
+                case etoken::s_and:                     len = len_match_exact<'&'>(iter);           m_column += len; break;
+                case etoken::s_andand:                  len = len_match_exact<'&', '&'>(iter);      m_column += len; break;
+                case etoken::s_arrowhead:               len = len_match_exact<'=', '>'>(iter);      m_column += len; break;
+                case etoken::s_circumflex:              len = len_match_exact<'^'>(iter);           m_column += len; break;
+                case etoken::s_colon:                   len = len_match_exact<':'>(iter);           m_column += len; break;
+                case etoken::s_coloncolon:              len = len_match_exact<':', ':'>(iter);      m_column += len; break;
+                case etoken::s_comma:                   len = len_match_exact<','>(iter);           m_column += len; break;
+                case etoken::s_curlyc:                  len = len_match_exact<'}'>(iter);           m_column += len; break;
+                case etoken::s_curlyo:                  len = len_match_exact<'{'>(iter);           m_column += len; break;
+                case etoken::s_dot:                     len = len_match_exact<'.'>(iter);           m_column += len; break;
+                case etoken::s_equal:                   len = len_match_exact<'='>(iter);           m_column += len; break;
+                case etoken::s_equalequal:              len = len_match_exact<'=', '='>(iter);          m_column += len; break;
+                case etoken::s_exclamationmark:         len = len_match_exact<'!'>(iter);           m_column += len; break;
+                case etoken::s_exclamationmarkequal:    len = len_match_exact<'!', '='>(iter);      m_column += len; break;
+                case etoken::s_gt:                      len = len_match_exact<'>'>(iter);           m_column += len; break;
+                case etoken::s_gtequal:                 len = len_match_exact<'>', '='>(iter);      m_column += len; break;
+                case etoken::s_gtgt:                    len = len_match_exact<'>', '>'>(iter);      m_column += len; break;
+                case etoken::s_gtgtgt:                  len = len_match_exact<'>', '>', '>'>(iter); m_column += len; break;
+                case etoken::s_lt:                      len = len_match_exact<'<'>(iter);           m_column += len; break;
+                case etoken::s_ltequal:                 len = len_match_exact<'<', '='>(iter);      m_column += len; break;
+                case etoken::s_ltlt:                    len = len_match_exact<'<', '<'>(iter);      m_column += len; break;
+                case etoken::s_ltltlt:                  len = len_match_exact<'<', '<', '<'>(iter); m_column += len; break;
+                case etoken::s_minus:                   len = len_match_exact<'-'>(iter);           m_column += len; break;
+                case etoken::s_minusminus:              len = len_match_exact<'-', '-'>(iter);      m_column += len; break;
+                case etoken::s_percent:                 len = len_match_exact<'%'>(iter);           m_column += len; break;
+                case etoken::s_plus:                    len = len_match_exact<'+'>(iter);           m_column += len; break;
+                case etoken::s_plusplus:                len = len_match_exact<'+', '+'>(iter);      m_column += len; break;
+                case etoken::s_questionmark:            len = len_match_exact<'?'>(iter);           m_column += len; break;
+                case etoken::s_roundc:                  len = len_match_exact<')'>(iter);           m_column += len; break;
+                case etoken::s_roundo:                  len = len_match_exact<'('>(iter);           m_column += len; break;
+                case etoken::s_semicolon:               len = len_match_exact<';'>(iter);           m_column += len; break;
+                case etoken::s_slash:                   len = len_match_exact<'/'>(iter);           m_column += len; break;
+                case etoken::s_squarec:                 len = len_match_exact<']'>(iter);           m_column += len; break;
+                case etoken::s_squareo:                 len = len_match_exact<'['>(iter);           m_column += len; break;
+                case etoken::s_star:                    len = len_match_exact<'*'>(iter);           m_column += len; break;
+                case etoken::s_tilde:                   len = len_match_exact<'~'>(iter);           m_column += len; break;
+                case etoken::s_tildeequal:              len = len_match_exact<'~', '='>(iter);      m_column += len; break;
+                case etoken::s_vline:                   len = len_match_exact<'|'>(iter);           m_column += len; break;
+                case etoken::s_vlinevline:              len = len_match_exact<'|', '|'>(iter);      m_column += len; break;
                 }
 
                 if (len > 0)
@@ -454,16 +486,33 @@ namespace yaoosl::compiler
             return t;
         }
 
+#ifdef _DEBUG
+        iterator    m_prev_current;
+        std::string m_prev_path;
+        size_t      m_prev_line;
+        size_t      m_prev_column;
+#endif // _DEBUG
+
+        static constexpr size_t null_col = 1;
+        static constexpr size_t null_line = 1;
+
     public:
-        tokenizer(iterator start, iterator end, std::string path) : m_start(start), m_current(start), m_end(end), m_line(0), m_column(0) {}
+        tokenizer(iterator start, iterator end, std::string path) : m_start(start), m_current(start), m_end(end), m_line(null_line), m_column(null_col) {}
         token next()
         {
+#ifdef _DEBUG
+            m_prev_current = m_current;
+            m_prev_path    = m_path;
+            m_prev_line    = m_line;
+            m_prev_column  = m_column;
+#endif // _DEBUG
+            
             if (m_current == m_end) { return { etoken::eof, m_line, m_column, (size_t)(m_current - m_start), {} }; };
             switch (*m_current)
             {
             case 'a':   return try_match({ etoken::l_ident });
-            case 'b':   return try_match({ etoken::l_ident });
-            case 'c':   return try_match({ etoken::t_case, etoken::t_catch, etoken::t_class, etoken::t_conversion, etoken::l_ident });
+            case 'b':   return try_match({ etoken::t_break, etoken::l_ident });
+            case 'c':   return try_match({ etoken::t_case, etoken::t_catch, etoken::t_class, etoken::t_continue, etoken::t_conversion, etoken::l_ident });
             case 'd':   return try_match({ etoken::t_default, etoken::t_delete, etoken::t_derived, etoken::t_do, etoken::l_ident });
             case 'e':   return try_match({ etoken::t_else, etoken::t_enum, etoken::l_ident });
             case 'f':   return try_match({ etoken::t_false, etoken::t_finally, etoken::t_for, etoken::l_ident });
@@ -561,11 +610,20 @@ namespace yaoosl::compiler
             default:    return { etoken::invalid, m_line, m_column, (size_t)(m_current - m_start), {} };
             }
         }
+#ifdef _DEBUG
+        void undo_prev()
+        {
+            m_current = m_prev_current;
+            m_path    = m_prev_path;
+            m_line    = m_prev_line;
+            m_column  = m_prev_column;
+        }
+#endif // _DEBUG
         token create_token() const
         {
             return { etoken::invalid, m_line, m_column, (size_t)(m_current - m_start), m_path };
         }
-        std::string_view to_string(etoken t) const
+        static std::string_view to_string(etoken t)
         {
             using namespace std::string_view_literals;
             switch (t)
@@ -577,9 +635,11 @@ namespace yaoosl::compiler
             case etoken::i_comment_block:           return "comment_block"sv;
             case etoken::i_whitespace:              return "whitespace"sv;
 
+            case etoken::t_break:                   return "break"sv;
             case etoken::t_case:                    return "case"sv;
             case etoken::t_catch:                   return "catch"sv;
             case etoken::t_class:                   return "class"sv;
+            case etoken::t_continue:                return "continue"sv;
             case etoken::t_conversion:              return "conversion"sv;
             case etoken::t_default:                 return "default"sv;
             case etoken::t_delete:                  return "delete"sv;
