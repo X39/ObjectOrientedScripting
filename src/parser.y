@@ -223,7 +223,7 @@ template_use    : %empty                                                { $$ = y
 template        : "<" template_defs ">"                                 { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::TEMPLATE, $1, { $2 } }; }
                 ;
 // ------------------- NAMESPACE ------------------- \\
-namespace       : "namespace" type_ident "{" filestmnt "}"              { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::NAMESPACE, $1, { $2, $4 } }; }
+namespace       : "namespace" type_ident "{" filestmnts "}"             { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::NAMESPACE, $1, { $2, $4 } }; }
                 ;
 // ---------------------- ENUM --------------------- \\
 enum            : encpsltn_n_cls "enum" enum_body                       { $$ = yaoosl::compiler::cstnode{ yaoosl::compiler::cstnode::ENUM, $2, { $1, $3 } }; }

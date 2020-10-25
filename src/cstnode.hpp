@@ -9,9 +9,21 @@ namespace yaoosl::compiler
 {
     struct cstnode
     {
-        enum kind
+        enum class kind
         {
             empty,
+            token,
+
+            s_file_statements,
+            s_class,
+            s_class_head,
+            s_namespace,
+            s_using,
+            s_encapsulation,
+            s_enum,
+            s_enum_head,
+            s_enum_body,
+            s_enum_value,
             
             ARRGET,
             ASSIGNMENT,
@@ -101,5 +113,10 @@ namespace yaoosl::compiler
         kind type;
         yaoosl::compiler::tokenizer::token token;
         std::vector<cstnode> nodes;
+
+        cstnode() : type(kind::empty), token(), nodes() {}
+        cstnode(kind type) : type(type), token(), nodes() {}
+        cstnode(kind type, yaoosl::compiler::tokenizer::token token) : type(type), token(token), nodes() {}
+        cstnode(yaoosl::compiler::tokenizer::token token) : type(kind::token), token(token), nodes() {}
     };
 }
