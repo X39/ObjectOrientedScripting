@@ -1,6 +1,7 @@
 #pragma once
 #include "cstnode.hpp"
 #include "tokenizer.hpp"
+#include "logging.h"
 
 #include <optional>
 #include <queue>
@@ -8,7 +9,7 @@
 
 namespace yaoosl::compiler
 {
-	class parser
+	class parser : public yaoosl::logging::can_log
 	{
 		class index_marker
 		{
@@ -36,6 +37,10 @@ namespace yaoosl::compiler
 			auto ret_token = m_tokens[m_tokens_index++];
 			return ret_token;
 		}
+		tokenizer::token current_token() {
+			auto ret_token = m_tokens[m_tokens_index];
+			return ret_token;
+		}
 		tokenizer::token look_ahead_token(size_t len = 1) {
 			auto index = m_tokens_index;
 			tokenizer::token t;
@@ -61,37 +66,44 @@ namespace yaoosl::compiler
 			return index_marker(*this);
 		}
 	public:
-		parser(tokenizer&& tokenizer) :
+		parser(yaoosl::logging::logger logger, tokenizer&& tokenizer) :
+			yaoosl::logging::can_log(logger),
 			m_tokenizer(tokenizer),
 			m_tokens_index(0),
 			m_tokens()
 		{}
 
-		std::optional<yaoosl::compiler::cstnode> p_start();
-		std::optional<yaoosl::compiler::cstnode> p_file_statements();
-		std::optional<yaoosl::compiler::cstnode> p_class();
-		std::optional<yaoosl::compiler::cstnode> p_class_head();
-		std::optional<yaoosl::compiler::cstnode> p_class_body();
-		std::optional<yaoosl::compiler::cstnode> p_class_statements();
-		std::optional<yaoosl::compiler::cstnode> p_namespace();
-		std::optional<yaoosl::compiler::cstnode> p_method(bool allow_instance);
-		std::optional<yaoosl::compiler::cstnode> p_method_head();
-		std::optional<yaoosl::compiler::cstnode> p_method_parameters();
-		std::optional<yaoosl::compiler::cstnode> p_method_body();
-		std::optional<yaoosl::compiler::cstnode> p_conversion(bool allow_instance);
-		std::optional<yaoosl::compiler::cstnode> p_operator(bool allow_instance);
-		std::optional<yaoosl::compiler::cstnode> p_constructor(tokenizer::token class_name_literal);
-		std::optional<yaoosl::compiler::cstnode> p_using();
-		std::optional<yaoosl::compiler::cstnode> p_enum();
-		std::optional<yaoosl::compiler::cstnode> p_enum_head();
-		std::optional<yaoosl::compiler::cstnode> p_enum_body();
-		std::optional<yaoosl::compiler::cstnode> p_enum_statements();
-		std::optional<yaoosl::compiler::cstnode> p_enum_value();
-		std::optional<yaoosl::compiler::cstnode> p_template_definition();
-		std::optional<yaoosl::compiler::cstnode> p_type_ident();
-		std::optional<yaoosl::compiler::cstnode> p_type_list();
-		std::optional<yaoosl::compiler::cstnode> p_type();
-		std::optional<yaoosl::compiler::cstnode> p_encapsulation(bool allow_instance);
-		std::optional<yaoosl::compiler::cstnode> p_value_constant();
+		std::optional<yaoosl::compiler::cstnode> p_start(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_file_statements(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_class(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_class_head(bool require, tokenizer::token* OUT_class_name_literal);
+		std::optional<yaoosl::compiler::cstnode> p_class_body(bool require, tokenizer::token class_name_literal);
+		std::optional<yaoosl::compiler::cstnode> p_class_statements(bool require, tokenizer::token class_name_literal);
+		std::optional<yaoosl::compiler::cstnode> p_class_member_head(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_namespace(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_property(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_property_body(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_property_get(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_property_set(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_method(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_method_head(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_method_parameters(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_method_body(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_conversion(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_operator(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_constructor(bool require, tokenizer::token class_name_literal);
+		std::optional<yaoosl::compiler::cstnode> p_destructor(bool require, tokenizer::token class_name_literal);
+		std::optional<yaoosl::compiler::cstnode> p_using(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_enum(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_enum_head(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_enum_body(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_enum_statements(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_enum_value(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_template_definition(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_type_ident(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_type_list(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_type(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_encapsulation(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_value_constant(bool require);
 	};
 }
