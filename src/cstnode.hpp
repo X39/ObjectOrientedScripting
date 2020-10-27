@@ -30,6 +30,8 @@ namespace yaoosl::compiler
             s_enum_body,
             s_enum_value,
             s_enum_statements,
+            s_method,
+            s_method_arg_list,
             
             ARRGET,
             ASSIGNMENT,

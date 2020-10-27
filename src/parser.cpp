@@ -254,7 +254,7 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_class_state
     return flag ? self_node : std::optional<cstnode>();
 }
 
-// p_class_member_head = p_encapsulation p_type L_IDENT
+// p_class_member_head = p_encapsulation [ "unbound" ] p_type L_IDENT
 std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_class_member_head(bool require, bool allow_instance)
 {
     auto __mark = mark();
@@ -266,6 +266,11 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_class_membe
     auto node_encapsulation = p_encapsulation(require, false);
     if (!node_encapsulation.has_value()) { __mark.rollback(); return {}; }
     else { self_node.nodes.push_back(node_encapsulation.value()); }
+
+    /* Optional token */
+    // ... [ "unbound" ] ...
+    auto token_unbound = look_ahead_token();
+    if (token_unbound.type == tokenizer::etoken::t_unbound) { self_node.nodes.push_back(next_token()); }
 
     /* we still cannot know duh... so rense and repeat. */
     // ... p_type ...
@@ -465,7 +470,158 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_property_se
     return self_node;
 }
 
-// p_using = "using" type [ "=" L_IDENT ]
+// p_method = p_class_member_head [ p_template_definition ] p_method_parameters p_method_body
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method(bool require, bool allow_instance)
+{
+    auto __mark = mark();
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_method;
+
+    /* pass down require to p_class_member_head. */
+    // p_class_member_head ...
+    auto node_class_member_head = p_class_member_head(require, allow_instance);
+    if (!node_class_member_head.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_class_member_head.value()); }
+
+    /* p_template_definition is optional. So pass down require to p_property_body. */
+    // ... [ p_template_definition ] ...
+    auto node_template_definition = p_template_definition(false);
+    if (!node_template_definition.has_value()) { }
+    else { self_node.nodes.push_back(node_template_definition.value()); }
+
+    /* pass down require to p_method_parameters. */
+    // ... p_method_parameters ...
+    auto node_method_parameters = p_method_parameters(require);
+    if (!node_method_parameters.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_method_parameters.value()); }
+
+    /* pass down require to p_method_body. */
+    // ... p_method_body
+    auto node_method_body = p_method_body(true, allow_instance);
+    if (!node_method_body.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_method_body.value()); }
+
+    return self_node;
+}
+
+// p_method_arg = p_type L_IDENT [ "=" p_value_constant ]
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method_arg(bool require)
+{
+    auto __mark = mark();
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_enum;
+
+    // p_type ...
+    auto node_type = p_type(require);
+    if (!node_type.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_type.value()); }
+
+    // ... L_IDENT ...
+    auto literal_ident = next_token();
+    if (literal_ident.type != tokenizer::etoken::l_ident) { log(msgs::syntax_error_generic(to_position(current_token()))); }
+    else { self_node.nodes.push_back(literal_ident); }
+
+    // ... [ "=" p_value_constant ]
+    if (look_ahead_token().type == tokenizer::etoken::s_equal)
+    {
+        // ... "=" ...
+        next_token();
+
+        /* pass down require to p_value_constant as this is ambigous with assignment */
+        // ... p_value_constant
+        auto node_value_constant = p_value_constant(require);
+        if (!node_value_constant.has_value()) { __mark.rollback(); return {}; }
+        else { self_node.nodes.push_back(node_value_constant.value()); }
+    }
+
+    return self_node;
+}
+
+// p_method_parameters = "(" p_method_arg_list ")"
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method_parameters(bool require)
+{
+    auto __mark = mark();
+
+    /* unless we are required, this determines a possible body-start. */
+    // "{" ...
+    auto token_curlyo = next_token();
+    if (token_curlyo.type != tokenizer::etoken::s_curlyo) { if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {}; }
+
+    /* unless we are required, the following is just a possible set. Pass down require as that only can tell wether we are or not. */
+    // ... p_method_arg_list ...
+    auto node_method_arg_list = p_method_arg_list(require);
+    if (!node_method_arg_list.has_value()) { __mark.rollback(); return {}; }
+
+    /* as we got to here, next token has to be s_curlyc. */
+    // ... "}"
+    auto token_curlyc = next_token();
+    if (token_curlyc.type != tokenizer::etoken::s_curlyc) { log(msgs::syntax_error_generic(to_position(current_token()))); __mark.rollback(); return {}; }
+
+    return node_method_arg_list.value();
+}
+
+// p_method_body = "{" p_code_statements "}"
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method_body(bool require, bool allow_instance)
+{
+    auto __mark = mark();
+
+    /* unless we are required, this determines a possible body-start. */
+    // "{" ...
+    auto token_curlyo = next_token();
+    if (token_curlyo.type != tokenizer::etoken::s_curlyo) { if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {}; }
+
+    /* unless we are required, the following is just a possible set. Pass down require as that only can tell wether we are or not. */
+    // ... p_code_statements ...
+    auto node_code_statements = p_code_statements(require);
+    if (!node_code_statements.has_value()) { __mark.rollback(); return {}; }
+
+    /* as we got to here, next token has to be s_curlyc. */
+    // ... "}"
+    auto token_curlyc = next_token();
+    if (token_curlyc.type != tokenizer::etoken::s_curlyc) { log(msgs::syntax_error_generic(to_position(current_token()))); __mark.rollback(); return {}; }
+
+    return node_code_statements.value();
+}
+
+// p_method_arg_list = [ p_method_arg { "," p_method_arg } [ "," ] ]
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method_arg_list(bool require)
+{
+    bool flag = false;
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_method_arg_list;
+    // Parse nodes until we can no longer parse nodes
+    bool had_comma = true; // set to true to prevent initial comma-check
+    do
+    {
+        if (!had_comma)
+        {
+            log(msgs::syntax_error_generic(to_position(current_token())));
+        }
+        std::optional<cstnode> tmp;
+        if ((tmp = p_enum_value(require)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if (!flag)
+        {
+            if (require)
+            {
+                log(msgs::syntax_error_generic(to_position(current_token())));
+            }
+            break;
+        }
+
+        // Check if next token is comma.
+        if (!(had_comma = next_token().type == tokenizer::etoken::s_comma))
+        {
+            undo_token();
+        }
+    } while (true);
+    return flag ? self_node : std::optional<cstnode>();
+}
+
+// p_using = "using" p_type [ "=" L_IDENT ]
 std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_using(bool require)
 {
     auto __mark = mark();

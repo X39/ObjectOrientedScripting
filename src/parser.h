@@ -74,6 +74,7 @@ namespace yaoosl::compiler
 		{}
 
 		std::optional<yaoosl::compiler::cstnode> p_start(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_code_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_file_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_class(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_class_head(bool require, tokenizer::token* OUT_class_name_literal);
@@ -86,7 +87,8 @@ namespace yaoosl::compiler
 		std::optional<yaoosl::compiler::cstnode> p_property_get(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_property_set(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_method(bool require, bool allow_instance);
-		std::optional<yaoosl::compiler::cstnode> p_method_head(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_method_arg(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_method_arg_list(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_method_parameters(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_method_body(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_conversion(bool require, bool allow_instance);
