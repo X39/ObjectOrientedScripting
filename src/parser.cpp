@@ -1,3 +1,12 @@
+/*************************************************************
+ *                  !!!!!IMPORTANT!!!!!                      *
+ *                                                           *
+ * Due to the complexity of the following code, whenever you *
+ * modify it, ensure that you updated the comments according *
+ * to your change too! Otherwise, the code might become      *
+ * unmaintainable due to the sheere complexity going on!     *
+ *************************************************************/
+
 #include "parser.h"
 #include "logging.h"
 
