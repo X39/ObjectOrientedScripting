@@ -25,7 +25,7 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_start(bool 
     return p_file_statements(require);
 }
 
-// p_code_statements = { p_conversion(false) | p_using ";" | p_if_else | p_for | p_try_catch_finally | p_while | p_switch | p_statements ";" | p_scope | p_value ";" | ";" }
+// p_code_statements = { p_conversion(false) | p_using ";" | p_if_else | p_for | p_try_catch_finally | p_while | p_switch | p_statements ";" | p_scope | p_value ";" | L_IDENT ":" | ";" }
 std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statements(bool require)
 {
     bool flag = false;
@@ -101,9 +101,105 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statem
             self_node.nodes.push_back(tmp.value());
             flag = true;
         }
+        else if (look_ahead_token(1).type == tokenizer::etoken::l_ident && look_ahead_token(2).type == tokenizer::etoken::s_colon)
+        {
+            cstnode cur = { next_token() };
+            cur.type = cstnode::kind::s_label;
+            self_node.nodes.push_back(cur); // Consume L_IDENT
+            next_token(); // Consume s_colon
+            flag = true;
+        }
         else if (look_ahead_token().type == tokenizer::etoken::s_semicolon)
         {
             next_token();
+        }
+        else if (!flag)
+        {
+            if (require)
+            {
+                log(msgs::syntax_error_generic(to_position(current_token())));
+            }
+            __mark.rollback();
+            break;
+        }
+    } while (true);
+    return flag ? self_node : std::optional<cstnode>();
+}
+
+// p_statements = { "break" | "continue" | "return" [ p_value ] | "throw" [ p_value ] | "delete" p_value | "goto" ( p_case | L_IDENT ) }
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_statements(bool require)
+{
+    bool flag = false;
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_code_statements;
+    // Parse nodes until we can no longer parse nodes
+    do
+    {
+        auto __mark = mark();
+        std::optional<cstnode> tmp;
+        if (look_ahead_token(1).type == tokenizer::etoken::t_break)
+        {
+            cstnode cur = {};
+            cur.token = next_token();
+            cur.type = cstnode::kind::s_statement_break;
+            self_node.nodes.push_back(cur);
+            flag = true;
+        }
+        else if (look_ahead_token(1).type == tokenizer::etoken::t_continue)
+        {
+            cstnode cur = {};
+            cur.token = next_token();
+            cur.type = cstnode::kind::s_statement_continue;
+            self_node.nodes.push_back(cur);
+            flag = true;
+        }
+        else if (look_ahead_token(1).type == tokenizer::etoken::t_return)
+        {
+            cstnode cur = {};
+            cur.token = next_token();
+            cur.type = cstnode::kind::s_statement_return;
+            if ((tmp = p_value(false)).has_value())
+            {
+                cur.nodes.push_back(tmp.value());
+            }
+            self_node.nodes.push_back(cur);
+            flag = true;
+        }
+        else if (look_ahead_token(1).type == tokenizer::etoken::t_throw)
+        {
+            cstnode cur = {};
+            cur.token = next_token();
+            cur.type = cstnode::kind::s_statement_throw;
+            if ((tmp = p_value(false)).has_value())
+            {
+                cur.nodes.push_back(tmp.value());
+            }
+            flag = true;
+        }
+        else if (look_ahead_token(1).type == tokenizer::etoken::t_delete && (tmp = p_value(false)).has_value())
+        {
+            cstnode cur = {};
+            cur.token = next_token();
+            cur.type = cstnode::kind::s_statement_delete;
+            cur.nodes.push_back(tmp.value());
+            self_node.nodes.push_back(cur);
+            flag = true;
+        }
+        else if (look_ahead_token(1).type == tokenizer::etoken::t_goto && (look_ahead_token(2).type == tokenizer::etoken::l_ident | (tmp = p_case(false)).has_value()))
+        {
+            cstnode cur = {};
+            cur.token = next_token();
+            cur.type = cstnode::kind::s_statement_return;
+            if (look_ahead_token().type == tokenizer::etoken::l_ident)
+            {
+                cur.nodes.push_back({ next_token() });
+            }
+            else
+            {
+                cur.nodes.push_back(tmp.value());
+            }
+            self_node.nodes.push_back(cur);
+            flag = true;
         }
         else if (!flag)
         {

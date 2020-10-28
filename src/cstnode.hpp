@@ -33,6 +33,12 @@ namespace yaoosl::compiler
             s_enum_statements,
             s_method,
             s_method_arg_list,
+            s_statement_return,
+            s_statement_throw,
+            s_statement_delete,
+            s_statement_break,
+            s_statement_continue,
+            s_label,
             
             ARRGET,
             ASSIGNMENT,
