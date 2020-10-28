@@ -14,6 +14,7 @@ namespace yaoosl::compiler
             empty,
             token,
 
+            s_code_statements,
             s_file_statements,
             s_class,
             s_class_head,

@@ -25,6 +25,99 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_start(bool 
     return p_file_statements(require);
 }
 
+// p_code_statements = { p_conversion(false) | p_using ";" | p_if_else | p_for | p_try_catch_finally | p_while | p_switch | p_statements ";" | p_scope | p_value ";" | ";" }
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statements(bool require)
+{
+    bool flag = false;
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_code_statements;
+    // Parse nodes until we can no longer parse nodes
+    do
+    {
+        auto __mark = mark();
+        std::optional<cstnode> tmp;
+        if ((tmp = p_conversion(false, false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_using(false)).has_value())
+        {
+            /* s_semicolon is required after using.                       *
+             * However, this is a weak error and we can continue parsing. */
+            if (look_ahead_token().type != tokenizer::etoken::s_semicolon)
+            { log(msgs::syntax_error_generic(to_position(look_ahead_token()))); }
+            else { next_token(); }
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_if_else(false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_for(false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_try_catch_finally(false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_while(false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_switch(false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_statements(false)).has_value())
+        {
+            /* s_semicolon is required after p_statements.                *
+             * However, this is a weak error and we can continue parsing. */
+            if (look_ahead_token().type != tokenizer::etoken::s_semicolon)
+            { log(msgs::syntax_error_generic(to_position(look_ahead_token()))); }
+            else { next_token(); }
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_scope(false)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if ((tmp = p_value(false)).has_value())
+        {
+            /* s_semicolon is required after p_value.                     *
+             * However, this is a weak error and we can continue parsing. */
+            if (look_ahead_token().type != tokenizer::etoken::s_semicolon)
+            { log(msgs::syntax_error_generic(to_position(look_ahead_token()))); }
+            else { next_token(); }
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if (look_ahead_token().type == tokenizer::etoken::s_semicolon)
+        {
+            next_token();
+        }
+        else if (!flag)
+        {
+            if (require)
+            {
+                log(msgs::syntax_error_generic(to_position(current_token())));
+            }
+            __mark.rollback();
+            break;
+        }
+    } while (true);
+    return flag ? self_node : std::optional<cstnode>();
+}
+
 // p_file_statements = { p_namespace | p_method | p_conversion | p_enum | p_using ";" }
 std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_file_statements(bool require)
 {
@@ -65,10 +158,9 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_file_statem
         {
             /* s_semicolon is required after using.                       *
              * However, this is a weak error and we can continue parsing. */
-            if (next_token().type != tokenizer::etoken::s_semicolon)
-            {
-                log(msgs::syntax_error_generic(to_position(current_token())));
-            }
+            if (look_ahead_token().type != tokenizer::etoken::s_semicolon)
+            { log(msgs::syntax_error_generic(to_position(look_ahead_token()))); }
+            else { next_token(); }
             self_node.nodes.push_back(tmp.value());
             flag = true;
         }
