@@ -91,7 +91,7 @@ namespace yaoosl::compiler
 		std::optional<yaoosl::compiler::cstnode> p_method_arg(bool require, bool allow_default = true);
 		std::optional<yaoosl::compiler::cstnode> p_method_arg_list(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_method_parameters(bool require);
-		std::optional<yaoosl::compiler::cstnode> p_method_body(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_method_scope(bool require, bool allow_this);
 		std::optional<yaoosl::compiler::cstnode> p_conversion(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_operator(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_operator_head(bool require);
@@ -103,7 +103,6 @@ namespace yaoosl::compiler
 		std::optional<yaoosl::compiler::cstnode> p_try_catch_finally(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_while(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_switch(bool require);
-		std::optional<yaoosl::compiler::cstnode> p_scope(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_label(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_case(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_enum(bool require);
