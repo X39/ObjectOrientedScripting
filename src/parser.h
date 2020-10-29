@@ -103,7 +103,6 @@ namespace yaoosl::compiler
 		std::optional<yaoosl::compiler::cstnode> p_try_catch_finally(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_while(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_switch(bool require);
-		std::optional<yaoosl::compiler::cstnode> p_label(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_case(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_enum(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_enum_head(bool require);
