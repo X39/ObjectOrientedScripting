@@ -74,7 +74,7 @@ namespace yaoosl::compiler
 		{}
 
 		std::optional<yaoosl::compiler::cstnode> p_start(bool require);
-		std::optional<yaoosl::compiler::cstnode> p_code_statements(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_code_statements(bool require, bool allow_this);
 		std::optional<yaoosl::compiler::cstnode> p_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_file_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_class(bool require);
