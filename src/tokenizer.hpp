@@ -72,6 +72,7 @@ namespace yaoosl::compiler
             s_curlyc,
             s_curlyo,
             s_dot,
+            s_dotdot,
             s_equal,
             s_equalequal,
             s_exclamationmarkequal,
@@ -444,8 +445,9 @@ namespace yaoosl::compiler
                 case etoken::s_curlyc:                  len = len_match_exact<'}'>(iter);           m_column += len; break;
                 case etoken::s_curlyo:                  len = len_match_exact<'{'>(iter);           m_column += len; break;
                 case etoken::s_dot:                     len = len_match_exact<'.'>(iter);           m_column += len; break;
+                case etoken::s_dotdot:                  len = len_match_exact<'.', '.'>(iter);      m_column += len; break;
                 case etoken::s_equal:                   len = len_match_exact<'='>(iter);           m_column += len; break;
-                case etoken::s_equalequal:              len = len_match_exact<'=', '='>(iter);          m_column += len; break;
+                case etoken::s_equalequal:              len = len_match_exact<'=', '='>(iter);      m_column += len; break;
                 case etoken::s_exclamationmark:         len = len_match_exact<'!'>(iter);           m_column += len; break;
                 case etoken::s_exclamationmarkequal:    len = len_match_exact<'!', '='>(iter);      m_column += len; break;
                 case etoken::s_gt:                      len = len_match_exact<'>'>(iter);           m_column += len; break;
@@ -598,7 +600,7 @@ namespace yaoosl::compiler
             case ':':   return try_match({ etoken::s_coloncolon, etoken::s_colon });
             case ';':   return try_match({ etoken::s_semicolon });
             case ',':   return try_match({ etoken::s_comma });
-            case '.':   return try_match({ etoken::s_dot });
+            case '.':   return try_match({ etoken::s_dotdot, etoken::s_dot });
             case ' ':   return try_match({ etoken::i_whitespace });
             case '\r':  return try_match({ etoken::i_whitespace });
             case '\t':  return try_match({ etoken::i_whitespace });
@@ -706,6 +708,7 @@ namespace yaoosl::compiler
             case etoken::s_semicolon:               return ";"sv;
             case etoken::s_comma:                   return ","sv;
             case etoken::s_dot:                     return "."sv;
+            case etoken::s_dotdot:                  return ".."sv;
 
             case etoken::l_char:                    return "char"sv;
             case etoken::l_string:                  return "string"sv;
