@@ -791,7 +791,7 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method_body
     return node_code_statements.value();
 }
 
-// [ p_encapsulation [ "unbound" ] ] p_type "conversion" "(" p_method_arg ")" p_method_body
+// p_conversion = [ p_encapsulation [ "unbound" ] ] p_type "conversion" "(" p_method_arg ")" p_method_body
 std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_conversion(bool require, bool allow_instance)
 {
     auto __mark = mark();
@@ -838,6 +838,41 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_conversion(
     else { self_node.nodes.push_back(node_method_body.value()); }
 
     return std::optional<yaoosl::compiler::cstnode>();
+}
+
+// p_operator = p_class_member_head [ p_template_definition ] p_operator_head p_method_body
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_operator(bool require, bool allow_instance)
+{
+    auto __mark = mark();
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_method;
+
+    /* pass down require to p_class_member_head. */
+    // p_class_member_head ...
+    bool is_unbound;
+    auto node_class_member_head = p_class_member_head(require, allow_instance, &is_unbound);
+    if (!node_class_member_head.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_class_member_head.value()); }
+
+    /* p_template_definition is optional. So pass down require to p_template_definition. */
+    // ... [ p_template_definition ] ...
+    auto node_template_definition = p_template_definition(false);
+    if (!node_template_definition.has_value()) {}
+    else { self_node.nodes.push_back(node_template_definition.value()); }
+
+    /* pass down require to p_method_parameters. */
+    // ... p_method_parameters ...
+    auto node_operator_head = p_operator_head(require);
+    if (!node_operator_head.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_operator_head.value()); }
+
+    /* pass down require to p_method_body. */
+    // ... p_method_body
+    auto node_method_body = p_method_body(true, !is_unbound);
+    if (!node_method_body.has_value()) { __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(node_method_body.value()); }
+
+    return self_node;
 }
 
 // p_method_arg_list = [ p_method_arg { "," p_method_arg } [ "," ] ]
