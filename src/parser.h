@@ -81,14 +81,14 @@ namespace yaoosl::compiler
 		std::optional<yaoosl::compiler::cstnode> p_class_head(bool require, tokenizer::token* OUT_class_name_literal);
 		std::optional<yaoosl::compiler::cstnode> p_class_body(bool require, tokenizer::token class_name_literal);
 		std::optional<yaoosl::compiler::cstnode> p_class_statements(bool require, tokenizer::token class_name_literal);
-		std::optional<yaoosl::compiler::cstnode> p_class_member_head(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_class_member_head(bool require, bool allow_instance, bool* OUT_is_unbound);
 		std::optional<yaoosl::compiler::cstnode> p_namespace(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_property(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_property_body(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_property_get(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_property_set(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_method(bool require, bool allow_instance);
-		std::optional<yaoosl::compiler::cstnode> p_method_arg(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_method_arg(bool require, bool allow_default = true);
 		std::optional<yaoosl::compiler::cstnode> p_method_arg_list(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_method_parameters(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_method_body(bool require, bool allow_instance);
