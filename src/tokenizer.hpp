@@ -58,6 +58,7 @@ namespace yaoosl::compiler
             t_throw,
             t_true,
             t_try,
+            t_typename,
             t_unbound,
             t_using,
             t_while,
@@ -431,6 +432,7 @@ namespace yaoosl::compiler
                 case etoken::t_throw:                   len = len_ident_match(iter, "throw");       m_column += len; break;
                 case etoken::t_true:                    len = len_ident_match(iter, "true");        m_column += len; break;
                 case etoken::t_try:                     len = len_ident_match(iter, "try");         m_column += len; break;
+                case etoken::t_typename:                len = len_ident_match(iter, "typename");    m_column += len; break;
                 case etoken::t_unbound:                 len = len_ident_match(iter, "unbound");     m_column += len; break;
                 case etoken::t_using:                   len = len_ident_match(iter, "using");       m_column += len; break;
                 case etoken::t_while:                   len = len_ident_match(iter, "while");       m_column += len; break;
@@ -531,7 +533,7 @@ namespace yaoosl::compiler
             case 'q':   return try_match({ etoken::l_ident });
             case 'r':   return try_match({ etoken::t_return, etoken::l_ident });
             case 's':   return try_match({ etoken::t_set, etoken::t_switch, etoken::l_ident });
-            case 't':   return try_match({ etoken::t_this, etoken::t_throw, etoken::t_true, etoken::t_try, etoken::l_ident });
+            case 't':   return try_match({ etoken::t_this, etoken::t_throw, etoken::t_true, etoken::t_try, etoken::t_typename, etoken::l_ident });
             case 'u':   return try_match({ etoken::t_unbound, etoken::t_using, etoken::l_ident });
             case 'v':   return try_match({ etoken::l_ident });
             case 'w':   return try_match({ etoken::t_while, etoken::l_ident });
@@ -668,6 +670,7 @@ namespace yaoosl::compiler
             case etoken::t_throw:                   return "throw"sv;
             case etoken::t_true:                    return "true"sv;
             case etoken::t_try:                     return "try"sv;
+            case etoken::t_typename:                return "typename"sv;
             case etoken::t_unbound:                 return "unbound"sv;
             case etoken::t_using:                   return "using"sv;
             case etoken::t_while:                   return "while"sv;

@@ -34,7 +34,7 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_start(bool 
     return p_file_statements(require);
 }
 
-// p_code_statements = { p_conversion(false) | p_using ";" | p_if_else | p_for | p_try_catch_finally | p_while | p_switch | p_statements ";" | p_method_scope | p_value ";" | L_IDENT ":" | ";" }
+// p_code_statements = { p_conversion(false) | p_using ";" | p_if_else | p_for | p_try_catch_finally | p_while | p_switch | p_code_statements ";" | p_method_scope | p_value ";" | L_IDENT ":" | ";" }
 std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statements(bool require, bool allow_this)
 {
     bool flag = false;
@@ -87,9 +87,9 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statem
             self_node.nodes.push_back(tmp.value());
             flag = true;
         }
-        else if ((tmp = p_statements(false)).has_value())
+        else if ((tmp = p_code_statements(false)).has_value())
         {
-            /* s_semicolon is required after p_statements.                *
+            /* s_semicolon is required after p_code_statements.                *
              * However, this is a weak error and we can continue parsing. */
             if (look_ahead_token().type != tokenizer::etoken::s_semicolon)
             {
@@ -141,8 +141,8 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statem
     return flag ? self_node : std::optional<cstnode>();
 }
 
-// p_statements = { "break" | "continue" | "return" [ p_value ] | "throw" [ p_value ] | "delete" p_value | "goto" ( p_case | L_IDENT ) }
-std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_statements(bool require)
+// p_code_statements = { "break" | "continue" | "return" [ p_value ] | "throw" [ p_value ] | "delete" p_value | "goto" ( p_case | L_IDENT ) | p_expression }
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_code_statements(bool require)
 {
     bool flag = false;
     cstnode self_node = {};
@@ -387,7 +387,7 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_class_state
 {
     bool flag = false;
     cstnode self_node = {};
-    self_node.type = cstnode::kind::s_file_statements;
+    self_node.type = cstnode::kind::s_class_statements;
     // Parse nodes until we can no longer parse nodes
     bool has_destructor = false;
     do
@@ -1021,7 +1021,9 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_constructor
     // ... L_IDENT ...
     auto literal_ident = next_token();
     if (literal_ident.type != tokenizer::etoken::l_ident || literal_ident.contents != class_name_literal.contents)
-    { if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {}; }
+    {
+        if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {};
+    }
     else { self_node.nodes.push_back(literal_ident); }
 
     // ... p_method_arg_list ...
@@ -1089,7 +1091,7 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_method_arg_
             log(msgs::syntax_error_generic(to_position(current_token())));
         }
         std::optional<cstnode> tmp;
-        if ((tmp = p_enum_value(require)).has_value())
+        if ((tmp = p_method_arg(require)).has_value())
         {
             self_node.nodes.push_back(tmp.value());
             flag = true;
@@ -1281,6 +1283,155 @@ std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_enum_value(
         if (!node_value_constant.has_value()) { __mark.rollback(); return {}; }
         else { self_node.nodes.push_back(node_value_constant.value()); }
     }
+
+    return self_node;
+}
+
+// p_template_usage = "<" p_template_usage_item_list ">"
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_template_usage(bool require)
+{
+    auto __mark = mark();
+
+    /* unless we are required, this determines a possible body-start. */
+    // "<" ...
+    auto token_curlyo = next_token();
+    if (token_curlyo.type != tokenizer::etoken::s_lt) { if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {}; }
+
+    /* unless we are required, the following is just a possible set. Pass down require as that only can tell wether we are or not. */
+    // ... p_enum_statements ...
+    auto node_template_usage_item_list = p_template_usage_item_list(require);
+    if (!node_template_usage_item_list.has_value()) { __mark.rollback(); return {}; }
+
+    /* as we got to here, next token has to be s_curlyc. */
+    // ... ">"
+    auto token_curlyc = next_token();
+    if (token_curlyc.type != tokenizer::etoken::s_gt) { log(msgs::syntax_error_generic(to_position(current_token()))); __mark.rollback(); return {}; }
+
+    return node_template_usage_item_list.value();
+}
+
+
+// p_template_usage_item_list = [ p_template_usage_item { "," p_template_usage_item } [ "," ] ]
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_template_usage_item_list(bool require)
+{
+    bool flag = false;
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_template_usage_item_list;
+    // Parse nodes until we can no longer parse nodes
+    bool had_comma = true; // set to true to prevent initial comma-check
+    do
+    {
+        if (!had_comma)
+        {
+            log(msgs::syntax_error_generic(to_position(current_token())));
+        }
+        std::optional<cstnode> tmp;
+        if ((tmp = p_template_usage_item(require)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if (!flag)
+        {
+            if (require)
+            {
+                log(msgs::syntax_error_generic(to_position(current_token())));
+            }
+            break;
+        }
+
+        // Check if next token is comma.
+        if (!(had_comma = next_token().type == tokenizer::etoken::s_comma))
+        {
+            undo_token();
+        }
+    } while (true);
+    return flag ? self_node : std::optional<cstnode>();
+}
+// p_template_usage_item = p_type
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_template_usage_item(bool require)
+{
+    // Yes, this is just a placeholder for future use pretty much.
+    return p_type(require);
+}
+
+// p_template_definition = "<" p_template_definition_item_list ">"
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_template_definition(bool require)
+{
+    auto __mark = mark();
+
+    /* unless we are required, this determines a possible body-start. */
+    // "<" ...
+    auto token_curlyo = next_token();
+    if (token_curlyo.type != tokenizer::etoken::s_lt) { if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {}; }
+
+    /* unless we are required, the following is just a possible set. Pass down require as that only can tell wether we are or not. */
+    // ... p_enum_statements ...
+    auto node_template_definition_item_list = p_template_definition_item_list(require);
+    if (!node_template_definition_item_list.has_value()) { __mark.rollback(); return {}; }
+
+    /* as we got to here, next token has to be s_curlyc. */
+    // ... ">"
+    auto token_curlyc = next_token();
+    if (token_curlyc.type != tokenizer::etoken::s_gt) { log(msgs::syntax_error_generic(to_position(current_token()))); __mark.rollback(); return {}; }
+
+    return node_template_definition_item_list.value();
+}
+
+// p_template_definition_item_list = [ p_template_definition_item { "," p_template_definition_item } [ "," ] ]
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_template_definition_item_list(bool require)
+{
+    bool flag = false;
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_template_definition_item_list;
+    // Parse nodes until we can no longer parse nodes
+    bool had_comma = true; // set to true to prevent initial comma-check
+    do
+    {
+        if (!had_comma)
+        {
+            log(msgs::syntax_error_generic(to_position(current_token())));
+        }
+        std::optional<cstnode> tmp;
+        if ((tmp = p_template_definition_item(require)).has_value())
+        {
+            self_node.nodes.push_back(tmp.value());
+            flag = true;
+        }
+        else if (!flag)
+        {
+            if (require)
+            {
+                log(msgs::syntax_error_generic(to_position(current_token())));
+            }
+            break;
+        }
+
+        // Check if next token is comma.
+        if (!(had_comma = next_token().type == tokenizer::etoken::s_comma))
+        {
+            undo_token();
+        }
+    } while (true);
+    return flag ? self_node : std::optional<cstnode>();
+}
+
+// p_template_definition_item = "typename" L_IDENT
+std::optional<yaoosl::compiler::cstnode> yaoosl::compiler::parser::p_template_definition_item(bool require)
+{
+    auto __mark = mark();
+    cstnode self_node = {};
+    self_node.type = cstnode::kind::s_template_definition_item;
+
+    // "typename" ...
+    auto token_typename = next_token();
+    if (token_typename.type != tokenizer::etoken::t_typename) { if (require) { log(msgs::syntax_error_generic(to_position(current_token()))); } __mark.rollback(); return {}; }
+    else { self_node.token = token_typename; }
+
+    // ... L_IDENT
+    auto literal_ident = next_token();
+    if (literal_ident.type != tokenizer::etoken::l_ident) { log(msgs::syntax_error_generic(to_position(current_token()))); __mark.rollback(); return {}; }
+    else { self_node.nodes.push_back(literal_ident); }
 
     return self_node;
 }

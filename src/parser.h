@@ -75,7 +75,7 @@ namespace yaoosl::compiler
 
 		std::optional<yaoosl::compiler::cstnode> p_start(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_code_statements(bool require, bool allow_this);
-		std::optional<yaoosl::compiler::cstnode> p_statements(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_code_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_file_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_class(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_class_head(bool require, tokenizer::token* OUT_class_name_literal);
@@ -109,11 +109,17 @@ namespace yaoosl::compiler
 		std::optional<yaoosl::compiler::cstnode> p_enum_body(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_enum_statements(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_enum_value(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_template_usage_item(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_template_usage_item_list(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_template_usage(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_template_definition(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_template_definition_item(bool require);
+		std::optional<yaoosl::compiler::cstnode> p_template_definition_item_list(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_type_ident(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_type_list(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_type(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_encapsulation(bool require, bool allow_instance);
+		std::optional<yaoosl::compiler::cstnode> p_expression(bool require, bool allow_instance);
 		std::optional<yaoosl::compiler::cstnode> p_value(bool require);
 		std::optional<yaoosl::compiler::cstnode> p_value_constant(bool require);
 	};
